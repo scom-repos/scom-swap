@@ -14,12 +14,12 @@ import {
   setUserTokens,
   setTokenMap,
   getTokenList,
-  fallBackUrl,
 } from '@swap/store';
 import { ITokenObject, formatNumber, EventId } from '@swap/global';
 import Assets from '@swap/assets';
 import './tokenSelection.css';
 import { ImportToken } from './importToken';
+const Theme = Styles.Theme.ThemeVars;
 
 interface TokenSelectionElement extends ControlElement{
   disableSelect?: boolean,
@@ -44,7 +44,7 @@ export class TokenSelection extends Module {
   private _onSelectToken: any;
   private _isCommonShown: boolean;
   private _isSortBalanceShown: boolean = true;
-  private _isBtnMaxShown: boolean = false;
+  private _isBtnMaxShown: boolean = true;
   private _onSetMaxBalance: any;
   private tokenSelectionModal: Modal;
   private currentChainId: number;
@@ -67,7 +67,7 @@ export class TokenSelection extends Module {
   private $eventBus: IEventBus;
   private _disableSelect: boolean;
   private _disabledMaxBtn: boolean;
-  isInitialized = false;
+  private fallbackUrl: string = Assets.fullPath('img/tokens/token-placeholder.svg');
 
   get token() {
     return this._token;
@@ -84,7 +84,7 @@ export class TokenSelection extends Module {
 
   set targetChainId(value: number) {
     this._targetChainId = value;
-    this.updateDataByChain(true);
+    this.updateDataByChain();
   }
 
   get tokenDataListProp(): Array<ITokenObject> {
@@ -120,7 +120,11 @@ export class TokenSelection extends Module {
 
   set isSortBalanceShown(value: boolean) {
     this._isSortBalanceShown = value;
-    this.sortBalancePanel.visible = value;
+    if (value) {
+      this.sortBalancePanel.classList.remove('hidden');
+    } else {
+      this.sortBalancePanel.classList.add('hidden');
+    }
   }
 
   get isBtnMaxShown(): boolean {
@@ -131,9 +135,9 @@ export class TokenSelection extends Module {
     this._isBtnMaxShown = value;
     if (!this.btnMax) return;
     if (value) {
-      this.btnMax.visible = true;
+      this.btnMax.classList.remove('hidden');
     } else {
-      this.btnMax.visible = false;
+      this.btnMax.classList.add('hidden');
     }
   }
 
@@ -182,13 +186,10 @@ export class TokenSelection extends Module {
     this.renderTokenItems();
   }
 
-  private async updateDataByChain(init?: boolean) {
+  private async updateDataByChain() {
     this.tokenBalancesMap = await updateAllTokenBalances();
     this.renderTokenItems();
-    this.updateButton(init ? undefined : this.token);
-    if (init) {
-      this.isInitialized = true;
-    }
+    this.updateButton();
   }
 
   private async updateDataByNewToken() {
@@ -230,7 +231,7 @@ export class TokenSelection extends Module {
     if (this.tokenDataListProp && this.tokenDataListProp.length) {
       return this.tokenDataListProp;
     }
-    const tokenList = getTokenList(this.chainId).filter(f => f.address);
+    const tokenList = getTokenList(this.chainId);
     return tokenList.map((token: ITokenObject) => {
       const tokenObject = { ...token };
       const nativeToken = ChainNativeTokenByChainId[this.chainId];
@@ -314,7 +315,7 @@ export class TokenSelection extends Module {
     if (!this.commonTokenList) return;
     this.commonTokenList.innerHTML = '';
     if (this.isCommonShown && this.commonTokenDataList) {
-      this.commonTokenPanel.visible = true;
+      this.commonTokenPanel.classList.remove('hidden');
       this.commonTokenDataList.forEach((token: ITokenObject) => {
         const logoAddress = token.address && !this.targetChainId ? getTokenIcon(token.address) : Assets.fullPath(getTokenIconPath(token, this.chainId));
 
@@ -326,13 +327,13 @@ export class TokenSelection extends Module {
             verticalAlignment="center"
             class="grid-item"
           >
-            <i-image width={24} height={24} url={logoAddress} fallbackUrl={fallBackUrl} />
+            <i-image width={24} height={24} url={logoAddress} fallbackUrl={this.fallbackUrl} />
             <i-label caption={token.symbol} onClick={() => this.onSelect(token)}></i-label>
           </i-hstack>
         )
       })
     } else {
-      this.commonTokenPanel.visible = false;
+      this.commonTokenPanel.classList.add('hidden');
     }
   }
 
@@ -348,7 +349,7 @@ export class TokenSelection extends Module {
         <i-vstack width="100%">
           <i-hstack>
             <i-hstack>
-              <i-image width={36} height={36} url={logoAddress} fallbackUrl={fallBackUrl} />
+              <i-image width={36} height={36} url={logoAddress} fallbackUrl={this.fallbackUrl} />
               <i-panel class="token-info">
                 <i-label caption={token.symbol}  onClick={() => this.onSelect(token)}/>
                 <i-hstack class="token-name" verticalAlignment="center">
@@ -358,7 +359,7 @@ export class TokenSelection extends Module {
                       name="copy"
                       width="14px"
                       height="14px"
-                      fill='#FFFFFF'
+                      fill={Theme.text.primary}
                       margin={{ right: 8 }}
                       tooltip={{ content: `${token.symbol} has been copied`, trigger: 'click' }}
                       onClick={() => application.copyToClipboard(token.address || '')}
@@ -368,7 +369,6 @@ export class TokenSelection extends Module {
                   }
                   {token.address && this.checkHasMetaMask ?
                     <i-image
-                      display="flex"
                       width={16}
                       height={16}
                       url={Assets.fullPath('img/swap/metamask.png')}
@@ -408,7 +408,7 @@ export class TokenSelection extends Module {
       this.tokenList.append(...tokenItems);
     } else if (this.targetChainId && this.targetChainId !== getChainId()) {
       this.tokenList.innerHTML = '';
-      this.tokenList.append(<i-label font={{ color: '#FFFFFF' }} class="text-center mt-1 mb-1" caption="No tokens found" />)
+      this.tokenList.append(<i-label class="text-center mt-1 mb-1" caption="No tokens found" />)
     } else  {
       try {
         const tokenObj = await getTokenObject(this.filterValue, true);
@@ -418,7 +418,7 @@ export class TokenSelection extends Module {
       } catch (err) {
         this.tokenList.innerHTML = '';
         this.tokenList.append(
-          <i-label font={{ color: '#FFFFFF' }} class="text-center mt-1 mb-1" caption="No tokens found" />
+          <i-label class="text-center mt-1 mb-1" caption="No tokens found" />
         )
       }
     }
@@ -469,11 +469,13 @@ export class TokenSelection extends Module {
     if (!btnToken) return;
     try {
       let image: Image = btnToken.querySelector('i-image') as Image;
-      token = this.tokenDataList?.find((v: ITokenObject) => (v.address && v.address == this.token?.address))
+      if (!token) {
+        token = this.tokenDataList?.find((v: ITokenObject) => (v.address && v.address == this.token?.address) || (v.symbol == this.token?.symbol))
+      }
       if (!token) {
         btnToken.caption = 'Select a token';
         btnToken.classList.remove('has-token');
-        this.btnMax.visible = false;
+        this.btnMax.classList.add('hidden');
         if (image) {
           btnToken.removeChild(image);
         }
@@ -481,14 +483,14 @@ export class TokenSelection extends Module {
         btnToken.caption = token.symbol;
         btnToken.classList.add('has-token');
         if (this.isBtnMaxShown) {
-          this.btnMax.visible = true;
+          this.btnMax.classList.remove('hidden');
         }
         const logoAddress = token.address && !this.targetChainId ? getTokenIcon(token.address) : Assets.fullPath(getTokenIconPath(token, this.chainId));
         if (!image) {
           image = new Image(btnToken, {
             width: 20,
             height: 20,
-            fallbackUrl: fallBackUrl
+            fallbackUrl: this.fallbackUrl
           });
           btnToken.prepend(image);
         }
@@ -523,7 +525,7 @@ export class TokenSelection extends Module {
     this.disableSelect = this.getAttribute("disableSelect", true);
     this.disabledMaxBtn = this.getAttribute("disabledMaxBtn", true);
     this.updateStatusButton();
-    this.updateButton();
+    this.updateButton(this._token);
     if (!isWalletConnected())
       this.disableSelect = false;
   }
@@ -544,15 +546,15 @@ export class TokenSelection extends Module {
 
   render() {
     return (
-      <i-panel class="token-selection">
+      <i-panel class='token-selection'>
         <i-panel class="flex">
-          <i-button id="btnMax" visible={false} enabled={false} class="custom-btn" caption="Max" onClick={() => this.onSetMaxBalance()} />
-          <i-button id="btnToken" enabled={false} class="custom-btn" rightIcon={{ name: "caret-down", fill: '#F15E61' }} caption="Select a token" onClick={() => this.showModal()} />
+          <i-button id="btnMax" enabled={false} class="custom-btn hidden" caption="Max" onClick={() => this.onSetMaxBalance()} />
+          <i-button id="btnToken" enabled={false} class="custom-btn" rightIcon={{ name: "caret-down" }} caption="Select a token" onClick={() => this.showModal()} />
         </i-panel>
         <i-modal id="tokenSelectionModal" class="bg-modal" title="Select Token" closeIcon={{ name: 'times' }} onClose={() => this.onCloseModal()}>
           <i-panel class="search">
             <i-icon width={16} height={16} name="search" fill="white" />
-            <i-input id="tokenSearch" placeholder="Search name or paste address" width="100%" height="auto" onKeyUp={this.filterSearch.bind(this)} />
+            <i-input id="tokenSearch" placeholder="Search name or paste address" width="100%" onKeyUp={this.filterSearch.bind(this)}></i-input>
           </i-panel>
           <i-panel id="commonTokenPanel" class="common-token">
             <i-label caption="Common Token" />
@@ -560,7 +562,7 @@ export class TokenSelection extends Module {
               id="commonTokenList"
               columnsPerRow={4} gap={{ row: '1rem', column: '1rem' }}
               class="common-list" verticalAlignment="center"
-            />
+            ></i-grid-layout>
           </i-panel>
           <i-panel id="sortBalancePanel" class="token-header">
             <i-label caption="Token" />
@@ -570,7 +572,7 @@ export class TokenSelection extends Module {
               <i-icon id="iconSortDown" class="icon-sort-down" name="sort-down" />
             </i-panel>
           </i-panel>
-          <i-grid-layout id="tokenList" class="token-list" columnsPerRow={1} />
+          <i-grid-layout id="tokenList" class="token-list" columnsPerRow={1}></i-grid-layout>
         </i-modal>
         <swap-import-token id="importTokenModal" />
       </i-panel>

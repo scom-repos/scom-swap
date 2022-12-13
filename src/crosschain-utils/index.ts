@@ -3,11 +3,11 @@ import {
   ITokenObject,
   getAPI,
   ERC20ApprovalModel,
-  IERC20ApprovalEventOptions
+  IERC20ApprovalEventOptions,
+  IProvider
 } from "@swap/global";
 import {
   DefaultTokens,
-  ProviderConfigMap,
   TokenBalancesType,
   baseRoute,
   BridgeVaultGroupList,
@@ -18,10 +18,10 @@ import {
   getTokenList,
   getChainId,
   getNetworkInfo,
-  ProviderConfig,
-  getMatchNetworks
+  getMatchNetworks,
+  getProviderList
 } from "@swap/store"
-import  {Contracts as CrossChainContracts} from "@openswap/cross-chain-bridge-sdk"
+import { Contracts as CrossChainContracts } from "@openswap/cross-chain-bridge-sdk"
 
 export interface IBridgeVaultBond {
   vaultTrollRegistry: string;
@@ -98,7 +98,7 @@ export interface GetAvailableRouteOptionsParams {
   toChainId: number;
   tokenIn: ITokenObject;
   tokenOut: ITokenObject;
-  amountIn: number | BigNumber;
+  amountIn: number | BigNumber
 }
 
 export interface IBridgeFees {
@@ -465,28 +465,6 @@ const getExtendedRouteObjDataForDirectRoute = async (bestRouteObj: any, swapPric
       tradeFee: fee.toFixed(),   
   }
   return extendedRouteObj
-} 
-
-
-const fetchBridgeFee = async (targetChainId:number, vaultAddress:string): Promise<IBridgeFees> => {
-  let bridgeVaults = await getBridgeVaults()
-  let vault = bridgeVaults.find( v=> v.chainId == targetChainId && v.address == vaultAddress)
-  let bridgeFeeParams: IBridgeFees = {
-    baseFee: new BigNumber(0),
-    protocolFee: new BigNumber(0),
-    transactionFee: new BigNumber(0),
-    imbalanceFee: new BigNumber(0)
-  }
-  if (vault) {
-    bridgeFeeParams = {
-      baseFee: new BigNumber(vault.baseFee),
-      protocolFee: new BigNumber(vault.protocolFee),
-      transactionFee: new BigNumber(vault.transactionFee),
-      imbalanceFee: new BigNumber(vault.imbalanceFee)
-    }
-
-  }
-  return bridgeFeeParams;
 }
 
 const checkIsApproveButtonShown = async (tokenIn: ITokenObject, fromInput: BigNumber, address: string) => {
@@ -514,9 +492,7 @@ const getAvailableRouteOptions = async (params: GetAvailableRouteOptionsParams, 
   if (tokenOut.isNative) {
     tokenOut.address = crossChainNativeTokenList[toChainId].wethAddress
   }
-
-  const tradeFeeMapMarkets = Object.values(ProviderConfigMap).map(({ marketCode }) => marketCode);
-  const tradeFeeMap = await getTradeFeeMap(tradeFeeMapMarkets);
+  const tradeFeeMap = await getTradeFeeMap();
   const routeObjArr: {routes: ICrossChainRouteFromAPI[]} = await getAPI(routeAPI, {
       fromChainId,
       toChainId,
@@ -529,12 +505,12 @@ const getAvailableRouteOptions = async (params: GetAvailableRouteOptionsParams, 
   if (!routeObjArr || !routeObjArr.routes) return []
 
   const composeRoutes = async (routeObj: ICrossChainRouteFromAPI['sourceRoute'] | ICrossChainRouteFromAPI['targetRoute'], chainId: number, fromAmount: string | BigNumber) => {
-      const providerConfigByDexId = Object.values(ProviderConfigMap)
+      const providerConfigByDexId = getProviderList()
         .filter(({ supportedChains }) => supportedChains?.includes(chainId!))
         .reduce((acc, cur) => {
-          if (cur.dexId || cur.dexId === 0) acc[cur.dexId] = cur;
+          if (cur.dexId || (cur.dexId && cur.dexId === 0)) acc[cur.dexId] = cur;
           return acc;
-        }, {} as {[dexId: number]: ProviderConfig});
+        }, {} as {[dexId: string]: IProvider});
       let dexId = [5, 6].includes(routeObj.dexId) ? 5: routeObj.dexId;
       let bestRouteObj: any
       bestRouteObj = {
@@ -542,7 +518,7 @@ const getAvailableRouteOptions = async (params: GetAvailableRouteOptionsParams, 
           isRegistered: routeObj.route.map(v => v.isRegistered),
           market: routeObj.route.map(v => {
               let dexId = [5, 6].includes(v.dexId) ? 5: v.dexId;
-              return providerConfigByDexId[dexId].marketCode;
+              return providerConfigByDexId[dexId].key;
           }),
           route: routeObj.tokens,
           customDataList: routeObj.route.map(v => {
@@ -598,7 +574,6 @@ const getAvailableRouteOptions = async (params: GetAvailableRouteOptionsParams, 
         return acc;
       }, {} as ICrossChainRouteFromAPI["fees"]);
 
-      //let bridgeFeeParams = await fetchBridgeFee(toChainId, targetVaultAddresses.vaultAddress)
       amountIn = new BigNumber(amountIn)
       let sourceRouteObj = routeObj.sourceRoute? await composeRoutes(routeObj.sourceRoute, fromChainId, amountIn): null 
       let vaultTokenFromSourceChain = routeObj.sourceRoute? sourceRouteObj.amountOut: amountIn

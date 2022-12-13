@@ -7,6 +7,7 @@ import {
   TokenMapType,
   getERC20Amount,
   INetwork,
+  IProvider
 } from '@swap/global';
 
 import Assets from '@swap/assets';
@@ -195,16 +196,10 @@ export const state = {
   transactionDeadline: 30,
   tokenBalances: {} as TokenBalancesType,
   tokenMap: {} as TokenMapType,
-  trollActionsMapStatus: {} as {[key: string]: boolean},
-  minPrice: null as any,
-  maxPrice: null as any,
-  priorityQueueActionsStatus: {} as {[key: string]: boolean},
-  rangeQueueActionsStatus: {} as {[key: string]: boolean},
-  groupQueueActionsStatus: {} as {[key: string]: boolean},
-  groupQueueOfferStatus: {} as {[key: string]: {value: boolean, text: string}},
   userTokens: {} as {[key: string]: ITokenObject[]},
   infuraId: "",
-  networkMap: {} as { [key: number]: INetwork }
+  networkMap: {} as { [key: number]: INetwork },
+  providerList: [] as IProvider[]
 }
 
 export const setDataFromSCConfig = (Networks: any, InfuraId: string) => {
@@ -438,72 +433,25 @@ export const tokenSymbol = (address: string) => {
   return tokenObject ? tokenObject.symbol : '';
 }
 
-export const setTrollActionsMapStatus = (actionKey: string, status: boolean) => {
-  state.trollActionsMapStatus[actionKey] = status;
-}
-
-export const getTrollActionsMapStatus = (actionKey: string) => {
-  return state.trollActionsMapStatus[actionKey] || false;
-}
-
-export const setMinPrice = (value: number) => {
-  state.minPrice = value;
-}
-
-export const getMinPrice = (): number => {
-  return state.minPrice;
-}
-
-export const setMaxPrice = (value: number) => {
-  state.maxPrice = value;
-}
-
-export const getMaxPrice = (): number => {
-  return state.maxPrice;
-}
-
-export const setPriorityQueueActionsStatus = (key: string, value: boolean, keyTab: string) => {
-  state.priorityQueueActionsStatus[key] = value;
-  application.EventBus.dispatch(EventId.EmitButtonStatus, {name: 'Priority Queue', keyTab, key, value});
-}
-
-export const getPriorityQueueActionsStatus = (key: string) => {
-  return state.priorityQueueActionsStatus[key] || false;
-}
-
-export const setRangeQueueActionsStatus = (key: string, value: boolean, keyTab: string) => {
-  state.rangeQueueActionsStatus[key] = value;
-  application.EventBus.dispatch(EventId.EmitButtonStatus, {name: 'Range Queue', keyTab, key, value});
-}
-
-export const getRangeQueueActionsStatus = (key: string) => {
-  return state.rangeQueueActionsStatus[key] || false;
-}
-
-export const setGroupQueueActionsStatus = (key: string, value: boolean, keyTab: string) => {
-  state.groupQueueActionsStatus[key] = value;
-  application.EventBus.dispatch(EventId.EmitButtonStatus, {name: 'Group Queue', keyTab, key, value});
-}
-
-export const getGroupQueueActionsStatus = (key: string) => {
-  return state.groupQueueActionsStatus[key] || false;
-}
-
-export const setGroupQueueOfferStatus = (key: string, value: boolean, text: string) => {
-  state.groupQueueOfferStatus[key] = { value, text };
-  application.EventBus.dispatch(EventId.EmitButtonStatus, {name: 'Group Queue Offer', key, value, text});
-}
-
-export const getGroupQueueOfferStatus = (key: string) => {
-  return state.groupQueueOfferStatus[key] || { value : false, text: 'Swap' };
-}
-
 export const setUserTokens = (token: ITokenObject, chainId: number) => {
   if (!state.userTokens[chainId]) {
     state.userTokens[chainId] = [token];
   } else {
     state.userTokens[chainId].push(token);
   }
+}
+
+export const setProviderList = (value: IProvider[]) => {
+  state.providerList = value;
+}
+
+export const getProviderList = () => {
+  return state.providerList || [];
+}
+
+export const getProviderByKey = (providerKey: string) => {
+  const providers = state.providerList || [];
+  return providers.find(item => item.key === providerKey) || null;
 }
 
 export const hasUserToken = (address: string, chainId: number) => {

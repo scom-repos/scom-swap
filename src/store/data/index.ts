@@ -23,9 +23,6 @@ export {
 export { CoreContractAddressesByChainId } from './core/index';
 
 export {
-  ProviderConfig,
-  Market,
-  ProviderConfigMap,
   availableMarketsByChainId
 } from './swap/index';
 

@@ -177,7 +177,7 @@ define("@swap/token-selection/tokenSelection.css.ts", ["require", "exports", "@i
                         $nest: {
                             'i-icon': {
                                 position: 'absolute',
-                                top: 'calc(50% - 8px)',
+                                top: 'calc(50% - 4px)',
                                 left: '1rem',
                                 transform: 'rotate(90deg)',
                                 opacity: 0.7
@@ -400,13 +400,14 @@ define("@swap/token-selection/tokenSelection.tsx", ["require", "exports", "@ijst
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.TokenSelection = void 0;
+    const Theme = components_3.Styles.Theme.ThemeVars;
     ;
     let TokenSelection = class TokenSelection extends components_3.Module {
         constructor(parent, options) {
             super(parent, options);
             this._isSortBalanceShown = true;
-            this._isBtnMaxShown = false;
-            this.isInitialized = false;
+            this._isBtnMaxShown = true;
+            this.fallbackUrl = assets_1.default.fullPath('img/tokens/token-placeholder.svg');
             this.sortToken = (a, b, asc) => {
                 if (a.balance != b.balance) {
                     return asc ? (a.balance - b.balance) : (b.balance - a.balance);
@@ -434,7 +435,7 @@ define("@swap/token-selection/tokenSelection.tsx", ["require", "exports", "@ijst
         }
         set targetChainId(value) {
             this._targetChainId = value;
-            this.updateDataByChain(true);
+            this.updateDataByChain();
         }
         get tokenDataListProp() {
             return this._tokenDataListProp;
@@ -462,7 +463,12 @@ define("@swap/token-selection/tokenSelection.tsx", ["require", "exports", "@ijst
         }
         set isSortBalanceShown(value) {
             this._isSortBalanceShown = value;
-            this.sortBalancePanel.visible = value;
+            if (value) {
+                this.sortBalancePanel.classList.remove('hidden');
+            }
+            else {
+                this.sortBalancePanel.classList.add('hidden');
+            }
         }
         get isBtnMaxShown() {
             return this._isBtnMaxShown;
@@ -472,10 +478,10 @@ define("@swap/token-selection/tokenSelection.tsx", ["require", "exports", "@ijst
             if (!this.btnMax)
                 return;
             if (value) {
-                this.btnMax.visible = true;
+                this.btnMax.classList.remove('hidden');
             }
             else {
-                this.btnMax.visible = false;
+                this.btnMax.classList.add('hidden');
             }
         }
         get onSetMaxBalance() {
@@ -515,13 +521,10 @@ define("@swap/token-selection/tokenSelection.tsx", ["require", "exports", "@ijst
             }
             this.renderTokenItems();
         }
-        async updateDataByChain(init) {
+        async updateDataByChain() {
             this.tokenBalancesMap = await store_2.updateAllTokenBalances();
             this.renderTokenItems();
-            this.updateButton(init ? undefined : this.token);
-            if (init) {
-                this.isInitialized = true;
-            }
+            this.updateButton();
         }
         async updateDataByNewToken() {
             this.tokenBalancesMap = store_2.getTokenBalances();
@@ -556,7 +559,7 @@ define("@swap/token-selection/tokenSelection.tsx", ["require", "exports", "@ijst
             if (this.tokenDataListProp && this.tokenDataListProp.length) {
                 return this.tokenDataListProp;
             }
-            const tokenList = store_2.getTokenList(this.chainId).filter(f => f.address);
+            const tokenList = store_2.getTokenList(this.chainId);
             return tokenList.map((token) => {
                 var _a;
                 const tokenObject = Object.assign({}, token);
@@ -627,16 +630,16 @@ define("@swap/token-selection/tokenSelection.tsx", ["require", "exports", "@ijst
                 return;
             this.commonTokenList.innerHTML = '';
             if (this.isCommonShown && this.commonTokenDataList) {
-                this.commonTokenPanel.visible = true;
+                this.commonTokenPanel.classList.remove('hidden');
                 this.commonTokenDataList.forEach((token) => {
                     const logoAddress = token.address && !this.targetChainId ? store_2.getTokenIcon(token.address) : assets_1.default.fullPath(store_2.getTokenIconPath(token, this.chainId));
                     this.commonTokenList.appendChild(this.$render("i-hstack", { background: { color: "var(--background-default)" }, onClick: () => this.onSelect(token), tooltip: { content: token.name }, verticalAlignment: "center", class: "grid-item" },
-                        this.$render("i-image", { width: 24, height: 24, url: logoAddress, fallbackUrl: store_2.fallBackUrl }),
+                        this.$render("i-image", { width: 24, height: 24, url: logoAddress, fallbackUrl: this.fallbackUrl }),
                         this.$render("i-label", { caption: token.symbol, onClick: () => this.onSelect(token) })));
                 });
             }
             else {
-                this.commonTokenPanel.visible = false;
+                this.commonTokenPanel.classList.add('hidden');
             }
         }
         renderToken(token) {
@@ -645,16 +648,16 @@ define("@swap/token-selection/tokenSelection.tsx", ["require", "exports", "@ijst
                 this.$render("i-vstack", { width: "100%" },
                     this.$render("i-hstack", null,
                         this.$render("i-hstack", null,
-                            this.$render("i-image", { width: 36, height: 36, url: logoAddress, fallbackUrl: store_2.fallBackUrl }),
+                            this.$render("i-image", { width: 36, height: 36, url: logoAddress, fallbackUrl: this.fallbackUrl }),
                             this.$render("i-panel", { class: "token-info" },
                                 this.$render("i-label", { caption: token.symbol, onClick: () => this.onSelect(token) }),
                                 this.$render("i-hstack", { class: "token-name", verticalAlignment: "center" },
                                     this.$render("i-label", { caption: token.name, onClick: () => this.onSelect(token) }),
                                     token.address && !token.isNative ?
-                                        this.$render("i-icon", { name: "copy", width: "14px", height: "14px", fill: '#FFFFFF', margin: { right: 8 }, tooltip: { content: `${token.symbol} has been copied`, trigger: 'click' }, onClick: () => components_3.application.copyToClipboard(token.address || ''), class: "inline-flex pointer" })
+                                        this.$render("i-icon", { name: "copy", width: "14px", height: "14px", fill: Theme.text.primary, margin: { right: 8 }, tooltip: { content: `${token.symbol} has been copied`, trigger: 'click' }, onClick: () => components_3.application.copyToClipboard(token.address || ''), class: "inline-flex pointer" })
                                         : [],
                                     token.address && this.checkHasMetaMask ?
-                                        this.$render("i-image", { display: "flex", width: 16, height: 16, url: assets_1.default.fullPath('img/swap/metamask.png'), tooltip: { content: 'Add to MetaMask' }, onClick: (target, event) => this.addToMetamask(event, token) })
+                                        this.$render("i-image", { width: 16, height: 16, url: assets_1.default.fullPath('img/swap/metamask.png'), tooltip: { content: 'Add to MetaMask' }, onClick: (target, event) => this.addToMetamask(event, token) })
                                         : []))),
                         this.$render("i-label", { class: "ml-auto", caption: global_1.formatNumber(token.balance, 4), onClick: () => this.onSelect(token) })),
                     token.isNew ? (this.$render("i-hstack", { horizontalAlignment: "center" },
@@ -671,7 +674,7 @@ define("@swap/token-selection/tokenSelection.tsx", ["require", "exports", "@ijst
             }
             else if (this.targetChainId && this.targetChainId !== store_2.getChainId()) {
                 this.tokenList.innerHTML = '';
-                this.tokenList.append(this.$render("i-label", { font: { color: '#FFFFFF' }, class: "text-center mt-1 mb-1", caption: "No tokens found" }));
+                this.tokenList.append(this.$render("i-label", { class: "text-center mt-1 mb-1", caption: "No tokens found" }));
             }
             else {
                 try {
@@ -683,7 +686,7 @@ define("@swap/token-selection/tokenSelection.tsx", ["require", "exports", "@ijst
                 }
                 catch (err) {
                     this.tokenList.innerHTML = '';
-                    this.tokenList.append(this.$render("i-label", { font: { color: '#FFFFFF' }, class: "text-center mt-1 mb-1", caption: "No tokens found" }));
+                    this.tokenList.append(this.$render("i-label", { class: "text-center mt-1 mb-1", caption: "No tokens found" }));
                 }
             }
         }
@@ -732,11 +735,13 @@ define("@swap/token-selection/tokenSelection.tsx", ["require", "exports", "@ijst
                 return;
             try {
                 let image = btnToken.querySelector('i-image');
-                token = (_a = this.tokenDataList) === null || _a === void 0 ? void 0 : _a.find((v) => { var _a; return (v.address && v.address == ((_a = this.token) === null || _a === void 0 ? void 0 : _a.address)); });
+                if (!token) {
+                    token = (_a = this.tokenDataList) === null || _a === void 0 ? void 0 : _a.find((v) => { var _a, _b; return (v.address && v.address == ((_a = this.token) === null || _a === void 0 ? void 0 : _a.address)) || (v.symbol == ((_b = this.token) === null || _b === void 0 ? void 0 : _b.symbol)); });
+                }
                 if (!token) {
                     btnToken.caption = 'Select a token';
                     btnToken.classList.remove('has-token');
-                    this.btnMax.visible = false;
+                    this.btnMax.classList.add('hidden');
                     if (image) {
                         btnToken.removeChild(image);
                     }
@@ -745,14 +750,14 @@ define("@swap/token-selection/tokenSelection.tsx", ["require", "exports", "@ijst
                     btnToken.caption = token.symbol;
                     btnToken.classList.add('has-token');
                     if (this.isBtnMaxShown) {
-                        this.btnMax.visible = true;
+                        this.btnMax.classList.remove('hidden');
                     }
                     const logoAddress = token.address && !this.targetChainId ? store_2.getTokenIcon(token.address) : assets_1.default.fullPath(store_2.getTokenIconPath(token, this.chainId));
                     if (!image) {
                         image = new components_3.Image(btnToken, {
                             width: 20,
                             height: 20,
-                            fallbackUrl: store_2.fallBackUrl
+                            fallbackUrl: this.fallbackUrl
                         });
                         btnToken.prepend(image);
                     }
@@ -781,7 +786,7 @@ define("@swap/token-selection/tokenSelection.tsx", ["require", "exports", "@ijst
             this.disableSelect = this.getAttribute("disableSelect", true);
             this.disabledMaxBtn = this.getAttribute("disabledMaxBtn", true);
             this.updateStatusButton();
-            this.updateButton();
+            this.updateButton(this._token);
             if (!store_2.isWalletConnected())
                 this.disableSelect = false;
         }
@@ -800,14 +805,14 @@ define("@swap/token-selection/tokenSelection.tsx", ["require", "exports", "@ijst
             this.renderTokenItems();
         }
         render() {
-            return (this.$render("i-panel", { class: "token-selection" },
+            return (this.$render("i-panel", { class: 'token-selection' },
                 this.$render("i-panel", { class: "flex" },
-                    this.$render("i-button", { id: "btnMax", visible: false, enabled: false, class: "custom-btn", caption: "Max", onClick: () => this.onSetMaxBalance() }),
-                    this.$render("i-button", { id: "btnToken", enabled: false, class: "custom-btn", rightIcon: { name: "caret-down", fill: '#F15E61' }, caption: "Select a token", onClick: () => this.showModal() })),
+                    this.$render("i-button", { id: "btnMax", enabled: false, class: "custom-btn hidden", caption: "Max", onClick: () => this.onSetMaxBalance() }),
+                    this.$render("i-button", { id: "btnToken", enabled: false, class: "custom-btn", rightIcon: { name: "caret-down" }, caption: "Select a token", onClick: () => this.showModal() })),
                 this.$render("i-modal", { id: "tokenSelectionModal", class: "bg-modal", title: "Select Token", closeIcon: { name: 'times' }, onClose: () => this.onCloseModal() },
                     this.$render("i-panel", { class: "search" },
                         this.$render("i-icon", { width: 16, height: 16, name: "search", fill: "white" }),
-                        this.$render("i-input", { id: "tokenSearch", placeholder: "Search name or paste address", width: "100%", height: "auto", onKeyUp: this.filterSearch.bind(this) })),
+                        this.$render("i-input", { id: "tokenSearch", placeholder: "Search name or paste address", width: "100%", onKeyUp: this.filterSearch.bind(this) })),
                     this.$render("i-panel", { id: "commonTokenPanel", class: "common-token" },
                         this.$render("i-label", { caption: "Common Token" }),
                         this.$render("i-grid-layout", { id: "commonTokenList", columnsPerRow: 4, gap: { row: '1rem', column: '1rem' }, class: "common-list", verticalAlignment: "center" })),

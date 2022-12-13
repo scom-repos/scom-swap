@@ -2,14 +2,15 @@ import { BigNumber } from "@ijstech/eth-wallet";
 import { initCrossChainWallet } from "@swap/crosschain-utils";
 import { BridgeVaultConstant, BridgeVaultGroupList, MockOracleMap } from "@swap/store";
 import { Contracts as SolidityContracts } from "@openswap/chainlink-sdk"
+import { Control } from "@ijstech/components";
 
-// export function debounce(func: any, timeout = 500){
-//   let timer: any; // NodeJS.Timeout;
-//   return (...args: any) => {
-//     clearTimeout(timer);
-//     timer = setTimeout(() => { func.apply(this, args); }, timeout);
-//   };
-// };
+export function debounce(func: any, timeout = 500, target: Control){
+  let timer: any; // NodeJS.Timeout;
+  return (...args: any) => {
+    clearTimeout(timer);
+    timer = setTimeout(() => { func.apply(target, args); }, timeout);
+  };
+};
 
 export const getOraclePriceMap = async (chainId: number) => {
   const oraclePriceMap: {[key: string]: BigNumber} = {};

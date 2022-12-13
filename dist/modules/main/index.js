@@ -841,7 +841,6 @@ define("@swap/main", ["require", "exports", "@ijstech/components", "@ijstech/eth
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.SwapBlock = void 0;
-    components_2.Styles.Theme.applyTheme(components_2.Styles.Theme.darkTheme);
     const priceImpactTooHighMsg = 'Price Impact Too High. If you want to bypass this check, please turn on Expert Mode';
     const defaultInput = '1';
     let SwapBlock = class SwapBlock extends components_2.Module {
@@ -855,11 +854,13 @@ define("@swap/main", ["require", "exports", "@ijstech/components", "@ijstech/eth
             this.oldSupportedChainList = [];
             this.supportedChainList = [];
             this.onWalletConnect = async (connected) => {
+                var _a, _b;
                 if (connected && (this.chainId == null || this.chainId == undefined)) {
                     this.onChainChange();
                 }
                 else {
-                    this.onSetupPage(connected);
+                    if ((_b = (_a = this._data) === null || _a === void 0 ? void 0 : _a.data) === null || _b === void 0 ? void 0 : _b.length)
+                        this.onSetupPage(connected);
                 }
             };
             this.onWalletDisconnect = async (connected) => {
@@ -870,11 +871,13 @@ define("@swap/main", ["require", "exports", "@ijstech/components", "@ijstech/eth
                 }
             };
             this.onChainChange = () => {
+                var _a, _b;
                 this.chainId = store_1.getChainId();
                 if (this.chainId != null && this.chainId != undefined)
                     this.swapBtn.classList.remove('hidden');
                 this.availableMarkets = store_1.getAvailableMarkets() || [];
-                this.onSetupPage(true);
+                if ((_b = (_a = this._data) === null || _a === void 0 ? void 0 : _a.data) === null || _b === void 0 ? void 0 : _b.length)
+                    this.onSetupPage(true);
                 this.swapButtonText = this.getSwapButtonText();
             };
             this.initWalletData = async () => {
@@ -961,7 +964,6 @@ define("@swap/main", ["require", "exports", "@ijstech/components", "@ijstech/eth
             };
             this.onSetupPage = async (connected) => {
                 var _a, _b, _c, _d, _e, _f, _g;
-                console.log('onSetupPage');
                 this.getAddressFromUrl();
                 this.chainId = store_1.getChainId();
                 this.checkHasWallet = store_1.hasWallet();
@@ -1208,7 +1210,8 @@ define("@swap/main", ["require", "exports", "@ijstech/components", "@ijstech/eth
                         pairs: this.record.pairs,
                         fromAmount: this.record.fromAmount,
                         toAmount: this.record.toAmount,
-                        isFromEstimated: this.isFrom
+                        isFromEstimated: this.isFrom,
+                        providerList: this._data.data
                     };
                     const { error } = await swap_utils_1.executeSwap(swapData);
                     if (error) {
@@ -1222,7 +1225,7 @@ define("@swap/main", ["require", "exports", "@ijstech/components", "@ijstech/eth
             this.onApproveRouterMax = () => {
                 const item = this.record;
                 this.showResultMessage(this.openswapResult, 'warning', 'Approving');
-                this.setApprovalModalSpenderAddress();
+                this.setApprovalSpenderAddress();
                 this.approvalModelAction.doApproveAction(this.fromToken, this.fromInputValue.toString(), this.record);
             };
             this.onSetMaxBalance = async (value) => {
@@ -1568,24 +1571,15 @@ define("@swap/main", ["require", "exports", "@ijstech/components", "@ijstech/eth
                 result.showModal();
             };
             this.init = async () => {
-                super.init();
-                const body = this.closest('body');
-                if (body)
-                    body.style.overflow = 'auto !important';
-                this.resultElm = new result_1.Result();
-                this.swapComponent.appendChild(this.resultElm);
-                this.resultElm.visible = false;
-                this.showResultMessage(this.resultElm, 'warning', '');
-                setTimeout(() => {
-                    this.resultElm.closeModal();
-                    this.resultElm.visible = true;
-                }, 100);
-                this.initWalletData();
-                store_1.setDataFromSCConfig(store_1.Networks, store_1.InfuraId);
-                store_1.setCurrentChainId(store_1.getDefaultChainId());
                 this.chainId = store_1.getChainId();
                 this.availableMarkets = store_1.getAvailableMarkets() || [];
                 this.swapButtonText = this.getSwapButtonText();
+                super.init();
+                this.openswapResult = new result_1.Result();
+                this.swapComponent.appendChild(this.openswapResult);
+                this.initWalletData();
+                store_1.setDataFromSCConfig(store_1.Networks, store_1.InfuraId);
+                store_1.setCurrentChainId(store_1.getDefaultChainId());
                 this.initTokenSelection();
                 this.initApprovalModelAction();
             };
@@ -1603,7 +1597,8 @@ define("@swap/main", ["require", "exports", "@ijstech/components", "@ijstech/eth
         async setData(value) {
             this._data = value;
             this.cardConfig.data = value;
-            this.onSetupPage(store_1.isWalletConnected());
+            store_1.setProviderList(value.data);
+            // this.onSetupPage(isWalletConnected());
         }
         async getTag() {
             return this.tag;
@@ -1612,10 +1607,12 @@ define("@swap/main", ["require", "exports", "@ijstech/components", "@ijstech/eth
             this.tag = value;
         }
         async confirm() {
+            var _a, _b;
             this._data = this.cardConfig.data;
-            if (this._data.data.length)
+            console.log('confirm');
+            store_1.setProviderList(this._data.data);
+            if ((_b = (_a = this._data) === null || _a === void 0 ? void 0 : _a.data) === null || _b === void 0 ? void 0 : _b.length)
                 this.onSetupPage(store_1.isWalletConnected());
-            console.log('confirm', this._data.data, this._data);
             this.swapContainer.visible = true;
             this.cardConfig.visible = false;
         }
@@ -1628,12 +1625,11 @@ define("@swap/main", ["require", "exports", "@ijstech/components", "@ijstech/eth
             this.swapContainer.visible = false;
             this.cardConfig.visible = true;
         }
-        async config() {
-        }
+        async config() { }
         isEmptyObject(obj) {
             let result = false;
             for (let prop in obj) {
-                if (!obj[prop]) {
+                if (!obj[prop] && (prop !== 'dexId' && prop !== 'supportedChains')) {
                     result = true;
                     break;
                 }
@@ -1648,7 +1644,7 @@ define("@swap/main", ["require", "exports", "@ijstech/components", "@ijstech/eth
             let emptyProp = false;
             for (let item of data) {
                 const hasTradeFee = !this.isEmptyObject(item.tradeFee);
-                if (!hasTradeFee || this.isEmptyObject(data)) {
+                if (!hasTradeFee || this.isEmptyObject(item)) {
                     emptyProp = true;
                     break;
                 }
@@ -1964,18 +1960,19 @@ define("@swap/main", ["require", "exports", "@ijstech/components", "@ijstech/eth
             this.firstTokenSelection.enabled = true;
             this.secondTokenSelection.enabled = true;
         }
-        setApprovalModalSpenderAddress() {
+        setApprovalSpenderAddress() {
+            var _a;
             const item = this.record;
-            if (this.isCrossChain && item.contractAddress) {
-                swap_utils_1.setApprovalModalSpenderAddress(store_1.Market.HYBRID, item.contractAddress);
-            }
-            else if ((item === null || item === void 0 ? void 0 : item.provider) && this.availableMarkets.includes(item.provider)) {
-                const market = store_1.ProviderConfigMap[item.provider].marketCode;
-                swap_utils_1.setApprovalModalSpenderAddress(market);
-            }
-            else {
-                swap_utils_1.setApprovalModalSpenderAddress(store_1.Market.HYBRID);
-            }
+            // if (this.isCrossChain && item.contractAddress){
+            //   setApprovalModalSpenderAddress(Market.HYBRID, item.contractAddress)
+            // } else if (item?.provider && this.availableMarkets.includes(item.provider)) {
+            //   const market = ProviderConfigMap[item.key].marketCode;
+            //   setApprovalModalSpenderAddress(market);
+            // } else {
+            //   setApprovalModalSpenderAddress(Market.HYBRID);
+            // }
+            const market = ((_a = store_1.getProviderByKey(item.provider)) === null || _a === void 0 ? void 0 : _a.key) || '';
+            swap_utils_1.setApprovalModalSpenderAddress(market);
         }
         getInputValue(isFrom) {
             const token = isFrom ? this.fromToken : this.toToken;
@@ -2068,7 +2065,7 @@ define("@swap/main", ["require", "exports", "@ijstech/components", "@ijstech/eth
             this.record = item;
             if (this.isCrossChain && this.fromToken && !this.fromToken.isNative) {
                 try {
-                    this.setApprovalModalSpenderAddress();
+                    this.setApprovalSpenderAddress();
                     await this.approvalModelAction.checkAllowance(this.fromToken, this.fromInputValue.toFixed());
                 }
                 catch (e) {
@@ -2166,8 +2163,9 @@ define("@swap/main", ["require", "exports", "@ijstech/components", "@ijstech/eth
             if (!this.isCrossChain) {
                 listRouting = await swap_utils_1.getAllRoutesData(this.fromToken, this.toToken, this.fromInputValue, this.toInputValue, this.isFrom);
                 listRouting = listRouting.map((v) => {
-                    const config = store_1.ProviderConfigMap[v.provider];
-                    return Object.assign(Object.assign({}, v), { isHybrid: config.marketCode == store_1.Market.HYBRID });
+                    // const config = ProviderConfigMap[v.provider];
+                    return Object.assign(Object.assign({}, v), { isHybrid: false // config.marketCode == Market.HYBRID,
+                     });
                 });
             }
             else if (this.srcChain && this.desChain) {
@@ -2186,9 +2184,10 @@ define("@swap/main", ["require", "exports", "@ijstech/components", "@ijstech/eth
                         const amountOut = v.targetRouteObj ? v.targetRouteObj.amountOut : v.sourceRouteObj.amountOut;
                         route = Object.assign(Object.assign(Object.assign({}, v), v.sourceRouteObj), { tradeFee: v.tradeFee, price: v.price, amountOut: new eth_wallet_1.BigNumber(amountOut) });
                         if (v.targetRouteObj) {
-                            const config = store_1.ProviderConfigMap[v.targetRouteObj.provider];
+                            const config = store_1.getProviderByKey(v.targetRouteObj.provider); // ProviderConfigMap[v.targetRouteObj.provider];
                             if (config) {
-                                route.targetRouteObj = Object.assign(Object.assign({}, route.targetRouteObj), { caption: config.caption, route: v.targetRouteObj.bestRoute, isHybrid: config.marketCode == store_1.Market.HYBRID });
+                                route.targetRouteObj = Object.assign(Object.assign({}, route.targetRouteObj), { caption: config.caption || '', route: v.targetRouteObj.bestRoute, isHybrid: false // config.marketCode == Market.HYBRID,
+                                 });
                             }
                             else {
                                 route.targetRouteObj = undefined;
@@ -2300,12 +2299,12 @@ define("@swap/main", ["require", "exports", "@ijstech/components", "@ijstech/eth
                 }
             }
             if (this.record)
-                this.setApprovalModalSpenderAddress();
+                this.setApprovalSpenderAddress();
         }
         getProviderCaption(provider, caption) {
             let providerObj;
             if (typeof provider === 'string') {
-                providerObj = provider ? (store_1.ProviderConfigMap[provider] || null) : null;
+                providerObj = provider ? store_1.getProviderByKey(provider) : null;
                 if (!providerObj)
                     return caption;
             }
@@ -2318,9 +2317,10 @@ define("@swap/main", ["require", "exports", "@ijstech/components", "@ijstech/eth
             return `${tokenIcon}`;
         }
         async addRoute(item, index, pricePercent) {
-            const isHybrid = store_1.ProviderConfigMap[item.provider].marketCode === store_1.Market.HYBRID;
-            const isBestSmartRoute = isHybrid && item.bestSmartRoute && item.bestSmartRoute.length;
-            const providerConfig = isBestSmartRoute ? item.bestSmartRoute : [store_1.ProviderConfigMap[item.provider]];
+            // const isHybrid = ProviderConfigMap[item.provider].marketCode === Market.HYBRID;
+            const isBestSmartRoute = item.bestSmartRoute && item.bestSmartRoute.length; // isHybrid && item.bestSmartRoute && item.bestSmartRoute.length;
+            const providerByKey = store_1.getProviderByKey(item.provider);
+            const providerConfig = isBestSmartRoute ? item.bestSmartRoute : providerByKey ? [providerByKey] : [];
             let balanceValue = this.isFrom ? item.amountIn : item.amountOut;
             const swapBalance = global_1.formatNumber(balanceValue, 4);
             const routingMainPanel = new components_2.Panel();
@@ -2416,7 +2416,7 @@ define("@swap/main", ["require", "exports", "@ijstech/components", "@ijstech/eth
                 targetLabel.caption = `(${this.desChain.name})`;
                 targetLabel.classList.add("routing-name");
                 routingTargetRow.appendChild(targetLabel);
-                const isTargetHybrid = store_1.ProviderConfigMap[item.targetRouteObj.provider].marketCode === store_1.Market.HYBRID;
+                const isTargetHybrid = false; // ProviderConfigMap[item.targetRouteObj.provider].marketCode === Market.HYBRID;
                 const isTargetBestSmartRoute = isTargetHybrid && item.targetRouteObj && item.targetRouteObj.bestSmartRoute && item.targetRouteObj.bestSmartRoute.length;
                 if (isTargetBestSmartRoute) {
                     for (let idx = 0; idx < item.targetRouteObj.bestSmartRoute.length; idx++) {
@@ -2833,7 +2833,8 @@ define("@swap/main", ["require", "exports", "@ijstech/components", "@ijstech/eth
             let listMarket = [];
             let listPairAddress = [];
             this.pairs.forEach((pair) => {
-                const market = store_1.ProviderConfigMap[pair.provider].marketCode;
+                var _a;
+                const market = (_a = store_1.getProviderByKey(pair.provider)) === null || _a === void 0 ? void 0 : _a.key; // ProviderConfigMap[pair.provider].marketCode;
                 listMarket.push(market);
                 listPairAddress.push(pair.pairAddress);
             });
@@ -2905,7 +2906,7 @@ define("@swap/main", ["require", "exports", "@ijstech/components", "@ijstech/eth
         async onRenderIconList() {
             this.iconList.innerHTML = '';
             this.availableMarkets.forEach(async (item) => {
-                const config = store_1.ProviderConfigMap[item];
+                const config = store_1.getProviderList().find(p => p.key === item); // ProviderConfigMap[item];
                 if (config) {
                     const image = new components_2.Image();
                     image.url = config.image;
@@ -3003,7 +3004,7 @@ define("@swap/main", ["require", "exports", "@ijstech/components", "@ijstech/eth
             return store_1.getWalletProvider() === eth_wallet_1.WalletPlugin.MetaMask;
         }
         render() {
-            return (this.$render("i-panel", { id: "swapComponent" },
+            return (this.$render("i-panel", { id: "swapComponent", background: { color: '#0c1234' } },
                 this.$render("i-panel", { class: "pageblock-swap" },
                     this.$render("i-panel", { id: "swapContainer" },
                         this.$render("i-panel", { class: "bill-board" },
@@ -3023,7 +3024,7 @@ define("@swap/main", ["require", "exports", "@ijstech/components", "@ijstech/eth
                                     this.$render("i-label", { class: "text--grey", caption: "Selected Source Chain" }),
                                     this.$render("i-label", { id: "srcChainLabel", caption: "-" })),
                                 this.$render("i-panel", { id: "srcChainList", class: "icon-list", maxWidth: "100%" })),
-                            this.$render("i-range", { id: "fromSlider", class: "custom--slider", width: '100%', min: 0, max: 100, tooltipFormatter: this.tipFormatter, tooltipVisible: true, stepDots: 5 }),
+                            this.$render("i-range", { id: "fromSlider", class: "custom--slider", width: '100%', min: 0, max: 100, tooltipFormatter: this.tipFormatter, tooltipVisible: true, stepDots: 5, onChanged: swap_utils_1.debounce(this.onSliderChange.bind(this), 500, this) }),
                             this.$render("i-panel", { class: "token-box" },
                                 this.$render("i-vstack", { id: "payContainer", class: "input--token-container" },
                                     this.$render("i-hstack", { class: "balance-info", horizontalAlignment: "space-between", verticalAlignment: "center", width: "100%" },

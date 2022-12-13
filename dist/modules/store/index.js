@@ -3068,188 +3068,197 @@ define("@swap/store/data/core/index.ts", ["require", "exports"], function (requi
         }
     };
 });
-define("@swap/store/data/swap/index.ts", ["require", "exports", "@swap/assets"], function (require, exports, assets_1) {
+///<amd-module name='@swap/store/data/swap/index.ts'/> 
+// import Assets from '@swap/assets';
+// export interface ProviderConfig {
+//   caption: string;
+//   image: string;
+//   key: string;
+//   marketCode: number;
+//   dexId?: number;
+//   supportedChains?: number[];
+// }
+define("@swap/store/data/swap/index.ts", ["require", "exports"], function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.availableMarketsByChainId = exports.ProviderConfigMap = exports.Market = void 0;
-    var Market;
-    (function (Market) {
-        Market[Market["OPENSWAP"] = 0] = "OPENSWAP";
-        Market[Market["UNISWAP"] = 1] = "UNISWAP";
-        Market[Market["SUSHISWAP"] = 2] = "SUSHISWAP";
-        Market[Market["PANCAKESWAPV1"] = 3] = "PANCAKESWAPV1";
-        Market[Market["PANCAKESWAP"] = 4] = "PANCAKESWAP";
-        Market[Market["BAKERYSWAP"] = 5] = "BAKERYSWAP";
-        Market[Market["BURGERSWAP"] = 6] = "BURGERSWAP";
-        Market[Market["IFSWAPV1"] = 7] = "IFSWAPV1";
-        Market[Market["OPENSWAPV1"] = 8] = "OPENSWAPV1";
-        Market[Market["HYBRID"] = 9] = "HYBRID";
-        Market[Market["MIXED_QUEUE"] = 10] = "MIXED_QUEUE";
-        Market[Market["GROUP_QUEUE"] = 11] = "GROUP_QUEUE";
-        Market[Market["QUICKSWAP"] = 12] = "QUICKSWAP";
-        Market[Market["BISWAP"] = 13] = "BISWAP";
-        Market[Market["PANGOLIN"] = 14] = "PANGOLIN";
-        Market[Market["TRADERJOE"] = 15] = "TRADERJOE";
-        Market[Market["SPIRITSWAP"] = 16] = "SPIRITSWAP";
-        Market[Market["SPOOKYSWAP"] = 17] = "SPOOKYSWAP";
-        Market[Market["PEGGED_QUEUE"] = 18] = "PEGGED_QUEUE";
-        Market[Market["HAKUSWAP"] = 19] = "HAKUSWAP";
-        Market[Market["JETSWAP"] = 20] = "JETSWAP";
-        Market[Market["IFSWAPV3"] = 21] = "IFSWAPV3";
-    })(Market = exports.Market || (exports.Market = {}));
-    exports.ProviderConfigMap = {
-        OpenSwap: {
-            caption: 'OpenSwap',
-            image: assets_1.default.fullPath('img/swap/openswap.png'),
-            marketCode: Market.OPENSWAP,
-            key: 'OpenSwap',
-            dexId: 1,
-            supportedChains: [42, 56, 97, 4002, 43113, 43114, 80001, 13370, 338]
-        },
-        Uniswap: {
-            caption: 'Uniswap',
-            image: assets_1.default.fullPath('img/swap/uniswap-logo.svg'),
-            marketCode: Market.UNISWAP,
-            key: 'Uniswap',
-            dexId: 10,
-            supportedChains: [1, 42]
-        },
-        SushiSwap: {
-            caption: 'SushiSwap',
-            image: assets_1.default.fullPath('img/swap/sushiswap-logo.svg'),
-            marketCode: Market.SUSHISWAP,
-            key: 'SushiSwap',
-            dexId: 8,
-            supportedChains: [1, 42, 137, 250, 43113, 43114]
-        },
-        PancakeSwap: {
-            caption: 'PancakeSwap',
-            image: assets_1.default.fullPath('img/swap/pancakeswap.svg'),
-            marketCode: Market.PANCAKESWAP,
-            key: 'PancakeSwap',
-            dexId: 2,
-            supportedChains: [56, 97]
-        },
-        PancakeSwapV1: {
-            caption: 'PancakeSwapV1',
-            image: assets_1.default.fullPath('img/pancakeswap.svg'),
-            marketCode: Market.PANCAKESWAPV1,
-            key: 'PancakeSwapV1'
-        },
-        BakerySwap: {
-            caption: 'BakerySwap',
-            image: assets_1.default.fullPath('img/swap/bakeryswap.svg'),
-            marketCode: Market.BAKERYSWAP,
-            key: 'BakerySwap',
-            dexId: 3,
-            supportedChains: [56, 97]
-        },
-        BurgerSwap: {
-            caption: 'BurgerSwap',
-            image: assets_1.default.fullPath('img/swap/burgerswap.png'),
-            marketCode: Market.BURGERSWAP,
-            key: 'BurgerSwap',
-            dexId: 4
-        },
-        Oracle: {
-            caption: 'Oracle',
-            image: assets_1.default.fullPath('img/swap/openswap.png'),
-            marketCode: Market.MIXED_QUEUE,
-            key: 'Oracle',
-            dexId: 5,
-            supportedChains: [56, 97, 43113, 43114]
-        },
-        PeggedOracle: {
-            caption: 'Pegged Queue',
-            image: assets_1.default.fullPath('img/swap/openswap.png'),
-            marketCode: Market.PEGGED_QUEUE,
-            key: 'PeggedOracle'
-        },
-        GroupQueue: {
-            caption: 'Group Queue',
-            image: assets_1.default.fullPath('img/swap/openswap.png'),
-            marketCode: Market.GROUP_QUEUE,
-            key: 'GroupQueue'
-        },
-        IFSwapV1: {
-            caption: 'IFSwapV1',
-            image: assets_1.default.fullPath('img/swap/IFSwapV1.png'),
-            marketCode: Market.IFSWAPV1,
-            key: 'IFSwapV1',
-            dexId: 7,
-            supportedChains: [56]
-        },
-        IFSwapV3: {
-            caption: 'IFSwapV3',
-            image: assets_1.default.fullPath('img/swap/IFSwapV1.png'),
-            marketCode: Market.IFSWAPV3,
-            key: 'IFSwapV3',
-            dexId: 18,
-            supportedChains: [56]
-        },
-        OpenSwapV1: {
-            caption: 'OpenSwapV1',
-            image: assets_1.default.fullPath('img/swap/openswap.png'),
-            marketCode: Market.OPENSWAPV1,
-            key: 'OpenSwapV1'
-        },
-        Hybrid: {
-            caption: 'Smart Router',
-            image: assets_1.default.fullPath('img/swap/openswap.png'),
-            marketCode: Market.HYBRID,
-            key: 'Hybrid',
-            dexId: 0,
-            supportedChains: [42, 56, 97, 43113, 43114]
-        },
-        QuickSwap: {
-            caption: 'QuickSwap',
-            image: assets_1.default.fullPath('img/swap/quickswap-logo.png'),
-            marketCode: Market.QUICKSWAP,
-            key: 'QuickSwap',
-            dexId: 9,
-            supportedChains: [137]
-        },
-        BiSwap: {
-            caption: 'BiSwap',
-            image: assets_1.default.fullPath('img/swap/biswapsvg.svg'),
-            marketCode: Market.BISWAP,
-            key: 'BiSwap',
-            dexId: 11,
-            supportedChains: [56]
-        },
-        Pangolin: {
-            caption: 'Pangolin',
-            image: assets_1.default.fullPath('img/swap/pangolin.svg'),
-            marketCode: Market.PANGOLIN,
-            key: 'Pangolin',
-            dexId: 12,
-            supportedChains: [43113, 43114]
-        },
-        TraderJoe: {
-            caption: 'TraderJoe',
-            image: assets_1.default.fullPath('img/swap/traderjoe.svg'),
-            marketCode: Market.TRADERJOE,
-            key: 'TraderJoe',
-            dexId: 13,
-            supportedChains: [43114]
-        },
-        SpiritSwap: {
-            caption: 'SpiritSwap',
-            image: assets_1.default.fullPath('img/swap/spiritswap-logo.svg'),
-            marketCode: Market.SPIRITSWAP,
-            key: 'SpiritSwap',
-            dexId: 15,
-            supportedChains: [250]
-        },
-        SpookySwap: {
-            caption: 'SpookySwap',
-            image: assets_1.default.fullPath('img/swap/spookyswap-logo.svg'),
-            marketCode: Market.SPOOKYSWAP,
-            key: 'SpookySwap',
-            dexId: 14,
-            supportedChains: [250]
-        },
-    };
+    exports.availableMarketsByChainId = void 0;
+    // export enum Market {
+    //   OPENSWAP = 'OpenSwap',
+    //   UNISWAP = 'Uniswap',
+    //   SUSHISWAP = 'SushiSwap',
+    //   PANCAKESWAPV1 = 'PancakeSwapV1',
+    //   PANCAKESWAP = 'PancakeSwap',
+    //   BAKERYSWAP = 'BakerySwap',
+    //   BURGERSWAP = 'BurgerSwap',
+    //   IFSWAPV1 = 'IFSwapV1',
+    //   OPENSWAPV1 = 'OpenSwapV1',
+    //   HYBRID = 'Hybrid',
+    //   MIXED_QUEUE = 'MIXED_QUEUE',
+    //   GROUP_QUEUE = 'GroupQueue',
+    //   QUICKSWAP = 'QUICKSWAP',
+    //   BISWAP = 'BISWAP',
+    //   PANGOLIN = 'PANGOLIN',
+    //   TRADERJOE = 'TRADERJOE',
+    //   SPIRITSWAP = 'SPIRITSWAP',
+    //   SPOOKYSWAP = 'SPOOKYSWAP',
+    //   PEGGED_QUEUE = 'PEGGED_QUEUE',
+    //   HAKUSWAP = 'HAKUSWAP',
+    //   JETSWAP = 'JETSWAP',
+    //   IFSWAPV3 = 'IFSwapV3'
+    // }
+    // export const ProviderConfigMap: { [key: string]: any } = {
+    //   OpenSwap: {
+    //     caption: 'OpenSwap',
+    //     image: Assets.fullPath('img/swap/openswap.png'),
+    //     marketCode: Market.OPENSWAP,
+    //     key: 'OpenSwap',
+    //     dexId: 1,
+    //     supportedChains: [42, 56, 97, 4002, 43113, 43114, 80001, 13370, 338]
+    //   },
+    //   Uniswap: {
+    //     caption: 'Uniswap',
+    //     image: Assets.fullPath('img/swap/uniswap-logo.svg'),
+    //     marketCode: Market.UNISWAP,
+    //     key: 'Uniswap',
+    //     dexId: 10,
+    //     supportedChains: [1, 42]
+    //   },
+    //   SushiSwap: {
+    //     caption: 'SushiSwap',
+    //     image: Assets.fullPath('img/swap/sushiswap-logo.svg'),
+    //     marketCode: Market.SUSHISWAP,
+    //     key: 'SushiSwap',
+    //     dexId: 8,
+    //     supportedChains: [1, 42, 137, 250, 43113, 43114]
+    //   },
+    //   PancakeSwap: {
+    //     caption: 'PancakeSwap',
+    //     image: Assets.fullPath('img/swap/pancakeswap.svg'),
+    //     marketCode: Market.PANCAKESWAP,
+    //     key: 'PancakeSwap',
+    //     dexId: 2,
+    //     supportedChains: [56, 97]
+    //   },
+    //   PancakeSwapV1: {
+    //     caption: 'PancakeSwapV1',
+    //     image: Assets.fullPath('img/pancakeswap.svg'),
+    //     marketCode: Market.PANCAKESWAPV1,
+    //     key: 'PancakeSwapV1'
+    //   },
+    //   BakerySwap: {
+    //     caption: 'BakerySwap',
+    //     image: Assets.fullPath('img/swap/bakeryswap.svg'),
+    //     marketCode: Market.BAKERYSWAP,
+    //     key: 'BakerySwap',
+    //     dexId: 3,
+    //     supportedChains: [56, 97]
+    //   },
+    //   BurgerSwap: {
+    //     caption: 'BurgerSwap',
+    //     image: Assets.fullPath('img/swap/burgerswap.png'),
+    //     marketCode: Market.BURGERSWAP,
+    //     key: 'BurgerSwap',
+    //     dexId: 4
+    //   },
+    //   Oracle: {
+    //     caption: 'Oracle',
+    //     image: Assets.fullPath('img/swap/openswap.png'),
+    //     marketCode: Market.MIXED_QUEUE,
+    //     key: 'Oracle',
+    //     dexId: 5,
+    //     supportedChains: [56, 97, 43113, 43114]
+    //   },
+    //   PeggedOracle: {
+    //     caption: 'Pegged Queue',
+    //     image: Assets.fullPath('img/swap/openswap.png'),
+    //     marketCode: Market.PEGGED_QUEUE,
+    //     key: 'PeggedOracle'
+    //   },
+    //   GroupQueue: {
+    //     caption: 'Group Queue',
+    //     image: Assets.fullPath('img/swap/openswap.png'),
+    //     marketCode: Market.GROUP_QUEUE,
+    //     key: 'GroupQueue'
+    //   },
+    //   IFSwapV1: {
+    //     caption: 'IFSwapV1',
+    //     image: Assets.fullPath('img/swap/IFSwapV1.png'),
+    //     marketCode: Market.IFSWAPV1,
+    //     key: 'IFSwapV1',
+    //     dexId: 7,
+    //     supportedChains: [56]
+    //   },
+    //   IFSwapV3: {
+    //     caption: 'IFSwapV3',
+    //     image: Assets.fullPath('img/swap/IFSwapV1.png'),
+    //     marketCode: Market.IFSWAPV3,
+    //     key: 'IFSwapV3',
+    //     dexId: 18,
+    //     supportedChains: [56]
+    //   },
+    //   OpenSwapV1: {
+    //     caption: 'OpenSwapV1',
+    //     image: Assets.fullPath('img/swap/openswap.png'),
+    //     marketCode: Market.OPENSWAPV1,
+    //     key: 'OpenSwapV1'
+    //   },
+    //   Hybrid: {
+    //     caption: 'Smart Router',
+    //     image: Assets.fullPath('img/swap/openswap.png'),
+    //     marketCode: Market.HYBRID,
+    //     key: 'Hybrid',
+    //     dexId: 0,
+    //     supportedChains: [42, 56, 97, 43113, 43114]
+    //   },
+    //   QuickSwap: {
+    //     caption: 'QuickSwap',
+    //     image: Assets.fullPath('img/swap/quickswap-logo.png'),
+    //     marketCode: Market.QUICKSWAP,
+    //     key: 'QuickSwap',
+    //     dexId: 9,
+    //     supportedChains: [137]
+    //   },
+    //   BiSwap: {
+    //     caption: 'BiSwap',
+    //     image: Assets.fullPath('img/swap/biswapsvg.svg'),
+    //     marketCode: Market.BISWAP,
+    //     key: 'BiSwap',
+    //     dexId: 11,
+    //     supportedChains: [56]
+    //   },
+    //   Pangolin: {
+    //     caption: 'Pangolin',
+    //     image: Assets.fullPath('img/swap/pangolin.svg'),
+    //     marketCode: Market.PANGOLIN,
+    //     key: 'Pangolin',
+    //     dexId: 12,
+    //     supportedChains: [43113, 43114]
+    //   },
+    //   TraderJoe: {
+    //     caption: 'TraderJoe',
+    //     image: Assets.fullPath('img/swap/traderjoe.svg'),
+    //     marketCode: Market.TRADERJOE,
+    //     key: 'TraderJoe',
+    //     dexId: 13,
+    //     supportedChains: [43114]
+    //   },
+    //   SpiritSwap: {
+    //     caption: 'SpiritSwap',
+    //     image: Assets.fullPath('img/swap/spiritswap-logo.svg'),
+    //     marketCode: Market.SPIRITSWAP,
+    //     key: 'SpiritSwap',
+    //     dexId: 15,
+    //     supportedChains: [250]
+    //   },
+    //   SpookySwap: {
+    //     caption: 'SpookySwap',
+    //     image: Assets.fullPath('img/swap/spookyswap-logo.svg'),
+    //     marketCode: Market.SPOOKYSWAP,
+    //     key: 'SpookySwap',
+    //     dexId: 14,
+    //     supportedChains: [250]
+    //   },
+    // };
     exports.availableMarketsByChainId = {
         1: [
             // 'OpenSwap', 
@@ -3573,7 +3582,7 @@ define("@swap/store/data/cross-chain/index.ts", ["require", "exports"], function
 define("@swap/store/data/index.ts", ["require", "exports", "@swap/store/data/tokens/index.ts", "@swap/store/data/networks/index.ts", "@swap/store/data/core/index.ts", "@swap/store/data/swap/index.ts", "@swap/store/data/cross-chain/index.ts"], function (require, exports, index_3, index_4, index_5, index_6, index_7) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.availableMarketsByChainId = exports.ProviderConfigMap = exports.Market = exports.CoreContractAddressesByChainId = exports.Networks = exports.InfuraId = exports.getOpenSwapToken = exports.getTokenIconPath = exports.tokenPriceAMMReference = exports.ToUSDPriceFeedAddressesMap = exports.DefaultTokens = exports.WETHByChainId = exports.ChainNativeTokenByChainId = exports.DefaultERC20Tokens = exports.LockTokenType = void 0;
+    exports.availableMarketsByChainId = exports.CoreContractAddressesByChainId = exports.Networks = exports.InfuraId = exports.getOpenSwapToken = exports.getTokenIconPath = exports.tokenPriceAMMReference = exports.ToUSDPriceFeedAddressesMap = exports.DefaultTokens = exports.WETHByChainId = exports.ChainNativeTokenByChainId = exports.DefaultERC20Tokens = exports.LockTokenType = void 0;
     ///<amd-module name='@swap/store/data/index.ts'/> 
     var LockTokenType;
     (function (LockTokenType) {
@@ -3592,16 +3601,14 @@ define("@swap/store/data/index.ts", ["require", "exports", "@swap/store/data/tok
     Object.defineProperty(exports, "InfuraId", { enumerable: true, get: function () { return index_4.InfuraId; } });
     Object.defineProperty(exports, "Networks", { enumerable: true, get: function () { return index_4.Networks; } });
     Object.defineProperty(exports, "CoreContractAddressesByChainId", { enumerable: true, get: function () { return index_5.CoreContractAddressesByChainId; } });
-    Object.defineProperty(exports, "Market", { enumerable: true, get: function () { return index_6.Market; } });
-    Object.defineProperty(exports, "ProviderConfigMap", { enumerable: true, get: function () { return index_6.ProviderConfigMap; } });
     Object.defineProperty(exports, "availableMarketsByChainId", { enumerable: true, get: function () { return index_6.availableMarketsByChainId; } });
     __exportStar(index_7, exports);
 });
-define("@swap/store", ["require", "exports", "@ijstech/eth-wallet", "@ijstech/components", "@swap/global", "@swap/assets", "@openswap/sdk", "@swap/store/data/index.ts", "@swap/store/data/index.ts"], function (require, exports, eth_wallet_1, components_1, global_1, assets_2, sdk_1, index_8, index_9) {
+define("@swap/store", ["require", "exports", "@ijstech/eth-wallet", "@ijstech/components", "@swap/global", "@swap/assets", "@openswap/sdk", "@swap/store/data/index.ts", "@swap/store/data/index.ts"], function (require, exports, eth_wallet_1, components_1, global_1, assets_1, sdk_1, index_8, index_9) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.getBridgeVaultVersion = exports.maxHeight = exports.maxWidth = exports.isMultiple = exports.isThemeApplied = exports.getTokenUrl = exports.baseUrl = exports.hasMetaMask = exports.hasWallet = exports.logoutWallet = exports.switchNetwork = exports.connectWallet = exports.isWalletConnected = exports.getWalletOptions = exports.walletList = exports.viewOnExplorerByAddress = exports.viewOnExplorerByTxHash = exports.hasUserToken = exports.setUserTokens = exports.getGroupQueueOfferStatus = exports.setGroupQueueOfferStatus = exports.getGroupQueueActionsStatus = exports.setGroupQueueActionsStatus = exports.getRangeQueueActionsStatus = exports.setRangeQueueActionsStatus = exports.getPriorityQueueActionsStatus = exports.setPriorityQueueActionsStatus = exports.getMaxPrice = exports.setMaxPrice = exports.getMinPrice = exports.setMinPrice = exports.getTrollActionsMapStatus = exports.setTrollActionsMapStatus = exports.tokenSymbol = exports.getTokenIcon = exports.getTokenDecimals = exports.getTokensDataList = exports.getTokenMap = exports.setTokenMap = exports.getTokenObject = exports.projectNativeTokenSymbol = exports.projectNativeToken = exports.getNetworkImg = exports.getNetworkExplorerName = exports.getSiteSupportedNetworks = exports.getMatchNetworks = exports.getFilteredNetworks = exports.getNetworkInfo = exports.getInfuraId = exports.getDefaultChainId = exports.setDataFromSCConfig = exports.state = exports.setTokenBalances = exports.getTokenBalance = exports.getTokenBalances = exports.updateAllTokenBalances = exports.getTokenList = exports.setTransactionDeadline = exports.getTransactionDeadline = exports.setSlippageTolerance = exports.getSlippageTolerance = exports.toggleExpertMode = exports.isExpertMode = exports.getAvailableMarkets = exports.getErc20 = exports.getWalletProvider = exports.getWallet = exports.getChainId = exports.getWETH = exports.getChainNativeToken = exports.getAddresses = exports.getCurrentChainId = exports.setCurrentChainId = exports.getSiteEnv = exports.setSiteEnv = exports.addUserTokens = exports.getUserTokens = exports.nullAddress = exports.fallBackUrl = void 0;
-    exports.fallBackUrl = assets_2.default.fullPath('img/tokens/token-placeholder.svg');
+    exports.getBridgeVaultVersion = exports.maxHeight = exports.maxWidth = exports.isMultiple = exports.isThemeApplied = exports.getTokenUrl = exports.baseUrl = exports.hasMetaMask = exports.hasWallet = exports.logoutWallet = exports.switchNetwork = exports.connectWallet = exports.isWalletConnected = exports.getWalletOptions = exports.walletList = exports.viewOnExplorerByAddress = exports.viewOnExplorerByTxHash = exports.hasUserToken = exports.getProviderByKey = exports.getProviderList = exports.setProviderList = exports.setUserTokens = exports.tokenSymbol = exports.getTokenIcon = exports.getTokenDecimals = exports.getTokensDataList = exports.getTokenMap = exports.setTokenMap = exports.getTokenObject = exports.projectNativeTokenSymbol = exports.projectNativeToken = exports.getNetworkImg = exports.getNetworkExplorerName = exports.getSiteSupportedNetworks = exports.getMatchNetworks = exports.getFilteredNetworks = exports.getNetworkInfo = exports.getInfuraId = exports.getDefaultChainId = exports.setDataFromSCConfig = exports.state = exports.setTokenBalances = exports.getTokenBalance = exports.getTokenBalances = exports.updateAllTokenBalances = exports.getTokenList = exports.setTransactionDeadline = exports.getTransactionDeadline = exports.setSlippageTolerance = exports.getSlippageTolerance = exports.toggleExpertMode = exports.isExpertMode = exports.getAvailableMarkets = exports.getErc20 = exports.getWalletProvider = exports.getWallet = exports.getChainId = exports.getWETH = exports.getChainNativeToken = exports.getAddresses = exports.getCurrentChainId = exports.setCurrentChainId = exports.getSiteEnv = exports.setSiteEnv = exports.addUserTokens = exports.getUserTokens = exports.nullAddress = exports.fallBackUrl = void 0;
+    exports.fallBackUrl = assets_1.default.fullPath('img/tokens/token-placeholder.svg');
     exports.nullAddress = "0x0000000000000000000000000000000000000000";
     const TOKENS = "oswap_user_tokens_";
     const getUserTokens = (chainId) => {
@@ -3782,16 +3789,10 @@ define("@swap/store", ["require", "exports", "@ijstech/eth-wallet", "@ijstech/co
         transactionDeadline: 30,
         tokenBalances: {},
         tokenMap: {},
-        trollActionsMapStatus: {},
-        minPrice: null,
-        maxPrice: null,
-        priorityQueueActionsStatus: {},
-        rangeQueueActionsStatus: {},
-        groupQueueActionsStatus: {},
-        groupQueueOfferStatus: {},
         userTokens: {},
         infuraId: "",
-        networkMap: {}
+        networkMap: {},
+        providerList: []
     };
     const setDataFromSCConfig = (Networks, InfuraId) => {
         if (InfuraId) {
@@ -3887,11 +3888,11 @@ define("@swap/store", ["require", "exports", "@ijstech/eth-wallet", "@ijstech/co
         try {
             const network = exports.getNetworkInfo(chainId);
             if (network) {
-                return assets_2.default.fullPath(network.img);
+                return assets_1.default.fullPath(network.img);
             }
         }
         catch (_a) { }
-        return assets_2.default.fullPath('img/tokens/token-placeholder.svg');
+        return assets_1.default.fullPath('img/tokens/token-placeholder.svg');
     };
     exports.getNetworkImg = getNetworkImg;
     const projectNativeToken = () => {
@@ -4004,7 +4005,7 @@ define("@swap/store", ["require", "exports", "@ijstech/eth-wallet", "@ijstech/co
         else {
             tokenObject = tokenMap[address.toLowerCase()];
         }
-        return assets_2.default.fullPath(index_8.getTokenIconPath(tokenObject, getChainId()));
+        return assets_1.default.fullPath(index_8.getTokenIconPath(tokenObject, getChainId()));
     };
     exports.getTokenIcon = getTokenIcon;
     const tokenSymbol = (address) => {
@@ -4018,66 +4019,6 @@ define("@swap/store", ["require", "exports", "@ijstech/eth-wallet", "@ijstech/co
         return tokenObject ? tokenObject.symbol : '';
     };
     exports.tokenSymbol = tokenSymbol;
-    const setTrollActionsMapStatus = (actionKey, status) => {
-        exports.state.trollActionsMapStatus[actionKey] = status;
-    };
-    exports.setTrollActionsMapStatus = setTrollActionsMapStatus;
-    const getTrollActionsMapStatus = (actionKey) => {
-        return exports.state.trollActionsMapStatus[actionKey] || false;
-    };
-    exports.getTrollActionsMapStatus = getTrollActionsMapStatus;
-    const setMinPrice = (value) => {
-        exports.state.minPrice = value;
-    };
-    exports.setMinPrice = setMinPrice;
-    const getMinPrice = () => {
-        return exports.state.minPrice;
-    };
-    exports.getMinPrice = getMinPrice;
-    const setMaxPrice = (value) => {
-        exports.state.maxPrice = value;
-    };
-    exports.setMaxPrice = setMaxPrice;
-    const getMaxPrice = () => {
-        return exports.state.maxPrice;
-    };
-    exports.getMaxPrice = getMaxPrice;
-    const setPriorityQueueActionsStatus = (key, value, keyTab) => {
-        exports.state.priorityQueueActionsStatus[key] = value;
-        components_1.application.EventBus.dispatch("emitButtonStatus" /* EmitButtonStatus */, { name: 'Priority Queue', keyTab, key, value });
-    };
-    exports.setPriorityQueueActionsStatus = setPriorityQueueActionsStatus;
-    const getPriorityQueueActionsStatus = (key) => {
-        return exports.state.priorityQueueActionsStatus[key] || false;
-    };
-    exports.getPriorityQueueActionsStatus = getPriorityQueueActionsStatus;
-    const setRangeQueueActionsStatus = (key, value, keyTab) => {
-        exports.state.rangeQueueActionsStatus[key] = value;
-        components_1.application.EventBus.dispatch("emitButtonStatus" /* EmitButtonStatus */, { name: 'Range Queue', keyTab, key, value });
-    };
-    exports.setRangeQueueActionsStatus = setRangeQueueActionsStatus;
-    const getRangeQueueActionsStatus = (key) => {
-        return exports.state.rangeQueueActionsStatus[key] || false;
-    };
-    exports.getRangeQueueActionsStatus = getRangeQueueActionsStatus;
-    const setGroupQueueActionsStatus = (key, value, keyTab) => {
-        exports.state.groupQueueActionsStatus[key] = value;
-        components_1.application.EventBus.dispatch("emitButtonStatus" /* EmitButtonStatus */, { name: 'Group Queue', keyTab, key, value });
-    };
-    exports.setGroupQueueActionsStatus = setGroupQueueActionsStatus;
-    const getGroupQueueActionsStatus = (key) => {
-        return exports.state.groupQueueActionsStatus[key] || false;
-    };
-    exports.getGroupQueueActionsStatus = getGroupQueueActionsStatus;
-    const setGroupQueueOfferStatus = (key, value, text) => {
-        exports.state.groupQueueOfferStatus[key] = { value, text };
-        components_1.application.EventBus.dispatch("emitButtonStatus" /* EmitButtonStatus */, { name: 'Group Queue Offer', key, value, text });
-    };
-    exports.setGroupQueueOfferStatus = setGroupQueueOfferStatus;
-    const getGroupQueueOfferStatus = (key) => {
-        return exports.state.groupQueueOfferStatus[key] || { value: false, text: 'Swap' };
-    };
-    exports.getGroupQueueOfferStatus = getGroupQueueOfferStatus;
     const setUserTokens = (token, chainId) => {
         if (!exports.state.userTokens[chainId]) {
             exports.state.userTokens[chainId] = [token];
@@ -4087,6 +4028,19 @@ define("@swap/store", ["require", "exports", "@ijstech/eth-wallet", "@ijstech/co
         }
     };
     exports.setUserTokens = setUserTokens;
+    const setProviderList = (value) => {
+        exports.state.providerList = value;
+    };
+    exports.setProviderList = setProviderList;
+    const getProviderList = () => {
+        return exports.state.providerList || [];
+    };
+    exports.getProviderList = getProviderList;
+    const getProviderByKey = (providerKey) => {
+        const providers = exports.state.providerList || [];
+        return providers.find(item => item.key === providerKey) || null;
+    };
+    exports.getProviderByKey = getProviderByKey;
     const hasUserToken = (address, chainId) => {
         var _a;
         return (_a = exports.state.userTokens[chainId]) === null || _a === void 0 ? void 0 : _a.some((token) => { var _a; return ((_a = token.address) === null || _a === void 0 ? void 0 : _a.toLocaleLowerCase()) === (address === null || address === void 0 ? void 0 : address.toLocaleLowerCase()); });

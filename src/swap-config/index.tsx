@@ -1,20 +1,28 @@
-import { customElements, Module, ControlElement, Input, VStack, Control } from '@ijstech/components';
-import { pointerStyle } from './swap-config.css';
+import { customElements, Module, ControlElement, Input, VStack, Control, Upload, ComboBox, IComboItem } from '@ijstech/components';
+import { pointerStyle, uploadStyle } from './swap-config.css';
 
 export interface IConfig {
-  data: IData[]
+  data: IProvider[]
 }
 
- export interface IData {
+export interface IProvider {
   factoryAddress: string;
   routerAddress: string;
-  tradeFee: {
-    fee: string,
-    base: string
-  }
+  tradeFee: { fee: string, base: string };
+  caption: string;
+  image: string;
+  key: string;
+  dexId?: number;
+  supportedChains?: number[];
 }
 
-type IDataProp = 'factoryAddress' | 'routerAddress' | 'fee' | 'base';
+interface IChainOption {
+  label: string;
+  value: string;
+}
+const chainsList = [1, 42, 56, 97, 4002, 43113, 43114, 80001, 13370, 338, 137, 250, 56, 97];
+
+type IProviderProp = 'factoryAddress'|'routerAddress'|'fee'|'base'|'caption'|'image'|'key'|'dexId'|'supportedChains';
 
 declare global {
   namespace JSX {
@@ -28,13 +36,14 @@ declare global {
 export class SwapConfig extends Module {
 
   private listStack: VStack;
-  private itemMap: Map<number, IData> = new Map();
-  private _itemList: IData[] = [];
+  private itemMap: Map<number, IProvider> = new Map();
+  private _itemList: IProvider[] = [];
+  private _chainOptions: IChainOption[];
 
   get itemList() {
     return Array.from(this.itemMap).map(item => item[1]);
   }
-  set itemList(data: IData[]) {
+  set itemList(data: IProvider[]) {
     this._itemList = data;
   }
 
@@ -49,8 +58,26 @@ export class SwapConfig extends Module {
     this._itemList.forEach(item => this.addProvider(item));
   }
 
-  private addProvider(item?: IData) {
+  private addProvider(item?: IProvider) {
     const lastIndex = this.itemList.length;
+    const uploadElm = (
+      <i-upload
+        maxHeight={200}
+        maxWidth={200}
+        class={uploadStyle}
+        onChanged={(source: Control, files: File[]) => this.updateConfig(source, lastIndex, 'image', files)}
+        onRemoved={() => this.onRemovedImage(lastIndex)}
+      ></i-upload>
+    )
+    const comboboxElm: ComboBox = (
+      <i-combo-box
+        width="100%"
+        icon={{ name: 'angle-down' }}
+        items={this._chainOptions}
+        mode="multiple"
+        onChanged={(source: Control) => this.updateConfig(source, lastIndex, 'supportedChains')}
+      ></i-combo-box>
+    )
     const itemElm = (
       <i-vstack
         gap='0.5rem'
@@ -66,17 +93,55 @@ export class SwapConfig extends Module {
           onClick={() => this.deleteProvider(itemElm, lastIndex)}
         ></i-icon>
         <i-hstack>
+          <i-label caption="Caption"></i-label>
+          <i-label caption="*" font={{ color: 'red' }} margin={{left: '4px'}}></i-label>
+          <i-label caption=":"></i-label>
+        </i-hstack>
+        <i-input
+          width="100%" value={item?.caption || ''}
+          onChanged={(source: Control) => this.updateConfig(source, lastIndex, 'caption')}
+        ></i-input>
+        <i-hstack>
+          <i-label caption="Image"></i-label>
+          <i-label caption="*" font={{ color: 'red' }} margin={{left: '4px'}}></i-label>
+          <i-label caption=":"></i-label>
+        </i-hstack>
+        { uploadElm }
+        <i-hstack>
+          <i-label caption="Key"></i-label>
+          <i-label caption="*" font={{ color: 'red' }} margin={{left: '4px'}}></i-label>
+          <i-label caption=":"></i-label>
+        </i-hstack>
+        <i-input
+          width="100%" value={item?.key || ''}
+          onChanged={(source: Control) => this.updateConfig(source, lastIndex, 'key')}
+        ></i-input>
+        <i-label caption="Dex Id"></i-label>
+        <i-input
+          width="100%" value={item?.dexId || ''}
+          inputType="number"
+          onChanged={(source: Control) => this.updateConfig(source, lastIndex, 'dexId')}
+        ></i-input>
+        <i-label caption="Supported Chains"></i-label>
+        { comboboxElm}
+        <i-hstack>
           <i-label caption="Factory Address"></i-label>
           <i-label caption="*" font={{ color: 'red' }} margin={{left: '4px'}}></i-label>
           <i-label caption=":"></i-label>
         </i-hstack>
-        <i-input width="100%" onChanged={(source: Control) => this.updateConfig(source, lastIndex, 'factoryAddress')}></i-input>
+        <i-input
+          width="100%" value={item?.factoryAddress || ''}
+          onChanged={(source: Control) => this.updateConfig(source, lastIndex, 'factoryAddress')}
+        ></i-input>
         <i-hstack>
           <i-label caption="Router Address"></i-label>
           <i-label caption="*" font={{ color: 'red' }} margin={{left: '4px'}}></i-label>
           <i-label caption=":"></i-label>
         </i-hstack>
-        <i-input width="100%" onChanged={(source: Control) => this.updateConfig(source, lastIndex, 'routerAddress')}></i-input>
+        <i-input
+          width="100%" value={item?.routerAddress || ''}
+          onChanged={(source: Control) => this.updateConfig(source, lastIndex, 'routerAddress')}
+        ></i-input>
         <i-hstack>
           <i-label caption="Trade Fee"></i-label>
           <i-label caption="*" font={{ color: 'red' }} margin={{left: '4px'}}></i-label>
@@ -92,29 +157,52 @@ export class SwapConfig extends Module {
             <i-label caption="*" font={{ color: 'red' }} margin={{left: '4px'}}></i-label>
             <i-label caption=":"></i-label>
           </i-hstack>
-          <i-input width="100%" inputType="number" onChanged={(source: Control) => this.updateConfig(source, lastIndex, 'fee')}></i-input>
+          <i-input
+            width="100%" inputType="number"
+            value={item?.tradeFee.fee || ''}
+            onChanged={(source: Control) => this.updateConfig(source, lastIndex, 'fee')}
+          ></i-input>
           <i-hstack>
             <i-label caption="Base"></i-label>
             <i-label caption="*" font={{ color: 'red' }} margin={{left: '4px'}}></i-label>
             <i-label caption=":"></i-label>
           </i-hstack>
-          <i-input width="100%" inputType="number" onChanged={(source: Control) => this.updateConfig(source, lastIndex, 'base')}></i-input>
+          <i-input
+            width="100%" inputType="number"
+            value={item?.tradeFee.base || ''}
+            onChanged={(source: Control) => this.updateConfig(source, lastIndex, 'base')}
+          ></i-input>
         </i-vstack>
       </i-vstack>
     );
+    if (item?.image) uploadElm.preview(item.image);
+    if (item?.supportedChains?.length) {
+      comboboxElm.selectedItem = item.supportedChains.map(item => ({ label: `${item}`, value: `${item}` }));
+    }
     this.listStack.appendChild(itemElm);
     const initObj = {
       factoryAddress: "",
       routerAddress: "",
-      tradeFee: { fee: "", base: "" }
+      tradeFee: { fee: "", base: "" },
+      caption: "",
+      image: "",
+      key: "",
+      dexId: undefined,
+      supportedChains: []
     }
     this.itemMap.set(lastIndex, item ||  initObj);
   }
 
-  private updateConfig(source: Control, index: number, prop: IDataProp) {
+  private async updateConfig(source: Control, index: number, prop: IProviderProp, files?: File[]) {
     const item: any = this.itemMap.get(index);
     if (prop === 'fee' || prop === 'base')
       item['tradeFee'][prop] = (source as Input).value;
+    else if (prop === 'image')
+      item.image = files ? await (source as Upload).toBase64(files[0]) : undefined;
+    else if (prop === 'supportedChains')
+      item.supportedChains = ((source as ComboBox).selectedItem as IComboItem[] || []).map(item => Number(item.value));
+    else if (prop === 'dexId')
+      item.dexId = +(source as Input).value;
     else
       item[prop] = (source as Input).value;
   }
@@ -124,6 +212,13 @@ export class SwapConfig extends Module {
       source.remove();
       this.itemMap.delete(index);
     }
+  }
+
+  private onRemovedImage(index: number) { }
+  
+  init() {
+    super.init();
+    this._chainOptions = chainsList.map(item => ({ label: `${item}`, value: `${item}` }));
   }
 
   render() {

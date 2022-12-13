@@ -255,25 +255,6 @@ define("@swap/crosschain-utils", ["require", "exports", "@ijstech/eth-wallet", "
         };
         return extendedRouteObj;
     };
-    const fetchBridgeFee = async (targetChainId, vaultAddress) => {
-        let bridgeVaults = await getBridgeVaults();
-        let vault = bridgeVaults.find(v => v.chainId == targetChainId && v.address == vaultAddress);
-        let bridgeFeeParams = {
-            baseFee: new eth_wallet_1.BigNumber(0),
-            protocolFee: new eth_wallet_1.BigNumber(0),
-            transactionFee: new eth_wallet_1.BigNumber(0),
-            imbalanceFee: new eth_wallet_1.BigNumber(0)
-        };
-        if (vault) {
-            bridgeFeeParams = {
-                baseFee: new eth_wallet_1.BigNumber(vault.baseFee),
-                protocolFee: new eth_wallet_1.BigNumber(vault.protocolFee),
-                transactionFee: new eth_wallet_1.BigNumber(vault.transactionFee),
-                imbalanceFee: new eth_wallet_1.BigNumber(vault.imbalanceFee)
-            };
-        }
-        return bridgeFeeParams;
-    };
     const checkIsApproveButtonShown = async (tokenIn, fromInput, address) => {
         const wallet = eth_wallet_1.Wallet.getInstance();
         let erc20 = new eth_wallet_1.Erc20(wallet, tokenIn.address);
@@ -296,8 +277,7 @@ define("@swap/crosschain-utils", ["require", "exports", "@ijstech/eth-wallet", "
         if (tokenOut.isNative) {
             tokenOut.address = store_1.crossChainNativeTokenList[toChainId].wethAddress;
         }
-        const tradeFeeMapMarkets = Object.values(store_1.ProviderConfigMap).map(({ marketCode }) => marketCode);
-        const tradeFeeMap = await getTradeFeeMap(tradeFeeMapMarkets);
+        const tradeFeeMap = await getTradeFeeMap();
         const routeObjArr = await global_1.getAPI(routeAPI, {
             fromChainId,
             toChainId,
@@ -309,10 +289,10 @@ define("@swap/crosschain-utils", ["require", "exports", "@ijstech/eth-wallet", "
         if (!routeObjArr || !routeObjArr.routes)
             return [];
         const composeRoutes = async (routeObj, chainId, fromAmount) => {
-            const providerConfigByDexId = Object.values(store_1.ProviderConfigMap)
+            const providerConfigByDexId = store_1.getProviderList()
                 .filter(({ supportedChains }) => supportedChains === null || supportedChains === void 0 ? void 0 : supportedChains.includes(chainId))
                 .reduce((acc, cur) => {
-                if (cur.dexId || cur.dexId === 0)
+                if (cur.dexId || (cur.dexId && cur.dexId === 0))
                     acc[cur.dexId] = cur;
                 return acc;
             }, {});
@@ -323,7 +303,7 @@ define("@swap/crosschain-utils", ["require", "exports", "@ijstech/eth-wallet", "
                 isRegistered: routeObj.route.map(v => v.isRegistered),
                 market: routeObj.route.map(v => {
                     let dexId = [5, 6].includes(v.dexId) ? 5 : v.dexId;
-                    return providerConfigByDexId[dexId].marketCode;
+                    return providerConfigByDexId[dexId].key;
                 }),
                 route: routeObj.tokens,
                 customDataList: routeObj.route.map(v => {
@@ -366,7 +346,6 @@ define("@swap/crosschain-utils", ["require", "exports", "@ijstech/eth-wallet", "
                 acc[key] = new eth_wallet_1.BigNumber(value).shiftedBy(-targetVaultToken.decimals);
                 return acc;
             }, {});
-            //let bridgeFeeParams = await fetchBridgeFee(toChainId, targetVaultAddresses.vaultAddress)
             amountIn = new eth_wallet_1.BigNumber(amountIn);
             let sourceRouteObj = routeObj.sourceRoute ? await composeRoutes(routeObj.sourceRoute, fromChainId, amountIn) : null;
             let vaultTokenFromSourceChain = routeObj.sourceRoute ? sourceRouteObj.amountOut : amountIn;

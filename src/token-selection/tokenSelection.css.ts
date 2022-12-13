@@ -170,7 +170,7 @@ Styles.cssRule('.token-selection', {
           $nest: {
             'i-icon': {
               position: 'absolute',
-              top: 'calc(50% - 8px)',
+              top: 'calc(50% - 4px)',
               left: '1rem',
               transform: 'rotate(90deg)',
               opacity: 0.7

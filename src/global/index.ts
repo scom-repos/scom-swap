@@ -74,3 +74,14 @@ export enum QueueType {
 }
 
 export * from './utils/index';
+  
+export interface IProvider {
+    factoryAddress: string;
+    routerAddress: string;
+    tradeFee: { fee: string, base: string };
+    caption: string;
+    image: string;
+    key: string;
+    dexId?: number;
+    supportedChains?: number[];
+}
