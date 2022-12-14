@@ -32,7 +32,6 @@ export {
   registerSendTxEvents,
   approveERC20Max,
   getERC20Allowance,
-  isAddressValid,
   getERC20Amount,
   ITokenObject,
   TokenMapType

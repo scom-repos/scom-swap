@@ -841,6 +841,7 @@ define("@swap/main", ["require", "exports", "@ijstech/components", "@ijstech/eth
         constructor(parent, options) {
             super(parent, options);
             this.defaultEdit = true;
+            this.isInited = false;
             this.fallbackUrl = assets_2.default.fullPath('img/tokens/Custom.png');
             this._lastUpdated = 0;
             // Cross Chain
@@ -1571,11 +1572,6 @@ define("@swap/main", ["require", "exports", "@ijstech/components", "@ijstech/eth
                 super.init();
                 this.openswapResult = new result_1.Result();
                 this.swapComponent.appendChild(this.openswapResult);
-                this.initWalletData();
-                store_1.setDataFromSCConfig(store_1.Networks, store_1.InfuraId);
-                store_1.setCurrentChainId(store_1.getDefaultChainId());
-                this.initTokenSelection();
-                this.initApprovalModelAction();
             };
             this.fromInputValue = new eth_wallet_1.BigNumber(0);
             this.toInputValue = new eth_wallet_1.BigNumber(0);
@@ -1603,11 +1599,13 @@ define("@swap/main", ["require", "exports", "@ijstech/components", "@ijstech/eth
         async confirm() {
             var _a, _b;
             this._data = this.cardConfig.data;
-            store_1.setProviderList(this._data.data);
-            if ((_b = (_a = this._data) === null || _a === void 0 ? void 0 : _a.data) === null || _b === void 0 ? void 0 : _b.length)
-                this.onSetupPage(store_1.isWalletConnected());
             this.swapContainer.visible = true;
             this.cardConfig.visible = false;
+            store_1.setProviderList(this._data.data);
+            if ((_b = (_a = this._data) === null || _a === void 0 ? void 0 : _a.data) === null || _b === void 0 ? void 0 : _b.length) {
+                await this.initData();
+                this.onSetupPage(store_1.isWalletConnected());
+            }
         }
         async discard() {
             this.swapContainer.visible = false;
@@ -1619,9 +1617,6 @@ define("@swap/main", ["require", "exports", "@ijstech/components", "@ijstech/eth
             this.cardConfig.visible = true;
         }
         async config() { }
-        async onConfigSave() {
-            console.log('onConfig');
-        }
         isEmptyObject(obj) {
             let result = false;
             for (let prop in obj) {
@@ -1635,7 +1630,7 @@ define("@swap/main", ["require", "exports", "@ijstech/components", "@ijstech/eth
         validate() {
             var _a;
             const data = ((_a = this.cardConfig.data) === null || _a === void 0 ? void 0 : _a.data) || [];
-            if (!data.length)
+            if (!data || !data.length)
                 return false;
             let emptyProp = false;
             for (let item of data) {
@@ -2998,6 +2993,16 @@ define("@swap/main", ["require", "exports", "@ijstech/components", "@ijstech/eth
         ;
         get isMetaMask() {
             return store_1.getWalletProvider() === eth_wallet_1.WalletPlugin.MetaMask;
+        }
+        async initData() {
+            if (!this.isInited) {
+                await this.initWalletData();
+                store_1.setDataFromSCConfig(store_1.Networks, store_1.InfuraId);
+                store_1.setCurrentChainId(store_1.getDefaultChainId());
+                this.initTokenSelection();
+                await this.initApprovalModelAction();
+                this.isInited = true;
+            }
         }
         render() {
             return (this.$render("i-panel", { id: "swapComponent", background: { color: '#0c1234' } },

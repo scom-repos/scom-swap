@@ -310,8 +310,8 @@ async function getBestAmountInRouteFromAPI(wallet: any, tokenIn: ITokenObject, t
   let Address = getAddresses();
   let wrappedTokenAddress = Address['WETH9'];
   let tradeFeeMap = await getTradeFeeMap();
-  let network = getNetworkInfo(chainId);
-  let api = network.isTestnet || network.isDisabled ? newRouteAPI : routeAPI;
+  let network = chainId ? getNetworkInfo(chainId) : null;
+  let api = network?.isTestnet || network?.isDisabled ? newRouteAPI : routeAPI;
   let routeObjArr = await getAPI(api, {
     chainId,
     tokenIn: tokenIn.address ? tokenIn.address : wrappedTokenAddress,
@@ -375,8 +375,8 @@ async function getBestAmountOutRouteFromAPI(wallet: any, tokenIn: ITokenObject, 
   let Address = getAddresses();
   let wrappedTokenAddress = Address['WETH9'];
   let tradeFeeMap = await getTradeFeeMap();
-  let network = getNetworkInfo(chainId);
-  let api = network.isTestnet || network.isDisabled ? newRouteAPI : routeAPI;
+  let network = chainId ? getNetworkInfo(chainId) : null;
+  let api = network?.isTestnet || network?.isDisabled ? newRouteAPI : routeAPI;
   let routeObjArr = await getAPI(api, {
     chainId,
     tokenIn: tokenIn.address ? tokenIn.address : wrappedTokenAddress,

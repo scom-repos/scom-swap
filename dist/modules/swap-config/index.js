@@ -55,7 +55,7 @@ define("@swap/swap-config", ["require", "exports", "@ijstech/components", "@swap
             var _a;
             const lastIndex = this.itemList.length;
             const uploadElm = (this.$render("i-upload", { maxHeight: 200, maxWidth: 200, class: swap_config_css_1.uploadStyle, onChanged: (source, files) => this.updateConfig(source, lastIndex, 'image', files), onRemoved: () => this.onRemovedImage(lastIndex) }));
-            const comboboxElm = (this.$render("i-combo-box", { width: "100%", icon: { name: 'angle-down' }, items: this._chainOptions, mode: "multiple", onChanged: (source) => this.updateConfig(source, lastIndex, 'supportedChains') }));
+            const comboboxElm = (this.$render("i-combo-box", { width: "100%", icon: { name: 'angle-down' }, items: this._chainOptions, mode: "tags", onChanged: (source) => this.updateConfig(source, lastIndex, 'supportedChains') }));
             const itemElm = (this.$render("i-vstack", { gap: '0.5rem', padding: { top: '1rem', bottom: '1rem', left: '1rem', right: '1rem' }, border: { width: 1, style: 'solid', color: 'rgba(217,225,232,.38)', radius: 5 }, position: "relative" },
                 this.$render("i-icon", { name: "times", fill: "red", width: 20, height: 20, position: "absolute", top: 10, right: 10, class: swap_config_css_1.pointerStyle, onClick: () => this.deleteProvider(itemElm, lastIndex) }),
                 this.$render("i-hstack", null,
@@ -126,8 +126,9 @@ define("@swap/swap-config", ["require", "exports", "@ijstech/components", "@swap
                 item['tradeFee'][prop] = source.value;
             else if (prop === 'image')
                 item.image = files ? await source.toBase64(files[0]) : undefined;
-            else if (prop === 'supportedChains')
+            else if (prop === 'supportedChains') {
                 item.supportedChains = (source.selectedItem || []).map(item => Number(item.value));
+            }
             else if (prop === 'dexId')
                 item.dexId = +source.value;
             else

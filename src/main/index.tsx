@@ -87,6 +87,7 @@ export class SwapBlock extends Module implements PageBlock {
 	private cardConfig: SwapConfig;
 	private swapComponent: Panel;
   private swapContainer: Container;
+  private isInited: boolean = false;
 
   private payContainer: Panel;
   private receiveContainer: Panel;
@@ -102,7 +103,7 @@ export class SwapBlock extends Module implements PageBlock {
   private swapModal: Modal;
   private priceInfo: PriceInfo;
   private priceInfo2: PriceInfo;
-  private detailsFeeInfo: PriceInfo
+  // private detailsFeeInfo: PriceInfo
   private priceInfoContainer: Panel;
   private fromTokenImage: Image;
   private fromTokenLabel: Label;
@@ -117,7 +118,7 @@ export class SwapBlock extends Module implements PageBlock {
   private fromSlider: Range;
   private maxButton: Button;
   private swapBtn: Button;
-  private iconList: Panel;
+  // private iconList: Panel;
   private actionSetting: Panel;
 
   private isFrom: boolean;
@@ -226,11 +227,13 @@ export class SwapBlock extends Module implements PageBlock {
 
   async confirm() {
     this._data = this.cardConfig.data
-    setProviderList(this._data.data);
-    if (this._data?.data?.length)
-      this.onSetupPage(isWalletConnected());
     this.swapContainer.visible = true
     this.cardConfig.visible = false
+    setProviderList(this._data.data);
+    if (this._data?.data?.length) {
+      await this.initData();
+      this.onSetupPage(isWalletConnected());
+    }
   }
 
   async discard() {
@@ -245,10 +248,6 @@ export class SwapBlock extends Module implements PageBlock {
 	}
 
   async config() { }
-  
-  async onConfigSave() {
-    console.log('onConfig')
-	}
 
   private isEmptyObject(obj: any): boolean {
     let result = false;
@@ -263,7 +262,7 @@ export class SwapBlock extends Module implements PageBlock {
   
   validate() {
     const data = this.cardConfig.data?.data || [];
-    if (!data.length) return false;
+    if (!data || !data.length) return false;
     let emptyProp = false;
     for (let item of data) {
       const hasTradeFee = !this.isEmptyObject(item.tradeFee);
@@ -2384,7 +2383,18 @@ export class SwapBlock extends Module implements PageBlock {
 		}
 		result.message = { ...params };
 		result.showModal();
-	}
+  }
+  
+  private async initData() {
+    if (!this.isInited) {
+      await this.initWalletData();
+      setDataFromSCConfig(Networks, InfuraId);
+      setCurrentChainId(getDefaultChainId());
+      this.initTokenSelection();
+      await this.initApprovalModelAction();
+      this.isInited = true;
+    }
+  }
 
   init = async () => {
     this.chainId = getChainId();
@@ -2393,11 +2403,6 @@ export class SwapBlock extends Module implements PageBlock {
     super.init();
     this.openswapResult = new Result();
     this.swapComponent.appendChild(this.openswapResult);
-		this.initWalletData();
-		setDataFromSCConfig(Networks, InfuraId);
-    setCurrentChainId(getDefaultChainId());
-    this.initTokenSelection();
-    this.initApprovalModelAction();
   }
 
 	render() {
