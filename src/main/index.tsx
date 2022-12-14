@@ -7,7 +7,6 @@ import {
   ChainNativeTokenByChainId,
   getChainId,
   getTokenBalances,
-  getAvailableMarkets,
   isExpertMode,
   projectNativeTokenSymbol,
   getTokenMap,
@@ -132,8 +131,8 @@ export class SwapBlock extends Module implements PageBlock {
   private isPriceToggled: boolean;
   private record: any;
   private allTokenBalancesMap: any;
-  private checkHasWallet: boolean;
-  private availableMarkets: any;
+  // private checkHasWallet: boolean;
+  // private availableMarkets: any;
   private chainId: number;
   private fallbackUrl: string = Assets.fullPath('img/tokens/Custom.png');
   @observable()
@@ -214,7 +213,7 @@ export class SwapBlock extends Module implements PageBlock {
     this._data = value;
     this.cardConfig.data = value;
     setProviderList(value.data);
-    // this.onSetupPage(isWalletConnected());
+    this.onSetupPage(isWalletConnected());
 	}
 
 	async getTag() {
@@ -227,7 +226,6 @@ export class SwapBlock extends Module implements PageBlock {
 
   async confirm() {
     this._data = this.cardConfig.data
-    console.log('confirm')
     setProviderList(this._data.data);
     if (this._data?.data?.length)
       this.onSetupPage(isWalletConnected());
@@ -246,7 +244,11 @@ export class SwapBlock extends Module implements PageBlock {
 		this.cardConfig.visible = true;
 	}
 
-	async config() {}
+  async config() { }
+  
+  async onConfigSave() {
+    console.log('onConfig')
+	}
 
   private isEmptyObject(obj: any): boolean {
     let result = false;
@@ -314,7 +316,7 @@ export class SwapBlock extends Module implements PageBlock {
     this.chainId = getChainId();
     if (this.chainId != null && this.chainId != undefined)
       this.swapBtn.classList.remove('hidden');
-    this.availableMarkets = getAvailableMarkets() || [];
+    // this.availableMarkets = getAvailableMarkets() || [];
     if (this._data?.data?.length) this.onSetupPage(true);
     this.swapButtonText = this.getSwapButtonText()
   }
@@ -451,7 +453,7 @@ export class SwapBlock extends Module implements PageBlock {
   private onSetupPage = async (connected: boolean) => {
     this.getAddressFromUrl();
     this.chainId = getChainId();
-    this.checkHasWallet = hasWallet();
+    // this.checkHasWallet = hasWallet();
     this.swapButtonText = this.getSwapButtonText();
     await this.updateBalance();
     await this.onRenderChainList();
@@ -540,7 +542,7 @@ export class SwapBlock extends Module implements PageBlock {
       this.lastUpdated = 0;
       if (!this.record)
         this.swapBtn.classList.add('hidden');
-      this.onRenderIconList();
+      // this.onRenderIconList();
       this.onRenderPriceInfo();
       this.redirectToken();
       await this.handleAddRoute();
@@ -1952,17 +1954,17 @@ export class SwapBlock extends Module implements PageBlock {
     this.fromSlider.value = val > 100 ? 100 : val;
   }
   async onRenderIconList() {
-    this.iconList.innerHTML = '';
-    this.availableMarkets.forEach(async (item: any) => {
-      const config = getProviderList().find(p => p.key === item)  // ProviderConfigMap[item];
-      if (config) {
-        const image = new Image();
-        image.url = config.image;
-        image.tooltip.content = config.key;
-        image.classList.add('icon-item');
-        this.iconList.appendChild(image);
-      }
-    })
+    // this.iconList.innerHTML = '';
+    // this.availableMarkets.forEach(async (item: any) => {
+    //   const config = getProviderList().find(p => p.key === item)  // ProviderConfigMap[item];
+    //   if (config) {
+    //     const image = new Image();
+    //     image.url = config.image;
+    //     image.tooltip.content = config.key;
+    //     image.classList.add('icon-item');
+    //     this.iconList.appendChild(image);
+    //   }
+    // })
   }
   onRenderPriceInfo() {
     if (!this.priceInfo) {
@@ -2386,7 +2388,7 @@ export class SwapBlock extends Module implements PageBlock {
 
   init = async () => {
     this.chainId = getChainId();
-    this.availableMarkets = getAvailableMarkets() || [];
+    // this.availableMarkets = getAvailableMarkets() || [];
     this.swapButtonText = this.getSwapButtonText();
     super.init();
     this.openswapResult = new Result();

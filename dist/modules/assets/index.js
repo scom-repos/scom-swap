@@ -8,10 +8,6 @@ define("@swap/assets", ["require", "exports", "@ijstech/components"], function (
         return `${moduleDir}/${path}`;
     }
     exports.default = {
-        icons: {
-            logo: `${moduleDir}/img/openswap-logo-beta.svg`,
-            logoMobile: `${moduleDir}/img/OpenSwap-Logo-Mobile.svg`
-        },
         fullPath
     };
 });

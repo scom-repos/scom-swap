@@ -16,12 +16,6 @@ define("@swap/main/index.css.ts", ["require", "exports", "@ijstech/components", 
         primaryDisabled: 'transparent linear-gradient(270deg,#351f52,#552a42) 0% 0% no-repeat padding-box !important'
     };
     components_1.Styles.fontFace({
-        fontFamily: "Apple SD Gothic Neo",
-        src: `url("${assets_1.default.fullPath('fonts/FontsFree-Net-Apple-SD-Gothic-Neo-Bold.ttf')}") format("truetype")`,
-        fontWeight: 'bold',
-        fontStyle: 'normal'
-    });
-    components_1.Styles.fontFace({
         fontFamily: "Montserrat Regular",
         src: `url("${assets_1.default.fullPath('fonts/montserrat/Montserrat-Regular.ttf')}") format("truetype")`,
         fontWeight: 'nomal',
@@ -875,7 +869,7 @@ define("@swap/main", ["require", "exports", "@ijstech/components", "@ijstech/eth
                 this.chainId = store_1.getChainId();
                 if (this.chainId != null && this.chainId != undefined)
                     this.swapBtn.classList.remove('hidden');
-                this.availableMarkets = store_1.getAvailableMarkets() || [];
+                // this.availableMarkets = getAvailableMarkets() || [];
                 if ((_b = (_a = this._data) === null || _a === void 0 ? void 0 : _a.data) === null || _b === void 0 ? void 0 : _b.length)
                     this.onSetupPage(true);
                 this.swapButtonText = this.getSwapButtonText();
@@ -966,7 +960,7 @@ define("@swap/main", ["require", "exports", "@ijstech/components", "@ijstech/eth
                 var _a, _b, _c, _d, _e, _f, _g;
                 this.getAddressFromUrl();
                 this.chainId = store_1.getChainId();
-                this.checkHasWallet = store_1.hasWallet();
+                // this.checkHasWallet = hasWallet();
                 this.swapButtonText = this.getSwapButtonText();
                 await this.updateBalance();
                 await this.onRenderChainList();
@@ -1045,7 +1039,7 @@ define("@swap/main", ["require", "exports", "@ijstech/components", "@ijstech/eth
                 this.lastUpdated = 0;
                 if (!this.record)
                     this.swapBtn.classList.add('hidden');
-                this.onRenderIconList();
+                // this.onRenderIconList();
                 this.onRenderPriceInfo();
                 this.redirectToken();
                 await this.handleAddRoute();
@@ -1572,7 +1566,7 @@ define("@swap/main", ["require", "exports", "@ijstech/components", "@ijstech/eth
             };
             this.init = async () => {
                 this.chainId = store_1.getChainId();
-                this.availableMarkets = store_1.getAvailableMarkets() || [];
+                // this.availableMarkets = getAvailableMarkets() || [];
                 this.swapButtonText = this.getSwapButtonText();
                 super.init();
                 this.openswapResult = new result_1.Result();
@@ -1598,7 +1592,7 @@ define("@swap/main", ["require", "exports", "@ijstech/components", "@ijstech/eth
             this._data = value;
             this.cardConfig.data = value;
             store_1.setProviderList(value.data);
-            // this.onSetupPage(isWalletConnected());
+            this.onSetupPage(store_1.isWalletConnected());
         }
         async getTag() {
             return this.tag;
@@ -1609,7 +1603,6 @@ define("@swap/main", ["require", "exports", "@ijstech/components", "@ijstech/eth
         async confirm() {
             var _a, _b;
             this._data = this.cardConfig.data;
-            console.log('confirm');
             store_1.setProviderList(this._data.data);
             if ((_b = (_a = this._data) === null || _a === void 0 ? void 0 : _a.data) === null || _b === void 0 ? void 0 : _b.length)
                 this.onSetupPage(store_1.isWalletConnected());
@@ -1626,6 +1619,9 @@ define("@swap/main", ["require", "exports", "@ijstech/components", "@ijstech/eth
             this.cardConfig.visible = true;
         }
         async config() { }
+        async onConfigSave() {
+            console.log('onConfig');
+        }
         isEmptyObject(obj) {
             let result = false;
             for (let prop in obj) {
@@ -2904,17 +2900,17 @@ define("@swap/main", ["require", "exports", "@ijstech/components", "@ijstech/eth
             this.fromSlider.value = val > 100 ? 100 : val;
         }
         async onRenderIconList() {
-            this.iconList.innerHTML = '';
-            this.availableMarkets.forEach(async (item) => {
-                const config = store_1.getProviderList().find(p => p.key === item); // ProviderConfigMap[item];
-                if (config) {
-                    const image = new components_2.Image();
-                    image.url = config.image;
-                    image.tooltip.content = config.key;
-                    image.classList.add('icon-item');
-                    this.iconList.appendChild(image);
-                }
-            });
+            // this.iconList.innerHTML = '';
+            // this.availableMarkets.forEach(async (item: any) => {
+            //   const config = getProviderList().find(p => p.key === item)  // ProviderConfigMap[item];
+            //   if (config) {
+            //     const image = new Image();
+            //     image.url = config.image;
+            //     image.tooltip.content = config.key;
+            //     image.classList.add('icon-item');
+            //     this.iconList.appendChild(image);
+            //   }
+            // })
         }
         onRenderPriceInfo() {
             if (!this.priceInfo) {

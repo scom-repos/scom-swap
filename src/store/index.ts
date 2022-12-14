@@ -17,7 +17,6 @@ import {
   CoreContractAddressesByChainId,
   ChainNativeTokenByChainId,
   WETHByChainId,
-  availableMarketsByChainId,
   getTokenIconPath,
 } from './data/index';
 
@@ -107,11 +106,11 @@ export function getErc20(address: string) {
   return new Erc20(wallet, address);
 }
 
-export function getAvailableMarkets() {
-  let chainId = getChainId();
-  let markets = availableMarketsByChainId[chainId];
-  return markets;
-}
+// export function getAvailableMarkets() {
+//   let chainId = getChainId();
+//   let markets = availableMarketsByChainId[chainId];
+//   return markets;
+// }
 
 export const isExpertMode = (): boolean => {
   return state.isExpertMode;

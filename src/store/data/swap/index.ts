@@ -187,66 +187,66 @@
 //   },
 // };
 
-export const availableMarketsByChainId: { [key: number]: string[] } = {
-  1: [
-    // 'OpenSwap', 
-    'Uniswap',
-    'SushiSwap'
-  ],
-  // Rinkeby
-  4: [
-    'OpenSwap',
-    'Uniswap',
-    'SushiSwap'
-  ],
-  // Kovan
-  42: [
-    'OpenSwap',
-    'Uniswap',
-    'SushiSwap'
-  ],
-  // Binance Mainnet
-  56: [
-    'OpenSwap',
-    //'OpenSwapV1', 
-    'PancakeSwap',
-    // 'PancakeSwapV1',
-    'BakerySwap',
-    //'BurgerSwap'
-    'IFSwapV1',
-    'BiSwap',
-    'IFSwapV3',
-  ],
-  // Binance Test Chain
-  97: [
-    'OpenSwap',
-    'PancakeSwap',
-    'BakerySwap',
-    'BurgerSwap'
-  ],
-  // Polygon
-  137: [
-    'SushiSwap',
-    'QuickSwap',
-  ],
-  // Moonbeam
-  1287: ['OpenSwap'],
-  1337: ['OpenSwap'],
-  // Amino Testnet    
-  31337: ['OpenSwap'],
-  // Mumbai, Polygon Testnet
-  80001: ['OpenSwap'],
-  // Avalance Mainnet C-Chain
-  43114: ['OpenSwap', 'Pangolin', 'TraderJoe', 'SushiSwap'],
-  // Avalance Fuji Testnet C-Chain
-  43113: ['Pangolin', 'OpenSwap', 'SushiSwap'],
-  // Fantom Opera
-  250: ['SpiritSwap', 'SpookySwap', 'SushiSwap'],
-  // Fantom Testnet
-  4002: ['OpenSwap'],
-  13370: ['OpenSwap'],
-  // Cronos Mainnet
-  //25: ['SpiritSwap', 'SpookySwap', 'SushiSwap'],
-  // Cronos Testnet
-  338: ['OpenSwap']
-}
+// export const availableMarketsByChainId: { [key: number]: string[] } = {
+//   1: [
+//     // 'OpenSwap', 
+//     'Uniswap',
+//     'SushiSwap'
+//   ],
+//   // Rinkeby
+//   4: [
+//     'OpenSwap',
+//     'Uniswap',
+//     'SushiSwap'
+//   ],
+//   // Kovan
+//   42: [
+//     'OpenSwap',
+//     'Uniswap',
+//     'SushiSwap'
+//   ],
+//   // Binance Mainnet
+//   56: [
+//     'OpenSwap',
+//     //'OpenSwapV1', 
+//     'PancakeSwap',
+//     // 'PancakeSwapV1',
+//     'BakerySwap',
+//     //'BurgerSwap'
+//     'IFSwapV1',
+//     'BiSwap',
+//     'IFSwapV3',
+//   ],
+//   // Binance Test Chain
+//   97: [
+//     'OpenSwap',
+//     'PancakeSwap',
+//     'BakerySwap',
+//     'BurgerSwap'
+//   ],
+//   // Polygon
+//   137: [
+//     'SushiSwap',
+//     'QuickSwap',
+//   ],
+//   // Moonbeam
+//   1287: ['OpenSwap'],
+//   1337: ['OpenSwap'],
+//   // Amino Testnet    
+//   31337: ['OpenSwap'],
+//   // Mumbai, Polygon Testnet
+//   80001: ['OpenSwap'],
+//   // Avalance Mainnet C-Chain
+//   43114: ['OpenSwap', 'Pangolin', 'TraderJoe', 'SushiSwap'],
+//   // Avalance Fuji Testnet C-Chain
+//   43113: ['Pangolin', 'OpenSwap', 'SushiSwap'],
+//   // Fantom Opera
+//   250: ['SpiritSwap', 'SpookySwap', 'SushiSwap'],
+//   // Fantom Testnet
+//   4002: ['OpenSwap'],
+//   13370: ['OpenSwap'],
+//   // Cronos Mainnet
+//   //25: ['SpiritSwap', 'SpookySwap', 'SushiSwap'],
+//   // Cronos Testnet
+//   338: ['OpenSwap']
+// }
