@@ -1,0 +1,49 @@
+{
+  "name": "@swap/main",
+  "env": "mainnet",
+  "version": "0.1.0",
+  "moduleDir": "src",
+  "main": "@swap/main",
+  "modules": {
+    "@swap/assets": {
+      "path": "assets"
+    },
+    "@swap/global": {
+      "path": "global"
+    },
+    "@swap/store": {
+      "path": "store"
+    },
+    "@swap/result": {
+      "path": "result"
+    },
+    "@swap/main": {
+      "path": "main"
+    },
+    "@swap/token-selection": {
+      "path": "token-selection"
+    },
+    "@swap/swap-utils": {
+      "path": "swap-utils"
+    },
+    "@swap/queue-utils": {
+      "path": "queue-utils"
+    },
+    "@swap/crosschain-utils": {
+      "path": "crosschain-utils"
+    },
+    "@swap/price-info": {
+      "path": "price-info"
+    },
+    "@swap/swap-config": {
+      "path": "swap-config"
+    }
+  },
+  "dependencies": {
+    "@ijstech/eth-contract": "*",
+    "@openswap/sdk": "*",
+    "@openswap/chainlink-sdk": "*",
+    "@openswap/cross-chain-bridge-sdk": "*",
+    "@openswap/oracle-adaptor-sdk": "*"
+  }
+}
