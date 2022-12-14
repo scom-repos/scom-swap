@@ -3068,261 +3068,6 @@ define("@swap/store/data/core/index.ts", ["require", "exports"], function (requi
         }
     };
 });
-///<amd-module name='@swap/store/data/swap/index.ts'/> 
-// import Assets from '@swap/assets';
-// export interface ProviderConfig {
-//   caption: string;
-//   image: string;
-//   key: string;
-//   marketCode: number;
-//   dexId?: number;
-//   supportedChains?: number[];
-// }
-define("@swap/store/data/swap/index.ts", ["require", "exports"], function (require, exports) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    exports.availableMarketsByChainId = void 0;
-    // export enum Market {
-    //   OPENSWAP = 'OpenSwap',
-    //   UNISWAP = 'Uniswap',
-    //   SUSHISWAP = 'SushiSwap',
-    //   PANCAKESWAPV1 = 'PancakeSwapV1',
-    //   PANCAKESWAP = 'PancakeSwap',
-    //   BAKERYSWAP = 'BakerySwap',
-    //   BURGERSWAP = 'BurgerSwap',
-    //   IFSWAPV1 = 'IFSwapV1',
-    //   OPENSWAPV1 = 'OpenSwapV1',
-    //   HYBRID = 'Hybrid',
-    //   MIXED_QUEUE = 'MIXED_QUEUE',
-    //   GROUP_QUEUE = 'GroupQueue',
-    //   QUICKSWAP = 'QUICKSWAP',
-    //   BISWAP = 'BISWAP',
-    //   PANGOLIN = 'PANGOLIN',
-    //   TRADERJOE = 'TRADERJOE',
-    //   SPIRITSWAP = 'SPIRITSWAP',
-    //   SPOOKYSWAP = 'SPOOKYSWAP',
-    //   PEGGED_QUEUE = 'PEGGED_QUEUE',
-    //   HAKUSWAP = 'HAKUSWAP',
-    //   JETSWAP = 'JETSWAP',
-    //   IFSWAPV3 = 'IFSwapV3'
-    // }
-    // export const ProviderConfigMap: { [key: string]: any } = {
-    //   OpenSwap: {
-    //     caption: 'OpenSwap',
-    //     image: Assets.fullPath('img/swap/openswap.png'),
-    //     marketCode: Market.OPENSWAP,
-    //     key: 'OpenSwap',
-    //     dexId: 1,
-    //     supportedChains: [42, 56, 97, 4002, 43113, 43114, 80001, 13370, 338]
-    //   },
-    //   Uniswap: {
-    //     caption: 'Uniswap',
-    //     image: Assets.fullPath('img/swap/uniswap-logo.svg'),
-    //     marketCode: Market.UNISWAP,
-    //     key: 'Uniswap',
-    //     dexId: 10,
-    //     supportedChains: [1, 42]
-    //   },
-    //   SushiSwap: {
-    //     caption: 'SushiSwap',
-    //     image: Assets.fullPath('img/swap/sushiswap-logo.svg'),
-    //     marketCode: Market.SUSHISWAP,
-    //     key: 'SushiSwap',
-    //     dexId: 8,
-    //     supportedChains: [1, 42, 137, 250, 43113, 43114]
-    //   },
-    //   PancakeSwap: {
-    //     caption: 'PancakeSwap',
-    //     image: Assets.fullPath('img/swap/pancakeswap.svg'),
-    //     marketCode: Market.PANCAKESWAP,
-    //     key: 'PancakeSwap',
-    //     dexId: 2,
-    //     supportedChains: [56, 97]
-    //   },
-    //   PancakeSwapV1: {
-    //     caption: 'PancakeSwapV1',
-    //     image: Assets.fullPath('img/pancakeswap.svg'),
-    //     marketCode: Market.PANCAKESWAPV1,
-    //     key: 'PancakeSwapV1'
-    //   },
-    //   BakerySwap: {
-    //     caption: 'BakerySwap',
-    //     image: Assets.fullPath('img/swap/bakeryswap.svg'),
-    //     marketCode: Market.BAKERYSWAP,
-    //     key: 'BakerySwap',
-    //     dexId: 3,
-    //     supportedChains: [56, 97]
-    //   },
-    //   BurgerSwap: {
-    //     caption: 'BurgerSwap',
-    //     image: Assets.fullPath('img/swap/burgerswap.png'),
-    //     marketCode: Market.BURGERSWAP,
-    //     key: 'BurgerSwap',
-    //     dexId: 4
-    //   },
-    //   Oracle: {
-    //     caption: 'Oracle',
-    //     image: Assets.fullPath('img/swap/openswap.png'),
-    //     marketCode: Market.MIXED_QUEUE,
-    //     key: 'Oracle',
-    //     dexId: 5,
-    //     supportedChains: [56, 97, 43113, 43114]
-    //   },
-    //   PeggedOracle: {
-    //     caption: 'Pegged Queue',
-    //     image: Assets.fullPath('img/swap/openswap.png'),
-    //     marketCode: Market.PEGGED_QUEUE,
-    //     key: 'PeggedOracle'
-    //   },
-    //   GroupQueue: {
-    //     caption: 'Group Queue',
-    //     image: Assets.fullPath('img/swap/openswap.png'),
-    //     marketCode: Market.GROUP_QUEUE,
-    //     key: 'GroupQueue'
-    //   },
-    //   IFSwapV1: {
-    //     caption: 'IFSwapV1',
-    //     image: Assets.fullPath('img/swap/IFSwapV1.png'),
-    //     marketCode: Market.IFSWAPV1,
-    //     key: 'IFSwapV1',
-    //     dexId: 7,
-    //     supportedChains: [56]
-    //   },
-    //   IFSwapV3: {
-    //     caption: 'IFSwapV3',
-    //     image: Assets.fullPath('img/swap/IFSwapV1.png'),
-    //     marketCode: Market.IFSWAPV3,
-    //     key: 'IFSwapV3',
-    //     dexId: 18,
-    //     supportedChains: [56]
-    //   },
-    //   OpenSwapV1: {
-    //     caption: 'OpenSwapV1',
-    //     image: Assets.fullPath('img/swap/openswap.png'),
-    //     marketCode: Market.OPENSWAPV1,
-    //     key: 'OpenSwapV1'
-    //   },
-    //   Hybrid: {
-    //     caption: 'Smart Router',
-    //     image: Assets.fullPath('img/swap/openswap.png'),
-    //     marketCode: Market.HYBRID,
-    //     key: 'Hybrid',
-    //     dexId: 0,
-    //     supportedChains: [42, 56, 97, 43113, 43114]
-    //   },
-    //   QuickSwap: {
-    //     caption: 'QuickSwap',
-    //     image: Assets.fullPath('img/swap/quickswap-logo.png'),
-    //     marketCode: Market.QUICKSWAP,
-    //     key: 'QuickSwap',
-    //     dexId: 9,
-    //     supportedChains: [137]
-    //   },
-    //   BiSwap: {
-    //     caption: 'BiSwap',
-    //     image: Assets.fullPath('img/swap/biswapsvg.svg'),
-    //     marketCode: Market.BISWAP,
-    //     key: 'BiSwap',
-    //     dexId: 11,
-    //     supportedChains: [56]
-    //   },
-    //   Pangolin: {
-    //     caption: 'Pangolin',
-    //     image: Assets.fullPath('img/swap/pangolin.svg'),
-    //     marketCode: Market.PANGOLIN,
-    //     key: 'Pangolin',
-    //     dexId: 12,
-    //     supportedChains: [43113, 43114]
-    //   },
-    //   TraderJoe: {
-    //     caption: 'TraderJoe',
-    //     image: Assets.fullPath('img/swap/traderjoe.svg'),
-    //     marketCode: Market.TRADERJOE,
-    //     key: 'TraderJoe',
-    //     dexId: 13,
-    //     supportedChains: [43114]
-    //   },
-    //   SpiritSwap: {
-    //     caption: 'SpiritSwap',
-    //     image: Assets.fullPath('img/swap/spiritswap-logo.svg'),
-    //     marketCode: Market.SPIRITSWAP,
-    //     key: 'SpiritSwap',
-    //     dexId: 15,
-    //     supportedChains: [250]
-    //   },
-    //   SpookySwap: {
-    //     caption: 'SpookySwap',
-    //     image: Assets.fullPath('img/swap/spookyswap-logo.svg'),
-    //     marketCode: Market.SPOOKYSWAP,
-    //     key: 'SpookySwap',
-    //     dexId: 14,
-    //     supportedChains: [250]
-    //   },
-    // };
-    exports.availableMarketsByChainId = {
-        1: [
-            // 'OpenSwap', 
-            'Uniswap',
-            'SushiSwap'
-        ],
-        // Rinkeby
-        4: [
-            'OpenSwap',
-            'Uniswap',
-            'SushiSwap'
-        ],
-        // Kovan
-        42: [
-            'OpenSwap',
-            'Uniswap',
-            'SushiSwap'
-        ],
-        // Binance Mainnet
-        56: [
-            'OpenSwap',
-            //'OpenSwapV1', 
-            'PancakeSwap',
-            // 'PancakeSwapV1',
-            'BakerySwap',
-            //'BurgerSwap'
-            'IFSwapV1',
-            'BiSwap',
-            'IFSwapV3',
-        ],
-        // Binance Test Chain
-        97: [
-            'OpenSwap',
-            'PancakeSwap',
-            'BakerySwap',
-            'BurgerSwap'
-        ],
-        // Polygon
-        137: [
-            'SushiSwap',
-            'QuickSwap',
-        ],
-        // Moonbeam
-        1287: ['OpenSwap'],
-        1337: ['OpenSwap'],
-        // Amino Testnet    
-        31337: ['OpenSwap'],
-        // Mumbai, Polygon Testnet
-        80001: ['OpenSwap'],
-        // Avalance Mainnet C-Chain
-        43114: ['OpenSwap', 'Pangolin', 'TraderJoe', 'SushiSwap'],
-        // Avalance Fuji Testnet C-Chain
-        43113: ['Pangolin', 'OpenSwap', 'SushiSwap'],
-        // Fantom Opera
-        250: ['SpiritSwap', 'SpookySwap', 'SushiSwap'],
-        // Fantom Testnet
-        4002: ['OpenSwap'],
-        13370: ['OpenSwap'],
-        // Cronos Mainnet
-        //25: ['SpiritSwap', 'SpookySwap', 'SushiSwap'],
-        // Cronos Testnet
-        338: ['OpenSwap']
-    };
-});
 define("@swap/store/data/cross-chain/index.ts", ["require", "exports"], function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
@@ -3579,17 +3324,10 @@ define("@swap/store/data/cross-chain/index.ts", ["require", "exports"], function
     exports.TrollManagementActionType = TrollManagementActionType;
     ;
 });
-define("@swap/store/data/index.ts", ["require", "exports", "@swap/store/data/tokens/index.ts", "@swap/store/data/networks/index.ts", "@swap/store/data/core/index.ts", "@swap/store/data/swap/index.ts", "@swap/store/data/cross-chain/index.ts"], function (require, exports, index_3, index_4, index_5, index_6, index_7) {
+define("@swap/store/data/index.ts", ["require", "exports", "@swap/store/data/tokens/index.ts", "@swap/store/data/networks/index.ts", "@swap/store/data/core/index.ts", "@swap/store/data/cross-chain/index.ts"], function (require, exports, index_3, index_4, index_5, index_6) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.availableMarketsByChainId = exports.CoreContractAddressesByChainId = exports.Networks = exports.InfuraId = exports.getOpenSwapToken = exports.getTokenIconPath = exports.tokenPriceAMMReference = exports.ToUSDPriceFeedAddressesMap = exports.DefaultTokens = exports.WETHByChainId = exports.ChainNativeTokenByChainId = exports.DefaultERC20Tokens = exports.LockTokenType = void 0;
-    ///<amd-module name='@swap/store/data/index.ts'/> 
-    var LockTokenType;
-    (function (LockTokenType) {
-        LockTokenType[LockTokenType["ERC20_Token"] = 0] = "ERC20_Token";
-        LockTokenType[LockTokenType["LP_Token"] = 1] = "LP_Token";
-        LockTokenType[LockTokenType["VAULT_Token"] = 2] = "VAULT_Token";
-    })(LockTokenType = exports.LockTokenType || (exports.LockTokenType = {}));
+    exports.CoreContractAddressesByChainId = exports.Networks = exports.InfuraId = exports.getOpenSwapToken = exports.getTokenIconPath = exports.tokenPriceAMMReference = exports.ToUSDPriceFeedAddressesMap = exports.DefaultTokens = exports.WETHByChainId = exports.ChainNativeTokenByChainId = exports.DefaultERC20Tokens = void 0;
     Object.defineProperty(exports, "DefaultERC20Tokens", { enumerable: true, get: function () { return index_3.DefaultERC20Tokens; } });
     Object.defineProperty(exports, "ChainNativeTokenByChainId", { enumerable: true, get: function () { return index_3.ChainNativeTokenByChainId; } });
     Object.defineProperty(exports, "WETHByChainId", { enumerable: true, get: function () { return index_3.WETHByChainId; } });
@@ -3601,13 +3339,12 @@ define("@swap/store/data/index.ts", ["require", "exports", "@swap/store/data/tok
     Object.defineProperty(exports, "InfuraId", { enumerable: true, get: function () { return index_4.InfuraId; } });
     Object.defineProperty(exports, "Networks", { enumerable: true, get: function () { return index_4.Networks; } });
     Object.defineProperty(exports, "CoreContractAddressesByChainId", { enumerable: true, get: function () { return index_5.CoreContractAddressesByChainId; } });
-    Object.defineProperty(exports, "availableMarketsByChainId", { enumerable: true, get: function () { return index_6.availableMarketsByChainId; } });
-    __exportStar(index_7, exports);
+    __exportStar(index_6, exports);
 });
-define("@swap/store", ["require", "exports", "@ijstech/eth-wallet", "@ijstech/components", "@swap/global", "@swap/assets", "@openswap/sdk", "@swap/store/data/index.ts", "@swap/store/data/index.ts"], function (require, exports, eth_wallet_1, components_1, global_1, assets_1, sdk_1, index_8, index_9) {
+define("@swap/store", ["require", "exports", "@ijstech/eth-wallet", "@ijstech/components", "@swap/global", "@swap/assets", "@openswap/sdk", "@swap/store/data/index.ts", "@swap/store/data/index.ts"], function (require, exports, eth_wallet_1, components_1, global_1, assets_1, sdk_1, index_7, index_8) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.getBridgeVaultVersion = exports.maxHeight = exports.maxWidth = exports.isMultiple = exports.isThemeApplied = exports.getTokenUrl = exports.baseUrl = exports.hasMetaMask = exports.hasWallet = exports.logoutWallet = exports.switchNetwork = exports.connectWallet = exports.isWalletConnected = exports.getWalletOptions = exports.walletList = exports.viewOnExplorerByAddress = exports.viewOnExplorerByTxHash = exports.hasUserToken = exports.getProviderByKey = exports.getProviderList = exports.setProviderList = exports.setUserTokens = exports.tokenSymbol = exports.getTokenIcon = exports.getTokenDecimals = exports.getTokensDataList = exports.getTokenMap = exports.setTokenMap = exports.getTokenObject = exports.projectNativeTokenSymbol = exports.projectNativeToken = exports.getNetworkImg = exports.getNetworkExplorerName = exports.getSiteSupportedNetworks = exports.getMatchNetworks = exports.getFilteredNetworks = exports.getNetworkInfo = exports.getInfuraId = exports.getDefaultChainId = exports.setDataFromSCConfig = exports.state = exports.setTokenBalances = exports.getTokenBalance = exports.getTokenBalances = exports.updateAllTokenBalances = exports.getTokenList = exports.setTransactionDeadline = exports.getTransactionDeadline = exports.setSlippageTolerance = exports.getSlippageTolerance = exports.toggleExpertMode = exports.isExpertMode = exports.getAvailableMarkets = exports.getErc20 = exports.getWalletProvider = exports.getWallet = exports.getChainId = exports.getWETH = exports.getChainNativeToken = exports.getAddresses = exports.getCurrentChainId = exports.setCurrentChainId = exports.getSiteEnv = exports.setSiteEnv = exports.addUserTokens = exports.getUserTokens = exports.nullAddress = exports.fallBackUrl = void 0;
+    exports.getBridgeVaultVersion = exports.maxHeight = exports.maxWidth = exports.isMultiple = exports.isThemeApplied = exports.getTokenUrl = exports.baseUrl = exports.hasMetaMask = exports.hasWallet = exports.logoutWallet = exports.switchNetwork = exports.connectWallet = exports.isWalletConnected = exports.getWalletOptions = exports.walletList = exports.viewOnExplorerByAddress = exports.viewOnExplorerByTxHash = exports.hasUserToken = exports.getProviderByKey = exports.getProviderList = exports.setProviderList = exports.setUserTokens = exports.tokenSymbol = exports.getTokenIcon = exports.getTokenDecimals = exports.getTokensDataList = exports.getTokenMap = exports.setTokenMap = exports.getTokenObject = exports.projectNativeTokenSymbol = exports.projectNativeToken = exports.getNetworkImg = exports.getNetworkExplorerName = exports.getSiteSupportedNetworks = exports.getMatchNetworks = exports.getFilteredNetworks = exports.getNetworkInfo = exports.getInfuraId = exports.getDefaultChainId = exports.setDataFromSCConfig = exports.state = exports.setTokenBalances = exports.getTokenBalance = exports.getTokenBalances = exports.updateAllTokenBalances = exports.getTokenList = exports.setTransactionDeadline = exports.getTransactionDeadline = exports.setSlippageTolerance = exports.getSlippageTolerance = exports.toggleExpertMode = exports.isExpertMode = exports.getErc20 = exports.getWalletProvider = exports.getWallet = exports.getChainId = exports.getWETH = exports.getChainNativeToken = exports.getAddresses = exports.getCurrentChainId = exports.setCurrentChainId = exports.getSiteEnv = exports.setSiteEnv = exports.addUserTokens = exports.getUserTokens = exports.nullAddress = exports.fallBackUrl = void 0;
     exports.fallBackUrl = assets_1.default.fullPath('img/tokens/token-placeholder.svg');
     exports.nullAddress = "0x0000000000000000000000000000000000000000";
     const TOKENS = "oswap_user_tokens_";
@@ -3665,16 +3402,16 @@ define("@swap/store", ["require", "exports", "@ijstech/eth-wallet", "@ijstech/co
     };
     exports.getCurrentChainId = getCurrentChainId;
     function getAddresses(chainId) {
-        return index_8.CoreContractAddressesByChainId[chainId];
+        return index_7.CoreContractAddressesByChainId[chainId];
     }
     exports.getAddresses = getAddresses;
     ;
     const getChainNativeToken = (chainId) => {
-        return index_8.ChainNativeTokenByChainId[chainId];
+        return index_7.ChainNativeTokenByChainId[chainId];
     };
     exports.getChainNativeToken = getChainNativeToken;
     const getWETH = (chainId) => {
-        let wrappedToken = index_8.WETHByChainId[chainId];
+        let wrappedToken = index_7.WETHByChainId[chainId];
         return wrappedToken;
     };
     exports.getWETH = getWETH;
@@ -3696,12 +3433,11 @@ define("@swap/store", ["require", "exports", "@ijstech/eth-wallet", "@ijstech/co
         return new eth_wallet_1.Erc20(wallet, address);
     }
     exports.getErc20 = getErc20;
-    function getAvailableMarkets() {
-        let chainId = getChainId();
-        let markets = index_8.availableMarketsByChainId[chainId];
-        return markets;
-    }
-    exports.getAvailableMarkets = getAvailableMarkets;
+    // export function getAvailableMarkets() {
+    //   let chainId = getChainId();
+    //   let markets = availableMarketsByChainId[chainId];
+    //   return markets;
+    // }
     const isExpertMode = () => {
         return exports.state.isExpertMode;
     };
@@ -3727,7 +3463,7 @@ define("@swap/store", ["require", "exports", "@ijstech/eth-wallet", "@ijstech/co
     };
     exports.setTransactionDeadline = setTransactionDeadline;
     const getTokenList = (chainId) => {
-        const tokenList = [...index_8.DefaultTokens[chainId]];
+        const tokenList = [...index_7.DefaultTokens[chainId]];
         const userCustomTokens = exports.getUserTokens(chainId);
         if (userCustomTokens) {
             userCustomTokens.forEach(v => tokenList.push(Object.assign(Object.assign({}, v), { isNew: false, isCustom: true })));
@@ -3738,7 +3474,7 @@ define("@swap/store", ["require", "exports", "@ijstech/eth-wallet", "@ijstech/co
     async function updateAllTokenBalances() {
         const wallet = getWallet();
         let allTokenBalancesMap = {};
-        if (!wallet.chainId || !index_8.DefaultTokens[wallet.chainId])
+        if (!wallet.chainId || !index_7.DefaultTokens[wallet.chainId])
             return allTokenBalancesMap;
         const tokenList = exports.getTokenList(wallet.chainId);
         let promises = [];
@@ -3899,7 +3635,7 @@ define("@swap/store", ["require", "exports", "@ijstech/eth-wallet", "@ijstech/co
         let chainId = getChainId();
         if (chainId == null || chainId == undefined)
             return null;
-        let stakeToken = index_8.DefaultTokens[chainId].find(v => v.symbol == 'OSWAP');
+        let stakeToken = index_7.DefaultTokens[chainId].find(v => v.symbol == 'OSWAP');
         return stakeToken ? Object.assign(Object.assign({}, stakeToken), { address: stakeToken.address.toLowerCase() }) : null;
     };
     exports.projectNativeToken = projectNativeToken;
@@ -3929,8 +3665,8 @@ define("@swap/store", ["require", "exports", "@ijstech/eth-wallet", "@ijstech/co
     const getTokenMapData = () => {
         let allTokensMap = {};
         let chainId = getChainId();
-        if (index_8.DefaultTokens[chainId]) {
-            let defaultTokenList = index_8.DefaultTokens[chainId].sort((a, b) => {
+        if (index_7.DefaultTokens[chainId]) {
+            let defaultTokenList = index_7.DefaultTokens[chainId].sort((a, b) => {
                 if (a.symbol.toLowerCase() < b.symbol.toLowerCase()) {
                     return -1;
                 }
@@ -4005,7 +3741,7 @@ define("@swap/store", ["require", "exports", "@ijstech/eth-wallet", "@ijstech/co
         else {
             tokenObject = tokenMap[address.toLowerCase()];
         }
-        return assets_1.default.fullPath(index_8.getTokenIconPath(tokenObject, getChainId()));
+        return assets_1.default.fullPath(index_7.getTokenIconPath(tokenObject, getChainId()));
     };
     exports.getTokenIcon = getTokenIcon;
     const tokenSymbol = (address) => {
@@ -4213,5 +3949,5 @@ define("@swap/store", ["require", "exports", "@ijstech/eth-wallet", "@ijstech/co
         return '1.1.1';
     };
     exports.getBridgeVaultVersion = getBridgeVaultVersion;
-    __exportStar(index_9, exports);
+    __exportStar(index_8, exports);
 });

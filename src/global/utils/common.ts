@@ -1,4 +1,4 @@
-import { Wallet, Erc20, BigNumber, ISendTxEventsOptions } from "@ijstech/eth-wallet"; 
+import { Wallet, Erc20, BigNumber, ISendTxEventsOptions } from "@ijstech/eth-wallet";
 import { Contracts } from "@openswap/sdk";
 
 export interface ITokenObject {
@@ -67,10 +67,4 @@ export const getERC20Allowance = async (token: ITokenObject, spenderAddress: str
     spender: spenderAddress
   });
   return allowance;
-}
-
-export const isAddressValid = async(address: string) => {
-  let wallet = Wallet.getInstance();
-  const isValid = (wallet.web3 as any).utils.isAddress(address);
-  return isValid;
 }

@@ -11,7 +11,7 @@ var __exportStar = (this && this.__exportStar) || function(m, exports) {
 define("@swap/global/utils/common.ts", ["require", "exports", "@ijstech/eth-wallet", "@openswap/sdk"], function (require, exports, eth_wallet_1, sdk_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.isAddressValid = exports.getERC20Allowance = exports.approveERC20Max = exports.getERC20Amount = exports.registerSendTxEvents = exports.isTransactionConfirmed = void 0;
+    exports.getERC20Allowance = exports.approveERC20Max = exports.getERC20Amount = exports.registerSendTxEvents = exports.isTransactionConfirmed = void 0;
     ;
     const isTransactionConfirmed = async (txHash) => {
         const tx = await eth_wallet_1.Wallet.getInstance().getTransactionReceipt(txHash);
@@ -66,12 +66,6 @@ define("@swap/global/utils/common.ts", ["require", "exports", "@ijstech/eth-wall
         return allowance;
     };
     exports.getERC20Allowance = getERC20Allowance;
-    const isAddressValid = async (address) => {
-        let wallet = eth_wallet_1.Wallet.getInstance();
-        const isValid = wallet.web3.utils.isAddress(address);
-        return isValid;
-    };
-    exports.isAddressValid = isAddressValid;
 });
 define("@swap/global/utils/helper.ts", ["require", "exports", "@ijstech/eth-wallet", "@ijstech/components"], function (require, exports, eth_wallet_2, components_1) {
     "use strict";
@@ -575,7 +569,7 @@ define("@swap/global/utils/approvalModel.ts", ["require", "exports", "@ijstech/e
 define("@swap/global/utils/index.ts", ["require", "exports", "@swap/global/utils/helper.ts", "@swap/global/utils/error.ts", "@swap/global/utils/common.ts", "@swap/global/utils/approvalModel.ts"], function (require, exports, helper_1, error_1, common_2, approvalModel_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.ERC20ApprovalModel = exports.ApprovalStatus = exports.getERC20Amount = exports.isAddressValid = exports.getERC20Allowance = exports.approveERC20Max = exports.registerSendTxEvents = exports.isTransactionConfirmed = exports.parseContractError = exports.SITE_ENV = exports.downloadJsonFile = exports.formatPercentNumber = exports.renderBalanceTooltip = exports.compareDate = exports.getWeekDays = exports.uniqWith = exports.formatNumberValue = exports.getParamsFromUrl = exports.numberToBytes32 = exports.toWeiInv = exports.isValidNumber = exports.isInvalidInput = exports.limitInputNumber = exports.limitDecimals = exports.formatUTCDate = exports.formatDate = exports.DefaultDateFormat = exports.DefaultDateTimeFormat = exports.formatNumberWithSeparators = exports.formatNumber = exports.getAPI = void 0;
+    exports.ERC20ApprovalModel = exports.ApprovalStatus = exports.getERC20Amount = exports.getERC20Allowance = exports.approveERC20Max = exports.registerSendTxEvents = exports.isTransactionConfirmed = exports.parseContractError = exports.SITE_ENV = exports.downloadJsonFile = exports.formatPercentNumber = exports.renderBalanceTooltip = exports.compareDate = exports.getWeekDays = exports.uniqWith = exports.formatNumberValue = exports.getParamsFromUrl = exports.numberToBytes32 = exports.toWeiInv = exports.isValidNumber = exports.isInvalidInput = exports.limitInputNumber = exports.limitDecimals = exports.formatUTCDate = exports.formatDate = exports.DefaultDateFormat = exports.DefaultDateTimeFormat = exports.formatNumberWithSeparators = exports.formatNumber = exports.getAPI = void 0;
     Object.defineProperty(exports, "getAPI", { enumerable: true, get: function () { return helper_1.getAPI; } });
     Object.defineProperty(exports, "formatNumber", { enumerable: true, get: function () { return helper_1.formatNumber; } });
     Object.defineProperty(exports, "formatNumberWithSeparators", { enumerable: true, get: function () { return helper_1.formatNumberWithSeparators; } });
@@ -603,7 +597,6 @@ define("@swap/global/utils/index.ts", ["require", "exports", "@swap/global/utils
     Object.defineProperty(exports, "registerSendTxEvents", { enumerable: true, get: function () { return common_2.registerSendTxEvents; } });
     Object.defineProperty(exports, "approveERC20Max", { enumerable: true, get: function () { return common_2.approveERC20Max; } });
     Object.defineProperty(exports, "getERC20Allowance", { enumerable: true, get: function () { return common_2.getERC20Allowance; } });
-    Object.defineProperty(exports, "isAddressValid", { enumerable: true, get: function () { return common_2.isAddressValid; } });
     Object.defineProperty(exports, "getERC20Amount", { enumerable: true, get: function () { return common_2.getERC20Amount; } });
     Object.defineProperty(exports, "ApprovalStatus", { enumerable: true, get: function () { return approvalModel_1.ApprovalStatus; } });
     Object.defineProperty(exports, "ERC20ApprovalModel", { enumerable: true, get: function () { return approvalModel_1.ERC20ApprovalModel; } });

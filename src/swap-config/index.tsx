@@ -34,8 +34,8 @@ declare global {
 
 @customElements('swap-config')
 export class SwapConfig extends Module {
-
   private listStack: VStack;
+
   private itemMap: Map<number, IProvider> = new Map();
   private _itemList: IProvider[] = [];
   private _chainOptions: IChainOption[];
@@ -74,7 +74,7 @@ export class SwapConfig extends Module {
         width="100%"
         icon={{ name: 'angle-down' }}
         items={this._chainOptions}
-        mode="multiple"
+        mode="tags"
         onChanged={(source: Control) => this.updateConfig(source, lastIndex, 'supportedChains')}
       ></i-combo-box>
     )
@@ -199,8 +199,9 @@ export class SwapConfig extends Module {
       item['tradeFee'][prop] = (source as Input).value;
     else if (prop === 'image')
       item.image = files ? await (source as Upload).toBase64(files[0]) : undefined;
-    else if (prop === 'supportedChains')
+    else if (prop === 'supportedChains') {
       item.supportedChains = ((source as ComboBox).selectedItem as IComboItem[] || []).map(item => Number(item.value));
+    }
     else if (prop === 'dexId')
       item.dexId = +(source as Input).value;
     else

@@ -11,13 +11,6 @@ const colorVar = {
 }
 
 Styles.fontFace({
-  fontFamily: "Apple SD Gothic Neo",
-  src: `url("${Assets.fullPath('fonts/FontsFree-Net-Apple-SD-Gothic-Neo-Bold.ttf')}") format("truetype")`,
-  fontWeight: 'bold',
-  fontStyle: 'normal'
-})
-
-Styles.fontFace({
   fontFamily: "Montserrat Regular",
   src: `url("${Assets.fullPath('fonts/montserrat/Montserrat-Regular.ttf')}") format("truetype")`,
   fontWeight: 'nomal',

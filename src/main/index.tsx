@@ -7,7 +7,6 @@ import {
   ChainNativeTokenByChainId,
   getChainId,
   getTokenBalances,
-  getAvailableMarkets,
   isExpertMode,
   projectNativeTokenSymbol,
   getTokenMap,
@@ -88,6 +87,7 @@ export class SwapBlock extends Module implements PageBlock {
 	private cardConfig: SwapConfig;
 	private swapComponent: Panel;
   private swapContainer: Container;
+  private isInited: boolean = false;
 
   private payContainer: Panel;
   private receiveContainer: Panel;
@@ -103,7 +103,7 @@ export class SwapBlock extends Module implements PageBlock {
   private swapModal: Modal;
   private priceInfo: PriceInfo;
   private priceInfo2: PriceInfo;
-  private detailsFeeInfo: PriceInfo
+  // private detailsFeeInfo: PriceInfo
   private priceInfoContainer: Panel;
   private fromTokenImage: Image;
   private fromTokenLabel: Label;
@@ -118,7 +118,7 @@ export class SwapBlock extends Module implements PageBlock {
   private fromSlider: Range;
   private maxButton: Button;
   private swapBtn: Button;
-  private iconList: Panel;
+  // private iconList: Panel;
   private actionSetting: Panel;
 
   private isFrom: boolean;
@@ -132,8 +132,8 @@ export class SwapBlock extends Module implements PageBlock {
   private isPriceToggled: boolean;
   private record: any;
   private allTokenBalancesMap: any;
-  private checkHasWallet: boolean;
-  private availableMarkets: any;
+  // private checkHasWallet: boolean;
+  // private availableMarkets: any;
   private chainId: number;
   private fallbackUrl: string = Assets.fullPath('img/tokens/Custom.png');
   @observable()
@@ -214,7 +214,7 @@ export class SwapBlock extends Module implements PageBlock {
     this._data = value;
     this.cardConfig.data = value;
     setProviderList(value.data);
-    // this.onSetupPage(isWalletConnected());
+    this.onSetupPage(isWalletConnected());
 	}
 
 	async getTag() {
@@ -227,12 +227,13 @@ export class SwapBlock extends Module implements PageBlock {
 
   async confirm() {
     this._data = this.cardConfig.data
-    console.log('confirm')
-    setProviderList(this._data.data);
-    if (this._data?.data?.length)
-      this.onSetupPage(isWalletConnected());
     this.swapContainer.visible = true
     this.cardConfig.visible = false
+    setProviderList(this._data.data);
+    if (this._data?.data?.length) {
+      await this.initData();
+      this.onSetupPage(isWalletConnected());
+    }
   }
 
   async discard() {
@@ -246,7 +247,7 @@ export class SwapBlock extends Module implements PageBlock {
 		this.cardConfig.visible = true;
 	}
 
-	async config() {}
+  async config() { }
 
   private isEmptyObject(obj: any): boolean {
     let result = false;
@@ -261,7 +262,7 @@ export class SwapBlock extends Module implements PageBlock {
   
   validate() {
     const data = this.cardConfig.data?.data || [];
-    if (!data.length) return false;
+    if (!data || !data.length) return false;
     let emptyProp = false;
     for (let item of data) {
       const hasTradeFee = !this.isEmptyObject(item.tradeFee);
@@ -314,7 +315,7 @@ export class SwapBlock extends Module implements PageBlock {
     this.chainId = getChainId();
     if (this.chainId != null && this.chainId != undefined)
       this.swapBtn.classList.remove('hidden');
-    this.availableMarkets = getAvailableMarkets() || [];
+    // this.availableMarkets = getAvailableMarkets() || [];
     if (this._data?.data?.length) this.onSetupPage(true);
     this.swapButtonText = this.getSwapButtonText()
   }
@@ -451,7 +452,7 @@ export class SwapBlock extends Module implements PageBlock {
   private onSetupPage = async (connected: boolean) => {
     this.getAddressFromUrl();
     this.chainId = getChainId();
-    this.checkHasWallet = hasWallet();
+    // this.checkHasWallet = hasWallet();
     this.swapButtonText = this.getSwapButtonText();
     await this.updateBalance();
     await this.onRenderChainList();
@@ -540,7 +541,7 @@ export class SwapBlock extends Module implements PageBlock {
       this.lastUpdated = 0;
       if (!this.record)
         this.swapBtn.classList.add('hidden');
-      this.onRenderIconList();
+      // this.onRenderIconList();
       this.onRenderPriceInfo();
       this.redirectToken();
       await this.handleAddRoute();
@@ -1952,17 +1953,17 @@ export class SwapBlock extends Module implements PageBlock {
     this.fromSlider.value = val > 100 ? 100 : val;
   }
   async onRenderIconList() {
-    this.iconList.innerHTML = '';
-    this.availableMarkets.forEach(async (item: any) => {
-      const config = getProviderList().find(p => p.key === item)  // ProviderConfigMap[item];
-      if (config) {
-        const image = new Image();
-        image.url = config.image;
-        image.tooltip.content = config.key;
-        image.classList.add('icon-item');
-        this.iconList.appendChild(image);
-      }
-    })
+    // this.iconList.innerHTML = '';
+    // this.availableMarkets.forEach(async (item: any) => {
+    //   const config = getProviderList().find(p => p.key === item)  // ProviderConfigMap[item];
+    //   if (config) {
+    //     const image = new Image();
+    //     image.url = config.image;
+    //     image.tooltip.content = config.key;
+    //     image.classList.add('icon-item');
+    //     this.iconList.appendChild(image);
+    //   }
+    // })
   }
   onRenderPriceInfo() {
     if (!this.priceInfo) {
@@ -2382,20 +2383,26 @@ export class SwapBlock extends Module implements PageBlock {
 		}
 		result.message = { ...params };
 		result.showModal();
-	}
+  }
+  
+  private async initData() {
+    if (!this.isInited) {
+      await this.initWalletData();
+      setDataFromSCConfig(Networks, InfuraId);
+      setCurrentChainId(getDefaultChainId());
+      this.initTokenSelection();
+      await this.initApprovalModelAction();
+      this.isInited = true;
+    }
+  }
 
   init = async () => {
     this.chainId = getChainId();
-    this.availableMarkets = getAvailableMarkets() || [];
+    // this.availableMarkets = getAvailableMarkets() || [];
     this.swapButtonText = this.getSwapButtonText();
     super.init();
     this.openswapResult = new Result();
     this.swapComponent.appendChild(this.openswapResult);
-		this.initWalletData();
-		setDataFromSCConfig(Networks, InfuraId);
-    setCurrentChainId(getDefaultChainId());
-    this.initTokenSelection();
-    this.initApprovalModelAction();
   }
 
 	render() {

@@ -304,8 +304,8 @@ define("@swap/swap-utils", ["require", "exports", "@ijstech/eth-wallet", "@opens
         let Address = getAddresses();
         let wrappedTokenAddress = Address['WETH9'];
         let tradeFeeMap = await getTradeFeeMap();
-        let network = store_2.getNetworkInfo(chainId);
-        let api = network.isTestnet || network.isDisabled ? newRouteAPI : routeAPI;
+        let network = chainId ? store_2.getNetworkInfo(chainId) : null;
+        let api = (network === null || network === void 0 ? void 0 : network.isTestnet) || (network === null || network === void 0 ? void 0 : network.isDisabled) ? newRouteAPI : routeAPI;
         let routeObjArr = await global_1.getAPI(api, {
             chainId,
             tokenIn: tokenIn.address ? tokenIn.address : wrappedTokenAddress,
@@ -366,8 +366,8 @@ define("@swap/swap-utils", ["require", "exports", "@ijstech/eth-wallet", "@opens
         let Address = getAddresses();
         let wrappedTokenAddress = Address['WETH9'];
         let tradeFeeMap = await getTradeFeeMap();
-        let network = store_2.getNetworkInfo(chainId);
-        let api = network.isTestnet || network.isDisabled ? newRouteAPI : routeAPI;
+        let network = chainId ? store_2.getNetworkInfo(chainId) : null;
+        let api = (network === null || network === void 0 ? void 0 : network.isTestnet) || (network === null || network === void 0 ? void 0 : network.isDisabled) ? newRouteAPI : routeAPI;
         let routeObjArr = await global_1.getAPI(api, {
             chainId,
             tokenIn: tokenIn.address ? tokenIn.address : wrappedTokenAddress,

@@ -7,9 +7,5 @@ function fullPath(path: string): string{
     return `${moduleDir}/${path}`
 }
 export default {
-    icons: {
-        logo: `${moduleDir}/img/openswap-logo-beta.svg`,
-        logoMobile: `${moduleDir}/img/OpenSwap-Logo-Mobile.svg`
-    },
     fullPath
 }
