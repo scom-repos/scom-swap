@@ -11,7 +11,7 @@ import {
 } from '@swap/global';
 
 import Assets from '@swap/assets';
-import { Contracts } from '@openswap/sdk';
+import { Contracts } from '@scom/oswap-openswap-contract';
 import {
   DefaultTokens,
   CoreContractAddressesByChainId,
@@ -94,7 +94,7 @@ export function getChainId() {
 
 export function getWallet() {
   const network = getNetworkInfo(state.currentChainId || getDefaultChainId());
-  return isWalletConnected() ? Wallet.getInstance() : new Wallet(network.rpc);
+  return isWalletConnected() ? Wallet.getClientInstance() : new Wallet(network.rpc);
 }
 
 export function getWalletProvider() {
@@ -529,12 +529,12 @@ export const getWalletOptions = (): { [key in WalletPlugin]?: any } => {
 }
 
 export function isWalletConnected() {
-  const wallet = Wallet.getInstance();
+  const wallet = Wallet.getClientInstance();
   return wallet.isConnected;
 }
 
 export async function connectWallet(walletPlugin: WalletPlugin, eventHandlers?: { [key: string]: Function }) {
-  let wallet = Wallet.getInstance();
+  let wallet = Wallet.getClientInstance();
   const walletOptions = getWalletOptions();
   let providerOptions = walletOptions[walletPlugin];
   if (!wallet.chainId) {
@@ -547,7 +547,7 @@ export async function connectWallet(walletPlugin: WalletPlugin, eventHandlers?: 
       }
       const connected = !!account;
       if (connected) {
-        localStorage.setItem('walletProvider', Wallet.getInstance()?.clientSideProvider?.walletPlugin || '');
+        localStorage.setItem('walletProvider', Wallet.getClientInstance()?.clientSideProvider?.walletPlugin || '');
         if (wallet.chainId !== getCurrentChainId()) {
           setCurrentChainId(wallet.chainId);
           application.EventBus.dispatch(EventId.chainChanged, wallet.chainId);
@@ -578,14 +578,14 @@ export async function switchNetwork(chainId: number) {
     application.EventBus.dispatch(EventId.chainChanged, chainId);
     return;
   }
-  const wallet = Wallet.getInstance();
+  const wallet = Wallet.getClientInstance();
   if (wallet?.clientSideProvider?.walletPlugin === WalletPlugin.MetaMask) {
     await wallet.switchNetwork(chainId);
   }
 }
 
 export async function logoutWallet() {
-  const wallet = Wallet.getInstance();
+  const wallet = Wallet.getClientInstance();
   await wallet.disconnect();
   localStorage.setItem('walletProvider', '');
   application.EventBus.dispatch(EventId.IsWalletDisconnected, false);

@@ -41,9 +41,9 @@
   },
   "dependencies": {
     "@ijstech/eth-contract": "*",
-    "@openswap/sdk": "*",
-    "@openswap/chainlink-sdk": "*",
-    "@openswap/cross-chain-bridge-sdk": "*",
-    "@openswap/oracle-adaptor-sdk": "*"
+    "@scom/oswap-openswap-contract": "*",
+    "@scom/oswap-chainlink-contract": "*",
+    "@scom/oswap-cross-chain-bridge-contract": "*",
+    "@scom/oswap-oracle-adaptor-contract": "*"
   }
 }

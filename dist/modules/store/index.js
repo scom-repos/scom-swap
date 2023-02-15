@@ -3341,7 +3341,7 @@ define("@swap/store/data/index.ts", ["require", "exports", "@swap/store/data/tok
     Object.defineProperty(exports, "CoreContractAddressesByChainId", { enumerable: true, get: function () { return index_5.CoreContractAddressesByChainId; } });
     __exportStar(index_6, exports);
 });
-define("@swap/store", ["require", "exports", "@ijstech/eth-wallet", "@ijstech/components", "@swap/global", "@swap/assets", "@openswap/sdk", "@swap/store/data/index.ts", "@swap/store/data/index.ts"], function (require, exports, eth_wallet_1, components_1, global_1, assets_1, sdk_1, index_7, index_8) {
+define("@swap/store", ["require", "exports", "@ijstech/eth-wallet", "@ijstech/components", "@swap/global", "@swap/assets", "@scom/oswap-openswap-contract", "@swap/store/data/index.ts", "@swap/store/data/index.ts"], function (require, exports, eth_wallet_1, components_1, global_1, assets_1, oswap_openswap_contract_1, index_7, index_8) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.getBridgeVaultVersion = exports.maxHeight = exports.maxWidth = exports.isMultiple = exports.isThemeApplied = exports.getTokenUrl = exports.baseUrl = exports.hasMetaMask = exports.hasWallet = exports.logoutWallet = exports.switchNetwork = exports.connectWallet = exports.isWalletConnected = exports.getWalletOptions = exports.walletList = exports.viewOnExplorerByAddress = exports.viewOnExplorerByTxHash = exports.hasUserToken = exports.getProviderByKey = exports.getProviderList = exports.setProviderList = exports.setUserTokens = exports.tokenSymbol = exports.getTokenIcon = exports.getTokenDecimals = exports.getTokensDataList = exports.getTokenMap = exports.setTokenMap = exports.getTokenObject = exports.projectNativeTokenSymbol = exports.projectNativeToken = exports.getNetworkImg = exports.getNetworkExplorerName = exports.getSiteSupportedNetworks = exports.getMatchNetworks = exports.getFilteredNetworks = exports.getNetworkInfo = exports.getInfuraId = exports.getDefaultChainId = exports.setDataFromSCConfig = exports.state = exports.setTokenBalances = exports.getTokenBalance = exports.getTokenBalances = exports.updateAllTokenBalances = exports.getTokenList = exports.setTransactionDeadline = exports.getTransactionDeadline = exports.setSlippageTolerance = exports.getSlippageTolerance = exports.toggleExpertMode = exports.isExpertMode = exports.getErc20 = exports.getWalletProvider = exports.getWallet = exports.getChainId = exports.getWETH = exports.getChainNativeToken = exports.getAddresses = exports.getCurrentChainId = exports.setCurrentChainId = exports.getSiteEnv = exports.setSiteEnv = exports.addUserTokens = exports.getUserTokens = exports.nullAddress = exports.fallBackUrl = void 0;
@@ -3421,7 +3421,7 @@ define("@swap/store", ["require", "exports", "@ijstech/eth-wallet", "@ijstech/co
     exports.getChainId = getChainId;
     function getWallet() {
         const network = exports.getNetworkInfo(exports.state.currentChainId || exports.getDefaultChainId());
-        return isWalletConnected() ? eth_wallet_1.Wallet.getInstance() : new eth_wallet_1.Wallet(network.rpc);
+        return isWalletConnected() ? eth_wallet_1.Wallet.getClientInstance() : new eth_wallet_1.Wallet(network.rpc);
     }
     exports.getWallet = getWallet;
     function getWalletProvider() {
@@ -3645,7 +3645,7 @@ define("@swap/store", ["require", "exports", "@ijstech/eth-wallet", "@ijstech/co
     };
     exports.projectNativeTokenSymbol = projectNativeTokenSymbol;
     const getTokenObject = async (address, showBalance) => {
-        const ERC20Contract = new sdk_1.Contracts.ERC20(eth_wallet_1.Wallet.getInstance(), address);
+        const ERC20Contract = new oswap_openswap_contract_1.Contracts.ERC20(eth_wallet_1.Wallet.getInstance(), address);
         const symbol = await ERC20Contract.symbol();
         const name = await ERC20Contract.name();
         const decimals = (await ERC20Contract.decimals()).toFixed();
@@ -3854,12 +3854,12 @@ define("@swap/store", ["require", "exports", "@ijstech/eth-wallet", "@ijstech/co
     };
     exports.getWalletOptions = getWalletOptions;
     function isWalletConnected() {
-        const wallet = eth_wallet_1.Wallet.getInstance();
+        const wallet = eth_wallet_1.Wallet.getClientInstance();
         return wallet.isConnected;
     }
     exports.isWalletConnected = isWalletConnected;
     async function connectWallet(walletPlugin, eventHandlers) {
-        let wallet = eth_wallet_1.Wallet.getInstance();
+        let wallet = eth_wallet_1.Wallet.getClientInstance();
         const walletOptions = exports.getWalletOptions();
         let providerOptions = walletOptions[walletPlugin];
         if (!wallet.chainId) {
@@ -3873,7 +3873,7 @@ define("@swap/store", ["require", "exports", "@ijstech/eth-wallet", "@ijstech/co
                 }
                 const connected = !!account;
                 if (connected) {
-                    localStorage.setItem('walletProvider', ((_b = (_a = eth_wallet_1.Wallet.getInstance()) === null || _a === void 0 ? void 0 : _a.clientSideProvider) === null || _b === void 0 ? void 0 : _b.walletPlugin) || '');
+                    localStorage.setItem('walletProvider', ((_b = (_a = eth_wallet_1.Wallet.getClientInstance()) === null || _a === void 0 ? void 0 : _a.clientSideProvider) === null || _b === void 0 ? void 0 : _b.walletPlugin) || '');
                     if (wallet.chainId !== exports.getCurrentChainId()) {
                         exports.setCurrentChainId(wallet.chainId);
                         components_1.application.EventBus.dispatch("chainChanged" /* chainChanged */, wallet.chainId);
@@ -3904,14 +3904,14 @@ define("@swap/store", ["require", "exports", "@ijstech/eth-wallet", "@ijstech/co
             components_1.application.EventBus.dispatch("chainChanged" /* chainChanged */, chainId);
             return;
         }
-        const wallet = eth_wallet_1.Wallet.getInstance();
+        const wallet = eth_wallet_1.Wallet.getClientInstance();
         if (((_a = wallet === null || wallet === void 0 ? void 0 : wallet.clientSideProvider) === null || _a === void 0 ? void 0 : _a.walletPlugin) === eth_wallet_1.WalletPlugin.MetaMask) {
             await wallet.switchNetwork(chainId);
         }
     }
     exports.switchNetwork = switchNetwork;
     async function logoutWallet() {
-        const wallet = eth_wallet_1.Wallet.getInstance();
+        const wallet = eth_wallet_1.Wallet.getClientInstance();
         await wallet.disconnect();
         localStorage.setItem('walletProvider', '');
         components_1.application.EventBus.dispatch("IsWalletDisconnected" /* IsWalletDisconnected */, false);

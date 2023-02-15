@@ -21,7 +21,7 @@ import {
   getMatchNetworks,
   getProviderList
 } from "@swap/store"
-import { Contracts as CrossChainContracts } from "@openswap/cross-chain-bridge-sdk"
+import { Contracts as CrossChainContracts } from "@scom/oswap-cross-chain-bridge-contract"
 
 export interface IBridgeVaultBond {
   vaultTrollRegistry: string;

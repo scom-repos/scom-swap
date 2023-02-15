@@ -16,9 +16,9 @@ import {
   getChainId, 
   getTokenMap
 } from '@swap/store';
-import { Contracts } from "@openswap/sdk";
-import { Contracts as SolidityContracts } from "@openswap/chainlink-sdk"
-import { Contracts as AdaptorContracts } from "@openswap/oracle-adaptor-sdk"
+import { Contracts } from "@scom/oswap-openswap-contract";
+import { Contracts as SolidityContracts } from "@scom/oswap-chainlink-contract"
+import { Contracts as AdaptorContracts } from "@scom/oswap-oracle-adaptor-contract"
 import { moment } from '@ijstech/components';
 
 const ConfigStore = ABIKeys.ConfigStore;

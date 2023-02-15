@@ -1865,9 +1865,7 @@ var AMDLoader;
             moduleManager.enqueueDefineAnonymousModule(dependencies, callback);
         }
     };
-    // DefineFunc.amd = {
-    //     jQuery: true
-    // };
+    DefineFunc.amd = true;
     var _requireFunc_config = function (params, shouldOverwrite) {
         if (shouldOverwrite === void 0) { shouldOverwrite = false; }
         moduleManager.configure(params, shouldOverwrite);
@@ -9935,6 +9933,9 @@ var __getOwnPropNames = Object.getOwnPropertyNames;
 var __getProtoOf = Object.getPrototypeOf;
 var __hasOwnProp = Object.prototype.hasOwnProperty;
 var __markAsModule = (target) => __defProp(target, "__esModule", { value: true });
+var __commonJS = (cb, mod) => function __require() {
+  return mod || (0, cb[Object.keys(cb)[0]])((mod = { exports: {} }).exports, mod), mod.exports;
+};
 var __export = (target, all) => {
   __markAsModule(target);
   for (var name in all)
@@ -9961,6 +9962,3705 @@ var __decorateClass = (decorators, target, key2, kind) => {
   return result;
 };
 
+// node_modules/moment/moment.js
+var require_moment = __commonJS({
+  "node_modules/moment/moment.js"(exports, module2) {
+    (function(global, factory) {
+      typeof exports === "object" && typeof module2 !== "undefined" ? module2.exports = factory() : typeof define === "function" && define.amd ? define(factory) : global.moment = factory();
+    })(exports, function() {
+      "use strict";
+      var hookCallback;
+      function hooks() {
+        return hookCallback.apply(null, arguments);
+      }
+      function setHookCallback(callback) {
+        hookCallback = callback;
+      }
+      function isArray(input) {
+        return input instanceof Array || Object.prototype.toString.call(input) === "[object Array]";
+      }
+      function isObject(input) {
+        return input != null && Object.prototype.toString.call(input) === "[object Object]";
+      }
+      function hasOwnProp(a, b) {
+        return Object.prototype.hasOwnProperty.call(a, b);
+      }
+      function isObjectEmpty(obj) {
+        if (Object.getOwnPropertyNames) {
+          return Object.getOwnPropertyNames(obj).length === 0;
+        } else {
+          var k;
+          for (k in obj) {
+            if (hasOwnProp(obj, k)) {
+              return false;
+            }
+          }
+          return true;
+        }
+      }
+      function isUndefined(input) {
+        return input === void 0;
+      }
+      function isNumber(input) {
+        return typeof input === "number" || Object.prototype.toString.call(input) === "[object Number]";
+      }
+      function isDate(input) {
+        return input instanceof Date || Object.prototype.toString.call(input) === "[object Date]";
+      }
+      function map(arr, fn) {
+        var res = [], i, arrLen = arr.length;
+        for (i = 0; i < arrLen; ++i) {
+          res.push(fn(arr[i], i));
+        }
+        return res;
+      }
+      function extend2(a, b) {
+        for (var i in b) {
+          if (hasOwnProp(b, i)) {
+            a[i] = b[i];
+          }
+        }
+        if (hasOwnProp(b, "toString")) {
+          a.toString = b.toString;
+        }
+        if (hasOwnProp(b, "valueOf")) {
+          a.valueOf = b.valueOf;
+        }
+        return a;
+      }
+      function createUTC(input, format2, locale2, strict) {
+        return createLocalOrUTC(input, format2, locale2, strict, true).utc();
+      }
+      function defaultParsingFlags() {
+        return {
+          empty: false,
+          unusedTokens: [],
+          unusedInput: [],
+          overflow: -2,
+          charsLeftOver: 0,
+          nullInput: false,
+          invalidEra: null,
+          invalidMonth: null,
+          invalidFormat: false,
+          userInvalidated: false,
+          iso: false,
+          parsedDateParts: [],
+          era: null,
+          meridiem: null,
+          rfc2822: false,
+          weekdayMismatch: false
+        };
+      }
+      function getParsingFlags(m) {
+        if (m._pf == null) {
+          m._pf = defaultParsingFlags();
+        }
+        return m._pf;
+      }
+      var some;
+      if (Array.prototype.some) {
+        some = Array.prototype.some;
+      } else {
+        some = function(fun) {
+          var t = Object(this), len = t.length >>> 0, i;
+          for (i = 0; i < len; i++) {
+            if (i in t && fun.call(this, t[i], i, t)) {
+              return true;
+            }
+          }
+          return false;
+        };
+      }
+      function isValid(m) {
+        if (m._isValid == null) {
+          var flags = getParsingFlags(m), parsedParts = some.call(flags.parsedDateParts, function(i) {
+            return i != null;
+          }), isNowValid = !isNaN(m._d.getTime()) && flags.overflow < 0 && !flags.empty && !flags.invalidEra && !flags.invalidMonth && !flags.invalidWeekday && !flags.weekdayMismatch && !flags.nullInput && !flags.invalidFormat && !flags.userInvalidated && (!flags.meridiem || flags.meridiem && parsedParts);
+          if (m._strict) {
+            isNowValid = isNowValid && flags.charsLeftOver === 0 && flags.unusedTokens.length === 0 && flags.bigHour === void 0;
+          }
+          if (Object.isFrozen == null || !Object.isFrozen(m)) {
+            m._isValid = isNowValid;
+          } else {
+            return isNowValid;
+          }
+        }
+        return m._isValid;
+      }
+      function createInvalid(flags) {
+        var m = createUTC(NaN);
+        if (flags != null) {
+          extend2(getParsingFlags(m), flags);
+        } else {
+          getParsingFlags(m).userInvalidated = true;
+        }
+        return m;
+      }
+      var momentProperties = hooks.momentProperties = [], updateInProgress = false;
+      function copyConfig(to2, from2) {
+        var i, prop, val, momentPropertiesLen = momentProperties.length;
+        if (!isUndefined(from2._isAMomentObject)) {
+          to2._isAMomentObject = from2._isAMomentObject;
+        }
+        if (!isUndefined(from2._i)) {
+          to2._i = from2._i;
+        }
+        if (!isUndefined(from2._f)) {
+          to2._f = from2._f;
+        }
+        if (!isUndefined(from2._l)) {
+          to2._l = from2._l;
+        }
+        if (!isUndefined(from2._strict)) {
+          to2._strict = from2._strict;
+        }
+        if (!isUndefined(from2._tzm)) {
+          to2._tzm = from2._tzm;
+        }
+        if (!isUndefined(from2._isUTC)) {
+          to2._isUTC = from2._isUTC;
+        }
+        if (!isUndefined(from2._offset)) {
+          to2._offset = from2._offset;
+        }
+        if (!isUndefined(from2._pf)) {
+          to2._pf = getParsingFlags(from2);
+        }
+        if (!isUndefined(from2._locale)) {
+          to2._locale = from2._locale;
+        }
+        if (momentPropertiesLen > 0) {
+          for (i = 0; i < momentPropertiesLen; i++) {
+            prop = momentProperties[i];
+            val = from2[prop];
+            if (!isUndefined(val)) {
+              to2[prop] = val;
+            }
+          }
+        }
+        return to2;
+      }
+      function Moment2(config) {
+        copyConfig(this, config);
+        this._d = new Date(config._d != null ? config._d.getTime() : NaN);
+        if (!this.isValid()) {
+          this._d = new Date(NaN);
+        }
+        if (updateInProgress === false) {
+          updateInProgress = true;
+          hooks.updateOffset(this);
+          updateInProgress = false;
+        }
+      }
+      function isMoment(obj) {
+        return obj instanceof Moment2 || obj != null && obj._isAMomentObject != null;
+      }
+      function warn(msg) {
+        if (hooks.suppressDeprecationWarnings === false && typeof console !== "undefined" && console.warn) {
+          console.warn("Deprecation warning: " + msg);
+        }
+      }
+      function deprecate(msg, fn) {
+        var firstTime = true;
+        return extend2(function() {
+          if (hooks.deprecationHandler != null) {
+            hooks.deprecationHandler(null, msg);
+          }
+          if (firstTime) {
+            var args = [], arg, i, key2, argLen = arguments.length;
+            for (i = 0; i < argLen; i++) {
+              arg = "";
+              if (typeof arguments[i] === "object") {
+                arg += "\n[" + i + "] ";
+                for (key2 in arguments[0]) {
+                  if (hasOwnProp(arguments[0], key2)) {
+                    arg += key2 + ": " + arguments[0][key2] + ", ";
+                  }
+                }
+                arg = arg.slice(0, -2);
+              } else {
+                arg = arguments[i];
+              }
+              args.push(arg);
+            }
+            warn(msg + "\nArguments: " + Array.prototype.slice.call(args).join("") + "\n" + new Error().stack);
+            firstTime = false;
+          }
+          return fn.apply(this, arguments);
+        }, fn);
+      }
+      var deprecations = {};
+      function deprecateSimple(name, msg) {
+        if (hooks.deprecationHandler != null) {
+          hooks.deprecationHandler(name, msg);
+        }
+        if (!deprecations[name]) {
+          warn(msg);
+          deprecations[name] = true;
+        }
+      }
+      hooks.suppressDeprecationWarnings = false;
+      hooks.deprecationHandler = null;
+      function isFunction(input) {
+        return typeof Function !== "undefined" && input instanceof Function || Object.prototype.toString.call(input) === "[object Function]";
+      }
+      function set(config) {
+        var prop, i;
+        for (i in config) {
+          if (hasOwnProp(config, i)) {
+            prop = config[i];
+            if (isFunction(prop)) {
+              this[i] = prop;
+            } else {
+              this["_" + i] = prop;
+            }
+          }
+        }
+        this._config = config;
+        this._dayOfMonthOrdinalParseLenient = new RegExp((this._dayOfMonthOrdinalParse.source || this._ordinalParse.source) + "|" + /\d{1,2}/.source);
+      }
+      function mergeConfigs(parentConfig, childConfig) {
+        var res = extend2({}, parentConfig), prop;
+        for (prop in childConfig) {
+          if (hasOwnProp(childConfig, prop)) {
+            if (isObject(parentConfig[prop]) && isObject(childConfig[prop])) {
+              res[prop] = {};
+              extend2(res[prop], parentConfig[prop]);
+              extend2(res[prop], childConfig[prop]);
+            } else if (childConfig[prop] != null) {
+              res[prop] = childConfig[prop];
+            } else {
+              delete res[prop];
+            }
+          }
+        }
+        for (prop in parentConfig) {
+          if (hasOwnProp(parentConfig, prop) && !hasOwnProp(childConfig, prop) && isObject(parentConfig[prop])) {
+            res[prop] = extend2({}, res[prop]);
+          }
+        }
+        return res;
+      }
+      function Locale(config) {
+        if (config != null) {
+          this.set(config);
+        }
+      }
+      var keys;
+      if (Object.keys) {
+        keys = Object.keys;
+      } else {
+        keys = function(obj) {
+          var i, res = [];
+          for (i in obj) {
+            if (hasOwnProp(obj, i)) {
+              res.push(i);
+            }
+          }
+          return res;
+        };
+      }
+      var defaultCalendar = {
+        sameDay: "[Today at] LT",
+        nextDay: "[Tomorrow at] LT",
+        nextWeek: "dddd [at] LT",
+        lastDay: "[Yesterday at] LT",
+        lastWeek: "[Last] dddd [at] LT",
+        sameElse: "L"
+      };
+      function calendar(key2, mom, now2) {
+        var output = this._calendar[key2] || this._calendar["sameElse"];
+        return isFunction(output) ? output.call(mom, now2) : output;
+      }
+      function zeroFill(number, targetLength, forceSign) {
+        var absNumber = "" + Math.abs(number), zerosToFill = targetLength - absNumber.length, sign2 = number >= 0;
+        return (sign2 ? forceSign ? "+" : "" : "-") + Math.pow(10, Math.max(0, zerosToFill)).toString().substr(1) + absNumber;
+      }
+      var formattingTokens = /(\[[^\[]*\])|(\\)?([Hh]mm(ss)?|Mo|MM?M?M?|Do|DDDo|DD?D?D?|ddd?d?|do?|w[o|w]?|W[o|W]?|Qo?|N{1,5}|YYYYYY|YYYYY|YYYY|YY|y{2,4}|yo?|gg(ggg?)?|GG(GGG?)?|e|E|a|A|hh?|HH?|kk?|mm?|ss?|S{1,9}|x|X|zz?|ZZ?|.)/g, localFormattingTokens = /(\[[^\[]*\])|(\\)?(LTS|LT|LL?L?L?|l{1,4})/g, formatFunctions = {}, formatTokenFunctions = {};
+      function addFormatToken(token2, padded, ordinal2, callback) {
+        var func = callback;
+        if (typeof callback === "string") {
+          func = function() {
+            return this[callback]();
+          };
+        }
+        if (token2) {
+          formatTokenFunctions[token2] = func;
+        }
+        if (padded) {
+          formatTokenFunctions[padded[0]] = function() {
+            return zeroFill(func.apply(this, arguments), padded[1], padded[2]);
+          };
+        }
+        if (ordinal2) {
+          formatTokenFunctions[ordinal2] = function() {
+            return this.localeData().ordinal(func.apply(this, arguments), token2);
+          };
+        }
+      }
+      function removeFormattingTokens(input) {
+        if (input.match(/\[[\s\S]/)) {
+          return input.replace(/^\[|\]$/g, "");
+        }
+        return input.replace(/\\/g, "");
+      }
+      function makeFormatFunction(format2) {
+        var array = format2.match(formattingTokens), i, length;
+        for (i = 0, length = array.length; i < length; i++) {
+          if (formatTokenFunctions[array[i]]) {
+            array[i] = formatTokenFunctions[array[i]];
+          } else {
+            array[i] = removeFormattingTokens(array[i]);
+          }
+        }
+        return function(mom) {
+          var output = "", i2;
+          for (i2 = 0; i2 < length; i2++) {
+            output += isFunction(array[i2]) ? array[i2].call(mom, format2) : array[i2];
+          }
+          return output;
+        };
+      }
+      function formatMoment(m, format2) {
+        if (!m.isValid()) {
+          return m.localeData().invalidDate();
+        }
+        format2 = expandFormat(format2, m.localeData());
+        formatFunctions[format2] = formatFunctions[format2] || makeFormatFunction(format2);
+        return formatFunctions[format2](m);
+      }
+      function expandFormat(format2, locale2) {
+        var i = 5;
+        function replaceLongDateFormatTokens(input) {
+          return locale2.longDateFormat(input) || input;
+        }
+        localFormattingTokens.lastIndex = 0;
+        while (i >= 0 && localFormattingTokens.test(format2)) {
+          format2 = format2.replace(localFormattingTokens, replaceLongDateFormatTokens);
+          localFormattingTokens.lastIndex = 0;
+          i -= 1;
+        }
+        return format2;
+      }
+      var defaultLongDateFormat = {
+        LTS: "h:mm:ss A",
+        LT: "h:mm A",
+        L: "MM/DD/YYYY",
+        LL: "MMMM D, YYYY",
+        LLL: "MMMM D, YYYY h:mm A",
+        LLLL: "dddd, MMMM D, YYYY h:mm A"
+      };
+      function longDateFormat(key2) {
+        var format2 = this._longDateFormat[key2], formatUpper = this._longDateFormat[key2.toUpperCase()];
+        if (format2 || !formatUpper) {
+          return format2;
+        }
+        this._longDateFormat[key2] = formatUpper.match(formattingTokens).map(function(tok) {
+          if (tok === "MMMM" || tok === "MM" || tok === "DD" || tok === "dddd") {
+            return tok.slice(1);
+          }
+          return tok;
+        }).join("");
+        return this._longDateFormat[key2];
+      }
+      var defaultInvalidDate = "Invalid date";
+      function invalidDate() {
+        return this._invalidDate;
+      }
+      var defaultOrdinal = "%d", defaultDayOfMonthOrdinalParse = /\d{1,2}/;
+      function ordinal(number) {
+        return this._ordinal.replace("%d", number);
+      }
+      var defaultRelativeTime = {
+        future: "in %s",
+        past: "%s ago",
+        s: "a few seconds",
+        ss: "%d seconds",
+        m: "a minute",
+        mm: "%d minutes",
+        h: "an hour",
+        hh: "%d hours",
+        d: "a day",
+        dd: "%d days",
+        w: "a week",
+        ww: "%d weeks",
+        M: "a month",
+        MM: "%d months",
+        y: "a year",
+        yy: "%d years"
+      };
+      function relativeTime(number, withoutSuffix, string, isFuture) {
+        var output = this._relativeTime[string];
+        return isFunction(output) ? output(number, withoutSuffix, string, isFuture) : output.replace(/%d/i, number);
+      }
+      function pastFuture(diff2, output) {
+        var format2 = this._relativeTime[diff2 > 0 ? "future" : "past"];
+        return isFunction(format2) ? format2(output) : format2.replace(/%s/i, output);
+      }
+      var aliases = {};
+      function addUnitAlias(unit, shorthand) {
+        var lowerCase = unit.toLowerCase();
+        aliases[lowerCase] = aliases[lowerCase + "s"] = aliases[shorthand] = unit;
+      }
+      function normalizeUnits(units) {
+        return typeof units === "string" ? aliases[units] || aliases[units.toLowerCase()] : void 0;
+      }
+      function normalizeObjectUnits(inputObject) {
+        var normalizedInput = {}, normalizedProp, prop;
+        for (prop in inputObject) {
+          if (hasOwnProp(inputObject, prop)) {
+            normalizedProp = normalizeUnits(prop);
+            if (normalizedProp) {
+              normalizedInput[normalizedProp] = inputObject[prop];
+            }
+          }
+        }
+        return normalizedInput;
+      }
+      var priorities = {};
+      function addUnitPriority(unit, priority) {
+        priorities[unit] = priority;
+      }
+      function getPrioritizedUnits(unitsObj) {
+        var units = [], u;
+        for (u in unitsObj) {
+          if (hasOwnProp(unitsObj, u)) {
+            units.push({ unit: u, priority: priorities[u] });
+          }
+        }
+        units.sort(function(a, b) {
+          return a.priority - b.priority;
+        });
+        return units;
+      }
+      function isLeapYear(year) {
+        return year % 4 === 0 && year % 100 !== 0 || year % 400 === 0;
+      }
+      function absFloor(number) {
+        if (number < 0) {
+          return Math.ceil(number) || 0;
+        } else {
+          return Math.floor(number);
+        }
+      }
+      function toInt(argumentForCoercion) {
+        var coercedNumber = +argumentForCoercion, value = 0;
+        if (coercedNumber !== 0 && isFinite(coercedNumber)) {
+          value = absFloor(coercedNumber);
+        }
+        return value;
+      }
+      function makeGetSet(unit, keepTime) {
+        return function(value) {
+          if (value != null) {
+            set$1(this, unit, value);
+            hooks.updateOffset(this, keepTime);
+            return this;
+          } else {
+            return get(this, unit);
+          }
+        };
+      }
+      function get(mom, unit) {
+        return mom.isValid() ? mom._d["get" + (mom._isUTC ? "UTC" : "") + unit]() : NaN;
+      }
+      function set$1(mom, unit, value) {
+        if (mom.isValid() && !isNaN(value)) {
+          if (unit === "FullYear" && isLeapYear(mom.year()) && mom.month() === 1 && mom.date() === 29) {
+            value = toInt(value);
+            mom._d["set" + (mom._isUTC ? "UTC" : "") + unit](value, mom.month(), daysInMonth(value, mom.month()));
+          } else {
+            mom._d["set" + (mom._isUTC ? "UTC" : "") + unit](value);
+          }
+        }
+      }
+      function stringGet(units) {
+        units = normalizeUnits(units);
+        if (isFunction(this[units])) {
+          return this[units]();
+        }
+        return this;
+      }
+      function stringSet(units, value) {
+        if (typeof units === "object") {
+          units = normalizeObjectUnits(units);
+          var prioritized = getPrioritizedUnits(units), i, prioritizedLen = prioritized.length;
+          for (i = 0; i < prioritizedLen; i++) {
+            this[prioritized[i].unit](units[prioritized[i].unit]);
+          }
+        } else {
+          units = normalizeUnits(units);
+          if (isFunction(this[units])) {
+            return this[units](value);
+          }
+        }
+        return this;
+      }
+      var match1 = /\d/, match2 = /\d\d/, match3 = /\d{3}/, match4 = /\d{4}/, match6 = /[+-]?\d{6}/, match1to2 = /\d\d?/, match3to4 = /\d\d\d\d?/, match5to6 = /\d\d\d\d\d\d?/, match1to3 = /\d{1,3}/, match1to4 = /\d{1,4}/, match1to6 = /[+-]?\d{1,6}/, matchUnsigned = /\d+/, matchSigned = /[+-]?\d+/, matchOffset = /Z|[+-]\d\d:?\d\d/gi, matchShortOffset = /Z|[+-]\d\d(?::?\d\d)?/gi, matchTimestamp = /[+-]?\d+(\.\d{1,3})?/, matchWord = /[0-9]{0,256}['a-z\u00A0-\u05FF\u0700-\uD7FF\uF900-\uFDCF\uFDF0-\uFF07\uFF10-\uFFEF]{1,256}|[\u0600-\u06FF\/]{1,256}(\s*?[\u0600-\u06FF]{1,256}){1,2}/i, regexes;
+      regexes = {};
+      function addRegexToken(token2, regex, strictRegex) {
+        regexes[token2] = isFunction(regex) ? regex : function(isStrict, localeData2) {
+          return isStrict && strictRegex ? strictRegex : regex;
+        };
+      }
+      function getParseRegexForToken(token2, config) {
+        if (!hasOwnProp(regexes, token2)) {
+          return new RegExp(unescapeFormat(token2));
+        }
+        return regexes[token2](config._strict, config._locale);
+      }
+      function unescapeFormat(s) {
+        return regexEscape(s.replace("\\", "").replace(/\\(\[)|\\(\])|\[([^\]\[]*)\]|\\(.)/g, function(matched, p1, p2, p3, p4) {
+          return p1 || p2 || p3 || p4;
+        }));
+      }
+      function regexEscape(s) {
+        return s.replace(/[-\/\\^$*+?.()|[\]{}]/g, "\\$&");
+      }
+      var tokens = {};
+      function addParseToken(token2, callback) {
+        var i, func = callback, tokenLen;
+        if (typeof token2 === "string") {
+          token2 = [token2];
+        }
+        if (isNumber(callback)) {
+          func = function(input, array) {
+            array[callback] = toInt(input);
+          };
+        }
+        tokenLen = token2.length;
+        for (i = 0; i < tokenLen; i++) {
+          tokens[token2[i]] = func;
+        }
+      }
+      function addWeekParseToken(token2, callback) {
+        addParseToken(token2, function(input, array, config, token3) {
+          config._w = config._w || {};
+          callback(input, config._w, config, token3);
+        });
+      }
+      function addTimeToArrayFromToken(token2, input, config) {
+        if (input != null && hasOwnProp(tokens, token2)) {
+          tokens[token2](input, config._a, config, token2);
+        }
+      }
+      var YEAR = 0, MONTH = 1, DATE = 2, HOUR = 3, MINUTE = 4, SECOND = 5, MILLISECOND = 6, WEEK = 7, WEEKDAY = 8;
+      function mod(n, x) {
+        return (n % x + x) % x;
+      }
+      var indexOf;
+      if (Array.prototype.indexOf) {
+        indexOf = Array.prototype.indexOf;
+      } else {
+        indexOf = function(o) {
+          var i;
+          for (i = 0; i < this.length; ++i) {
+            if (this[i] === o) {
+              return i;
+            }
+          }
+          return -1;
+        };
+      }
+      function daysInMonth(year, month) {
+        if (isNaN(year) || isNaN(month)) {
+          return NaN;
+        }
+        var modMonth = mod(month, 12);
+        year += (month - modMonth) / 12;
+        return modMonth === 1 ? isLeapYear(year) ? 29 : 28 : 31 - modMonth % 7 % 2;
+      }
+      addFormatToken("M", ["MM", 2], "Mo", function() {
+        return this.month() + 1;
+      });
+      addFormatToken("MMM", 0, 0, function(format2) {
+        return this.localeData().monthsShort(this, format2);
+      });
+      addFormatToken("MMMM", 0, 0, function(format2) {
+        return this.localeData().months(this, format2);
+      });
+      addUnitAlias("month", "M");
+      addUnitPriority("month", 8);
+      addRegexToken("M", match1to2);
+      addRegexToken("MM", match1to2, match2);
+      addRegexToken("MMM", function(isStrict, locale2) {
+        return locale2.monthsShortRegex(isStrict);
+      });
+      addRegexToken("MMMM", function(isStrict, locale2) {
+        return locale2.monthsRegex(isStrict);
+      });
+      addParseToken(["M", "MM"], function(input, array) {
+        array[MONTH] = toInt(input) - 1;
+      });
+      addParseToken(["MMM", "MMMM"], function(input, array, config, token2) {
+        var month = config._locale.monthsParse(input, token2, config._strict);
+        if (month != null) {
+          array[MONTH] = month;
+        } else {
+          getParsingFlags(config).invalidMonth = input;
+        }
+      });
+      var defaultLocaleMonths = "January_February_March_April_May_June_July_August_September_October_November_December".split("_"), defaultLocaleMonthsShort = "Jan_Feb_Mar_Apr_May_Jun_Jul_Aug_Sep_Oct_Nov_Dec".split("_"), MONTHS_IN_FORMAT = /D[oD]?(\[[^\[\]]*\]|\s)+MMMM?/, defaultMonthsShortRegex = matchWord, defaultMonthsRegex = matchWord;
+      function localeMonths(m, format2) {
+        if (!m) {
+          return isArray(this._months) ? this._months : this._months["standalone"];
+        }
+        return isArray(this._months) ? this._months[m.month()] : this._months[(this._months.isFormat || MONTHS_IN_FORMAT).test(format2) ? "format" : "standalone"][m.month()];
+      }
+      function localeMonthsShort(m, format2) {
+        if (!m) {
+          return isArray(this._monthsShort) ? this._monthsShort : this._monthsShort["standalone"];
+        }
+        return isArray(this._monthsShort) ? this._monthsShort[m.month()] : this._monthsShort[MONTHS_IN_FORMAT.test(format2) ? "format" : "standalone"][m.month()];
+      }
+      function handleStrictParse(monthName, format2, strict) {
+        var i, ii, mom, llc = monthName.toLocaleLowerCase();
+        if (!this._monthsParse) {
+          this._monthsParse = [];
+          this._longMonthsParse = [];
+          this._shortMonthsParse = [];
+          for (i = 0; i < 12; ++i) {
+            mom = createUTC([2e3, i]);
+            this._shortMonthsParse[i] = this.monthsShort(mom, "").toLocaleLowerCase();
+            this._longMonthsParse[i] = this.months(mom, "").toLocaleLowerCase();
+          }
+        }
+        if (strict) {
+          if (format2 === "MMM") {
+            ii = indexOf.call(this._shortMonthsParse, llc);
+            return ii !== -1 ? ii : null;
+          } else {
+            ii = indexOf.call(this._longMonthsParse, llc);
+            return ii !== -1 ? ii : null;
+          }
+        } else {
+          if (format2 === "MMM") {
+            ii = indexOf.call(this._shortMonthsParse, llc);
+            if (ii !== -1) {
+              return ii;
+            }
+            ii = indexOf.call(this._longMonthsParse, llc);
+            return ii !== -1 ? ii : null;
+          } else {
+            ii = indexOf.call(this._longMonthsParse, llc);
+            if (ii !== -1) {
+              return ii;
+            }
+            ii = indexOf.call(this._shortMonthsParse, llc);
+            return ii !== -1 ? ii : null;
+          }
+        }
+      }
+      function localeMonthsParse(monthName, format2, strict) {
+        var i, mom, regex;
+        if (this._monthsParseExact) {
+          return handleStrictParse.call(this, monthName, format2, strict);
+        }
+        if (!this._monthsParse) {
+          this._monthsParse = [];
+          this._longMonthsParse = [];
+          this._shortMonthsParse = [];
+        }
+        for (i = 0; i < 12; i++) {
+          mom = createUTC([2e3, i]);
+          if (strict && !this._longMonthsParse[i]) {
+            this._longMonthsParse[i] = new RegExp("^" + this.months(mom, "").replace(".", "") + "$", "i");
+            this._shortMonthsParse[i] = new RegExp("^" + this.monthsShort(mom, "").replace(".", "") + "$", "i");
+          }
+          if (!strict && !this._monthsParse[i]) {
+            regex = "^" + this.months(mom, "") + "|^" + this.monthsShort(mom, "");
+            this._monthsParse[i] = new RegExp(regex.replace(".", ""), "i");
+          }
+          if (strict && format2 === "MMMM" && this._longMonthsParse[i].test(monthName)) {
+            return i;
+          } else if (strict && format2 === "MMM" && this._shortMonthsParse[i].test(monthName)) {
+            return i;
+          } else if (!strict && this._monthsParse[i].test(monthName)) {
+            return i;
+          }
+        }
+      }
+      function setMonth(mom, value) {
+        var dayOfMonth;
+        if (!mom.isValid()) {
+          return mom;
+        }
+        if (typeof value === "string") {
+          if (/^\d+$/.test(value)) {
+            value = toInt(value);
+          } else {
+            value = mom.localeData().monthsParse(value);
+            if (!isNumber(value)) {
+              return mom;
+            }
+          }
+        }
+        dayOfMonth = Math.min(mom.date(), daysInMonth(mom.year(), value));
+        mom._d["set" + (mom._isUTC ? "UTC" : "") + "Month"](value, dayOfMonth);
+        return mom;
+      }
+      function getSetMonth(value) {
+        if (value != null) {
+          setMonth(this, value);
+          hooks.updateOffset(this, true);
+          return this;
+        } else {
+          return get(this, "Month");
+        }
+      }
+      function getDaysInMonth() {
+        return daysInMonth(this.year(), this.month());
+      }
+      function monthsShortRegex(isStrict) {
+        if (this._monthsParseExact) {
+          if (!hasOwnProp(this, "_monthsRegex")) {
+            computeMonthsParse.call(this);
+          }
+          if (isStrict) {
+            return this._monthsShortStrictRegex;
+          } else {
+            return this._monthsShortRegex;
+          }
+        } else {
+          if (!hasOwnProp(this, "_monthsShortRegex")) {
+            this._monthsShortRegex = defaultMonthsShortRegex;
+          }
+          return this._monthsShortStrictRegex && isStrict ? this._monthsShortStrictRegex : this._monthsShortRegex;
+        }
+      }
+      function monthsRegex(isStrict) {
+        if (this._monthsParseExact) {
+          if (!hasOwnProp(this, "_monthsRegex")) {
+            computeMonthsParse.call(this);
+          }
+          if (isStrict) {
+            return this._monthsStrictRegex;
+          } else {
+            return this._monthsRegex;
+          }
+        } else {
+          if (!hasOwnProp(this, "_monthsRegex")) {
+            this._monthsRegex = defaultMonthsRegex;
+          }
+          return this._monthsStrictRegex && isStrict ? this._monthsStrictRegex : this._monthsRegex;
+        }
+      }
+      function computeMonthsParse() {
+        function cmpLenRev(a, b) {
+          return b.length - a.length;
+        }
+        var shortPieces = [], longPieces = [], mixedPieces = [], i, mom;
+        for (i = 0; i < 12; i++) {
+          mom = createUTC([2e3, i]);
+          shortPieces.push(this.monthsShort(mom, ""));
+          longPieces.push(this.months(mom, ""));
+          mixedPieces.push(this.months(mom, ""));
+          mixedPieces.push(this.monthsShort(mom, ""));
+        }
+        shortPieces.sort(cmpLenRev);
+        longPieces.sort(cmpLenRev);
+        mixedPieces.sort(cmpLenRev);
+        for (i = 0; i < 12; i++) {
+          shortPieces[i] = regexEscape(shortPieces[i]);
+          longPieces[i] = regexEscape(longPieces[i]);
+        }
+        for (i = 0; i < 24; i++) {
+          mixedPieces[i] = regexEscape(mixedPieces[i]);
+        }
+        this._monthsRegex = new RegExp("^(" + mixedPieces.join("|") + ")", "i");
+        this._monthsShortRegex = this._monthsRegex;
+        this._monthsStrictRegex = new RegExp("^(" + longPieces.join("|") + ")", "i");
+        this._monthsShortStrictRegex = new RegExp("^(" + shortPieces.join("|") + ")", "i");
+      }
+      addFormatToken("Y", 0, 0, function() {
+        var y = this.year();
+        return y <= 9999 ? zeroFill(y, 4) : "+" + y;
+      });
+      addFormatToken(0, ["YY", 2], 0, function() {
+        return this.year() % 100;
+      });
+      addFormatToken(0, ["YYYY", 4], 0, "year");
+      addFormatToken(0, ["YYYYY", 5], 0, "year");
+      addFormatToken(0, ["YYYYYY", 6, true], 0, "year");
+      addUnitAlias("year", "y");
+      addUnitPriority("year", 1);
+      addRegexToken("Y", matchSigned);
+      addRegexToken("YY", match1to2, match2);
+      addRegexToken("YYYY", match1to4, match4);
+      addRegexToken("YYYYY", match1to6, match6);
+      addRegexToken("YYYYYY", match1to6, match6);
+      addParseToken(["YYYYY", "YYYYYY"], YEAR);
+      addParseToken("YYYY", function(input, array) {
+        array[YEAR] = input.length === 2 ? hooks.parseTwoDigitYear(input) : toInt(input);
+      });
+      addParseToken("YY", function(input, array) {
+        array[YEAR] = hooks.parseTwoDigitYear(input);
+      });
+      addParseToken("Y", function(input, array) {
+        array[YEAR] = parseInt(input, 10);
+      });
+      function daysInYear(year) {
+        return isLeapYear(year) ? 366 : 365;
+      }
+      hooks.parseTwoDigitYear = function(input) {
+        return toInt(input) + (toInt(input) > 68 ? 1900 : 2e3);
+      };
+      var getSetYear = makeGetSet("FullYear", true);
+      function getIsLeapYear() {
+        return isLeapYear(this.year());
+      }
+      function createDate(y, m, d, h, M, s, ms) {
+        var date;
+        if (y < 100 && y >= 0) {
+          date = new Date(y + 400, m, d, h, M, s, ms);
+          if (isFinite(date.getFullYear())) {
+            date.setFullYear(y);
+          }
+        } else {
+          date = new Date(y, m, d, h, M, s, ms);
+        }
+        return date;
+      }
+      function createUTCDate(y) {
+        var date, args;
+        if (y < 100 && y >= 0) {
+          args = Array.prototype.slice.call(arguments);
+          args[0] = y + 400;
+          date = new Date(Date.UTC.apply(null, args));
+          if (isFinite(date.getUTCFullYear())) {
+            date.setUTCFullYear(y);
+          }
+        } else {
+          date = new Date(Date.UTC.apply(null, arguments));
+        }
+        return date;
+      }
+      function firstWeekOffset(year, dow, doy) {
+        var fwd = 7 + dow - doy, fwdlw = (7 + createUTCDate(year, 0, fwd).getUTCDay() - dow) % 7;
+        return -fwdlw + fwd - 1;
+      }
+      function dayOfYearFromWeeks(year, week, weekday, dow, doy) {
+        var localWeekday = (7 + weekday - dow) % 7, weekOffset = firstWeekOffset(year, dow, doy), dayOfYear = 1 + 7 * (week - 1) + localWeekday + weekOffset, resYear, resDayOfYear;
+        if (dayOfYear <= 0) {
+          resYear = year - 1;
+          resDayOfYear = daysInYear(resYear) + dayOfYear;
+        } else if (dayOfYear > daysInYear(year)) {
+          resYear = year + 1;
+          resDayOfYear = dayOfYear - daysInYear(year);
+        } else {
+          resYear = year;
+          resDayOfYear = dayOfYear;
+        }
+        return {
+          year: resYear,
+          dayOfYear: resDayOfYear
+        };
+      }
+      function weekOfYear(mom, dow, doy) {
+        var weekOffset = firstWeekOffset(mom.year(), dow, doy), week = Math.floor((mom.dayOfYear() - weekOffset - 1) / 7) + 1, resWeek, resYear;
+        if (week < 1) {
+          resYear = mom.year() - 1;
+          resWeek = week + weeksInYear(resYear, dow, doy);
+        } else if (week > weeksInYear(mom.year(), dow, doy)) {
+          resWeek = week - weeksInYear(mom.year(), dow, doy);
+          resYear = mom.year() + 1;
+        } else {
+          resYear = mom.year();
+          resWeek = week;
+        }
+        return {
+          week: resWeek,
+          year: resYear
+        };
+      }
+      function weeksInYear(year, dow, doy) {
+        var weekOffset = firstWeekOffset(year, dow, doy), weekOffsetNext = firstWeekOffset(year + 1, dow, doy);
+        return (daysInYear(year) - weekOffset + weekOffsetNext) / 7;
+      }
+      addFormatToken("w", ["ww", 2], "wo", "week");
+      addFormatToken("W", ["WW", 2], "Wo", "isoWeek");
+      addUnitAlias("week", "w");
+      addUnitAlias("isoWeek", "W");
+      addUnitPriority("week", 5);
+      addUnitPriority("isoWeek", 5);
+      addRegexToken("w", match1to2);
+      addRegexToken("ww", match1to2, match2);
+      addRegexToken("W", match1to2);
+      addRegexToken("WW", match1to2, match2);
+      addWeekParseToken(["w", "ww", "W", "WW"], function(input, week, config, token2) {
+        week[token2.substr(0, 1)] = toInt(input);
+      });
+      function localeWeek(mom) {
+        return weekOfYear(mom, this._week.dow, this._week.doy).week;
+      }
+      var defaultLocaleWeek = {
+        dow: 0,
+        doy: 6
+      };
+      function localeFirstDayOfWeek() {
+        return this._week.dow;
+      }
+      function localeFirstDayOfYear() {
+        return this._week.doy;
+      }
+      function getSetWeek(input) {
+        var week = this.localeData().week(this);
+        return input == null ? week : this.add((input - week) * 7, "d");
+      }
+      function getSetISOWeek(input) {
+        var week = weekOfYear(this, 1, 4).week;
+        return input == null ? week : this.add((input - week) * 7, "d");
+      }
+      addFormatToken("d", 0, "do", "day");
+      addFormatToken("dd", 0, 0, function(format2) {
+        return this.localeData().weekdaysMin(this, format2);
+      });
+      addFormatToken("ddd", 0, 0, function(format2) {
+        return this.localeData().weekdaysShort(this, format2);
+      });
+      addFormatToken("dddd", 0, 0, function(format2) {
+        return this.localeData().weekdays(this, format2);
+      });
+      addFormatToken("e", 0, 0, "weekday");
+      addFormatToken("E", 0, 0, "isoWeekday");
+      addUnitAlias("day", "d");
+      addUnitAlias("weekday", "e");
+      addUnitAlias("isoWeekday", "E");
+      addUnitPriority("day", 11);
+      addUnitPriority("weekday", 11);
+      addUnitPriority("isoWeekday", 11);
+      addRegexToken("d", match1to2);
+      addRegexToken("e", match1to2);
+      addRegexToken("E", match1to2);
+      addRegexToken("dd", function(isStrict, locale2) {
+        return locale2.weekdaysMinRegex(isStrict);
+      });
+      addRegexToken("ddd", function(isStrict, locale2) {
+        return locale2.weekdaysShortRegex(isStrict);
+      });
+      addRegexToken("dddd", function(isStrict, locale2) {
+        return locale2.weekdaysRegex(isStrict);
+      });
+      addWeekParseToken(["dd", "ddd", "dddd"], function(input, week, config, token2) {
+        var weekday = config._locale.weekdaysParse(input, token2, config._strict);
+        if (weekday != null) {
+          week.d = weekday;
+        } else {
+          getParsingFlags(config).invalidWeekday = input;
+        }
+      });
+      addWeekParseToken(["d", "e", "E"], function(input, week, config, token2) {
+        week[token2] = toInt(input);
+      });
+      function parseWeekday(input, locale2) {
+        if (typeof input !== "string") {
+          return input;
+        }
+        if (!isNaN(input)) {
+          return parseInt(input, 10);
+        }
+        input = locale2.weekdaysParse(input);
+        if (typeof input === "number") {
+          return input;
+        }
+        return null;
+      }
+      function parseIsoWeekday(input, locale2) {
+        if (typeof input === "string") {
+          return locale2.weekdaysParse(input) % 7 || 7;
+        }
+        return isNaN(input) ? null : input;
+      }
+      function shiftWeekdays(ws, n) {
+        return ws.slice(n, 7).concat(ws.slice(0, n));
+      }
+      var defaultLocaleWeekdays = "Sunday_Monday_Tuesday_Wednesday_Thursday_Friday_Saturday".split("_"), defaultLocaleWeekdaysShort = "Sun_Mon_Tue_Wed_Thu_Fri_Sat".split("_"), defaultLocaleWeekdaysMin = "Su_Mo_Tu_We_Th_Fr_Sa".split("_"), defaultWeekdaysRegex = matchWord, defaultWeekdaysShortRegex = matchWord, defaultWeekdaysMinRegex = matchWord;
+      function localeWeekdays(m, format2) {
+        var weekdays = isArray(this._weekdays) ? this._weekdays : this._weekdays[m && m !== true && this._weekdays.isFormat.test(format2) ? "format" : "standalone"];
+        return m === true ? shiftWeekdays(weekdays, this._week.dow) : m ? weekdays[m.day()] : weekdays;
+      }
+      function localeWeekdaysShort(m) {
+        return m === true ? shiftWeekdays(this._weekdaysShort, this._week.dow) : m ? this._weekdaysShort[m.day()] : this._weekdaysShort;
+      }
+      function localeWeekdaysMin(m) {
+        return m === true ? shiftWeekdays(this._weekdaysMin, this._week.dow) : m ? this._weekdaysMin[m.day()] : this._weekdaysMin;
+      }
+      function handleStrictParse$1(weekdayName, format2, strict) {
+        var i, ii, mom, llc = weekdayName.toLocaleLowerCase();
+        if (!this._weekdaysParse) {
+          this._weekdaysParse = [];
+          this._shortWeekdaysParse = [];
+          this._minWeekdaysParse = [];
+          for (i = 0; i < 7; ++i) {
+            mom = createUTC([2e3, 1]).day(i);
+            this._minWeekdaysParse[i] = this.weekdaysMin(mom, "").toLocaleLowerCase();
+            this._shortWeekdaysParse[i] = this.weekdaysShort(mom, "").toLocaleLowerCase();
+            this._weekdaysParse[i] = this.weekdays(mom, "").toLocaleLowerCase();
+          }
+        }
+        if (strict) {
+          if (format2 === "dddd") {
+            ii = indexOf.call(this._weekdaysParse, llc);
+            return ii !== -1 ? ii : null;
+          } else if (format2 === "ddd") {
+            ii = indexOf.call(this._shortWeekdaysParse, llc);
+            return ii !== -1 ? ii : null;
+          } else {
+            ii = indexOf.call(this._minWeekdaysParse, llc);
+            return ii !== -1 ? ii : null;
+          }
+        } else {
+          if (format2 === "dddd") {
+            ii = indexOf.call(this._weekdaysParse, llc);
+            if (ii !== -1) {
+              return ii;
+            }
+            ii = indexOf.call(this._shortWeekdaysParse, llc);
+            if (ii !== -1) {
+              return ii;
+            }
+            ii = indexOf.call(this._minWeekdaysParse, llc);
+            return ii !== -1 ? ii : null;
+          } else if (format2 === "ddd") {
+            ii = indexOf.call(this._shortWeekdaysParse, llc);
+            if (ii !== -1) {
+              return ii;
+            }
+            ii = indexOf.call(this._weekdaysParse, llc);
+            if (ii !== -1) {
+              return ii;
+            }
+            ii = indexOf.call(this._minWeekdaysParse, llc);
+            return ii !== -1 ? ii : null;
+          } else {
+            ii = indexOf.call(this._minWeekdaysParse, llc);
+            if (ii !== -1) {
+              return ii;
+            }
+            ii = indexOf.call(this._weekdaysParse, llc);
+            if (ii !== -1) {
+              return ii;
+            }
+            ii = indexOf.call(this._shortWeekdaysParse, llc);
+            return ii !== -1 ? ii : null;
+          }
+        }
+      }
+      function localeWeekdaysParse(weekdayName, format2, strict) {
+        var i, mom, regex;
+        if (this._weekdaysParseExact) {
+          return handleStrictParse$1.call(this, weekdayName, format2, strict);
+        }
+        if (!this._weekdaysParse) {
+          this._weekdaysParse = [];
+          this._minWeekdaysParse = [];
+          this._shortWeekdaysParse = [];
+          this._fullWeekdaysParse = [];
+        }
+        for (i = 0; i < 7; i++) {
+          mom = createUTC([2e3, 1]).day(i);
+          if (strict && !this._fullWeekdaysParse[i]) {
+            this._fullWeekdaysParse[i] = new RegExp("^" + this.weekdays(mom, "").replace(".", "\\.?") + "$", "i");
+            this._shortWeekdaysParse[i] = new RegExp("^" + this.weekdaysShort(mom, "").replace(".", "\\.?") + "$", "i");
+            this._minWeekdaysParse[i] = new RegExp("^" + this.weekdaysMin(mom, "").replace(".", "\\.?") + "$", "i");
+          }
+          if (!this._weekdaysParse[i]) {
+            regex = "^" + this.weekdays(mom, "") + "|^" + this.weekdaysShort(mom, "") + "|^" + this.weekdaysMin(mom, "");
+            this._weekdaysParse[i] = new RegExp(regex.replace(".", ""), "i");
+          }
+          if (strict && format2 === "dddd" && this._fullWeekdaysParse[i].test(weekdayName)) {
+            return i;
+          } else if (strict && format2 === "ddd" && this._shortWeekdaysParse[i].test(weekdayName)) {
+            return i;
+          } else if (strict && format2 === "dd" && this._minWeekdaysParse[i].test(weekdayName)) {
+            return i;
+          } else if (!strict && this._weekdaysParse[i].test(weekdayName)) {
+            return i;
+          }
+        }
+      }
+      function getSetDayOfWeek(input) {
+        if (!this.isValid()) {
+          return input != null ? this : NaN;
+        }
+        var day = this._isUTC ? this._d.getUTCDay() : this._d.getDay();
+        if (input != null) {
+          input = parseWeekday(input, this.localeData());
+          return this.add(input - day, "d");
+        } else {
+          return day;
+        }
+      }
+      function getSetLocaleDayOfWeek(input) {
+        if (!this.isValid()) {
+          return input != null ? this : NaN;
+        }
+        var weekday = (this.day() + 7 - this.localeData()._week.dow) % 7;
+        return input == null ? weekday : this.add(input - weekday, "d");
+      }
+      function getSetISODayOfWeek(input) {
+        if (!this.isValid()) {
+          return input != null ? this : NaN;
+        }
+        if (input != null) {
+          var weekday = parseIsoWeekday(input, this.localeData());
+          return this.day(this.day() % 7 ? weekday : weekday - 7);
+        } else {
+          return this.day() || 7;
+        }
+      }
+      function weekdaysRegex(isStrict) {
+        if (this._weekdaysParseExact) {
+          if (!hasOwnProp(this, "_weekdaysRegex")) {
+            computeWeekdaysParse.call(this);
+          }
+          if (isStrict) {
+            return this._weekdaysStrictRegex;
+          } else {
+            return this._weekdaysRegex;
+          }
+        } else {
+          if (!hasOwnProp(this, "_weekdaysRegex")) {
+            this._weekdaysRegex = defaultWeekdaysRegex;
+          }
+          return this._weekdaysStrictRegex && isStrict ? this._weekdaysStrictRegex : this._weekdaysRegex;
+        }
+      }
+      function weekdaysShortRegex(isStrict) {
+        if (this._weekdaysParseExact) {
+          if (!hasOwnProp(this, "_weekdaysRegex")) {
+            computeWeekdaysParse.call(this);
+          }
+          if (isStrict) {
+            return this._weekdaysShortStrictRegex;
+          } else {
+            return this._weekdaysShortRegex;
+          }
+        } else {
+          if (!hasOwnProp(this, "_weekdaysShortRegex")) {
+            this._weekdaysShortRegex = defaultWeekdaysShortRegex;
+          }
+          return this._weekdaysShortStrictRegex && isStrict ? this._weekdaysShortStrictRegex : this._weekdaysShortRegex;
+        }
+      }
+      function weekdaysMinRegex(isStrict) {
+        if (this._weekdaysParseExact) {
+          if (!hasOwnProp(this, "_weekdaysRegex")) {
+            computeWeekdaysParse.call(this);
+          }
+          if (isStrict) {
+            return this._weekdaysMinStrictRegex;
+          } else {
+            return this._weekdaysMinRegex;
+          }
+        } else {
+          if (!hasOwnProp(this, "_weekdaysMinRegex")) {
+            this._weekdaysMinRegex = defaultWeekdaysMinRegex;
+          }
+          return this._weekdaysMinStrictRegex && isStrict ? this._weekdaysMinStrictRegex : this._weekdaysMinRegex;
+        }
+      }
+      function computeWeekdaysParse() {
+        function cmpLenRev(a, b) {
+          return b.length - a.length;
+        }
+        var minPieces = [], shortPieces = [], longPieces = [], mixedPieces = [], i, mom, minp, shortp, longp;
+        for (i = 0; i < 7; i++) {
+          mom = createUTC([2e3, 1]).day(i);
+          minp = regexEscape(this.weekdaysMin(mom, ""));
+          shortp = regexEscape(this.weekdaysShort(mom, ""));
+          longp = regexEscape(this.weekdays(mom, ""));
+          minPieces.push(minp);
+          shortPieces.push(shortp);
+          longPieces.push(longp);
+          mixedPieces.push(minp);
+          mixedPieces.push(shortp);
+          mixedPieces.push(longp);
+        }
+        minPieces.sort(cmpLenRev);
+        shortPieces.sort(cmpLenRev);
+        longPieces.sort(cmpLenRev);
+        mixedPieces.sort(cmpLenRev);
+        this._weekdaysRegex = new RegExp("^(" + mixedPieces.join("|") + ")", "i");
+        this._weekdaysShortRegex = this._weekdaysRegex;
+        this._weekdaysMinRegex = this._weekdaysRegex;
+        this._weekdaysStrictRegex = new RegExp("^(" + longPieces.join("|") + ")", "i");
+        this._weekdaysShortStrictRegex = new RegExp("^(" + shortPieces.join("|") + ")", "i");
+        this._weekdaysMinStrictRegex = new RegExp("^(" + minPieces.join("|") + ")", "i");
+      }
+      function hFormat() {
+        return this.hours() % 12 || 12;
+      }
+      function kFormat() {
+        return this.hours() || 24;
+      }
+      addFormatToken("H", ["HH", 2], 0, "hour");
+      addFormatToken("h", ["hh", 2], 0, hFormat);
+      addFormatToken("k", ["kk", 2], 0, kFormat);
+      addFormatToken("hmm", 0, 0, function() {
+        return "" + hFormat.apply(this) + zeroFill(this.minutes(), 2);
+      });
+      addFormatToken("hmmss", 0, 0, function() {
+        return "" + hFormat.apply(this) + zeroFill(this.minutes(), 2) + zeroFill(this.seconds(), 2);
+      });
+      addFormatToken("Hmm", 0, 0, function() {
+        return "" + this.hours() + zeroFill(this.minutes(), 2);
+      });
+      addFormatToken("Hmmss", 0, 0, function() {
+        return "" + this.hours() + zeroFill(this.minutes(), 2) + zeroFill(this.seconds(), 2);
+      });
+      function meridiem(token2, lowercase) {
+        addFormatToken(token2, 0, 0, function() {
+          return this.localeData().meridiem(this.hours(), this.minutes(), lowercase);
+        });
+      }
+      meridiem("a", true);
+      meridiem("A", false);
+      addUnitAlias("hour", "h");
+      addUnitPriority("hour", 13);
+      function matchMeridiem(isStrict, locale2) {
+        return locale2._meridiemParse;
+      }
+      addRegexToken("a", matchMeridiem);
+      addRegexToken("A", matchMeridiem);
+      addRegexToken("H", match1to2);
+      addRegexToken("h", match1to2);
+      addRegexToken("k", match1to2);
+      addRegexToken("HH", match1to2, match2);
+      addRegexToken("hh", match1to2, match2);
+      addRegexToken("kk", match1to2, match2);
+      addRegexToken("hmm", match3to4);
+      addRegexToken("hmmss", match5to6);
+      addRegexToken("Hmm", match3to4);
+      addRegexToken("Hmmss", match5to6);
+      addParseToken(["H", "HH"], HOUR);
+      addParseToken(["k", "kk"], function(input, array, config) {
+        var kInput = toInt(input);
+        array[HOUR] = kInput === 24 ? 0 : kInput;
+      });
+      addParseToken(["a", "A"], function(input, array, config) {
+        config._isPm = config._locale.isPM(input);
+        config._meridiem = input;
+      });
+      addParseToken(["h", "hh"], function(input, array, config) {
+        array[HOUR] = toInt(input);
+        getParsingFlags(config).bigHour = true;
+      });
+      addParseToken("hmm", function(input, array, config) {
+        var pos = input.length - 2;
+        array[HOUR] = toInt(input.substr(0, pos));
+        array[MINUTE] = toInt(input.substr(pos));
+        getParsingFlags(config).bigHour = true;
+      });
+      addParseToken("hmmss", function(input, array, config) {
+        var pos1 = input.length - 4, pos2 = input.length - 2;
+        array[HOUR] = toInt(input.substr(0, pos1));
+        array[MINUTE] = toInt(input.substr(pos1, 2));
+        array[SECOND] = toInt(input.substr(pos2));
+        getParsingFlags(config).bigHour = true;
+      });
+      addParseToken("Hmm", function(input, array, config) {
+        var pos = input.length - 2;
+        array[HOUR] = toInt(input.substr(0, pos));
+        array[MINUTE] = toInt(input.substr(pos));
+      });
+      addParseToken("Hmmss", function(input, array, config) {
+        var pos1 = input.length - 4, pos2 = input.length - 2;
+        array[HOUR] = toInt(input.substr(0, pos1));
+        array[MINUTE] = toInt(input.substr(pos1, 2));
+        array[SECOND] = toInt(input.substr(pos2));
+      });
+      function localeIsPM(input) {
+        return (input + "").toLowerCase().charAt(0) === "p";
+      }
+      var defaultLocaleMeridiemParse = /[ap]\.?m?\.?/i, getSetHour = makeGetSet("Hours", true);
+      function localeMeridiem(hours2, minutes2, isLower) {
+        if (hours2 > 11) {
+          return isLower ? "pm" : "PM";
+        } else {
+          return isLower ? "am" : "AM";
+        }
+      }
+      var baseConfig = {
+        calendar: defaultCalendar,
+        longDateFormat: defaultLongDateFormat,
+        invalidDate: defaultInvalidDate,
+        ordinal: defaultOrdinal,
+        dayOfMonthOrdinalParse: defaultDayOfMonthOrdinalParse,
+        relativeTime: defaultRelativeTime,
+        months: defaultLocaleMonths,
+        monthsShort: defaultLocaleMonthsShort,
+        week: defaultLocaleWeek,
+        weekdays: defaultLocaleWeekdays,
+        weekdaysMin: defaultLocaleWeekdaysMin,
+        weekdaysShort: defaultLocaleWeekdaysShort,
+        meridiemParse: defaultLocaleMeridiemParse
+      };
+      var locales = {}, localeFamilies = {}, globalLocale;
+      function commonPrefix(arr1, arr2) {
+        var i, minl = Math.min(arr1.length, arr2.length);
+        for (i = 0; i < minl; i += 1) {
+          if (arr1[i] !== arr2[i]) {
+            return i;
+          }
+        }
+        return minl;
+      }
+      function normalizeLocale(key2) {
+        return key2 ? key2.toLowerCase().replace("_", "-") : key2;
+      }
+      function chooseLocale(names) {
+        var i = 0, j, next, locale2, split;
+        while (i < names.length) {
+          split = normalizeLocale(names[i]).split("-");
+          j = split.length;
+          next = normalizeLocale(names[i + 1]);
+          next = next ? next.split("-") : null;
+          while (j > 0) {
+            locale2 = loadLocale(split.slice(0, j).join("-"));
+            if (locale2) {
+              return locale2;
+            }
+            if (next && next.length >= j && commonPrefix(split, next) >= j - 1) {
+              break;
+            }
+            j--;
+          }
+          i++;
+        }
+        return globalLocale;
+      }
+      function isLocaleNameSane(name) {
+        return name.match("^[^/\\\\]*$") != null;
+      }
+      function loadLocale(name) {
+        var oldLocale = null, aliasedRequire;
+        if (locales[name] === void 0 && typeof module2 !== "undefined" && module2 && module2.exports && isLocaleNameSane(name)) {
+          try {
+            oldLocale = globalLocale._abbr;
+            aliasedRequire = require;
+            aliasedRequire("./locale/" + name);
+            getSetGlobalLocale(oldLocale);
+          } catch (e) {
+            locales[name] = null;
+          }
+        }
+        return locales[name];
+      }
+      function getSetGlobalLocale(key2, values) {
+        var data;
+        if (key2) {
+          if (isUndefined(values)) {
+            data = getLocale(key2);
+          } else {
+            data = defineLocale(key2, values);
+          }
+          if (data) {
+            globalLocale = data;
+          } else {
+            if (typeof console !== "undefined" && console.warn) {
+              console.warn("Locale " + key2 + " not found. Did you forget to load it?");
+            }
+          }
+        }
+        return globalLocale._abbr;
+      }
+      function defineLocale(name, config) {
+        if (config !== null) {
+          var locale2, parentConfig = baseConfig;
+          config.abbr = name;
+          if (locales[name] != null) {
+            deprecateSimple("defineLocaleOverride", "use moment.updateLocale(localeName, config) to change an existing locale. moment.defineLocale(localeName, config) should only be used for creating a new locale See http://momentjs.com/guides/#/warnings/define-locale/ for more info.");
+            parentConfig = locales[name]._config;
+          } else if (config.parentLocale != null) {
+            if (locales[config.parentLocale] != null) {
+              parentConfig = locales[config.parentLocale]._config;
+            } else {
+              locale2 = loadLocale(config.parentLocale);
+              if (locale2 != null) {
+                parentConfig = locale2._config;
+              } else {
+                if (!localeFamilies[config.parentLocale]) {
+                  localeFamilies[config.parentLocale] = [];
+                }
+                localeFamilies[config.parentLocale].push({
+                  name,
+                  config
+                });
+                return null;
+              }
+            }
+          }
+          locales[name] = new Locale(mergeConfigs(parentConfig, config));
+          if (localeFamilies[name]) {
+            localeFamilies[name].forEach(function(x) {
+              defineLocale(x.name, x.config);
+            });
+          }
+          getSetGlobalLocale(name);
+          return locales[name];
+        } else {
+          delete locales[name];
+          return null;
+        }
+      }
+      function updateLocale(name, config) {
+        if (config != null) {
+          var locale2, tmpLocale, parentConfig = baseConfig;
+          if (locales[name] != null && locales[name].parentLocale != null) {
+            locales[name].set(mergeConfigs(locales[name]._config, config));
+          } else {
+            tmpLocale = loadLocale(name);
+            if (tmpLocale != null) {
+              parentConfig = tmpLocale._config;
+            }
+            config = mergeConfigs(parentConfig, config);
+            if (tmpLocale == null) {
+              config.abbr = name;
+            }
+            locale2 = new Locale(config);
+            locale2.parentLocale = locales[name];
+            locales[name] = locale2;
+          }
+          getSetGlobalLocale(name);
+        } else {
+          if (locales[name] != null) {
+            if (locales[name].parentLocale != null) {
+              locales[name] = locales[name].parentLocale;
+              if (name === getSetGlobalLocale()) {
+                getSetGlobalLocale(name);
+              }
+            } else if (locales[name] != null) {
+              delete locales[name];
+            }
+          }
+        }
+        return locales[name];
+      }
+      function getLocale(key2) {
+        var locale2;
+        if (key2 && key2._locale && key2._locale._abbr) {
+          key2 = key2._locale._abbr;
+        }
+        if (!key2) {
+          return globalLocale;
+        }
+        if (!isArray(key2)) {
+          locale2 = loadLocale(key2);
+          if (locale2) {
+            return locale2;
+          }
+          key2 = [key2];
+        }
+        return chooseLocale(key2);
+      }
+      function listLocales() {
+        return keys(locales);
+      }
+      function checkOverflow(m) {
+        var overflow, a = m._a;
+        if (a && getParsingFlags(m).overflow === -2) {
+          overflow = a[MONTH] < 0 || a[MONTH] > 11 ? MONTH : a[DATE] < 1 || a[DATE] > daysInMonth(a[YEAR], a[MONTH]) ? DATE : a[HOUR] < 0 || a[HOUR] > 24 || a[HOUR] === 24 && (a[MINUTE] !== 0 || a[SECOND] !== 0 || a[MILLISECOND] !== 0) ? HOUR : a[MINUTE] < 0 || a[MINUTE] > 59 ? MINUTE : a[SECOND] < 0 || a[SECOND] > 59 ? SECOND : a[MILLISECOND] < 0 || a[MILLISECOND] > 999 ? MILLISECOND : -1;
+          if (getParsingFlags(m)._overflowDayOfYear && (overflow < YEAR || overflow > DATE)) {
+            overflow = DATE;
+          }
+          if (getParsingFlags(m)._overflowWeeks && overflow === -1) {
+            overflow = WEEK;
+          }
+          if (getParsingFlags(m)._overflowWeekday && overflow === -1) {
+            overflow = WEEKDAY;
+          }
+          getParsingFlags(m).overflow = overflow;
+        }
+        return m;
+      }
+      var extendedIsoRegex = /^\s*((?:[+-]\d{6}|\d{4})-(?:\d\d-\d\d|W\d\d-\d|W\d\d|\d\d\d|\d\d))(?:(T| )(\d\d(?::\d\d(?::\d\d(?:[.,]\d+)?)?)?)([+-]\d\d(?::?\d\d)?|\s*Z)?)?$/, basicIsoRegex = /^\s*((?:[+-]\d{6}|\d{4})(?:\d\d\d\d|W\d\d\d|W\d\d|\d\d\d|\d\d|))(?:(T| )(\d\d(?:\d\d(?:\d\d(?:[.,]\d+)?)?)?)([+-]\d\d(?::?\d\d)?|\s*Z)?)?$/, tzRegex = /Z|[+-]\d\d(?::?\d\d)?/, isoDates = [
+        ["YYYYYY-MM-DD", /[+-]\d{6}-\d\d-\d\d/],
+        ["YYYY-MM-DD", /\d{4}-\d\d-\d\d/],
+        ["GGGG-[W]WW-E", /\d{4}-W\d\d-\d/],
+        ["GGGG-[W]WW", /\d{4}-W\d\d/, false],
+        ["YYYY-DDD", /\d{4}-\d{3}/],
+        ["YYYY-MM", /\d{4}-\d\d/, false],
+        ["YYYYYYMMDD", /[+-]\d{10}/],
+        ["YYYYMMDD", /\d{8}/],
+        ["GGGG[W]WWE", /\d{4}W\d{3}/],
+        ["GGGG[W]WW", /\d{4}W\d{2}/, false],
+        ["YYYYDDD", /\d{7}/],
+        ["YYYYMM", /\d{6}/, false],
+        ["YYYY", /\d{4}/, false]
+      ], isoTimes = [
+        ["HH:mm:ss.SSSS", /\d\d:\d\d:\d\d\.\d+/],
+        ["HH:mm:ss,SSSS", /\d\d:\d\d:\d\d,\d+/],
+        ["HH:mm:ss", /\d\d:\d\d:\d\d/],
+        ["HH:mm", /\d\d:\d\d/],
+        ["HHmmss.SSSS", /\d\d\d\d\d\d\.\d+/],
+        ["HHmmss,SSSS", /\d\d\d\d\d\d,\d+/],
+        ["HHmmss", /\d\d\d\d\d\d/],
+        ["HHmm", /\d\d\d\d/],
+        ["HH", /\d\d/]
+      ], aspNetJsonRegex = /^\/?Date\((-?\d+)/i, rfc2822 = /^(?:(Mon|Tue|Wed|Thu|Fri|Sat|Sun),?\s)?(\d{1,2})\s(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s(\d{2,4})\s(\d\d):(\d\d)(?::(\d\d))?\s(?:(UT|GMT|[ECMP][SD]T)|([Zz])|([+-]\d{4}))$/, obsOffsets = {
+        UT: 0,
+        GMT: 0,
+        EDT: -4 * 60,
+        EST: -5 * 60,
+        CDT: -5 * 60,
+        CST: -6 * 60,
+        MDT: -6 * 60,
+        MST: -7 * 60,
+        PDT: -7 * 60,
+        PST: -8 * 60
+      };
+      function configFromISO(config) {
+        var i, l, string = config._i, match = extendedIsoRegex.exec(string) || basicIsoRegex.exec(string), allowTime, dateFormat, timeFormat, tzFormat, isoDatesLen = isoDates.length, isoTimesLen = isoTimes.length;
+        if (match) {
+          getParsingFlags(config).iso = true;
+          for (i = 0, l = isoDatesLen; i < l; i++) {
+            if (isoDates[i][1].exec(match[1])) {
+              dateFormat = isoDates[i][0];
+              allowTime = isoDates[i][2] !== false;
+              break;
+            }
+          }
+          if (dateFormat == null) {
+            config._isValid = false;
+            return;
+          }
+          if (match[3]) {
+            for (i = 0, l = isoTimesLen; i < l; i++) {
+              if (isoTimes[i][1].exec(match[3])) {
+                timeFormat = (match[2] || " ") + isoTimes[i][0];
+                break;
+              }
+            }
+            if (timeFormat == null) {
+              config._isValid = false;
+              return;
+            }
+          }
+          if (!allowTime && timeFormat != null) {
+            config._isValid = false;
+            return;
+          }
+          if (match[4]) {
+            if (tzRegex.exec(match[4])) {
+              tzFormat = "Z";
+            } else {
+              config._isValid = false;
+              return;
+            }
+          }
+          config._f = dateFormat + (timeFormat || "") + (tzFormat || "");
+          configFromStringAndFormat(config);
+        } else {
+          config._isValid = false;
+        }
+      }
+      function extractFromRFC2822Strings(yearStr, monthStr, dayStr, hourStr, minuteStr, secondStr) {
+        var result = [
+          untruncateYear(yearStr),
+          defaultLocaleMonthsShort.indexOf(monthStr),
+          parseInt(dayStr, 10),
+          parseInt(hourStr, 10),
+          parseInt(minuteStr, 10)
+        ];
+        if (secondStr) {
+          result.push(parseInt(secondStr, 10));
+        }
+        return result;
+      }
+      function untruncateYear(yearStr) {
+        var year = parseInt(yearStr, 10);
+        if (year <= 49) {
+          return 2e3 + year;
+        } else if (year <= 999) {
+          return 1900 + year;
+        }
+        return year;
+      }
+      function preprocessRFC2822(s) {
+        return s.replace(/\([^()]*\)|[\n\t]/g, " ").replace(/(\s\s+)/g, " ").replace(/^\s\s*/, "").replace(/\s\s*$/, "");
+      }
+      function checkWeekday(weekdayStr, parsedInput, config) {
+        if (weekdayStr) {
+          var weekdayProvided = defaultLocaleWeekdaysShort.indexOf(weekdayStr), weekdayActual = new Date(parsedInput[0], parsedInput[1], parsedInput[2]).getDay();
+          if (weekdayProvided !== weekdayActual) {
+            getParsingFlags(config).weekdayMismatch = true;
+            config._isValid = false;
+            return false;
+          }
+        }
+        return true;
+      }
+      function calculateOffset(obsOffset, militaryOffset, numOffset) {
+        if (obsOffset) {
+          return obsOffsets[obsOffset];
+        } else if (militaryOffset) {
+          return 0;
+        } else {
+          var hm = parseInt(numOffset, 10), m = hm % 100, h = (hm - m) / 100;
+          return h * 60 + m;
+        }
+      }
+      function configFromRFC2822(config) {
+        var match = rfc2822.exec(preprocessRFC2822(config._i)), parsedArray;
+        if (match) {
+          parsedArray = extractFromRFC2822Strings(match[4], match[3], match[2], match[5], match[6], match[7]);
+          if (!checkWeekday(match[1], parsedArray, config)) {
+            return;
+          }
+          config._a = parsedArray;
+          config._tzm = calculateOffset(match[8], match[9], match[10]);
+          config._d = createUTCDate.apply(null, config._a);
+          config._d.setUTCMinutes(config._d.getUTCMinutes() - config._tzm);
+          getParsingFlags(config).rfc2822 = true;
+        } else {
+          config._isValid = false;
+        }
+      }
+      function configFromString(config) {
+        var matched = aspNetJsonRegex.exec(config._i);
+        if (matched !== null) {
+          config._d = new Date(+matched[1]);
+          return;
+        }
+        configFromISO(config);
+        if (config._isValid === false) {
+          delete config._isValid;
+        } else {
+          return;
+        }
+        configFromRFC2822(config);
+        if (config._isValid === false) {
+          delete config._isValid;
+        } else {
+          return;
+        }
+        if (config._strict) {
+          config._isValid = false;
+        } else {
+          hooks.createFromInputFallback(config);
+        }
+      }
+      hooks.createFromInputFallback = deprecate("value provided is not in a recognized RFC2822 or ISO format. moment construction falls back to js Date(), which is not reliable across all browsers and versions. Non RFC2822/ISO date formats are discouraged. Please refer to http://momentjs.com/guides/#/warnings/js-date/ for more info.", function(config) {
+        config._d = new Date(config._i + (config._useUTC ? " UTC" : ""));
+      });
+      function defaults(a, b, c) {
+        if (a != null) {
+          return a;
+        }
+        if (b != null) {
+          return b;
+        }
+        return c;
+      }
+      function currentDateArray(config) {
+        var nowValue = new Date(hooks.now());
+        if (config._useUTC) {
+          return [
+            nowValue.getUTCFullYear(),
+            nowValue.getUTCMonth(),
+            nowValue.getUTCDate()
+          ];
+        }
+        return [nowValue.getFullYear(), nowValue.getMonth(), nowValue.getDate()];
+      }
+      function configFromArray(config) {
+        var i, date, input = [], currentDate, expectedWeekday, yearToUse;
+        if (config._d) {
+          return;
+        }
+        currentDate = currentDateArray(config);
+        if (config._w && config._a[DATE] == null && config._a[MONTH] == null) {
+          dayOfYearFromWeekInfo(config);
+        }
+        if (config._dayOfYear != null) {
+          yearToUse = defaults(config._a[YEAR], currentDate[YEAR]);
+          if (config._dayOfYear > daysInYear(yearToUse) || config._dayOfYear === 0) {
+            getParsingFlags(config)._overflowDayOfYear = true;
+          }
+          date = createUTCDate(yearToUse, 0, config._dayOfYear);
+          config._a[MONTH] = date.getUTCMonth();
+          config._a[DATE] = date.getUTCDate();
+        }
+        for (i = 0; i < 3 && config._a[i] == null; ++i) {
+          config._a[i] = input[i] = currentDate[i];
+        }
+        for (; i < 7; i++) {
+          config._a[i] = input[i] = config._a[i] == null ? i === 2 ? 1 : 0 : config._a[i];
+        }
+        if (config._a[HOUR] === 24 && config._a[MINUTE] === 0 && config._a[SECOND] === 0 && config._a[MILLISECOND] === 0) {
+          config._nextDay = true;
+          config._a[HOUR] = 0;
+        }
+        config._d = (config._useUTC ? createUTCDate : createDate).apply(null, input);
+        expectedWeekday = config._useUTC ? config._d.getUTCDay() : config._d.getDay();
+        if (config._tzm != null) {
+          config._d.setUTCMinutes(config._d.getUTCMinutes() - config._tzm);
+        }
+        if (config._nextDay) {
+          config._a[HOUR] = 24;
+        }
+        if (config._w && typeof config._w.d !== "undefined" && config._w.d !== expectedWeekday) {
+          getParsingFlags(config).weekdayMismatch = true;
+        }
+      }
+      function dayOfYearFromWeekInfo(config) {
+        var w, weekYear, week, weekday, dow, doy, temp, weekdayOverflow, curWeek;
+        w = config._w;
+        if (w.GG != null || w.W != null || w.E != null) {
+          dow = 1;
+          doy = 4;
+          weekYear = defaults(w.GG, config._a[YEAR], weekOfYear(createLocal(), 1, 4).year);
+          week = defaults(w.W, 1);
+          weekday = defaults(w.E, 1);
+          if (weekday < 1 || weekday > 7) {
+            weekdayOverflow = true;
+          }
+        } else {
+          dow = config._locale._week.dow;
+          doy = config._locale._week.doy;
+          curWeek = weekOfYear(createLocal(), dow, doy);
+          weekYear = defaults(w.gg, config._a[YEAR], curWeek.year);
+          week = defaults(w.w, curWeek.week);
+          if (w.d != null) {
+            weekday = w.d;
+            if (weekday < 0 || weekday > 6) {
+              weekdayOverflow = true;
+            }
+          } else if (w.e != null) {
+            weekday = w.e + dow;
+            if (w.e < 0 || w.e > 6) {
+              weekdayOverflow = true;
+            }
+          } else {
+            weekday = dow;
+          }
+        }
+        if (week < 1 || week > weeksInYear(weekYear, dow, doy)) {
+          getParsingFlags(config)._overflowWeeks = true;
+        } else if (weekdayOverflow != null) {
+          getParsingFlags(config)._overflowWeekday = true;
+        } else {
+          temp = dayOfYearFromWeeks(weekYear, week, weekday, dow, doy);
+          config._a[YEAR] = temp.year;
+          config._dayOfYear = temp.dayOfYear;
+        }
+      }
+      hooks.ISO_8601 = function() {
+      };
+      hooks.RFC_2822 = function() {
+      };
+      function configFromStringAndFormat(config) {
+        if (config._f === hooks.ISO_8601) {
+          configFromISO(config);
+          return;
+        }
+        if (config._f === hooks.RFC_2822) {
+          configFromRFC2822(config);
+          return;
+        }
+        config._a = [];
+        getParsingFlags(config).empty = true;
+        var string = "" + config._i, i, parsedInput, tokens2, token2, skipped, stringLength = string.length, totalParsedInputLength = 0, era, tokenLen;
+        tokens2 = expandFormat(config._f, config._locale).match(formattingTokens) || [];
+        tokenLen = tokens2.length;
+        for (i = 0; i < tokenLen; i++) {
+          token2 = tokens2[i];
+          parsedInput = (string.match(getParseRegexForToken(token2, config)) || [])[0];
+          if (parsedInput) {
+            skipped = string.substr(0, string.indexOf(parsedInput));
+            if (skipped.length > 0) {
+              getParsingFlags(config).unusedInput.push(skipped);
+            }
+            string = string.slice(string.indexOf(parsedInput) + parsedInput.length);
+            totalParsedInputLength += parsedInput.length;
+          }
+          if (formatTokenFunctions[token2]) {
+            if (parsedInput) {
+              getParsingFlags(config).empty = false;
+            } else {
+              getParsingFlags(config).unusedTokens.push(token2);
+            }
+            addTimeToArrayFromToken(token2, parsedInput, config);
+          } else if (config._strict && !parsedInput) {
+            getParsingFlags(config).unusedTokens.push(token2);
+          }
+        }
+        getParsingFlags(config).charsLeftOver = stringLength - totalParsedInputLength;
+        if (string.length > 0) {
+          getParsingFlags(config).unusedInput.push(string);
+        }
+        if (config._a[HOUR] <= 12 && getParsingFlags(config).bigHour === true && config._a[HOUR] > 0) {
+          getParsingFlags(config).bigHour = void 0;
+        }
+        getParsingFlags(config).parsedDateParts = config._a.slice(0);
+        getParsingFlags(config).meridiem = config._meridiem;
+        config._a[HOUR] = meridiemFixWrap(config._locale, config._a[HOUR], config._meridiem);
+        era = getParsingFlags(config).era;
+        if (era !== null) {
+          config._a[YEAR] = config._locale.erasConvertYear(era, config._a[YEAR]);
+        }
+        configFromArray(config);
+        checkOverflow(config);
+      }
+      function meridiemFixWrap(locale2, hour, meridiem2) {
+        var isPm;
+        if (meridiem2 == null) {
+          return hour;
+        }
+        if (locale2.meridiemHour != null) {
+          return locale2.meridiemHour(hour, meridiem2);
+        } else if (locale2.isPM != null) {
+          isPm = locale2.isPM(meridiem2);
+          if (isPm && hour < 12) {
+            hour += 12;
+          }
+          if (!isPm && hour === 12) {
+            hour = 0;
+          }
+          return hour;
+        } else {
+          return hour;
+        }
+      }
+      function configFromStringAndArray(config) {
+        var tempConfig, bestMoment, scoreToBeat, i, currentScore, validFormatFound, bestFormatIsValid = false, configfLen = config._f.length;
+        if (configfLen === 0) {
+          getParsingFlags(config).invalidFormat = true;
+          config._d = new Date(NaN);
+          return;
+        }
+        for (i = 0; i < configfLen; i++) {
+          currentScore = 0;
+          validFormatFound = false;
+          tempConfig = copyConfig({}, config);
+          if (config._useUTC != null) {
+            tempConfig._useUTC = config._useUTC;
+          }
+          tempConfig._f = config._f[i];
+          configFromStringAndFormat(tempConfig);
+          if (isValid(tempConfig)) {
+            validFormatFound = true;
+          }
+          currentScore += getParsingFlags(tempConfig).charsLeftOver;
+          currentScore += getParsingFlags(tempConfig).unusedTokens.length * 10;
+          getParsingFlags(tempConfig).score = currentScore;
+          if (!bestFormatIsValid) {
+            if (scoreToBeat == null || currentScore < scoreToBeat || validFormatFound) {
+              scoreToBeat = currentScore;
+              bestMoment = tempConfig;
+              if (validFormatFound) {
+                bestFormatIsValid = true;
+              }
+            }
+          } else {
+            if (currentScore < scoreToBeat) {
+              scoreToBeat = currentScore;
+              bestMoment = tempConfig;
+            }
+          }
+        }
+        extend2(config, bestMoment || tempConfig);
+      }
+      function configFromObject(config) {
+        if (config._d) {
+          return;
+        }
+        var i = normalizeObjectUnits(config._i), dayOrDate = i.day === void 0 ? i.date : i.day;
+        config._a = map([i.year, i.month, dayOrDate, i.hour, i.minute, i.second, i.millisecond], function(obj) {
+          return obj && parseInt(obj, 10);
+        });
+        configFromArray(config);
+      }
+      function createFromConfig(config) {
+        var res = new Moment2(checkOverflow(prepareConfig(config)));
+        if (res._nextDay) {
+          res.add(1, "d");
+          res._nextDay = void 0;
+        }
+        return res;
+      }
+      function prepareConfig(config) {
+        var input = config._i, format2 = config._f;
+        config._locale = config._locale || getLocale(config._l);
+        if (input === null || format2 === void 0 && input === "") {
+          return createInvalid({ nullInput: true });
+        }
+        if (typeof input === "string") {
+          config._i = input = config._locale.preparse(input);
+        }
+        if (isMoment(input)) {
+          return new Moment2(checkOverflow(input));
+        } else if (isDate(input)) {
+          config._d = input;
+        } else if (isArray(format2)) {
+          configFromStringAndArray(config);
+        } else if (format2) {
+          configFromStringAndFormat(config);
+        } else {
+          configFromInput(config);
+        }
+        if (!isValid(config)) {
+          config._d = null;
+        }
+        return config;
+      }
+      function configFromInput(config) {
+        var input = config._i;
+        if (isUndefined(input)) {
+          config._d = new Date(hooks.now());
+        } else if (isDate(input)) {
+          config._d = new Date(input.valueOf());
+        } else if (typeof input === "string") {
+          configFromString(config);
+        } else if (isArray(input)) {
+          config._a = map(input.slice(0), function(obj) {
+            return parseInt(obj, 10);
+          });
+          configFromArray(config);
+        } else if (isObject(input)) {
+          configFromObject(config);
+        } else if (isNumber(input)) {
+          config._d = new Date(input);
+        } else {
+          hooks.createFromInputFallback(config);
+        }
+      }
+      function createLocalOrUTC(input, format2, locale2, strict, isUTC) {
+        var c = {};
+        if (format2 === true || format2 === false) {
+          strict = format2;
+          format2 = void 0;
+        }
+        if (locale2 === true || locale2 === false) {
+          strict = locale2;
+          locale2 = void 0;
+        }
+        if (isObject(input) && isObjectEmpty(input) || isArray(input) && input.length === 0) {
+          input = void 0;
+        }
+        c._isAMomentObject = true;
+        c._useUTC = c._isUTC = isUTC;
+        c._l = locale2;
+        c._i = input;
+        c._f = format2;
+        c._strict = strict;
+        return createFromConfig(c);
+      }
+      function createLocal(input, format2, locale2, strict) {
+        return createLocalOrUTC(input, format2, locale2, strict, false);
+      }
+      var prototypeMin = deprecate("moment().min is deprecated, use moment.max instead. http://momentjs.com/guides/#/warnings/min-max/", function() {
+        var other = createLocal.apply(null, arguments);
+        if (this.isValid() && other.isValid()) {
+          return other < this ? this : other;
+        } else {
+          return createInvalid();
+        }
+      }), prototypeMax = deprecate("moment().max is deprecated, use moment.min instead. http://momentjs.com/guides/#/warnings/min-max/", function() {
+        var other = createLocal.apply(null, arguments);
+        if (this.isValid() && other.isValid()) {
+          return other > this ? this : other;
+        } else {
+          return createInvalid();
+        }
+      });
+      function pickBy(fn, moments) {
+        var res, i;
+        if (moments.length === 1 && isArray(moments[0])) {
+          moments = moments[0];
+        }
+        if (!moments.length) {
+          return createLocal();
+        }
+        res = moments[0];
+        for (i = 1; i < moments.length; ++i) {
+          if (!moments[i].isValid() || moments[i][fn](res)) {
+            res = moments[i];
+          }
+        }
+        return res;
+      }
+      function min() {
+        var args = [].slice.call(arguments, 0);
+        return pickBy("isBefore", args);
+      }
+      function max() {
+        var args = [].slice.call(arguments, 0);
+        return pickBy("isAfter", args);
+      }
+      var now = function() {
+        return Date.now ? Date.now() : +new Date();
+      };
+      var ordering = [
+        "year",
+        "quarter",
+        "month",
+        "week",
+        "day",
+        "hour",
+        "minute",
+        "second",
+        "millisecond"
+      ];
+      function isDurationValid(m) {
+        var key2, unitHasDecimal = false, i, orderLen = ordering.length;
+        for (key2 in m) {
+          if (hasOwnProp(m, key2) && !(indexOf.call(ordering, key2) !== -1 && (m[key2] == null || !isNaN(m[key2])))) {
+            return false;
+          }
+        }
+        for (i = 0; i < orderLen; ++i) {
+          if (m[ordering[i]]) {
+            if (unitHasDecimal) {
+              return false;
+            }
+            if (parseFloat(m[ordering[i]]) !== toInt(m[ordering[i]])) {
+              unitHasDecimal = true;
+            }
+          }
+        }
+        return true;
+      }
+      function isValid$1() {
+        return this._isValid;
+      }
+      function createInvalid$1() {
+        return createDuration(NaN);
+      }
+      function Duration(duration) {
+        var normalizedInput = normalizeObjectUnits(duration), years2 = normalizedInput.year || 0, quarters = normalizedInput.quarter || 0, months2 = normalizedInput.month || 0, weeks2 = normalizedInput.week || normalizedInput.isoWeek || 0, days2 = normalizedInput.day || 0, hours2 = normalizedInput.hour || 0, minutes2 = normalizedInput.minute || 0, seconds2 = normalizedInput.second || 0, milliseconds2 = normalizedInput.millisecond || 0;
+        this._isValid = isDurationValid(normalizedInput);
+        this._milliseconds = +milliseconds2 + seconds2 * 1e3 + minutes2 * 6e4 + hours2 * 1e3 * 60 * 60;
+        this._days = +days2 + weeks2 * 7;
+        this._months = +months2 + quarters * 3 + years2 * 12;
+        this._data = {};
+        this._locale = getLocale();
+        this._bubble();
+      }
+      function isDuration(obj) {
+        return obj instanceof Duration;
+      }
+      function absRound(number) {
+        if (number < 0) {
+          return Math.round(-1 * number) * -1;
+        } else {
+          return Math.round(number);
+        }
+      }
+      function compareArrays(array1, array2, dontConvert) {
+        var len = Math.min(array1.length, array2.length), lengthDiff = Math.abs(array1.length - array2.length), diffs = 0, i;
+        for (i = 0; i < len; i++) {
+          if (dontConvert && array1[i] !== array2[i] || !dontConvert && toInt(array1[i]) !== toInt(array2[i])) {
+            diffs++;
+          }
+        }
+        return diffs + lengthDiff;
+      }
+      function offset(token2, separator) {
+        addFormatToken(token2, 0, 0, function() {
+          var offset2 = this.utcOffset(), sign2 = "+";
+          if (offset2 < 0) {
+            offset2 = -offset2;
+            sign2 = "-";
+          }
+          return sign2 + zeroFill(~~(offset2 / 60), 2) + separator + zeroFill(~~offset2 % 60, 2);
+        });
+      }
+      offset("Z", ":");
+      offset("ZZ", "");
+      addRegexToken("Z", matchShortOffset);
+      addRegexToken("ZZ", matchShortOffset);
+      addParseToken(["Z", "ZZ"], function(input, array, config) {
+        config._useUTC = true;
+        config._tzm = offsetFromString(matchShortOffset, input);
+      });
+      var chunkOffset = /([\+\-]|\d\d)/gi;
+      function offsetFromString(matcher, string) {
+        var matches = (string || "").match(matcher), chunk, parts, minutes2;
+        if (matches === null) {
+          return null;
+        }
+        chunk = matches[matches.length - 1] || [];
+        parts = (chunk + "").match(chunkOffset) || ["-", 0, 0];
+        minutes2 = +(parts[1] * 60) + toInt(parts[2]);
+        return minutes2 === 0 ? 0 : parts[0] === "+" ? minutes2 : -minutes2;
+      }
+      function cloneWithOffset(input, model) {
+        var res, diff2;
+        if (model._isUTC) {
+          res = model.clone();
+          diff2 = (isMoment(input) || isDate(input) ? input.valueOf() : createLocal(input).valueOf()) - res.valueOf();
+          res._d.setTime(res._d.valueOf() + diff2);
+          hooks.updateOffset(res, false);
+          return res;
+        } else {
+          return createLocal(input).local();
+        }
+      }
+      function getDateOffset(m) {
+        return -Math.round(m._d.getTimezoneOffset());
+      }
+      hooks.updateOffset = function() {
+      };
+      function getSetOffset(input, keepLocalTime, keepMinutes) {
+        var offset2 = this._offset || 0, localAdjust;
+        if (!this.isValid()) {
+          return input != null ? this : NaN;
+        }
+        if (input != null) {
+          if (typeof input === "string") {
+            input = offsetFromString(matchShortOffset, input);
+            if (input === null) {
+              return this;
+            }
+          } else if (Math.abs(input) < 16 && !keepMinutes) {
+            input = input * 60;
+          }
+          if (!this._isUTC && keepLocalTime) {
+            localAdjust = getDateOffset(this);
+          }
+          this._offset = input;
+          this._isUTC = true;
+          if (localAdjust != null) {
+            this.add(localAdjust, "m");
+          }
+          if (offset2 !== input) {
+            if (!keepLocalTime || this._changeInProgress) {
+              addSubtract(this, createDuration(input - offset2, "m"), 1, false);
+            } else if (!this._changeInProgress) {
+              this._changeInProgress = true;
+              hooks.updateOffset(this, true);
+              this._changeInProgress = null;
+            }
+          }
+          return this;
+        } else {
+          return this._isUTC ? offset2 : getDateOffset(this);
+        }
+      }
+      function getSetZone(input, keepLocalTime) {
+        if (input != null) {
+          if (typeof input !== "string") {
+            input = -input;
+          }
+          this.utcOffset(input, keepLocalTime);
+          return this;
+        } else {
+          return -this.utcOffset();
+        }
+      }
+      function setOffsetToUTC(keepLocalTime) {
+        return this.utcOffset(0, keepLocalTime);
+      }
+      function setOffsetToLocal(keepLocalTime) {
+        if (this._isUTC) {
+          this.utcOffset(0, keepLocalTime);
+          this._isUTC = false;
+          if (keepLocalTime) {
+            this.subtract(getDateOffset(this), "m");
+          }
+        }
+        return this;
+      }
+      function setOffsetToParsedOffset() {
+        if (this._tzm != null) {
+          this.utcOffset(this._tzm, false, true);
+        } else if (typeof this._i === "string") {
+          var tZone = offsetFromString(matchOffset, this._i);
+          if (tZone != null) {
+            this.utcOffset(tZone);
+          } else {
+            this.utcOffset(0, true);
+          }
+        }
+        return this;
+      }
+      function hasAlignedHourOffset(input) {
+        if (!this.isValid()) {
+          return false;
+        }
+        input = input ? createLocal(input).utcOffset() : 0;
+        return (this.utcOffset() - input) % 60 === 0;
+      }
+      function isDaylightSavingTime() {
+        return this.utcOffset() > this.clone().month(0).utcOffset() || this.utcOffset() > this.clone().month(5).utcOffset();
+      }
+      function isDaylightSavingTimeShifted() {
+        if (!isUndefined(this._isDSTShifted)) {
+          return this._isDSTShifted;
+        }
+        var c = {}, other;
+        copyConfig(c, this);
+        c = prepareConfig(c);
+        if (c._a) {
+          other = c._isUTC ? createUTC(c._a) : createLocal(c._a);
+          this._isDSTShifted = this.isValid() && compareArrays(c._a, other.toArray()) > 0;
+        } else {
+          this._isDSTShifted = false;
+        }
+        return this._isDSTShifted;
+      }
+      function isLocal() {
+        return this.isValid() ? !this._isUTC : false;
+      }
+      function isUtcOffset() {
+        return this.isValid() ? this._isUTC : false;
+      }
+      function isUtc() {
+        return this.isValid() ? this._isUTC && this._offset === 0 : false;
+      }
+      var aspNetRegex = /^(-|\+)?(?:(\d*)[. ])?(\d+):(\d+)(?::(\d+)(\.\d*)?)?$/, isoRegex = /^(-|\+)?P(?:([-+]?[0-9,.]*)Y)?(?:([-+]?[0-9,.]*)M)?(?:([-+]?[0-9,.]*)W)?(?:([-+]?[0-9,.]*)D)?(?:T(?:([-+]?[0-9,.]*)H)?(?:([-+]?[0-9,.]*)M)?(?:([-+]?[0-9,.]*)S)?)?$/;
+      function createDuration(input, key2) {
+        var duration = input, match = null, sign2, ret, diffRes;
+        if (isDuration(input)) {
+          duration = {
+            ms: input._milliseconds,
+            d: input._days,
+            M: input._months
+          };
+        } else if (isNumber(input) || !isNaN(+input)) {
+          duration = {};
+          if (key2) {
+            duration[key2] = +input;
+          } else {
+            duration.milliseconds = +input;
+          }
+        } else if (match = aspNetRegex.exec(input)) {
+          sign2 = match[1] === "-" ? -1 : 1;
+          duration = {
+            y: 0,
+            d: toInt(match[DATE]) * sign2,
+            h: toInt(match[HOUR]) * sign2,
+            m: toInt(match[MINUTE]) * sign2,
+            s: toInt(match[SECOND]) * sign2,
+            ms: toInt(absRound(match[MILLISECOND] * 1e3)) * sign2
+          };
+        } else if (match = isoRegex.exec(input)) {
+          sign2 = match[1] === "-" ? -1 : 1;
+          duration = {
+            y: parseIso(match[2], sign2),
+            M: parseIso(match[3], sign2),
+            w: parseIso(match[4], sign2),
+            d: parseIso(match[5], sign2),
+            h: parseIso(match[6], sign2),
+            m: parseIso(match[7], sign2),
+            s: parseIso(match[8], sign2)
+          };
+        } else if (duration == null) {
+          duration = {};
+        } else if (typeof duration === "object" && ("from" in duration || "to" in duration)) {
+          diffRes = momentsDifference(createLocal(duration.from), createLocal(duration.to));
+          duration = {};
+          duration.ms = diffRes.milliseconds;
+          duration.M = diffRes.months;
+        }
+        ret = new Duration(duration);
+        if (isDuration(input) && hasOwnProp(input, "_locale")) {
+          ret._locale = input._locale;
+        }
+        if (isDuration(input) && hasOwnProp(input, "_isValid")) {
+          ret._isValid = input._isValid;
+        }
+        return ret;
+      }
+      createDuration.fn = Duration.prototype;
+      createDuration.invalid = createInvalid$1;
+      function parseIso(inp, sign2) {
+        var res = inp && parseFloat(inp.replace(",", "."));
+        return (isNaN(res) ? 0 : res) * sign2;
+      }
+      function positiveMomentsDifference(base, other) {
+        var res = {};
+        res.months = other.month() - base.month() + (other.year() - base.year()) * 12;
+        if (base.clone().add(res.months, "M").isAfter(other)) {
+          --res.months;
+        }
+        res.milliseconds = +other - +base.clone().add(res.months, "M");
+        return res;
+      }
+      function momentsDifference(base, other) {
+        var res;
+        if (!(base.isValid() && other.isValid())) {
+          return { milliseconds: 0, months: 0 };
+        }
+        other = cloneWithOffset(other, base);
+        if (base.isBefore(other)) {
+          res = positiveMomentsDifference(base, other);
+        } else {
+          res = positiveMomentsDifference(other, base);
+          res.milliseconds = -res.milliseconds;
+          res.months = -res.months;
+        }
+        return res;
+      }
+      function createAdder(direction, name) {
+        return function(val, period) {
+          var dur, tmp;
+          if (period !== null && !isNaN(+period)) {
+            deprecateSimple(name, "moment()." + name + "(period, number) is deprecated. Please use moment()." + name + "(number, period). See http://momentjs.com/guides/#/warnings/add-inverted-param/ for more info.");
+            tmp = val;
+            val = period;
+            period = tmp;
+          }
+          dur = createDuration(val, period);
+          addSubtract(this, dur, direction);
+          return this;
+        };
+      }
+      function addSubtract(mom, duration, isAdding, updateOffset) {
+        var milliseconds2 = duration._milliseconds, days2 = absRound(duration._days), months2 = absRound(duration._months);
+        if (!mom.isValid()) {
+          return;
+        }
+        updateOffset = updateOffset == null ? true : updateOffset;
+        if (months2) {
+          setMonth(mom, get(mom, "Month") + months2 * isAdding);
+        }
+        if (days2) {
+          set$1(mom, "Date", get(mom, "Date") + days2 * isAdding);
+        }
+        if (milliseconds2) {
+          mom._d.setTime(mom._d.valueOf() + milliseconds2 * isAdding);
+        }
+        if (updateOffset) {
+          hooks.updateOffset(mom, days2 || months2);
+        }
+      }
+      var add = createAdder(1, "add"), subtract = createAdder(-1, "subtract");
+      function isString(input) {
+        return typeof input === "string" || input instanceof String;
+      }
+      function isMomentInput(input) {
+        return isMoment(input) || isDate(input) || isString(input) || isNumber(input) || isNumberOrStringArray(input) || isMomentInputObject(input) || input === null || input === void 0;
+      }
+      function isMomentInputObject(input) {
+        var objectTest = isObject(input) && !isObjectEmpty(input), propertyTest = false, properties = [
+          "years",
+          "year",
+          "y",
+          "months",
+          "month",
+          "M",
+          "days",
+          "day",
+          "d",
+          "dates",
+          "date",
+          "D",
+          "hours",
+          "hour",
+          "h",
+          "minutes",
+          "minute",
+          "m",
+          "seconds",
+          "second",
+          "s",
+          "milliseconds",
+          "millisecond",
+          "ms"
+        ], i, property, propertyLen = properties.length;
+        for (i = 0; i < propertyLen; i += 1) {
+          property = properties[i];
+          propertyTest = propertyTest || hasOwnProp(input, property);
+        }
+        return objectTest && propertyTest;
+      }
+      function isNumberOrStringArray(input) {
+        var arrayTest = isArray(input), dataTypeTest = false;
+        if (arrayTest) {
+          dataTypeTest = input.filter(function(item) {
+            return !isNumber(item) && isString(input);
+          }).length === 0;
+        }
+        return arrayTest && dataTypeTest;
+      }
+      function isCalendarSpec(input) {
+        var objectTest = isObject(input) && !isObjectEmpty(input), propertyTest = false, properties = [
+          "sameDay",
+          "nextDay",
+          "lastDay",
+          "nextWeek",
+          "lastWeek",
+          "sameElse"
+        ], i, property;
+        for (i = 0; i < properties.length; i += 1) {
+          property = properties[i];
+          propertyTest = propertyTest || hasOwnProp(input, property);
+        }
+        return objectTest && propertyTest;
+      }
+      function getCalendarFormat(myMoment, now2) {
+        var diff2 = myMoment.diff(now2, "days", true);
+        return diff2 < -6 ? "sameElse" : diff2 < -1 ? "lastWeek" : diff2 < 0 ? "lastDay" : diff2 < 1 ? "sameDay" : diff2 < 2 ? "nextDay" : diff2 < 7 ? "nextWeek" : "sameElse";
+      }
+      function calendar$1(time, formats) {
+        if (arguments.length === 1) {
+          if (!arguments[0]) {
+            time = void 0;
+            formats = void 0;
+          } else if (isMomentInput(arguments[0])) {
+            time = arguments[0];
+            formats = void 0;
+          } else if (isCalendarSpec(arguments[0])) {
+            formats = arguments[0];
+            time = void 0;
+          }
+        }
+        var now2 = time || createLocal(), sod = cloneWithOffset(now2, this).startOf("day"), format2 = hooks.calendarFormat(this, sod) || "sameElse", output = formats && (isFunction(formats[format2]) ? formats[format2].call(this, now2) : formats[format2]);
+        return this.format(output || this.localeData().calendar(format2, this, createLocal(now2)));
+      }
+      function clone() {
+        return new Moment2(this);
+      }
+      function isAfter(input, units) {
+        var localInput = isMoment(input) ? input : createLocal(input);
+        if (!(this.isValid() && localInput.isValid())) {
+          return false;
+        }
+        units = normalizeUnits(units) || "millisecond";
+        if (units === "millisecond") {
+          return this.valueOf() > localInput.valueOf();
+        } else {
+          return localInput.valueOf() < this.clone().startOf(units).valueOf();
+        }
+      }
+      function isBefore(input, units) {
+        var localInput = isMoment(input) ? input : createLocal(input);
+        if (!(this.isValid() && localInput.isValid())) {
+          return false;
+        }
+        units = normalizeUnits(units) || "millisecond";
+        if (units === "millisecond") {
+          return this.valueOf() < localInput.valueOf();
+        } else {
+          return this.clone().endOf(units).valueOf() < localInput.valueOf();
+        }
+      }
+      function isBetween(from2, to2, units, inclusivity) {
+        var localFrom = isMoment(from2) ? from2 : createLocal(from2), localTo = isMoment(to2) ? to2 : createLocal(to2);
+        if (!(this.isValid() && localFrom.isValid() && localTo.isValid())) {
+          return false;
+        }
+        inclusivity = inclusivity || "()";
+        return (inclusivity[0] === "(" ? this.isAfter(localFrom, units) : !this.isBefore(localFrom, units)) && (inclusivity[1] === ")" ? this.isBefore(localTo, units) : !this.isAfter(localTo, units));
+      }
+      function isSame(input, units) {
+        var localInput = isMoment(input) ? input : createLocal(input), inputMs;
+        if (!(this.isValid() && localInput.isValid())) {
+          return false;
+        }
+        units = normalizeUnits(units) || "millisecond";
+        if (units === "millisecond") {
+          return this.valueOf() === localInput.valueOf();
+        } else {
+          inputMs = localInput.valueOf();
+          return this.clone().startOf(units).valueOf() <= inputMs && inputMs <= this.clone().endOf(units).valueOf();
+        }
+      }
+      function isSameOrAfter(input, units) {
+        return this.isSame(input, units) || this.isAfter(input, units);
+      }
+      function isSameOrBefore(input, units) {
+        return this.isSame(input, units) || this.isBefore(input, units);
+      }
+      function diff(input, units, asFloat) {
+        var that, zoneDelta, output;
+        if (!this.isValid()) {
+          return NaN;
+        }
+        that = cloneWithOffset(input, this);
+        if (!that.isValid()) {
+          return NaN;
+        }
+        zoneDelta = (that.utcOffset() - this.utcOffset()) * 6e4;
+        units = normalizeUnits(units);
+        switch (units) {
+          case "year":
+            output = monthDiff(this, that) / 12;
+            break;
+          case "month":
+            output = monthDiff(this, that);
+            break;
+          case "quarter":
+            output = monthDiff(this, that) / 3;
+            break;
+          case "second":
+            output = (this - that) / 1e3;
+            break;
+          case "minute":
+            output = (this - that) / 6e4;
+            break;
+          case "hour":
+            output = (this - that) / 36e5;
+            break;
+          case "day":
+            output = (this - that - zoneDelta) / 864e5;
+            break;
+          case "week":
+            output = (this - that - zoneDelta) / 6048e5;
+            break;
+          default:
+            output = this - that;
+        }
+        return asFloat ? output : absFloor(output);
+      }
+      function monthDiff(a, b) {
+        if (a.date() < b.date()) {
+          return -monthDiff(b, a);
+        }
+        var wholeMonthDiff = (b.year() - a.year()) * 12 + (b.month() - a.month()), anchor = a.clone().add(wholeMonthDiff, "months"), anchor2, adjust;
+        if (b - anchor < 0) {
+          anchor2 = a.clone().add(wholeMonthDiff - 1, "months");
+          adjust = (b - anchor) / (anchor - anchor2);
+        } else {
+          anchor2 = a.clone().add(wholeMonthDiff + 1, "months");
+          adjust = (b - anchor) / (anchor2 - anchor);
+        }
+        return -(wholeMonthDiff + adjust) || 0;
+      }
+      hooks.defaultFormat = "YYYY-MM-DDTHH:mm:ssZ";
+      hooks.defaultFormatUtc = "YYYY-MM-DDTHH:mm:ss[Z]";
+      function toString() {
+        return this.clone().locale("en").format("ddd MMM DD YYYY HH:mm:ss [GMT]ZZ");
+      }
+      function toISOString(keepOffset) {
+        if (!this.isValid()) {
+          return null;
+        }
+        var utc = keepOffset !== true, m = utc ? this.clone().utc() : this;
+        if (m.year() < 0 || m.year() > 9999) {
+          return formatMoment(m, utc ? "YYYYYY-MM-DD[T]HH:mm:ss.SSS[Z]" : "YYYYYY-MM-DD[T]HH:mm:ss.SSSZ");
+        }
+        if (isFunction(Date.prototype.toISOString)) {
+          if (utc) {
+            return this.toDate().toISOString();
+          } else {
+            return new Date(this.valueOf() + this.utcOffset() * 60 * 1e3).toISOString().replace("Z", formatMoment(m, "Z"));
+          }
+        }
+        return formatMoment(m, utc ? "YYYY-MM-DD[T]HH:mm:ss.SSS[Z]" : "YYYY-MM-DD[T]HH:mm:ss.SSSZ");
+      }
+      function inspect() {
+        if (!this.isValid()) {
+          return "moment.invalid(/* " + this._i + " */)";
+        }
+        var func = "moment", zone = "", prefix, year, datetime, suffix;
+        if (!this.isLocal()) {
+          func = this.utcOffset() === 0 ? "moment.utc" : "moment.parseZone";
+          zone = "Z";
+        }
+        prefix = "[" + func + '("]';
+        year = 0 <= this.year() && this.year() <= 9999 ? "YYYY" : "YYYYYY";
+        datetime = "-MM-DD[T]HH:mm:ss.SSS";
+        suffix = zone + '[")]';
+        return this.format(prefix + year + datetime + suffix);
+      }
+      function format(inputString) {
+        if (!inputString) {
+          inputString = this.isUtc() ? hooks.defaultFormatUtc : hooks.defaultFormat;
+        }
+        var output = formatMoment(this, inputString);
+        return this.localeData().postformat(output);
+      }
+      function from(time, withoutSuffix) {
+        if (this.isValid() && (isMoment(time) && time.isValid() || createLocal(time).isValid())) {
+          return createDuration({ to: this, from: time }).locale(this.locale()).humanize(!withoutSuffix);
+        } else {
+          return this.localeData().invalidDate();
+        }
+      }
+      function fromNow(withoutSuffix) {
+        return this.from(createLocal(), withoutSuffix);
+      }
+      function to(time, withoutSuffix) {
+        if (this.isValid() && (isMoment(time) && time.isValid() || createLocal(time).isValid())) {
+          return createDuration({ from: this, to: time }).locale(this.locale()).humanize(!withoutSuffix);
+        } else {
+          return this.localeData().invalidDate();
+        }
+      }
+      function toNow(withoutSuffix) {
+        return this.to(createLocal(), withoutSuffix);
+      }
+      function locale(key2) {
+        var newLocaleData;
+        if (key2 === void 0) {
+          return this._locale._abbr;
+        } else {
+          newLocaleData = getLocale(key2);
+          if (newLocaleData != null) {
+            this._locale = newLocaleData;
+          }
+          return this;
+        }
+      }
+      var lang = deprecate("moment().lang() is deprecated. Instead, use moment().localeData() to get the language configuration. Use moment().locale() to change languages.", function(key2) {
+        if (key2 === void 0) {
+          return this.localeData();
+        } else {
+          return this.locale(key2);
+        }
+      });
+      function localeData() {
+        return this._locale;
+      }
+      var MS_PER_SECOND = 1e3, MS_PER_MINUTE = 60 * MS_PER_SECOND, MS_PER_HOUR = 60 * MS_PER_MINUTE, MS_PER_400_YEARS = (365 * 400 + 97) * 24 * MS_PER_HOUR;
+      function mod$1(dividend, divisor) {
+        return (dividend % divisor + divisor) % divisor;
+      }
+      function localStartOfDate(y, m, d) {
+        if (y < 100 && y >= 0) {
+          return new Date(y + 400, m, d) - MS_PER_400_YEARS;
+        } else {
+          return new Date(y, m, d).valueOf();
+        }
+      }
+      function utcStartOfDate(y, m, d) {
+        if (y < 100 && y >= 0) {
+          return Date.UTC(y + 400, m, d) - MS_PER_400_YEARS;
+        } else {
+          return Date.UTC(y, m, d);
+        }
+      }
+      function startOf(units) {
+        var time, startOfDate;
+        units = normalizeUnits(units);
+        if (units === void 0 || units === "millisecond" || !this.isValid()) {
+          return this;
+        }
+        startOfDate = this._isUTC ? utcStartOfDate : localStartOfDate;
+        switch (units) {
+          case "year":
+            time = startOfDate(this.year(), 0, 1);
+            break;
+          case "quarter":
+            time = startOfDate(this.year(), this.month() - this.month() % 3, 1);
+            break;
+          case "month":
+            time = startOfDate(this.year(), this.month(), 1);
+            break;
+          case "week":
+            time = startOfDate(this.year(), this.month(), this.date() - this.weekday());
+            break;
+          case "isoWeek":
+            time = startOfDate(this.year(), this.month(), this.date() - (this.isoWeekday() - 1));
+            break;
+          case "day":
+          case "date":
+            time = startOfDate(this.year(), this.month(), this.date());
+            break;
+          case "hour":
+            time = this._d.valueOf();
+            time -= mod$1(time + (this._isUTC ? 0 : this.utcOffset() * MS_PER_MINUTE), MS_PER_HOUR);
+            break;
+          case "minute":
+            time = this._d.valueOf();
+            time -= mod$1(time, MS_PER_MINUTE);
+            break;
+          case "second":
+            time = this._d.valueOf();
+            time -= mod$1(time, MS_PER_SECOND);
+            break;
+        }
+        this._d.setTime(time);
+        hooks.updateOffset(this, true);
+        return this;
+      }
+      function endOf(units) {
+        var time, startOfDate;
+        units = normalizeUnits(units);
+        if (units === void 0 || units === "millisecond" || !this.isValid()) {
+          return this;
+        }
+        startOfDate = this._isUTC ? utcStartOfDate : localStartOfDate;
+        switch (units) {
+          case "year":
+            time = startOfDate(this.year() + 1, 0, 1) - 1;
+            break;
+          case "quarter":
+            time = startOfDate(this.year(), this.month() - this.month() % 3 + 3, 1) - 1;
+            break;
+          case "month":
+            time = startOfDate(this.year(), this.month() + 1, 1) - 1;
+            break;
+          case "week":
+            time = startOfDate(this.year(), this.month(), this.date() - this.weekday() + 7) - 1;
+            break;
+          case "isoWeek":
+            time = startOfDate(this.year(), this.month(), this.date() - (this.isoWeekday() - 1) + 7) - 1;
+            break;
+          case "day":
+          case "date":
+            time = startOfDate(this.year(), this.month(), this.date() + 1) - 1;
+            break;
+          case "hour":
+            time = this._d.valueOf();
+            time += MS_PER_HOUR - mod$1(time + (this._isUTC ? 0 : this.utcOffset() * MS_PER_MINUTE), MS_PER_HOUR) - 1;
+            break;
+          case "minute":
+            time = this._d.valueOf();
+            time += MS_PER_MINUTE - mod$1(time, MS_PER_MINUTE) - 1;
+            break;
+          case "second":
+            time = this._d.valueOf();
+            time += MS_PER_SECOND - mod$1(time, MS_PER_SECOND) - 1;
+            break;
+        }
+        this._d.setTime(time);
+        hooks.updateOffset(this, true);
+        return this;
+      }
+      function valueOf() {
+        return this._d.valueOf() - (this._offset || 0) * 6e4;
+      }
+      function unix() {
+        return Math.floor(this.valueOf() / 1e3);
+      }
+      function toDate() {
+        return new Date(this.valueOf());
+      }
+      function toArray() {
+        var m = this;
+        return [
+          m.year(),
+          m.month(),
+          m.date(),
+          m.hour(),
+          m.minute(),
+          m.second(),
+          m.millisecond()
+        ];
+      }
+      function toObject() {
+        var m = this;
+        return {
+          years: m.year(),
+          months: m.month(),
+          date: m.date(),
+          hours: m.hours(),
+          minutes: m.minutes(),
+          seconds: m.seconds(),
+          milliseconds: m.milliseconds()
+        };
+      }
+      function toJSON() {
+        return this.isValid() ? this.toISOString() : null;
+      }
+      function isValid$2() {
+        return isValid(this);
+      }
+      function parsingFlags() {
+        return extend2({}, getParsingFlags(this));
+      }
+      function invalidAt() {
+        return getParsingFlags(this).overflow;
+      }
+      function creationData() {
+        return {
+          input: this._i,
+          format: this._f,
+          locale: this._locale,
+          isUTC: this._isUTC,
+          strict: this._strict
+        };
+      }
+      addFormatToken("N", 0, 0, "eraAbbr");
+      addFormatToken("NN", 0, 0, "eraAbbr");
+      addFormatToken("NNN", 0, 0, "eraAbbr");
+      addFormatToken("NNNN", 0, 0, "eraName");
+      addFormatToken("NNNNN", 0, 0, "eraNarrow");
+      addFormatToken("y", ["y", 1], "yo", "eraYear");
+      addFormatToken("y", ["yy", 2], 0, "eraYear");
+      addFormatToken("y", ["yyy", 3], 0, "eraYear");
+      addFormatToken("y", ["yyyy", 4], 0, "eraYear");
+      addRegexToken("N", matchEraAbbr);
+      addRegexToken("NN", matchEraAbbr);
+      addRegexToken("NNN", matchEraAbbr);
+      addRegexToken("NNNN", matchEraName);
+      addRegexToken("NNNNN", matchEraNarrow);
+      addParseToken(["N", "NN", "NNN", "NNNN", "NNNNN"], function(input, array, config, token2) {
+        var era = config._locale.erasParse(input, token2, config._strict);
+        if (era) {
+          getParsingFlags(config).era = era;
+        } else {
+          getParsingFlags(config).invalidEra = input;
+        }
+      });
+      addRegexToken("y", matchUnsigned);
+      addRegexToken("yy", matchUnsigned);
+      addRegexToken("yyy", matchUnsigned);
+      addRegexToken("yyyy", matchUnsigned);
+      addRegexToken("yo", matchEraYearOrdinal);
+      addParseToken(["y", "yy", "yyy", "yyyy"], YEAR);
+      addParseToken(["yo"], function(input, array, config, token2) {
+        var match;
+        if (config._locale._eraYearOrdinalRegex) {
+          match = input.match(config._locale._eraYearOrdinalRegex);
+        }
+        if (config._locale.eraYearOrdinalParse) {
+          array[YEAR] = config._locale.eraYearOrdinalParse(input, match);
+        } else {
+          array[YEAR] = parseInt(input, 10);
+        }
+      });
+      function localeEras(m, format2) {
+        var i, l, date, eras = this._eras || getLocale("en")._eras;
+        for (i = 0, l = eras.length; i < l; ++i) {
+          switch (typeof eras[i].since) {
+            case "string":
+              date = hooks(eras[i].since).startOf("day");
+              eras[i].since = date.valueOf();
+              break;
+          }
+          switch (typeof eras[i].until) {
+            case "undefined":
+              eras[i].until = Infinity;
+              break;
+            case "string":
+              date = hooks(eras[i].until).startOf("day").valueOf();
+              eras[i].until = date.valueOf();
+              break;
+          }
+        }
+        return eras;
+      }
+      function localeErasParse(eraName, format2, strict) {
+        var i, l, eras = this.eras(), name, abbr, narrow;
+        eraName = eraName.toUpperCase();
+        for (i = 0, l = eras.length; i < l; ++i) {
+          name = eras[i].name.toUpperCase();
+          abbr = eras[i].abbr.toUpperCase();
+          narrow = eras[i].narrow.toUpperCase();
+          if (strict) {
+            switch (format2) {
+              case "N":
+              case "NN":
+              case "NNN":
+                if (abbr === eraName) {
+                  return eras[i];
+                }
+                break;
+              case "NNNN":
+                if (name === eraName) {
+                  return eras[i];
+                }
+                break;
+              case "NNNNN":
+                if (narrow === eraName) {
+                  return eras[i];
+                }
+                break;
+            }
+          } else if ([name, abbr, narrow].indexOf(eraName) >= 0) {
+            return eras[i];
+          }
+        }
+      }
+      function localeErasConvertYear(era, year) {
+        var dir = era.since <= era.until ? 1 : -1;
+        if (year === void 0) {
+          return hooks(era.since).year();
+        } else {
+          return hooks(era.since).year() + (year - era.offset) * dir;
+        }
+      }
+      function getEraName() {
+        var i, l, val, eras = this.localeData().eras();
+        for (i = 0, l = eras.length; i < l; ++i) {
+          val = this.clone().startOf("day").valueOf();
+          if (eras[i].since <= val && val <= eras[i].until) {
+            return eras[i].name;
+          }
+          if (eras[i].until <= val && val <= eras[i].since) {
+            return eras[i].name;
+          }
+        }
+        return "";
+      }
+      function getEraNarrow() {
+        var i, l, val, eras = this.localeData().eras();
+        for (i = 0, l = eras.length; i < l; ++i) {
+          val = this.clone().startOf("day").valueOf();
+          if (eras[i].since <= val && val <= eras[i].until) {
+            return eras[i].narrow;
+          }
+          if (eras[i].until <= val && val <= eras[i].since) {
+            return eras[i].narrow;
+          }
+        }
+        return "";
+      }
+      function getEraAbbr() {
+        var i, l, val, eras = this.localeData().eras();
+        for (i = 0, l = eras.length; i < l; ++i) {
+          val = this.clone().startOf("day").valueOf();
+          if (eras[i].since <= val && val <= eras[i].until) {
+            return eras[i].abbr;
+          }
+          if (eras[i].until <= val && val <= eras[i].since) {
+            return eras[i].abbr;
+          }
+        }
+        return "";
+      }
+      function getEraYear() {
+        var i, l, dir, val, eras = this.localeData().eras();
+        for (i = 0, l = eras.length; i < l; ++i) {
+          dir = eras[i].since <= eras[i].until ? 1 : -1;
+          val = this.clone().startOf("day").valueOf();
+          if (eras[i].since <= val && val <= eras[i].until || eras[i].until <= val && val <= eras[i].since) {
+            return (this.year() - hooks(eras[i].since).year()) * dir + eras[i].offset;
+          }
+        }
+        return this.year();
+      }
+      function erasNameRegex(isStrict) {
+        if (!hasOwnProp(this, "_erasNameRegex")) {
+          computeErasParse.call(this);
+        }
+        return isStrict ? this._erasNameRegex : this._erasRegex;
+      }
+      function erasAbbrRegex(isStrict) {
+        if (!hasOwnProp(this, "_erasAbbrRegex")) {
+          computeErasParse.call(this);
+        }
+        return isStrict ? this._erasAbbrRegex : this._erasRegex;
+      }
+      function erasNarrowRegex(isStrict) {
+        if (!hasOwnProp(this, "_erasNarrowRegex")) {
+          computeErasParse.call(this);
+        }
+        return isStrict ? this._erasNarrowRegex : this._erasRegex;
+      }
+      function matchEraAbbr(isStrict, locale2) {
+        return locale2.erasAbbrRegex(isStrict);
+      }
+      function matchEraName(isStrict, locale2) {
+        return locale2.erasNameRegex(isStrict);
+      }
+      function matchEraNarrow(isStrict, locale2) {
+        return locale2.erasNarrowRegex(isStrict);
+      }
+      function matchEraYearOrdinal(isStrict, locale2) {
+        return locale2._eraYearOrdinalRegex || matchUnsigned;
+      }
+      function computeErasParse() {
+        var abbrPieces = [], namePieces = [], narrowPieces = [], mixedPieces = [], i, l, eras = this.eras();
+        for (i = 0, l = eras.length; i < l; ++i) {
+          namePieces.push(regexEscape(eras[i].name));
+          abbrPieces.push(regexEscape(eras[i].abbr));
+          narrowPieces.push(regexEscape(eras[i].narrow));
+          mixedPieces.push(regexEscape(eras[i].name));
+          mixedPieces.push(regexEscape(eras[i].abbr));
+          mixedPieces.push(regexEscape(eras[i].narrow));
+        }
+        this._erasRegex = new RegExp("^(" + mixedPieces.join("|") + ")", "i");
+        this._erasNameRegex = new RegExp("^(" + namePieces.join("|") + ")", "i");
+        this._erasAbbrRegex = new RegExp("^(" + abbrPieces.join("|") + ")", "i");
+        this._erasNarrowRegex = new RegExp("^(" + narrowPieces.join("|") + ")", "i");
+      }
+      addFormatToken(0, ["gg", 2], 0, function() {
+        return this.weekYear() % 100;
+      });
+      addFormatToken(0, ["GG", 2], 0, function() {
+        return this.isoWeekYear() % 100;
+      });
+      function addWeekYearFormatToken(token2, getter) {
+        addFormatToken(0, [token2, token2.length], 0, getter);
+      }
+      addWeekYearFormatToken("gggg", "weekYear");
+      addWeekYearFormatToken("ggggg", "weekYear");
+      addWeekYearFormatToken("GGGG", "isoWeekYear");
+      addWeekYearFormatToken("GGGGG", "isoWeekYear");
+      addUnitAlias("weekYear", "gg");
+      addUnitAlias("isoWeekYear", "GG");
+      addUnitPriority("weekYear", 1);
+      addUnitPriority("isoWeekYear", 1);
+      addRegexToken("G", matchSigned);
+      addRegexToken("g", matchSigned);
+      addRegexToken("GG", match1to2, match2);
+      addRegexToken("gg", match1to2, match2);
+      addRegexToken("GGGG", match1to4, match4);
+      addRegexToken("gggg", match1to4, match4);
+      addRegexToken("GGGGG", match1to6, match6);
+      addRegexToken("ggggg", match1to6, match6);
+      addWeekParseToken(["gggg", "ggggg", "GGGG", "GGGGG"], function(input, week, config, token2) {
+        week[token2.substr(0, 2)] = toInt(input);
+      });
+      addWeekParseToken(["gg", "GG"], function(input, week, config, token2) {
+        week[token2] = hooks.parseTwoDigitYear(input);
+      });
+      function getSetWeekYear(input) {
+        return getSetWeekYearHelper.call(this, input, this.week(), this.weekday(), this.localeData()._week.dow, this.localeData()._week.doy);
+      }
+      function getSetISOWeekYear(input) {
+        return getSetWeekYearHelper.call(this, input, this.isoWeek(), this.isoWeekday(), 1, 4);
+      }
+      function getISOWeeksInYear() {
+        return weeksInYear(this.year(), 1, 4);
+      }
+      function getISOWeeksInISOWeekYear() {
+        return weeksInYear(this.isoWeekYear(), 1, 4);
+      }
+      function getWeeksInYear() {
+        var weekInfo = this.localeData()._week;
+        return weeksInYear(this.year(), weekInfo.dow, weekInfo.doy);
+      }
+      function getWeeksInWeekYear() {
+        var weekInfo = this.localeData()._week;
+        return weeksInYear(this.weekYear(), weekInfo.dow, weekInfo.doy);
+      }
+      function getSetWeekYearHelper(input, week, weekday, dow, doy) {
+        var weeksTarget;
+        if (input == null) {
+          return weekOfYear(this, dow, doy).year;
+        } else {
+          weeksTarget = weeksInYear(input, dow, doy);
+          if (week > weeksTarget) {
+            week = weeksTarget;
+          }
+          return setWeekAll.call(this, input, week, weekday, dow, doy);
+        }
+      }
+      function setWeekAll(weekYear, week, weekday, dow, doy) {
+        var dayOfYearData = dayOfYearFromWeeks(weekYear, week, weekday, dow, doy), date = createUTCDate(dayOfYearData.year, 0, dayOfYearData.dayOfYear);
+        this.year(date.getUTCFullYear());
+        this.month(date.getUTCMonth());
+        this.date(date.getUTCDate());
+        return this;
+      }
+      addFormatToken("Q", 0, "Qo", "quarter");
+      addUnitAlias("quarter", "Q");
+      addUnitPriority("quarter", 7);
+      addRegexToken("Q", match1);
+      addParseToken("Q", function(input, array) {
+        array[MONTH] = (toInt(input) - 1) * 3;
+      });
+      function getSetQuarter(input) {
+        return input == null ? Math.ceil((this.month() + 1) / 3) : this.month((input - 1) * 3 + this.month() % 3);
+      }
+      addFormatToken("D", ["DD", 2], "Do", "date");
+      addUnitAlias("date", "D");
+      addUnitPriority("date", 9);
+      addRegexToken("D", match1to2);
+      addRegexToken("DD", match1to2, match2);
+      addRegexToken("Do", function(isStrict, locale2) {
+        return isStrict ? locale2._dayOfMonthOrdinalParse || locale2._ordinalParse : locale2._dayOfMonthOrdinalParseLenient;
+      });
+      addParseToken(["D", "DD"], DATE);
+      addParseToken("Do", function(input, array) {
+        array[DATE] = toInt(input.match(match1to2)[0]);
+      });
+      var getSetDayOfMonth = makeGetSet("Date", true);
+      addFormatToken("DDD", ["DDDD", 3], "DDDo", "dayOfYear");
+      addUnitAlias("dayOfYear", "DDD");
+      addUnitPriority("dayOfYear", 4);
+      addRegexToken("DDD", match1to3);
+      addRegexToken("DDDD", match3);
+      addParseToken(["DDD", "DDDD"], function(input, array, config) {
+        config._dayOfYear = toInt(input);
+      });
+      function getSetDayOfYear(input) {
+        var dayOfYear = Math.round((this.clone().startOf("day") - this.clone().startOf("year")) / 864e5) + 1;
+        return input == null ? dayOfYear : this.add(input - dayOfYear, "d");
+      }
+      addFormatToken("m", ["mm", 2], 0, "minute");
+      addUnitAlias("minute", "m");
+      addUnitPriority("minute", 14);
+      addRegexToken("m", match1to2);
+      addRegexToken("mm", match1to2, match2);
+      addParseToken(["m", "mm"], MINUTE);
+      var getSetMinute = makeGetSet("Minutes", false);
+      addFormatToken("s", ["ss", 2], 0, "second");
+      addUnitAlias("second", "s");
+      addUnitPriority("second", 15);
+      addRegexToken("s", match1to2);
+      addRegexToken("ss", match1to2, match2);
+      addParseToken(["s", "ss"], SECOND);
+      var getSetSecond = makeGetSet("Seconds", false);
+      addFormatToken("S", 0, 0, function() {
+        return ~~(this.millisecond() / 100);
+      });
+      addFormatToken(0, ["SS", 2], 0, function() {
+        return ~~(this.millisecond() / 10);
+      });
+      addFormatToken(0, ["SSS", 3], 0, "millisecond");
+      addFormatToken(0, ["SSSS", 4], 0, function() {
+        return this.millisecond() * 10;
+      });
+      addFormatToken(0, ["SSSSS", 5], 0, function() {
+        return this.millisecond() * 100;
+      });
+      addFormatToken(0, ["SSSSSS", 6], 0, function() {
+        return this.millisecond() * 1e3;
+      });
+      addFormatToken(0, ["SSSSSSS", 7], 0, function() {
+        return this.millisecond() * 1e4;
+      });
+      addFormatToken(0, ["SSSSSSSS", 8], 0, function() {
+        return this.millisecond() * 1e5;
+      });
+      addFormatToken(0, ["SSSSSSSSS", 9], 0, function() {
+        return this.millisecond() * 1e6;
+      });
+      addUnitAlias("millisecond", "ms");
+      addUnitPriority("millisecond", 16);
+      addRegexToken("S", match1to3, match1);
+      addRegexToken("SS", match1to3, match2);
+      addRegexToken("SSS", match1to3, match3);
+      var token, getSetMillisecond;
+      for (token = "SSSS"; token.length <= 9; token += "S") {
+        addRegexToken(token, matchUnsigned);
+      }
+      function parseMs(input, array) {
+        array[MILLISECOND] = toInt(("0." + input) * 1e3);
+      }
+      for (token = "S"; token.length <= 9; token += "S") {
+        addParseToken(token, parseMs);
+      }
+      getSetMillisecond = makeGetSet("Milliseconds", false);
+      addFormatToken("z", 0, 0, "zoneAbbr");
+      addFormatToken("zz", 0, 0, "zoneName");
+      function getZoneAbbr() {
+        return this._isUTC ? "UTC" : "";
+      }
+      function getZoneName() {
+        return this._isUTC ? "Coordinated Universal Time" : "";
+      }
+      var proto = Moment2.prototype;
+      proto.add = add;
+      proto.calendar = calendar$1;
+      proto.clone = clone;
+      proto.diff = diff;
+      proto.endOf = endOf;
+      proto.format = format;
+      proto.from = from;
+      proto.fromNow = fromNow;
+      proto.to = to;
+      proto.toNow = toNow;
+      proto.get = stringGet;
+      proto.invalidAt = invalidAt;
+      proto.isAfter = isAfter;
+      proto.isBefore = isBefore;
+      proto.isBetween = isBetween;
+      proto.isSame = isSame;
+      proto.isSameOrAfter = isSameOrAfter;
+      proto.isSameOrBefore = isSameOrBefore;
+      proto.isValid = isValid$2;
+      proto.lang = lang;
+      proto.locale = locale;
+      proto.localeData = localeData;
+      proto.max = prototypeMax;
+      proto.min = prototypeMin;
+      proto.parsingFlags = parsingFlags;
+      proto.set = stringSet;
+      proto.startOf = startOf;
+      proto.subtract = subtract;
+      proto.toArray = toArray;
+      proto.toObject = toObject;
+      proto.toDate = toDate;
+      proto.toISOString = toISOString;
+      proto.inspect = inspect;
+      if (typeof Symbol !== "undefined" && Symbol.for != null) {
+        proto[Symbol.for("nodejs.util.inspect.custom")] = function() {
+          return "Moment<" + this.format() + ">";
+        };
+      }
+      proto.toJSON = toJSON;
+      proto.toString = toString;
+      proto.unix = unix;
+      proto.valueOf = valueOf;
+      proto.creationData = creationData;
+      proto.eraName = getEraName;
+      proto.eraNarrow = getEraNarrow;
+      proto.eraAbbr = getEraAbbr;
+      proto.eraYear = getEraYear;
+      proto.year = getSetYear;
+      proto.isLeapYear = getIsLeapYear;
+      proto.weekYear = getSetWeekYear;
+      proto.isoWeekYear = getSetISOWeekYear;
+      proto.quarter = proto.quarters = getSetQuarter;
+      proto.month = getSetMonth;
+      proto.daysInMonth = getDaysInMonth;
+      proto.week = proto.weeks = getSetWeek;
+      proto.isoWeek = proto.isoWeeks = getSetISOWeek;
+      proto.weeksInYear = getWeeksInYear;
+      proto.weeksInWeekYear = getWeeksInWeekYear;
+      proto.isoWeeksInYear = getISOWeeksInYear;
+      proto.isoWeeksInISOWeekYear = getISOWeeksInISOWeekYear;
+      proto.date = getSetDayOfMonth;
+      proto.day = proto.days = getSetDayOfWeek;
+      proto.weekday = getSetLocaleDayOfWeek;
+      proto.isoWeekday = getSetISODayOfWeek;
+      proto.dayOfYear = getSetDayOfYear;
+      proto.hour = proto.hours = getSetHour;
+      proto.minute = proto.minutes = getSetMinute;
+      proto.second = proto.seconds = getSetSecond;
+      proto.millisecond = proto.milliseconds = getSetMillisecond;
+      proto.utcOffset = getSetOffset;
+      proto.utc = setOffsetToUTC;
+      proto.local = setOffsetToLocal;
+      proto.parseZone = setOffsetToParsedOffset;
+      proto.hasAlignedHourOffset = hasAlignedHourOffset;
+      proto.isDST = isDaylightSavingTime;
+      proto.isLocal = isLocal;
+      proto.isUtcOffset = isUtcOffset;
+      proto.isUtc = isUtc;
+      proto.isUTC = isUtc;
+      proto.zoneAbbr = getZoneAbbr;
+      proto.zoneName = getZoneName;
+      proto.dates = deprecate("dates accessor is deprecated. Use date instead.", getSetDayOfMonth);
+      proto.months = deprecate("months accessor is deprecated. Use month instead", getSetMonth);
+      proto.years = deprecate("years accessor is deprecated. Use year instead", getSetYear);
+      proto.zone = deprecate("moment().zone is deprecated, use moment().utcOffset instead. http://momentjs.com/guides/#/warnings/zone/", getSetZone);
+      proto.isDSTShifted = deprecate("isDSTShifted is deprecated. See http://momentjs.com/guides/#/warnings/dst-shifted/ for more information", isDaylightSavingTimeShifted);
+      function createUnix(input) {
+        return createLocal(input * 1e3);
+      }
+      function createInZone() {
+        return createLocal.apply(null, arguments).parseZone();
+      }
+      function preParsePostFormat(string) {
+        return string;
+      }
+      var proto$1 = Locale.prototype;
+      proto$1.calendar = calendar;
+      proto$1.longDateFormat = longDateFormat;
+      proto$1.invalidDate = invalidDate;
+      proto$1.ordinal = ordinal;
+      proto$1.preparse = preParsePostFormat;
+      proto$1.postformat = preParsePostFormat;
+      proto$1.relativeTime = relativeTime;
+      proto$1.pastFuture = pastFuture;
+      proto$1.set = set;
+      proto$1.eras = localeEras;
+      proto$1.erasParse = localeErasParse;
+      proto$1.erasConvertYear = localeErasConvertYear;
+      proto$1.erasAbbrRegex = erasAbbrRegex;
+      proto$1.erasNameRegex = erasNameRegex;
+      proto$1.erasNarrowRegex = erasNarrowRegex;
+      proto$1.months = localeMonths;
+      proto$1.monthsShort = localeMonthsShort;
+      proto$1.monthsParse = localeMonthsParse;
+      proto$1.monthsRegex = monthsRegex;
+      proto$1.monthsShortRegex = monthsShortRegex;
+      proto$1.week = localeWeek;
+      proto$1.firstDayOfYear = localeFirstDayOfYear;
+      proto$1.firstDayOfWeek = localeFirstDayOfWeek;
+      proto$1.weekdays = localeWeekdays;
+      proto$1.weekdaysMin = localeWeekdaysMin;
+      proto$1.weekdaysShort = localeWeekdaysShort;
+      proto$1.weekdaysParse = localeWeekdaysParse;
+      proto$1.weekdaysRegex = weekdaysRegex;
+      proto$1.weekdaysShortRegex = weekdaysShortRegex;
+      proto$1.weekdaysMinRegex = weekdaysMinRegex;
+      proto$1.isPM = localeIsPM;
+      proto$1.meridiem = localeMeridiem;
+      function get$1(format2, index, field, setter) {
+        var locale2 = getLocale(), utc = createUTC().set(setter, index);
+        return locale2[field](utc, format2);
+      }
+      function listMonthsImpl(format2, index, field) {
+        if (isNumber(format2)) {
+          index = format2;
+          format2 = void 0;
+        }
+        format2 = format2 || "";
+        if (index != null) {
+          return get$1(format2, index, field, "month");
+        }
+        var i, out = [];
+        for (i = 0; i < 12; i++) {
+          out[i] = get$1(format2, i, field, "month");
+        }
+        return out;
+      }
+      function listWeekdaysImpl(localeSorted, format2, index, field) {
+        if (typeof localeSorted === "boolean") {
+          if (isNumber(format2)) {
+            index = format2;
+            format2 = void 0;
+          }
+          format2 = format2 || "";
+        } else {
+          format2 = localeSorted;
+          index = format2;
+          localeSorted = false;
+          if (isNumber(format2)) {
+            index = format2;
+            format2 = void 0;
+          }
+          format2 = format2 || "";
+        }
+        var locale2 = getLocale(), shift = localeSorted ? locale2._week.dow : 0, i, out = [];
+        if (index != null) {
+          return get$1(format2, (index + shift) % 7, field, "day");
+        }
+        for (i = 0; i < 7; i++) {
+          out[i] = get$1(format2, (i + shift) % 7, field, "day");
+        }
+        return out;
+      }
+      function listMonths(format2, index) {
+        return listMonthsImpl(format2, index, "months");
+      }
+      function listMonthsShort(format2, index) {
+        return listMonthsImpl(format2, index, "monthsShort");
+      }
+      function listWeekdays(localeSorted, format2, index) {
+        return listWeekdaysImpl(localeSorted, format2, index, "weekdays");
+      }
+      function listWeekdaysShort(localeSorted, format2, index) {
+        return listWeekdaysImpl(localeSorted, format2, index, "weekdaysShort");
+      }
+      function listWeekdaysMin(localeSorted, format2, index) {
+        return listWeekdaysImpl(localeSorted, format2, index, "weekdaysMin");
+      }
+      getSetGlobalLocale("en", {
+        eras: [
+          {
+            since: "0001-01-01",
+            until: Infinity,
+            offset: 1,
+            name: "Anno Domini",
+            narrow: "AD",
+            abbr: "AD"
+          },
+          {
+            since: "0000-12-31",
+            until: -Infinity,
+            offset: 1,
+            name: "Before Christ",
+            narrow: "BC",
+            abbr: "BC"
+          }
+        ],
+        dayOfMonthOrdinalParse: /\d{1,2}(th|st|nd|rd)/,
+        ordinal: function(number) {
+          var b = number % 10, output = toInt(number % 100 / 10) === 1 ? "th" : b === 1 ? "st" : b === 2 ? "nd" : b === 3 ? "rd" : "th";
+          return number + output;
+        }
+      });
+      hooks.lang = deprecate("moment.lang is deprecated. Use moment.locale instead.", getSetGlobalLocale);
+      hooks.langData = deprecate("moment.langData is deprecated. Use moment.localeData instead.", getLocale);
+      var mathAbs = Math.abs;
+      function abs() {
+        var data = this._data;
+        this._milliseconds = mathAbs(this._milliseconds);
+        this._days = mathAbs(this._days);
+        this._months = mathAbs(this._months);
+        data.milliseconds = mathAbs(data.milliseconds);
+        data.seconds = mathAbs(data.seconds);
+        data.minutes = mathAbs(data.minutes);
+        data.hours = mathAbs(data.hours);
+        data.months = mathAbs(data.months);
+        data.years = mathAbs(data.years);
+        return this;
+      }
+      function addSubtract$1(duration, input, value, direction) {
+        var other = createDuration(input, value);
+        duration._milliseconds += direction * other._milliseconds;
+        duration._days += direction * other._days;
+        duration._months += direction * other._months;
+        return duration._bubble();
+      }
+      function add$1(input, value) {
+        return addSubtract$1(this, input, value, 1);
+      }
+      function subtract$1(input, value) {
+        return addSubtract$1(this, input, value, -1);
+      }
+      function absCeil(number) {
+        if (number < 0) {
+          return Math.floor(number);
+        } else {
+          return Math.ceil(number);
+        }
+      }
+      function bubble() {
+        var milliseconds2 = this._milliseconds, days2 = this._days, months2 = this._months, data = this._data, seconds2, minutes2, hours2, years2, monthsFromDays;
+        if (!(milliseconds2 >= 0 && days2 >= 0 && months2 >= 0 || milliseconds2 <= 0 && days2 <= 0 && months2 <= 0)) {
+          milliseconds2 += absCeil(monthsToDays(months2) + days2) * 864e5;
+          days2 = 0;
+          months2 = 0;
+        }
+        data.milliseconds = milliseconds2 % 1e3;
+        seconds2 = absFloor(milliseconds2 / 1e3);
+        data.seconds = seconds2 % 60;
+        minutes2 = absFloor(seconds2 / 60);
+        data.minutes = minutes2 % 60;
+        hours2 = absFloor(minutes2 / 60);
+        data.hours = hours2 % 24;
+        days2 += absFloor(hours2 / 24);
+        monthsFromDays = absFloor(daysToMonths(days2));
+        months2 += monthsFromDays;
+        days2 -= absCeil(monthsToDays(monthsFromDays));
+        years2 = absFloor(months2 / 12);
+        months2 %= 12;
+        data.days = days2;
+        data.months = months2;
+        data.years = years2;
+        return this;
+      }
+      function daysToMonths(days2) {
+        return days2 * 4800 / 146097;
+      }
+      function monthsToDays(months2) {
+        return months2 * 146097 / 4800;
+      }
+      function as(units) {
+        if (!this.isValid()) {
+          return NaN;
+        }
+        var days2, months2, milliseconds2 = this._milliseconds;
+        units = normalizeUnits(units);
+        if (units === "month" || units === "quarter" || units === "year") {
+          days2 = this._days + milliseconds2 / 864e5;
+          months2 = this._months + daysToMonths(days2);
+          switch (units) {
+            case "month":
+              return months2;
+            case "quarter":
+              return months2 / 3;
+            case "year":
+              return months2 / 12;
+          }
+        } else {
+          days2 = this._days + Math.round(monthsToDays(this._months));
+          switch (units) {
+            case "week":
+              return days2 / 7 + milliseconds2 / 6048e5;
+            case "day":
+              return days2 + milliseconds2 / 864e5;
+            case "hour":
+              return days2 * 24 + milliseconds2 / 36e5;
+            case "minute":
+              return days2 * 1440 + milliseconds2 / 6e4;
+            case "second":
+              return days2 * 86400 + milliseconds2 / 1e3;
+            case "millisecond":
+              return Math.floor(days2 * 864e5) + milliseconds2;
+            default:
+              throw new Error("Unknown unit " + units);
+          }
+        }
+      }
+      function valueOf$1() {
+        if (!this.isValid()) {
+          return NaN;
+        }
+        return this._milliseconds + this._days * 864e5 + this._months % 12 * 2592e6 + toInt(this._months / 12) * 31536e6;
+      }
+      function makeAs(alias) {
+        return function() {
+          return this.as(alias);
+        };
+      }
+      var asMilliseconds = makeAs("ms"), asSeconds = makeAs("s"), asMinutes = makeAs("m"), asHours = makeAs("h"), asDays = makeAs("d"), asWeeks = makeAs("w"), asMonths = makeAs("M"), asQuarters = makeAs("Q"), asYears = makeAs("y");
+      function clone$1() {
+        return createDuration(this);
+      }
+      function get$2(units) {
+        units = normalizeUnits(units);
+        return this.isValid() ? this[units + "s"]() : NaN;
+      }
+      function makeGetter(name) {
+        return function() {
+          return this.isValid() ? this._data[name] : NaN;
+        };
+      }
+      var milliseconds = makeGetter("milliseconds"), seconds = makeGetter("seconds"), minutes = makeGetter("minutes"), hours = makeGetter("hours"), days = makeGetter("days"), months = makeGetter("months"), years = makeGetter("years");
+      function weeks() {
+        return absFloor(this.days() / 7);
+      }
+      var round = Math.round, thresholds = {
+        ss: 44,
+        s: 45,
+        m: 45,
+        h: 22,
+        d: 26,
+        w: null,
+        M: 11
+      };
+      function substituteTimeAgo(string, number, withoutSuffix, isFuture, locale2) {
+        return locale2.relativeTime(number || 1, !!withoutSuffix, string, isFuture);
+      }
+      function relativeTime$1(posNegDuration, withoutSuffix, thresholds2, locale2) {
+        var duration = createDuration(posNegDuration).abs(), seconds2 = round(duration.as("s")), minutes2 = round(duration.as("m")), hours2 = round(duration.as("h")), days2 = round(duration.as("d")), months2 = round(duration.as("M")), weeks2 = round(duration.as("w")), years2 = round(duration.as("y")), a = seconds2 <= thresholds2.ss && ["s", seconds2] || seconds2 < thresholds2.s && ["ss", seconds2] || minutes2 <= 1 && ["m"] || minutes2 < thresholds2.m && ["mm", minutes2] || hours2 <= 1 && ["h"] || hours2 < thresholds2.h && ["hh", hours2] || days2 <= 1 && ["d"] || days2 < thresholds2.d && ["dd", days2];
+        if (thresholds2.w != null) {
+          a = a || weeks2 <= 1 && ["w"] || weeks2 < thresholds2.w && ["ww", weeks2];
+        }
+        a = a || months2 <= 1 && ["M"] || months2 < thresholds2.M && ["MM", months2] || years2 <= 1 && ["y"] || ["yy", years2];
+        a[2] = withoutSuffix;
+        a[3] = +posNegDuration > 0;
+        a[4] = locale2;
+        return substituteTimeAgo.apply(null, a);
+      }
+      function getSetRelativeTimeRounding(roundingFunction) {
+        if (roundingFunction === void 0) {
+          return round;
+        }
+        if (typeof roundingFunction === "function") {
+          round = roundingFunction;
+          return true;
+        }
+        return false;
+      }
+      function getSetRelativeTimeThreshold(threshold, limit) {
+        if (thresholds[threshold] === void 0) {
+          return false;
+        }
+        if (limit === void 0) {
+          return thresholds[threshold];
+        }
+        thresholds[threshold] = limit;
+        if (threshold === "s") {
+          thresholds.ss = limit - 1;
+        }
+        return true;
+      }
+      function humanize(argWithSuffix, argThresholds) {
+        if (!this.isValid()) {
+          return this.localeData().invalidDate();
+        }
+        var withSuffix = false, th = thresholds, locale2, output;
+        if (typeof argWithSuffix === "object") {
+          argThresholds = argWithSuffix;
+          argWithSuffix = false;
+        }
+        if (typeof argWithSuffix === "boolean") {
+          withSuffix = argWithSuffix;
+        }
+        if (typeof argThresholds === "object") {
+          th = Object.assign({}, thresholds, argThresholds);
+          if (argThresholds.s != null && argThresholds.ss == null) {
+            th.ss = argThresholds.s - 1;
+          }
+        }
+        locale2 = this.localeData();
+        output = relativeTime$1(this, !withSuffix, th, locale2);
+        if (withSuffix) {
+          output = locale2.pastFuture(+this, output);
+        }
+        return locale2.postformat(output);
+      }
+      var abs$1 = Math.abs;
+      function sign(x) {
+        return (x > 0) - (x < 0) || +x;
+      }
+      function toISOString$1() {
+        if (!this.isValid()) {
+          return this.localeData().invalidDate();
+        }
+        var seconds2 = abs$1(this._milliseconds) / 1e3, days2 = abs$1(this._days), months2 = abs$1(this._months), minutes2, hours2, years2, s, total = this.asSeconds(), totalSign, ymSign, daysSign, hmsSign;
+        if (!total) {
+          return "P0D";
+        }
+        minutes2 = absFloor(seconds2 / 60);
+        hours2 = absFloor(minutes2 / 60);
+        seconds2 %= 60;
+        minutes2 %= 60;
+        years2 = absFloor(months2 / 12);
+        months2 %= 12;
+        s = seconds2 ? seconds2.toFixed(3).replace(/\.?0+$/, "") : "";
+        totalSign = total < 0 ? "-" : "";
+        ymSign = sign(this._months) !== sign(total) ? "-" : "";
+        daysSign = sign(this._days) !== sign(total) ? "-" : "";
+        hmsSign = sign(this._milliseconds) !== sign(total) ? "-" : "";
+        return totalSign + "P" + (years2 ? ymSign + years2 + "Y" : "") + (months2 ? ymSign + months2 + "M" : "") + (days2 ? daysSign + days2 + "D" : "") + (hours2 || minutes2 || seconds2 ? "T" : "") + (hours2 ? hmsSign + hours2 + "H" : "") + (minutes2 ? hmsSign + minutes2 + "M" : "") + (seconds2 ? hmsSign + s + "S" : "");
+      }
+      var proto$2 = Duration.prototype;
+      proto$2.isValid = isValid$1;
+      proto$2.abs = abs;
+      proto$2.add = add$1;
+      proto$2.subtract = subtract$1;
+      proto$2.as = as;
+      proto$2.asMilliseconds = asMilliseconds;
+      proto$2.asSeconds = asSeconds;
+      proto$2.asMinutes = asMinutes;
+      proto$2.asHours = asHours;
+      proto$2.asDays = asDays;
+      proto$2.asWeeks = asWeeks;
+      proto$2.asMonths = asMonths;
+      proto$2.asQuarters = asQuarters;
+      proto$2.asYears = asYears;
+      proto$2.valueOf = valueOf$1;
+      proto$2._bubble = bubble;
+      proto$2.clone = clone$1;
+      proto$2.get = get$2;
+      proto$2.milliseconds = milliseconds;
+      proto$2.seconds = seconds;
+      proto$2.minutes = minutes;
+      proto$2.hours = hours;
+      proto$2.days = days;
+      proto$2.weeks = weeks;
+      proto$2.months = months;
+      proto$2.years = years;
+      proto$2.humanize = humanize;
+      proto$2.toISOString = toISOString$1;
+      proto$2.toString = toISOString$1;
+      proto$2.toJSON = toISOString$1;
+      proto$2.locale = locale;
+      proto$2.localeData = localeData;
+      proto$2.toIsoString = deprecate("toIsoString() is deprecated. Please use toISOString() instead (notice the capitals)", toISOString$1);
+      proto$2.lang = lang;
+      addFormatToken("X", 0, 0, "unix");
+      addFormatToken("x", 0, 0, "valueOf");
+      addRegexToken("x", matchSigned);
+      addRegexToken("X", matchTimestamp);
+      addParseToken("X", function(input, array, config) {
+        config._d = new Date(parseFloat(input) * 1e3);
+      });
+      addParseToken("x", function(input, array, config) {
+        config._d = new Date(toInt(input));
+      });
+      hooks.version = "2.29.4";
+      setHookCallback(createLocal);
+      hooks.fn = proto;
+      hooks.min = min;
+      hooks.max = max;
+      hooks.now = now;
+      hooks.utc = createUTC;
+      hooks.unix = createUnix;
+      hooks.months = listMonths;
+      hooks.isDate = isDate;
+      hooks.locale = getSetGlobalLocale;
+      hooks.invalid = createInvalid;
+      hooks.duration = createDuration;
+      hooks.isMoment = isMoment;
+      hooks.weekdays = listWeekdays;
+      hooks.parseZone = createInZone;
+      hooks.localeData = getLocale;
+      hooks.isDuration = isDuration;
+      hooks.monthsShort = listMonthsShort;
+      hooks.weekdaysMin = listWeekdaysMin;
+      hooks.defineLocale = defineLocale;
+      hooks.updateLocale = updateLocale;
+      hooks.locales = listLocales;
+      hooks.weekdaysShort = listWeekdaysShort;
+      hooks.normalizeUnits = normalizeUnits;
+      hooks.relativeTimeRounding = getSetRelativeTimeRounding;
+      hooks.relativeTimeThreshold = getSetRelativeTimeThreshold;
+      hooks.calendarFormat = getCalendarFormat;
+      hooks.prototype = proto;
+      hooks.HTML5_FMT = {
+        DATETIME_LOCAL: "YYYY-MM-DDTHH:mm",
+        DATETIME_LOCAL_SECONDS: "YYYY-MM-DDTHH:mm:ss",
+        DATETIME_LOCAL_MS: "YYYY-MM-DDTHH:mm:ss.SSS",
+        DATE: "YYYY-MM-DD",
+        TIME: "HH:mm",
+        TIME_SECONDS: "HH:mm:ss",
+        TIME_MS: "HH:mm:ss.SSS",
+        WEEK: "GGGG-[W]WW",
+        MONTH: "YYYY-MM"
+      };
+      return hooks;
+    });
+  }
+});
+
 // src/index.ts
 __export(exports, {
   BarChart: () => BarChart,
@@ -9975,6 +13675,8 @@ __export(exports, {
   Component: () => Component,
   Container: () => Container,
   Control: () => Control,
+  DataGrid: () => DataGrid,
+  DataSchemaValidator: () => DataSchemaValidator,
   Datepicker: () => Datepicker,
   EventBus: () => EventBus,
   GridLayout: () => GridLayout,
@@ -10018,12 +13720,14 @@ __export(exports, {
   Unobserve: () => Unobserve,
   Upload: () => Upload,
   VStack: () => VStack,
+  Video: () => Video,
   application: () => application,
   customElements: () => customElements2,
   customModule: () => customModule,
   isObservable: () => isObservable,
   moment: () => moment,
-  observable: () => observable
+  observable: () => observable,
+  renderUI: () => renderUI
 });
 
 // packages/style/src/index.ts
@@ -10396,8 +14100,8 @@ var defaultTheme = {
   background: {
     default: "#fafafa",
     paper: "#fff",
-    main: "#181e3e",
-    modal: "#192046",
+    main: "#ffffff",
+    modal: "#ffffff",
     gradient: "linear-gradient(90deg, #a8327f 0%, #d4626a 100%)"
   },
   breakboints: {
@@ -10444,6 +14148,14 @@ var defaultTheme = {
       dark: "#f57c00",
       light: "#ffb74d",
       main: "#ff9800"
+    }
+  },
+  layout: {
+    container: {
+      width: "100%",
+      maxWidth: "100%",
+      textAlign: "left",
+      overflow: "auto"
     }
   },
   shadows: {
@@ -10542,6 +14254,14 @@ var darkTheme = {
       dark: "#f57c00",
       light: "#ffb74d",
       main: "#ffa726"
+    }
+  },
+  layout: {
+    container: {
+      width: "100%",
+      maxWidth: "100%",
+      textAlign: "left",
+      overflow: "auto"
     }
   },
   divider: "rgba(255, 255, 255, 0.12)",
@@ -11783,14 +15503,14 @@ var Component = class extends HTMLElement {
       parentElm.appendChild(result);
     return result;
   }
-  getValue(target, paths, idx) {
+  getAttributeValue(target, paths, idx) {
     idx = idx || 0;
     let path = paths[idx];
     let value = target[path];
     idx++;
     if (paths.length > idx)
       try {
-        return this.getValue(value, paths, idx);
+        return this.getAttributeValue(value, paths, idx);
       } catch (error) {
         return value;
       }
@@ -11804,7 +15524,7 @@ var Component = class extends HTMLElement {
       if (removeAfter)
         this.removeAttribute(name);
       if (this.attrs[name].__target)
-        return this.getValue(this.attrs[name].__target, this.attrs[name].__path);
+        return this.getAttributeValue(this.attrs[name].__target, this.attrs[name].__path);
       else
         return this.attrs[name];
     } else {
@@ -11855,6 +15575,9 @@ var Component = class extends HTMLElement {
   }
   init() {
     this.initialized = true;
+    if (this.options["class"]) {
+      this.setAttribute("class", this.options["class"]);
+    }
     if (this._ready === void 0) {
       this._ready = true;
       if (this._readyCallback) {
@@ -12164,7 +15887,7 @@ cssRule("body", {
       maxWidth: "300px",
       overflowWrap: "break-word",
       fontWeight: 500,
-      zIndex: 10
+      zIndex: 9999
     },
     ".ii-tooltip-top::after": {
       content: "''",
@@ -13101,6 +16824,84 @@ var Control = class extends Component {
     } else
       return true;
   }
+  _handleFocus(event, stopPropagation) {
+    if (this._onFocus) {
+      this._onFocus(this, event);
+      return true;
+    } else if (!stopPropagation) {
+      let parent = getParentControl(this);
+      if (!parent)
+        return false;
+      parent._handleFocus = parent._handleFocus.bind(parent);
+      return parent._handleFocus(event);
+    } else
+      return true;
+  }
+  _handleKeyDown(event, stopPropagation) {
+    if (this._onKeyDown) {
+      this._onKeyDown(this, event);
+      return true;
+    } else if (!stopPropagation) {
+      let parent = getParentControl(this);
+      if (!parent)
+        return false;
+      parent._handleKeyDown = parent._handleKeyDown.bind(parent);
+      return parent._handleKeyDown(event);
+    } else
+      return true;
+  }
+  _handleKeyUp(event, stopPropagation) {
+    if (this._onKeyUp) {
+      this._onKeyUp(this, event);
+      return true;
+    } else if (!stopPropagation) {
+      let parent = getParentControl(this);
+      if (!parent)
+        return false;
+      parent._handleKeyUp = parent._handleKeyUp.bind(parent);
+      return parent._handleKeyUp(event);
+    } else
+      return true;
+  }
+  _handleMouseDown(event, stopPropagation) {
+    if (this._onMouseDown) {
+      this._onMouseDown(this, event);
+      return true;
+    } else if (!stopPropagation) {
+      let parent = getParentControl(this);
+      if (!parent)
+        return false;
+      parent._handleMouseDown = parent._handleMouseDown.bind(parent);
+      return parent._handleMouseDown(event);
+    } else
+      return true;
+  }
+  _handleMouseMove(event, stopPropagation) {
+    if (this._onMouseMove) {
+      this._onMouseMove(this, event);
+      return true;
+    } else if (!stopPropagation) {
+      let parent = getParentControl(this);
+      if (!parent)
+        return false;
+      parent._handleMouseMove = parent._handleMouseMove.bind(parent);
+      return parent._handleMouseMove(event);
+    } else
+      return true;
+  }
+  _handleMouseUp(event, stopPropagation) {
+    if (this._onMouseUp) {
+      this._onMouseUp(this, event);
+      return true;
+    } else if (!stopPropagation) {
+      let parent = getParentControl(this);
+      if (!parent)
+        return false;
+      parent._handleMouseUp = parent._handleMouseUp.bind(parent);
+      return parent._handleMouseUp(event);
+    } else
+      return true;
+  }
   get maxWidth() {
     return this.style.maxWidth;
   }
@@ -13160,7 +16961,7 @@ var Control = class extends Component {
         }
         case "left": {
           let top = this.getParentOccupiedTop();
-          this.top = top + this.marginStyle("top");
+          this.top = top;
           this.left = this.getParentOccupiedLeft();
           this.height = this.getParentHeight() - top - this.getParentOccupiedBottom() - this.marginStyle("top") - this.marginStyle("bottom");
           break;
@@ -13282,12 +17083,19 @@ var Control = class extends Component {
       this["_" + prop] = value;
       this.style[prop] = value;
     }
+    ;
   }
   get height() {
     return !isNaN(this._height) ? this._height : this.offsetHeight;
   }
   set height(value) {
     this.setPosition("height", value);
+  }
+  get heightValue() {
+    if (typeof this._height == "string")
+      return parseInt(this._height, 10);
+    else
+      return this._height;
   }
   get left() {
     return !isNaN(this._left) ? this._left : this.offsetLeft;
@@ -13326,6 +17134,12 @@ var Control = class extends Component {
   }
   set width(value) {
     this.setPosition("width", value);
+  }
+  get widthValue() {
+    if (typeof this._width == "string")
+      return parseInt(this._width, 10);
+    else
+      return this._width;
   }
   get stack() {
     return this._stack;
@@ -13461,7 +17275,7 @@ var Control = class extends Component {
     this.style.fontFamily = value.name || "";
     this.style.fontStyle = value.style || "";
     this.style.textTransform = value.transform || "none";
-    this.style.fontWeight = value.bold ? "bold" : `${value.weight}` || "";
+    this.style.fontWeight = value.bold ? "bold" : `${value.weight || ""}`;
   }
   get display() {
     return this._display;
@@ -13632,8 +17446,8 @@ var RequireJS = {
   config(config) {
     window.require.config(config);
   },
-  require(reqs, callback) {
-    window.require(reqs, callback);
+  require(reqs2, callback) {
+    window.require(reqs2, callback);
   },
   defined(module2) {
     return window.require.defined(module2);
@@ -13901,6 +17715,9 @@ var GlobalEvents = class {
   constructor() {
     this.bindEvents();
   }
+  abortEvent(event) {
+    event.stopPropagation();
+  }
   _handleClick(event) {
     let control = getControl(event.target);
     if (control && !(control instanceof Checkbox)) {
@@ -13908,14 +17725,38 @@ var GlobalEvents = class {
         if (control._handleClick(event)) {
           event.stopPropagation();
         }
+        ;
+      }
+      ;
+    }
+    ;
+  }
+  _handleMouseDown(event) {
+    let control = getControl(event.target);
+    if (control == null ? void 0 : control.enabled) {
+      if (control._handleMouseDown(event)) {
+        event.preventDefault();
+        event.stopPropagation();
       }
     }
   }
-  _handleMouseDown(event) {
-  }
   _handleMouseMove(event) {
+    let control = getControl(event.target);
+    if (control == null ? void 0 : control.enabled) {
+      if (control._handleMouseMove(event)) {
+        event.preventDefault();
+        event.stopPropagation();
+      }
+    }
   }
   _handleMouseUp(event) {
+    let control = getControl(event.target);
+    if (control == null ? void 0 : control.enabled) {
+      if (control._handleMouseUp(event)) {
+        event.preventDefault();
+        event.stopPropagation();
+      }
+    }
   }
   _handleDblClick(event) {
     let control = getControl(event.target);
@@ -13929,8 +17770,26 @@ var GlobalEvents = class {
     }
   }
   _handleKeyDown(event) {
+    let control = getControl(event.target);
+    if (control) {
+      if (control.enabled) {
+        if (control._handleKeyDown(event)) {
+          event.preventDefault();
+          event.stopPropagation();
+        }
+      }
+    }
   }
   _handleKeyUp(event) {
+    let control = getControl(event.target);
+    if (control) {
+      if (control.enabled) {
+        if (control._handleKeyUp(event)) {
+          event.preventDefault();
+          event.stopPropagation();
+        }
+      }
+    }
   }
   _handleContextMenu(event) {
     let control = getControl(event.target);
@@ -13950,10 +17809,30 @@ var GlobalEvents = class {
   _handleChange(event) {
   }
   _handleMouseWheel(event) {
+    let control = getControl(event.target);
+    if (control) {
+      event.stopPropagation();
+      if (control.enabled && control._handleMouseWheel)
+        control._handleMouseWheel(event);
+    }
   }
   _handleFocus(event) {
+    let control = getControl(event.target);
+    if (control) {
+      event.preventDefault();
+      event.stopPropagation();
+      if (control.enabled && control._handleFocus)
+        control._handleFocus(event);
+    }
   }
   _handleBlur(event) {
+    let control = getControl(event.target);
+    if (control) {
+      event.preventDefault();
+      event.stopPropagation();
+      if (control.enabled && control._handleBlur)
+        control._handleBlur(event);
+    }
   }
   bindEvents() {
     window.addEventListener("mousedown", this._handleMouseDown.bind(this));
@@ -13968,7 +17847,7 @@ var GlobalEvents = class {
     window.addEventListener("touchend", this._handleTouchEnd);
     window.addEventListener("touchmove", this._handleTouchMove);
     window.addEventListener("change", this._handleChange);
-    window.addEventListener("wheel", this._handleMouseWheel, false);
+    window.addEventListener("wheel", this._handleMouseWheel, { passive: false });
     window.addEventListener("focus", this._handleFocus, true);
     window.addEventListener("blur", this._handleBlur, true);
   }
@@ -13985,268 +17864,37 @@ var applicationStyle = style({
   }
 });
 
-// packages/application/src/index.ts
-var IpfsDataType;
-(function(IpfsDataType2) {
-  IpfsDataType2[IpfsDataType2["Raw"] = 0] = "Raw";
-  IpfsDataType2[IpfsDataType2["Directory"] = 1] = "Directory";
-  IpfsDataType2[IpfsDataType2["File"] = 2] = "File";
-  IpfsDataType2[IpfsDataType2["Metadata"] = 3] = "Metadata";
-  IpfsDataType2[IpfsDataType2["Symlink"] = 4] = "Symlink";
-  IpfsDataType2[IpfsDataType2["HAMTShard"] = 5] = "HAMTShard";
-})(IpfsDataType || (IpfsDataType = {}));
-var Application = class {
-  constructor() {
-    this.modules = {};
-    this.modulesId = {};
-    this.scripts = {};
-    this.id = 0;
-    this.LibHost = "";
-    this.packages = {};
-    this.globalEvents = new GlobalEvents();
+// packages/ipfs/src/index.ts
+var src_exports2 = {};
+__export(src_exports2, {
+  hashContent: () => hashContent,
+  hashItems: () => hashItems,
+  parse: () => parse
+});
+var import_ipfs_utils = __toModule(require("@ijstech/ipfs-utils"));
+function parse(cid) {
+  return import_ipfs_utils.default.parse(cid);
+}
+async function hashItems(items, version) {
+  return await import_ipfs_utils.default.hashItems(items || [], version);
+}
+async function hashContent(content, version) {
+  if (version == void 0)
+    version = 1;
+  if (content.length == 0) {
+    return await import_ipfs_utils.default.hashContent("", version);
   }
-  get EventBus() {
-    return EventBus.getInstance();
-  }
-  static get Instance() {
-    return this._instance || (this._instance = new this());
-  }
-  assets(name) {
-    if (this._assets) {
-      let items = name.split("/");
-      let value = this._assets;
-      let item = items.shift();
-      ;
-      while (value && item) {
-        value = value[item];
-        item = items.shift();
-      }
-      ;
-      return value;
-    }
-    ;
-  }
-  async verifyScript(modulePath, script) {
-    return true;
-  }
-  async getScript(modulePath) {
-    if (this.scripts[modulePath])
-      return this.scripts[modulePath];
-    try {
-      let result = await (await fetch(modulePath)).text();
-      if (typeof result == "string") {
-        if (await this.verifyScript(modulePath, result)) {
-          this.scripts[modulePath] = result;
-          return result;
-        }
-        ;
-      }
-      ;
-    } catch (err) {
-    }
-    ;
-    return "";
-  }
-  async loadScript(modulePath, script) {
-    try {
-      if (this.scripts[modulePath])
-        return true;
-      if (await this.verifyScript(modulePath, script)) {
-        this.scripts[modulePath] = script;
-        return true;
-      }
-      ;
-    } catch (err) {
-    }
-    ;
-    return false;
-  }
-  async getContent(modulePath) {
-    try {
-      return await (await fetch(modulePath)).text();
-    } catch (err) {
-    }
-    return "";
-  }
-  async fetchDirectoryInfoByCID(ipfsCid) {
-    let directoryInfo = [];
-    try {
-      const IPFS_API = `https://ipfs.scom.dev/ipfs/${ipfsCid}`;
-      let result = await fetch(IPFS_API);
-      let jsonContent = await result.json();
-      if (jsonContent.links) {
-        directoryInfo = jsonContent.links;
-      }
-    } catch (err) {
-      console.log(err);
-    }
-    return directoryInfo;
-  }
-  async getModule(modulePath, options) {
-    if (this.modules[modulePath])
-      return this.modules[modulePath];
-    let result = await this.newModule(modulePath, options);
-    if (result)
-      this.modules[modulePath] = result;
-    return result;
-  }
-  async loadPackage(packageName, modulePath, options) {
-    var _a, _b;
-    if (RequireJS.defined(packageName)) {
-      if (!this.packages[packageName]) {
-        let m = window["require"](packageName);
-        if (m)
-          this.packages[packageName] = m.default || m;
-      }
-      return this.packages[packageName];
-    }
-    ;
-    let libPath = LibPath || "";
-    if (LibPath && !LibPath.endsWith("/"))
-      libPath = libPath + "/";
-    if (!modulePath) {
-      if ((_a = options == null ? void 0 : options.modules) == null ? void 0 : _a[packageName])
-        modulePath = "modules/" + ((_b = options == null ? void 0 : options.modules) == null ? void 0 : _b[packageName].path) + "/index.js";
-      else
-        return null;
-    } else if (modulePath == "*")
-      modulePath = "libs/" + packageName + "/index.js";
-    else if (modulePath.startsWith("{LIB}/"))
-      modulePath = modulePath.replace("{LIB}/", libPath);
-    let script = await this.getScript(modulePath);
-    if (script) {
-      _currentDefineModule = null;
-      this.currentModulePath = modulePath;
-      if (modulePath.indexOf("://") > 0)
-        this.currentModuleDir = modulePath.split("/").slice(0, -1).join("/");
-      else
-        this.currentModuleDir = application.LibHost + modulePath.split("/").slice(0, -1).join("/");
-      await import(`data:text/javascript,${encodeURIComponent(script)}`);
-      this.currentModulePath = "";
-      this.currentModuleDir = "";
-      let m = window["require"](packageName);
-      if (m)
-        return m.default || m;
-    }
-    ;
-    return null;
-  }
-  async loadModule(modulePath, options) {
-    let module2 = await this.newModule(modulePath, options);
-    if (module2)
-      document.body.append(module2);
-    return module2;
-  }
-  async newModule(module2, options) {
-    let modulePath = module2;
-    if (options) {
-      if (!this._assets && options.assets)
-        this._assets = await this.loadPackage(options.assets, "", options) || {};
-      if (options.modules && options.modules[module2] && options.modules[module2].path) {
-        modulePath = "/";
-        if (options.rootDir)
-          modulePath += options.rootDir + "/";
-        if (options.moduleDir)
-          modulePath += options.moduleDir + "/";
-        modulePath += options.modules[module2].path;
-        if (!modulePath.endsWith(".js"))
-          modulePath += "/index.js";
-      } else if (options.dependencies && options.dependencies[module2])
-        modulePath = `libs/${module2}/index.js`;
-    }
-    ;
-    let elmId = this.modulesId[modulePath];
-    if (elmId && modulePath)
-      return document.createElement(elmId);
-    if (options && options.dependencies) {
-      for (let p in options.dependencies) {
-        if (p != options.main)
-          await this.loadPackage(p, options.dependencies[p]);
-      }
-    }
-    ;
-    let script;
-    if (options && options.script)
-      script = options.script;
-    else {
-      if (options && options.modules && options.modules[module2] && options.modules[module2].dependencies) {
-        let dependencies = options.modules[module2].dependencies;
-        for (let i = 0; i < dependencies.length; i++) {
-          let pack = options.modules[dependencies[i]];
-          if (pack && pack.path) {
-            let path = "/";
-            if (options.rootDir)
-              path += options.rootDir + "/";
-            if (options.moduleDir)
-              path += options.moduleDir + "/";
-            path += pack.path;
-            if (!pack.path.endsWith(".js"))
-              path += "/index.js";
-            await this.loadPackage(dependencies[i], path, options);
-          }
-          ;
-        }
-        ;
-      }
-      ;
-      script = await this.getScript(modulePath);
-    }
-    ;
-    if (script) {
-      _currentDefineModule = null;
-      this.currentModulePath = modulePath;
-      if (modulePath.indexOf("://") > 0)
-        this.currentModuleDir = modulePath.split("/").slice(0, -1).join("/");
-      else
-        this.currentModuleDir = application.LibHost + modulePath.split("/").slice(0, -1).join("/");
-      await import(`data:text/javascript,${encodeURIComponent(script)}`);
-      document.getElementsByTagName("html")[0].classList.add(applicationStyle);
-      this.currentModulePath = "";
-      this.currentModuleDir = "";
-      if (_currentDefineModule) {
-        let module3 = _currentDefineModule.default || _currentDefineModule;
-        if (module3) {
-          this.id++;
-          elmId = `i-module--${this.id}`;
-          this.modulesId[modulePath] = elmId;
-          let Module2 = class extends module3 {
-          };
-          customElements.define(elmId, Module2);
-          let result = new Module2(null, options);
-          return result;
-        }
-        ;
-      }
-    }
-    return null;
-  }
-  async copyToClipboard(value) {
-    if (!value)
-      return false;
-    try {
-      if (navigator.clipboard) {
-        await navigator.clipboard.writeText(value);
-        return true;
-      } else {
-        const input = document.createElement("input");
-        input.value = value;
-        input.style.position = "fixed";
-        input.style.opacity = "0";
-        document.body.appendChild(input);
-        input.focus();
-        input.select();
-        const result = document.execCommand("copy");
-        document.body.removeChild(input);
-        return result;
-      }
-    } catch (err) {
-      console.log("debug: copy", err);
-      return false;
-    }
-  }
-};
-window["application"] = Application.Instance;
-var application = Application.Instance;
+  let result;
+  if (version == 1) {
+    result = await import_ipfs_utils.default.hashFile(content, version, {
+      rawLeaves: true,
+      maxChunkSize: 1048576,
+      maxChildrenPerNode: 1024
+    });
+  } else
+    result = await import_ipfs_utils.default.hashFile(content, version);
+  return result.cid;
+}
 
 // packages/image/src/style/image.css.ts
 var Theme4 = theme_exports.ThemeVars;
@@ -14676,454 +18324,603 @@ Button = __decorateClass([
   customElements2("i-button")
 ], Button);
 
-// packages/code-editor/src/monaco.ts
-async function addFile(fileName, content) {
-  let monaco = await initMonaco();
-  if (monaco) {
-    let model = await getFileModel(fileName);
-    if (!model) {
-      if ((fileName == null ? void 0 : fileName.endsWith(".tsx")) || (fileName == null ? void 0 : fileName.endsWith(".ts")))
-        model = monaco.editor.createModel(content || "", "typescript", monaco.Uri.file(fileName));
-      else
-        model = monaco.editor.createModel(content || "");
-    }
-    return model;
-  }
-  ;
-  return null;
-}
-async function updateFile(fileName, content) {
-  let monaco = await initMonaco();
-  if (monaco) {
-    let model = await getFileModel(fileName);
-    if (model) {
-      model.setValue(content);
-    }
-    return model;
-  }
-  ;
-  return null;
-}
-async function getFileModel(fileName) {
-  let monaco = await initMonaco();
-  if (monaco) {
-    let models = monaco.editor.getModels();
-    for (let i = 0; i < models.length; i++) {
-      let model = models[i];
-      if (model.uri.path == fileName || model.uri.path == "/" + fileName)
-        return model;
-    }
-    ;
-  }
-  ;
-  return null;
-}
-async function addLib(lib, dts) {
-  let monaco = await initMonaco();
-  monaco.languages.typescript.typescriptDefaults.addExtraLib(dts, lib);
-}
-async function initMonaco() {
-  if (window.monaco)
-    return window.monaco;
-  return new Promise((resolve) => {
-    window.MonacoEnvironment = {};
-    RequireJS.config({ paths: { "vs": `${LibPath}lib/monaco-editor/0.32.1/min/vs` } });
-    RequireJS.require([`vs/editor/editor.main`], (monaco) => {
-      resolve(monaco);
-      if (monaco.$loaded)
-        return;
-      monaco.$loaded = true;
-      monaco.languages.typescript.typescriptDefaults.setCompilerOptions({
-        experimentalDecorators: true,
-        allowSyntheticDefaultImports: true,
-        jsx: monaco.languages.typescript.JsxEmit.Preserve,
-        moduleResolution: monaco.languages.typescript.ModuleResolutionKind.NodeJs,
-        allowNonTsExtensions: true,
-        target: monaco.languages.typescript.ScriptTarget.ES2020
-      });
-      monaco.languages.typescript.typescriptDefaults.setEagerModelSync(true);
-      monaco.languages.registerCompletionItemProvider("typescript", {
-        triggerCharacters: [">"],
-        provideCompletionItems: (model, position) => {
-          const code = model.getValueInRange({
-            startLineNumber: position.lineNumber,
-            startColumn: 1,
-            endLineNumber: position.lineNumber,
-            endColumn: position.column
-          });
-          const tag = code.slice(code.lastIndexOf("<") + 1, code.length);
-          if (!tag || !tag.endsWith(">") || tag.startsWith("/") || tag.indexOf(" ") > 0)
-            return;
-          const word = model.getWordUntilPosition(position);
-          return {
-            suggestions: [
-              {
-                label: `</${tag}`,
-                kind: monaco.languages.CompletionItemKind.EnumMember,
-                insertText: `$1</${tag}`,
-                insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
-                range: {
-                  startLineNumber: position.lineNumber,
-                  endLineNumber: position.lineNumber,
-                  startColumn: word.startColumn,
-                  endColumn: word.endColumn
-                }
-              }
-            ]
-          };
-        }
-      });
-    });
-  });
-}
-
-// packages/code-editor/src/style/code-editor.css.ts
-cssRule("i-code-editor", {
-  $nest: {
-    "*": {
-      boxSizing: "border-box"
-    },
-    ".full-height": {
-      height: "100vh"
-    },
-    ".half-width": {
-      width: "50%"
-    },
-    ".column": {
-      display: "flex",
-      flexDirection: "column",
-      alignItems: "stretch"
-    },
-    ".row": {
-      display: "flex",
-      flexDirection: "row"
-    },
-    ".align-right": {
-      marginLeft: "auto",
-      alignSelf: "stretch"
-    },
-    "#flex-wrapper": {
-      display: "flex",
-      alignItems: "stretch"
-    },
-    "#operation-editor": {
-      height: "60vh",
-      minHeight: "260px"
-    },
-    "#variables-editor": {
-      height: "30vh",
-      alignItems: "stretch"
-    },
-    "#results-editor": {
-      height: "90vh",
-      alignItems: "stretch"
-    },
-    "#toolbar": {
-      minHeight: "40px",
-      backgroundColor: "#1e1e1e",
-      display: "inline-flex",
-      alignItems: "stretch"
-    },
-    "#toolbar > button, #toolbar > select, #toolbar > span, button#execute-op": {
-      margin: "4px",
-      padding: "4px"
-    },
-    "#toolbar button, #toolbar select": {
-      backgroundColor: "#1e1e1e",
-      color: "#eee",
-      border: "1px solid #eee",
-      borderRadius: "4px"
-    },
-    "#toolbar button:hover, select:hover, button:focus, select:focus": {
-      backgroundColor: "darkslategrey"
-    },
-    "#execution-tray": {
-      display: "inline-flex",
-      alignItems: "baseline"
-    },
-    "#schema-status": {
-      fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
-      color: "#eee"
-    },
-    "#toolbar button.reload-button": {
-      border: "0 none",
-      padding: "4px",
-      width: "30px",
-      textAlign: "center"
-    }
-  }
+// packages/layout/src/style/panel.css.ts
+var panelStyle = style({
+  display: "block",
+  clear: "both",
+  position: "relative"
 });
-
-// packages/code-editor/src/code-editor.ts
-var CodeEditor = class extends Control {
-  get monaco() {
-    return window.monaco;
-  }
-  init() {
-    if (!this.editor) {
-      super.init();
-      this.language = this.getAttribute("language", true);
-      this.style.display = "inline-block";
-      if (this.language)
-        this.loadContent("", this.language);
+var overflowStyle = style({
+  overflow: "hidden"
+});
+var vStackStyle = style({
+  display: "flex",
+  flexDirection: "column"
+});
+var hStackStyle = style({
+  display: "flex",
+  flexDirection: "row"
+});
+var gridStyle = style({
+  display: "grid"
+});
+var getStackDirectionStyleClass = (direction) => {
+  return style({
+    display: "flex",
+    flexDirection: direction == "vertical" ? "column" : "row"
+  });
+};
+var getStackMediaQueriesStyleClass = (mediaQueries) => {
+  let styleObj = getControlMediaQueriesStyle(mediaQueries);
+  for (let mediaQuery of mediaQueries) {
+    let mediaQueryRule;
+    if (mediaQuery.minWidth && mediaQuery.maxWidth) {
+      mediaQueryRule = `@media (min-width: ${mediaQuery.minWidth}) and (max-width: ${mediaQuery.maxWidth})`;
+    } else if (mediaQuery.minWidth) {
+      mediaQueryRule = `@media (min-width: ${mediaQuery.minWidth})`;
+    } else if (mediaQuery.maxWidth) {
+      mediaQueryRule = `@media (max-width: ${mediaQuery.maxWidth})`;
     }
-    ;
-  }
-  get editor() {
-    return this._editor;
-  }
-  get language() {
-    return this._language;
-  }
-  set language(value) {
-    this._language = value;
-    if (!this.editor) {
-      this.loadContent();
-    } else {
-      let monaco = this.monaco;
-      let model = this.editor.getModel();
-      if (model) {
-        monaco.editor.setModelLanguage(model, value);
+    if (mediaQueryRule) {
+      styleObj["$nest"][mediaQueryRule] = styleObj["$nest"][mediaQueryRule] || {};
+      if (mediaQuery.properties.direction) {
+        styleObj["$nest"][mediaQueryRule]["flexDirection"] = mediaQuery.properties.direction == "vertical" ? "column" : "row";
+      }
+      if (mediaQuery.properties.justifyContent) {
+        styleObj["$nest"][mediaQueryRule]["justifyContent"] = mediaQuery.properties.justifyContent;
+      }
+      if (mediaQuery.properties.alignItems) {
+        styleObj["$nest"][mediaQueryRule]["alignItems"] = mediaQuery.properties.alignItems;
+      }
+      if (mediaQuery.properties.width !== void 0 && mediaQuery.properties.width !== null) {
+        const width = mediaQuery.properties.width;
+        styleObj["$nest"][mediaQueryRule]["width"] = typeof width === "string" ? `${width} !important` : `${width}px !important`;
+      }
+      if (mediaQuery.properties.height !== void 0 && mediaQuery.properties.height !== null) {
+        const height = mediaQuery.properties.height;
+        styleObj["$nest"][mediaQueryRule]["height"] = typeof height === "string" ? `${height} !important` : `${height}px !important`;
+      }
+      if (mediaQuery.properties.gap !== void 0 && mediaQuery.properties.gap !== null) {
+        const gap = mediaQuery.properties.gap;
+        styleObj["$nest"][mediaQueryRule]["gap"] = typeof gap === "string" ? `${gap} !important` : `${gap}px !important`;
+      }
+      if (mediaQuery.properties.position) {
+        styleObj["$nest"][mediaQueryRule]["position"] = `${mediaQuery.properties.position} !important`;
+      }
+      if (mediaQuery.properties.top !== null && mediaQuery.properties.top !== void 0) {
+        styleObj["$nest"][mediaQueryRule]["top"] = `${mediaQuery.properties.top} !important`;
+      }
+      if (typeof mediaQuery.properties.visible === "boolean") {
+        const visible = mediaQuery.properties.visible;
+        styleObj["$nest"][mediaQueryRule]["display"] = visible ? "flex !important" : "none !important";
       }
     }
   }
-  async loadContent(content, language, fileName) {
-    let monaco = await initMonaco();
-    if (content == void 0)
-      content = content || this._value || "";
-    this._value = content;
-    language = language || this._language || "typescript";
-    this._language = language;
-    if (!this._editor) {
-      let captionDiv = this.createElement("div", this);
-      captionDiv.style.display = "inline-block";
-      captionDiv.style.height = "100%";
-      captionDiv.style.width = "100%";
-      const customOptions = this._options || {};
-      let options = {
-        theme: "vs-dark",
-        tabSize: 2,
-        formatOnPaste: true,
-        formatOnType: true,
-        renderWhitespace: "none",
-        automaticLayout: true,
-        minimap: {
-          enabled: false
-        },
-        ...customOptions
-      };
-      this._editor = monaco.editor.create(captionDiv, options);
-      this._editor.onDidChangeModelContent((event) => {
-        if (typeof this.onChange === "function")
-          this.onChange(this, event);
-      });
-      if (fileName) {
-        let model = await getFileModel(fileName);
-        if (model) {
-          this._editor.setModel(model);
-          model.setValue(content);
-          return;
+  return style(styleObj);
+};
+var justifyContentStartStyle = style({
+  justifyContent: "flex-start"
+});
+var justifyContentCenterStyle = style({
+  justifyContent: "center"
+});
+var justifyContentEndStyle = style({
+  justifyContent: "flex-end"
+});
+var justifyContentSpaceBetweenStyle = style({
+  justifyContent: "space-between"
+});
+var alignItemsStretchStyle = style({
+  alignItems: "stretch"
+});
+var alignItemsStartStyle = style({
+  alignItems: "flex-start"
+});
+var alignItemsCenterStyle = style({
+  alignItems: "center"
+});
+var alignItemsEndStyle = style({
+  alignItems: "flex-end"
+});
+var getTemplateColumnsStyleClass = (columns) => {
+  return style({
+    gridTemplateColumns: columns.join(" ")
+  });
+};
+var getTemplateRowsStyleClass = (rows) => {
+  return style({
+    gridTemplateRows: rows.join(" ")
+  });
+};
+var getTemplateAreasStyleClass = (templateAreas) => {
+  let templateAreasStr = "";
+  for (let i = 0; i < templateAreas.length; i++) {
+    templateAreasStr += '"' + templateAreas[i].join(" ") + '" ';
+  }
+  return style({
+    gridTemplateAreas: templateAreasStr
+  });
+};
+var getGridLayoutMediaQueriesStyleClass = (mediaQueries) => {
+  let styleObj = getControlMediaQueriesStyle(mediaQueries);
+  for (let mediaQuery of mediaQueries) {
+    let mediaQueryRule;
+    if (mediaQuery.minWidth && mediaQuery.maxWidth) {
+      mediaQueryRule = `@media (min-width: ${mediaQuery.minWidth}) and (max-width: ${mediaQuery.maxWidth})`;
+    } else if (mediaQuery.minWidth) {
+      mediaQueryRule = `@media (min-width: ${mediaQuery.minWidth})`;
+    } else if (mediaQuery.maxWidth) {
+      mediaQueryRule = `@media (max-width: ${mediaQuery.maxWidth})`;
+    }
+    if (mediaQueryRule) {
+      styleObj["$nest"][mediaQueryRule] = styleObj["$nest"][mediaQueryRule] || {};
+      if (mediaQuery.properties.templateColumns) {
+        const templateColumnsStr = mediaQuery.properties.templateColumns.join(" ");
+        styleObj["$nest"][mediaQueryRule]["gridTemplateColumns"] = `${templateColumnsStr} !important`;
+      }
+      if (mediaQuery.properties.templateRows) {
+        const templateRowsStr = mediaQuery.properties.templateRows.join(" ");
+        styleObj["$nest"][mediaQueryRule]["gridTemplateRows"] = `${templateRowsStr} !important`;
+      }
+      if (mediaQuery.properties.templateAreas) {
+        let templateAreasStr = "";
+        for (let i = 0; i < mediaQuery.properties.templateAreas.length; i++) {
+          templateAreasStr += '"' + mediaQuery.properties.templateAreas[i].join(" ") + '" ';
+        }
+        styleObj["$nest"][mediaQueryRule]["gridTemplateAreas"] = `${templateAreasStr} !important`;
+      }
+      if (mediaQuery.properties.display) {
+        styleObj["$nest"][mediaQueryRule]["display"] = mediaQuery.properties.display;
+      }
+      if (mediaQuery.properties.gap) {
+        const gap = mediaQuery.properties.gap;
+        if (gap.row) {
+          styleObj["$nest"][mediaQueryRule]["rowGap"] = typeof gap.row === "string" ? gap.row : `${gap.row}px`;
+        }
+        if (gap.column) {
+          styleObj["$nest"][mediaQueryRule]["columnGap"] = typeof gap.column === "string" ? gap.column : `${gap.column}px`;
         }
       }
-      ;
-      if (language == "typescript" || (fileName == null ? void 0 : fileName.endsWith(".tsx")) || (fileName == null ? void 0 : fileName.endsWith(".ts"))) {
-        let model = monaco.editor.createModel(content || this._value || "", "typescript", fileName ? monaco.Uri.file(fileName) : void 0);
-        this._editor.setModel(model);
-      } else {
-        let model = monaco.editor.createModel(content || this._value || "", language || this._language, fileName ? monaco.Uri.file(fileName) : void 0);
-        this._editor.setModel(model);
+      if (typeof mediaQuery.properties.visible === "boolean") {
+        const visible = mediaQuery.properties.visible;
+        const display = mediaQuery.properties.display || "grid";
+        styleObj["$nest"][mediaQueryRule]["display"] = visible ? display + " !important" : "none !important";
       }
-      ;
-    } else {
-      let model = this._editor.getModel();
-      if (language == "typescript" && model && fileName && this._fileName != fileName) {
-        if (!this._fileName)
-          model.dispose();
-        model = await getFileModel(fileName);
-        if (!model)
-          model = monaco.editor.createModel(content || this._value || "", "typescript", monaco.Uri.file(fileName));
-        this._editor.setModel(model);
-      } else {
-        this._editor.setValue(content);
-        if (language && model)
-          monaco.editor.setModelLanguage(model, language);
-      }
-      ;
     }
-    ;
-    this._fileName = fileName || "";
-    this._editor.setScrollTop(0);
   }
-  async loadFile(fileName) {
-    var _a;
-    let model = await getFileModel(fileName);
-    if (model) {
-      if (!this._fileName)
-        (_a = this._editor.getModel()) == null ? void 0 : _a.dispose();
-      this._fileName = fileName;
-      this._editor.setModel(model);
-    }
-    ;
-  }
-  updateOptions(options) {
-    this._options = options;
-    if (this._editor)
-      this._editor.updateOptions(options);
-  }
-  get value() {
-    if (this._editor)
-      return this._editor.getValue();
-    else
-      return this._value;
-  }
-  set value(value) {
-    this._value = value;
-    if (this._editor) {
-      this._editor.setValue(value);
-      this._editor.setScrollTop(0);
-    } else
-      this.loadContent();
-  }
+  return style(styleObj);
 };
-CodeEditor.addLib = addLib;
-CodeEditor.addFile = addFile;
-CodeEditor.getFileModel = getFileModel;
-CodeEditor.updateFile = updateFile;
-CodeEditor = __decorateClass([
-  customElements2("i-code-editor")
-], CodeEditor);
 
-// packages/code-editor/src/diff-editor.ts
-var EditorType;
-(function(EditorType2) {
-  EditorType2[EditorType2["modified"] = 0] = "modified";
-  EditorType2[EditorType2["original"] = 1] = "original";
-})(EditorType || (EditorType = {}));
-var CodeDiffEditor = class extends Control {
+// packages/layout/src/stack.ts
+var StackLayout = class extends Container {
+  constructor(parent, options) {
+    super(parent, options);
+  }
+  static async create(options, parent) {
+    let self = new this(parent, options);
+    await self.ready();
+    return self;
+  }
+  get direction() {
+    return this._direction;
+  }
+  set direction(value) {
+    this._direction = value;
+    if (value) {
+      let style2 = getStackDirectionStyleClass(value);
+      this.classList.add(style2);
+    }
+  }
+  get justifyContent() {
+    return this._justifyContent;
+  }
+  set justifyContent(value) {
+    this._justifyContent = value || "start";
+    switch (this._justifyContent) {
+      case "start":
+        this.classList.add(justifyContentStartStyle);
+        break;
+      case "center":
+        this.classList.add(justifyContentCenterStyle);
+        break;
+      case "end":
+        this.classList.add(justifyContentEndStyle);
+        break;
+      case "space-between":
+        this.classList.add(justifyContentSpaceBetweenStyle);
+        break;
+    }
+  }
+  get alignItems() {
+    return this._alignItems;
+  }
+  set alignItems(value) {
+    this._alignItems = value || "stretch";
+    switch (this._alignItems) {
+      case "stretch":
+        this.classList.add(alignItemsStretchStyle);
+        break;
+      case "start":
+        this.classList.add(alignItemsStartStyle);
+        break;
+      case "center":
+        this.classList.add(alignItemsCenterStyle);
+        break;
+      case "end":
+        this.classList.add(alignItemsEndStyle);
+        break;
+    }
+  }
+  get gap() {
+    return this._gap;
+  }
+  set gap(value) {
+    this._gap = value || "initial";
+    if (typeof this._gap === "number") {
+      this.style.gap = this._gap + "px";
+    } else {
+      this.style.gap = this._gap;
+    }
+  }
+  get wrap() {
+    return this._wrap;
+  }
+  set wrap(value) {
+    if (!value)
+      return;
+    this._wrap = value;
+    this.style.flexWrap = this._wrap;
+  }
+  get mediaQueries() {
+    return this._mediaQueries;
+  }
+  set mediaQueries(value) {
+    this._mediaQueries = value;
+    let style2 = getStackMediaQueriesStyleClass(this._mediaQueries);
+    this._mediaStyle && this.classList.remove(this._mediaStyle);
+    this._mediaStyle = style2;
+    this.classList.add(style2);
+  }
+  setAttributeToProperty(propertyName) {
+    const prop = this.getAttribute(propertyName, true);
+    if (prop)
+      this[propertyName] = prop;
+  }
   init() {
-    if (!this.editor) {
-      super.init();
-      this.language = this.getAttribute("language", true);
-      this.style.display = "inline-block";
-    }
-    ;
-  }
-  get editor() {
-    return this._editor;
-  }
-  get language() {
-    return this._language;
-  }
-  set language(value) {
-    this._language = value;
-    if (!this.editor) {
-      if (this.language) {
-        this.loadContent(1, "", this.language);
-        this.loadContent(0, "", this.language);
-      }
-    } else {
-      this.setModelLanguage(value, "getOriginalEditor");
-      this.setModelLanguage(value, "getModifiedEditor");
-    }
-  }
-  setModelLanguage(value, functionName) {
-    let monaco = window.monaco;
-    let model = this.editor[functionName]().getModel();
-    if (model) {
-      monaco.editor.setModelLanguage(model, value);
-    }
-  }
-  getEditor(type) {
-    if (type === 1)
-      return this.editor.getOriginalEditor();
-    else
-      return this.editor.getModifiedEditor();
-  }
-  getModel(type) {
-    return this.getEditor(type).getModel();
-  }
-  async loadContent(type, content, language, fileName) {
-    let monaco = await initMonaco();
-    const value = type === 0 ? this._modifiedValue : this._originalValue;
-    if (content == void 0)
-      content = content || value || "";
-    type === 0 ? this._modifiedValue = content : this._originalValue = content;
-    language = language || this._language || "typescript";
-    this._language = language;
-    if (!this._editor) {
-      let captionDiv = this.createElement("div", this);
-      captionDiv.style.display = "inline-block";
-      captionDiv.style.height = "100%";
-      captionDiv.style.width = "100%";
-      let options = {
-        theme: "vs-dark",
-        originalEditable: false,
-        automaticLayout: true
-      };
-      this._editor = monaco.editor.createDiffEditor(captionDiv, options);
-      this._editor.onDidUpdateDiff(() => {
-        if (typeof this.onChange === "function")
-          this.onChange(this);
-      });
-    }
-    if (!this._modifiedModel || !this._originalModel) {
-      let model;
-      if (fileName == null ? void 0 : fileName.endsWith(".tsx")) {
-        model = monaco.editor.createModel(content || value || "", "typescript");
-      } else
-        model = monaco.editor.createModel(content || value || "", language || this._language || "typescript");
-      type === 0 ? this._modifiedModel = model : this._originalModel = model;
-      if (this._originalModel && this._modifiedModel) {
-        this._editor.setModel({
-          original: this._originalModel,
-          modified: this._modifiedModel
-        });
-      }
-    } else {
-      let model = this.getModel(type);
-      if (model)
-        monaco.editor.setModelLanguage(model, language);
-      this.getEditor(type).setValue(content);
-    }
-  }
-  updateOptions(options) {
-    this.editor.updateOptions(options);
-  }
-  get originalValue() {
-    if (this.editor)
-      return this.editor.getOriginalEditor().getValue();
-    else
-      return this._originalValue;
-  }
-  set originalValue(value) {
-    this._originalValue = value;
-    if (this.editor) {
-      this.editor.getOriginalEditor().setValue(value);
-    } else
-      this.loadContent(1);
-  }
-  get modifiedValue() {
-    if (this.editor)
-      return this.editor.getModifiedEditor().getValue();
-    else
-      return this._modifiedValue;
-  }
-  set modifiedValue(value) {
-    this._modifiedValue = value;
-    if (this.editor) {
-      this.editor.getModifiedEditor().setValue(value);
-    } else {
-      this.loadContent(0);
-    }
+    super.init();
+    this.setAttributeToProperty("direction");
+    this.setAttributeToProperty("justifyContent");
+    this.setAttributeToProperty("alignItems");
+    this.setAttributeToProperty("gap");
+    this.setAttributeToProperty("wrap");
+    this.setAttributeToProperty("mediaQueries");
   }
 };
-CodeDiffEditor.addLib = addLib;
-CodeDiffEditor.addFile = addFile;
-CodeDiffEditor.getFileModel = getFileModel;
-CodeDiffEditor.updateFile = updateFile;
-CodeDiffEditor = __decorateClass([
-  customElements2("i-code-diff-editor")
-], CodeDiffEditor);
+StackLayout = __decorateClass([
+  customElements2("i-stack")
+], StackLayout);
+var HStack = class extends StackLayout {
+  constructor(parent, options) {
+    super(parent, options);
+  }
+  get horizontalAlignment() {
+    return this._horizontalAlignment;
+  }
+  set horizontalAlignment(value) {
+    this._horizontalAlignment = value || "start";
+    this.justifyContent = value;
+  }
+  get verticalAlignment() {
+    return this._verticalAlignment;
+  }
+  set verticalAlignment(value) {
+    this._verticalAlignment = value || "stretch";
+    this.alignItems = value;
+  }
+  setAttributeToProperty(propertyName) {
+    const prop = this.getAttribute(propertyName, true);
+    if (prop)
+      this[propertyName] = prop;
+  }
+  init() {
+    super.init();
+    this.direction = "horizontal";
+    this.setAttributeToProperty("horizontalAlignment");
+    this.setAttributeToProperty("verticalAlignment");
+  }
+  static async create(options, parent) {
+    let self = new this(parent, options);
+    await self.ready();
+    return self;
+  }
+};
+HStack = __decorateClass([
+  customElements2("i-hstack")
+], HStack);
+var VStack = class extends StackLayout {
+  constructor(parent, options) {
+    super(parent, options);
+  }
+  get horizontalAlignment() {
+    return this._horizontalAlignment;
+  }
+  set horizontalAlignment(value) {
+    this._horizontalAlignment = value || "stretch";
+    this.alignItems = value;
+  }
+  get verticalAlignment() {
+    return this._verticalAlignment;
+  }
+  set verticalAlignment(value) {
+    this._verticalAlignment = value || "start";
+    this.justifyContent = value;
+  }
+  setAttributeToProperty(propertyName) {
+    const prop = this.getAttribute(propertyName, true);
+    if (prop)
+      this[propertyName] = prop;
+  }
+  init() {
+    super.init();
+    this.direction = "vertical";
+    this.setAttributeToProperty("horizontalAlignment");
+    this.setAttributeToProperty("verticalAlignment");
+  }
+  static async create(options, parent) {
+    let self = new this(parent, options);
+    await self.ready();
+    return self;
+  }
+};
+VStack = __decorateClass([
+  customElements2("i-vstack")
+], VStack);
+
+// packages/layout/src/panel.ts
+var Panel = class extends Container {
+  constructor(parent, options) {
+    super(parent, options);
+  }
+  init() {
+    super.init();
+    this.classList.add(panelStyle);
+    if (this.dock) {
+      this.classList.add(overflowStyle);
+    }
+  }
+  connectedCallback() {
+    if (this.connected) {
+      return;
+    }
+    super.connectedCallback();
+  }
+  static async create(options, parent) {
+    let self = new this(parent, options);
+    await self.ready();
+    return self;
+  }
+};
+Panel = __decorateClass([
+  customElements2("i-panel")
+], Panel);
+
+// packages/layout/src/grid.ts
+var GridLayout = class extends Container {
+  constructor(parent, options) {
+    super(parent, options);
+    this._styleClassMap = {};
+    this.removeStyleClass = this.removeStyleClass.bind(this);
+  }
+  static async create(options, parent) {
+    let self = new this(parent, options);
+    await self.ready();
+    return self;
+  }
+  get templateColumns() {
+    return this._templateColumns;
+  }
+  set templateColumns(columns) {
+    this._templateColumns = columns;
+    this.removeStyleClass("columns");
+    if (columns) {
+      let style2 = getTemplateColumnsStyleClass(columns);
+      this._styleClassMap["columns"] = style2;
+      this.classList.add(style2);
+    }
+  }
+  get templateRows() {
+    return this._templateRows;
+  }
+  set templateRows(rows) {
+    this._templateRows = rows;
+    this.removeStyleClass("rows");
+    if (rows) {
+      let style2 = getTemplateRowsStyleClass(rows);
+      this._styleClassMap["rows"] = style2;
+      this.classList.add(style2);
+    }
+  }
+  get templateAreas() {
+    return this._templateAreas;
+  }
+  set templateAreas(value) {
+    this._templateAreas = value;
+    this.removeStyleClass("areas");
+    if (value) {
+      let style2 = getTemplateAreasStyleClass(value);
+      this._styleClassMap["areas"] = style2;
+      this.classList.add(style2);
+    }
+  }
+  get autoColumnSize() {
+    return this._autoColumnSize;
+  }
+  set autoColumnSize(value) {
+    this._autoColumnSize = value;
+    if (value) {
+      this.style.gridAutoColumns = value;
+    }
+  }
+  get autoRowSize() {
+    return this._autoRowSize;
+  }
+  set autoRowSize(value) {
+    this._autoRowSize = value;
+    if (value) {
+      this.style.gridAutoRows = value;
+    }
+  }
+  get columnsPerRow() {
+    return this._columnsPerRow;
+  }
+  set columnsPerRow(value) {
+    this._columnsPerRow = value;
+    this.style.gridTemplateColumns = `repeat(${this._columnsPerRow}, 1fr)`;
+  }
+  get gap() {
+    return this._gap;
+  }
+  set gap(value) {
+    this._gap = value;
+    if (value) {
+      if (value.row) {
+        if (typeof value.row == "number") {
+          this.style.rowGap = value.row + "px";
+        } else {
+          this.style.rowGap = value.row;
+        }
+      }
+      if (value.column) {
+        if (typeof value.column == "number") {
+          this.style.columnGap = value.column + "px";
+        } else {
+          this.style.columnGap = value.column;
+        }
+      }
+    }
+  }
+  get horizontalAlignment() {
+    return this._horizontalAlignment;
+  }
+  set horizontalAlignment(value) {
+    this._horizontalAlignment = value;
+    this.style.justifyItems = value;
+  }
+  get verticalAlignment() {
+    return this._verticalAlignment;
+  }
+  set verticalAlignment(value) {
+    this._verticalAlignment = value;
+    this.style.alignItems = value;
+  }
+  get autoFillInHoles() {
+    return this._autoFillInHoles;
+  }
+  set autoFillInHoles(value) {
+    this._autoFillInHoles = value;
+    this.style.gridAutoFlow = this._autoFillInHoles ? "dense" : "row";
+  }
+  get mediaQueries() {
+    return this._mediaQueries;
+  }
+  set mediaQueries(value) {
+    this._mediaQueries = value;
+    let style2 = getGridLayoutMediaQueriesStyleClass(this._mediaQueries);
+    this._mediaStyle && this.classList.remove(this._mediaStyle);
+    this._mediaStyle = style2;
+    this.classList.add(style2);
+  }
+  setAttributeToProperty(propertyName) {
+    const prop = this.getAttribute(propertyName, true);
+    if (this.id == "thisPnl") {
+      console.log(propertyName, prop);
+    }
+    if (prop)
+      this[propertyName] = prop;
+  }
+  removeStyleClass(name) {
+    if (this._styleClassMap && this._styleClassMap[name]) {
+      this.classList.remove(this._styleClassMap[name]);
+      delete this._styleClassMap[name];
+    }
+  }
+  init() {
+    super.init();
+    this._styleClassMap = {};
+    this.classList.add(gridStyle);
+    this.setAttributeToProperty("templateColumns");
+    this.setAttributeToProperty("templateRows");
+    this.setAttributeToProperty("templateAreas");
+    this.setAttributeToProperty("gap");
+    this.setAttributeToProperty("horizontalAlignment");
+    this.setAttributeToProperty("verticalAlignment");
+    this.setAttributeToProperty("columnsPerRow");
+    this.setAttributeToProperty("autoFillInHoles");
+    this.setAttributeToProperty("autoColumnSize");
+    this.setAttributeToProperty("autoRowSize");
+    this.setAttributeToProperty("mediaQueries");
+  }
+};
+GridLayout = __decorateClass([
+  customElements2("i-grid-layout")
+], GridLayout);
+
+// packages/layout/src/card.ts
+var CardLayout = class extends GridLayout {
+  constructor(parent, options) {
+    super(parent, options);
+  }
+  static async create(options, parent) {
+    let self = new this(parent, options);
+    await self.ready();
+    return self;
+  }
+  get cardMinWidth() {
+    return this._cardMinWidth;
+  }
+  set cardMinWidth(value) {
+    this._cardMinWidth = value;
+    this.updateGridTemplateColumns();
+  }
+  get columnsPerRow() {
+    return this._columnsPerRow;
+  }
+  set columnsPerRow(value) {
+    this._columnsPerRow = value;
+    this.updateGridTemplateColumns();
+  }
+  get cardHeight() {
+    return this._cardHeight;
+  }
+  set cardHeight(value) {
+    this._cardHeight = typeof value == "number" ? value + "px" : value;
+    this.style.gridAutoRows = this._cardHeight;
+  }
+  updateGridTemplateColumns() {
+    if (this.cardMinWidth && this.columnsPerRow) {
+      let minmaxFirstParam = this.gap && this.gap.column ? `max(${this.cardMinWidth}, calc(100%/${this.columnsPerRow} - ${this.gap.column}))` : `max(${this.cardMinWidth}, 100%/${this.columnsPerRow})`;
+      this.style.gridTemplateColumns = `repeat(auto-fill, minmax(${minmaxFirstParam}, 1fr))`;
+    } else if (this.cardMinWidth) {
+      this.style.gridTemplateColumns = `repeat(auto-fill, minmax(min(${this.cardMinWidth}, 100%), 1fr))`;
+    } else if (this.columnsPerRow) {
+      this.style.gridTemplateColumns = `repeat(${this.columnsPerRow}, 1fr)`;
+    }
+  }
+  setAttributeToProperty(propertyName) {
+    const prop = this.getAttribute(propertyName, true);
+    if (prop)
+      this[propertyName] = prop;
+  }
+  init() {
+    super.init();
+    this.autoRowSize = "1fr";
+    this.setAttributeToProperty("cardMinWidth");
+    this.setAttributeToProperty("cardHeight");
+  }
+};
+CardLayout = __decorateClass([
+  customElements2("i-card-layout")
+], CardLayout);
 
 // packages/combo-box/src/style/combo-box.css.ts
 var Theme6 = theme_exports.ThemeVars;
@@ -15448,17 +19245,21 @@ var ComboBox = class extends Control {
   }
   renderItems() {
     if (this.mode === "tags" && this.newItem) {
+      if (this.searchStr)
+        this.newItem.label = this.searchStr;
       const liElm = this.listElm.querySelector(`li[data-key="${this.newItem.value}"]`);
       if (liElm) {
         if (this.searchStr) {
+          liElm.textContent = this.searchStr;
           liElm.classList.add("matched");
           liElm.innerHTML = `<span class="highlight">${this.searchStr}</span>`;
-          this.newItem.label = this.searchStr;
-          return;
         } else {
           liElm.remove();
           this.newItem = null;
         }
+      } else {
+        const ul = this.listElm.querySelector("ul");
+        ul && this.add(this.newItem, ul);
       }
     }
     const regExp = new RegExp(this.escapeRegExp(this.searchStr), "g");
@@ -15466,9 +19267,14 @@ var ComboBox = class extends Control {
     if (this.searchStr)
       this.openList();
     const ulElm = this.createElement("ul", this.listElm);
+    let creatingNew = false;
     for (let item of this.items) {
-      const label = item.label;
-      if (!this.searchStr || label.toLowerCase().includes(this.searchStr.toLowerCase())) {
+      const label = item.label || "";
+      const isMatchedPart = this.searchStr && label.toLowerCase().includes(this.searchStr.toLowerCase());
+      const isMatchedDone = this.searchStr && label.toLowerCase() === this.searchStr.toLowerCase();
+      if (item.isNew && isMatchedPart && !isMatchedDone)
+        creatingNew = true;
+      if (!this.searchStr || isMatchedDone || isMatchedPart) {
         const liElm = this.createElement("li", ulElm);
         liElm.setAttribute("data-key", item.value);
         liElm.addEventListener("click", (event) => {
@@ -15486,21 +19292,22 @@ var ComboBox = class extends Control {
         liElm.innerHTML = displayItem;
       }
     }
-    if (!ulElm.innerHTML) {
-      if (this.mode === "tags" && !this.newItem) {
-        this.newItem = {
-          value: new Date().getTime().toString(),
-          label: this.searchStr
-        };
-        this.add(this.newItem, ulElm);
-        return;
-      } else {
+    if (!ulElm.innerHTML || creatingNew) {
+      if (this.mode === "tags") {
+        if (!this.newItem)
+          this.newItem = {
+            value: new Date().getTime().toString(),
+            label: this.searchStr
+          };
+        const liElm = this.listElm.querySelector(`li[data-key="${this.newItem.label}"]`);
+        if (!liElm)
+          this.add(this.newItem, ulElm);
+      } else if (!ulElm.innerHTML)
         ulElm.innerHTML = '<li style="text-align:center;">No data</li>';
-      }
     }
   }
   add(item, parent) {
-    const liElm = this.createElement("li", parent);
+    const liElm = this.createElement("li");
     liElm.setAttribute("data-key", item.value);
     liElm.addEventListener("click", (event) => {
       event.stopPropagation();
@@ -15508,6 +19315,7 @@ var ComboBox = class extends Control {
     });
     liElm.classList.add("matched");
     liElm.innerHTML = `<span class="highlight">${this.searchStr}</span>`;
+    parent.prepend(liElm);
   }
   handleRemove(event, item) {
     event.stopPropagation();
@@ -15532,10 +19340,10 @@ var ComboBox = class extends Control {
   onItemClick(event, liElm, item) {
     var _a;
     if (((_a = this.newItem) == null ? void 0 : _a.value) === item.value) {
-      item = { ...this.newItem, isNew: true };
+      item = { ...this.newItem, value: this.newItem.label, isNew: true };
       this.items.push(item);
-      this.newItem = null;
     }
+    this.newItem = null;
     if (Array.isArray(this.selectedItem)) {
       const index = this.getItemIndex(this.selectedItem, item);
       const selectedItem = this.selectedItem;
@@ -15740,14 +19548,6 @@ var Datepicker = class extends Control {
         if (len === 13) {
           this.inputElm.value += ":";
         }
-      }
-    };
-    this._onFocus = () => {
-      this.inputElm.placeholder = this.formatString;
-      if (!this.inputElm.value)
-        return;
-      if (this.value) {
-        this.inputElm.value = this.value.format(this.defaultDateTimeFormat);
       }
     };
     this._onBlur = (event) => {
@@ -16354,10 +20154,10 @@ var RadioGroup = class extends Control {
   set selectedValue(value) {
     this._selectedValue = value;
     this._group.forEach((item) => {
+      const inputElm = item.querySelector("input");
+      if (inputElm)
+        inputElm.checked = item.value === value;
       if (item.value === value) {
-        const inputElm = item.querySelector("input");
-        if (inputElm)
-          inputElm.checked = true;
         item.classList.add("is-checked");
       } else {
         item.classList.remove("is-checked");
@@ -16641,7 +20441,7 @@ var Input = class extends Control {
       this.inputElm.style.resize = value === "auto-grow" ? "none" : value;
       if (value === "auto" || value === "auto-grow") {
         this.inputElm.style.height = "auto";
-        this.inputElm.style.height = this.inputElm.scrollHeight + "px";
+        this.inputElm.style.height = this.inputElm.scrollHeight + 2 + "px";
       }
     }
   }
@@ -16755,6 +20555,19 @@ var Input = class extends Control {
         this.inputElm.addEventListener("blur", this._handleOnBlur.bind(this));
         this.inputElm.addEventListener("focus", this._handleOnFocus.bind(this));
         break;
+      case "color":
+        this.captionSpanElm = this.createElement("span", this);
+        this.labelElm = this.createElement("label", this.captionSpanElm);
+        this.inputElm = this.createElement("input", this);
+        this.inputElm.style.height = "auto";
+        this.inputElm.disabled = enabled === false;
+        this.inputElm.setAttribute("type", "color");
+        this.inputElm.addEventListener("input", this._handleChange.bind(this));
+        this.inputElm.addEventListener("keydown", this._handleInputKeyDown.bind(this));
+        this.inputElm.addEventListener("keyup", this._handleInputKeyUp.bind(this));
+        this.inputElm.addEventListener("blur", this._handleOnBlur.bind(this));
+        this.inputElm.addEventListener("focus", this._handleOnFocus.bind(this));
+        break;
       default:
         const inputType = type == "password" ? type : "text";
         this.captionSpanElm = this.createElement("span", this);
@@ -16797,7 +20610,7 @@ var Input = class extends Control {
     }
     if (this.inputType === "textarea" && (this.resize === "auto" || this.resize === "auto-grow")) {
       this.inputElm.style.height = "auto";
-      this.inputElm.style.height = this.inputElm.scrollHeight + "px";
+      this.inputElm.style.height = this.inputElm.scrollHeight + 2 + "px";
     }
     this._value = this.inputElm.value;
     if (this.onChanged)
@@ -16865,13 +20678,4418 @@ Input = __decorateClass([
   customElements2("i-input")
 ], Input);
 
-// packages/markdown/src/style/markdown.css.ts
+// packages/link/src/style/link.css.ts
 var Theme11 = theme_exports.ThemeVars;
+cssRule("i-link", {
+  display: "block",
+  cursor: "pointer",
+  textTransform: "inherit",
+  $nest: {
+    "&:hover *": {
+      color: Theme11.colors.primary.dark
+    },
+    "> a": {
+      display: "inline",
+      transition: "all .3s",
+      textDecoration: "underline",
+      color: "inherit",
+      fontSize: "inherit",
+      fontWeight: "inherit",
+      fontFamily: "inherit",
+      textTransform: "inherit"
+    }
+  }
+});
+
+// packages/link/src/link.ts
+var Link = class extends Control {
+  constructor(parent, options) {
+    super(parent, options, {
+      target: "_blank"
+    });
+  }
+  get href() {
+    return this._href;
+  }
+  set href(value) {
+    this._href = typeof value === "string" ? value : "";
+    if (this._linkElm)
+      this._linkElm.href = this._href;
+  }
+  get target() {
+    return this._target;
+  }
+  set target(value) {
+    this._target = value;
+    if (this._linkElm)
+      this._linkElm.target = value;
+  }
+  append(children) {
+    if (!this._linkElm) {
+      this._linkElm = this.createElement("a", this);
+    }
+    this._linkElm.appendChild(children);
+  }
+  _handleClick(event, stopPropagation) {
+    event.preventDefault();
+    window.open(this._linkElm.href, this._linkElm.target);
+    return super._handleClick(event);
+  }
+  addChildControl(control) {
+    if (this._linkElm)
+      this._linkElm.appendChild(control);
+  }
+  removeChildControl(control) {
+    if (this._linkElm && this._linkElm.contains(control))
+      this._linkElm.removeChild(control);
+  }
+  init() {
+    if (!this.initialized) {
+      super.init();
+      if (!this._linkElm)
+        this._linkElm = this.createElement("a", this);
+      this.classList.add("i-link");
+      const hrefAttr = this.getAttribute("href", true);
+      hrefAttr && (this.href = hrefAttr);
+      const targetAttr = this.getAttribute("target", true);
+      targetAttr && (this._linkElm.target = targetAttr);
+    }
+  }
+  static async create(options, parent) {
+    let self = new this(parent, options);
+    await self.ready();
+    return self;
+  }
+};
+Link = __decorateClass([
+  customElements2("i-link")
+], Link);
+
+// packages/label/src/style/label.css.ts
+var Theme12 = theme_exports.ThemeVars;
+var captionStyle2 = style({
+  display: "inline-block",
+  color: Theme12.text.primary,
+  fontFamily: Theme12.typography.fontFamily,
+  fontSize: Theme12.typography.fontSize
+});
+
+// packages/label/src/label.ts
+var Label = class extends Control {
+  constructor(parent, options) {
+    super(parent, options);
+  }
+  get caption() {
+    return this.captionSpan.innerHTML;
+  }
+  set caption(value) {
+    this.captionSpan.innerHTML = value || "";
+  }
+  get link() {
+    if (!this._link) {
+      this._link = new Link(this, {
+        href: "#",
+        target: "_blank",
+        font: this.font
+      });
+      this._link.append(this.captionSpan);
+      this.appendChild(this._link);
+    }
+    return this._link;
+  }
+  set link(value) {
+    if (this._link) {
+      this._link.prepend(this.captionSpan);
+      this._link.remove();
+    }
+    this._link = value;
+    if (this._link) {
+      this._link.append(this.captionSpan);
+      this.appendChild(this._link);
+    }
+  }
+  set height(value) {
+    this.setPosition("height", value);
+    if (this.captionSpan)
+      this.captionSpan.style.height = value + "px";
+  }
+  set width(value) {
+    this.setPosition("width", value);
+    if (this.captionSpan)
+      this.captionSpan.style.width = value + "px";
+  }
+  get wordBreak() {
+    return this.style.wordBreak;
+  }
+  set wordBreak(value) {
+    this.style.wordBreak = value;
+  }
+  get overflowWrap() {
+    return this.style.overflowWrap;
+  }
+  set overflowWrap(value) {
+    this.style.overflowWrap = value;
+  }
+  init() {
+    if (!this.captionSpan) {
+      let childNodes = [];
+      for (let i = 0; i < this.childNodes.length; i++) {
+        childNodes.push(this.childNodes[i]);
+      }
+      this.captionSpan = this.createElement("span", this);
+      this.classList.add(captionStyle2);
+      this.caption = this.getAttribute("caption", true) || "";
+      if (childNodes && childNodes.length) {
+        for (let i = 0; i < childNodes.length; i++) {
+          this.captionSpan.appendChild(childNodes[i]);
+        }
+      }
+      const linkAttr = this.getAttribute("link", true);
+      if (linkAttr) {
+        const link = new Link(this, {
+          ...linkAttr,
+          font: this.font
+        });
+        this.link = link;
+      }
+      const wordBreak = this.getAttribute("wordBreak", true);
+      if (wordBreak)
+        this.wordBreak = wordBreak;
+      const overflowWrap = this.getAttribute("overflowWrap", true);
+      if (overflowWrap)
+        this.overflowWrap = overflowWrap;
+      super.init();
+    }
+  }
+  static async create(options, parent) {
+    let self = new this(parent, options);
+    await self.ready();
+    return self;
+  }
+};
+Label = __decorateClass([
+  customElements2("i-label")
+], Label);
+
+// packages/application/src/jsonUI.ts
+var import_moment = __toModule(require_moment());
+var checkPropertyChange = (value, schema, property) => {
+  return validate(value, schema, { changing: property || "property" });
+};
+var validate = (instance, schema, options) => {
+  if (!options)
+    options = {};
+  var _changing = options.changing;
+  function getType(schema2) {
+    return schema2.type;
+  }
+  var errors = [];
+  function checkProp(value, schema2, path, i) {
+    var l;
+    path += path ? typeof i == "number" ? "[" + i + "]" : typeof i == "undefined" ? "" : "." + i : i;
+    function addError(message, overwritePath) {
+      errors.push({ property: overwritePath || path, message });
+    }
+    if ((typeof schema2 != "object" || schema2 instanceof Array) && (path || typeof schema2 != "function") && !(schema2 && getType(schema2))) {
+      if (typeof schema2 == "function") {
+        if (!(value instanceof schema2)) {
+          addError("is not an instance of the class/constructor " + schema2.name);
+        }
+      } else if (schema2) {
+        addError("Invalid schema/property definition " + schema2);
+      }
+      return null;
+    }
+    if (_changing && schema2.readOnly) {
+      addError("is a readonly field, it can not be changed");
+    }
+    if (schema2["extends"]) {
+      checkProp(value, schema2["extends"], path, i);
+    }
+    function checkType(type, value2) {
+      if (type) {
+        if (typeof type == "string" && type != "any" && (type == "null" ? value2 !== null : typeof value2 != type) && !(value2 instanceof Array && type == "array") && !(type == "integer" && value2 % 1 === 0)) {
+          return [{
+            property: path,
+            message: value2 + " - " + typeof value2 + " value found, but a " + type + " is required"
+          }];
+        }
+        if (type instanceof Array) {
+          let unionErrors = [];
+          for (var j2 = 0; j2 < type.length; j2++) {
+            if (!(unionErrors = checkType(type[j2], value2)).length) {
+              break;
+            }
+          }
+          if (unionErrors.length) {
+            return unionErrors;
+          }
+        } else if (typeof type == "object") {
+          var priorErrors = errors;
+          errors = [];
+          checkProp(value2, type, path);
+          var theseErrors = errors;
+          errors = priorErrors;
+          return theseErrors;
+        }
+      }
+      return [];
+    }
+    if (value === void 0) {
+      if (schema2.required) {
+        addError("is missing and it is required");
+      }
+    } else {
+      if (getType(schema2) === "object" && schema2.required instanceof Array) {
+        for (let requiredField of schema2.required) {
+          if (value[requiredField] === void 0)
+            addError(`is missing and it is required`, requiredField);
+        }
+      }
+      errors = errors.concat(checkType(getType(schema2), value));
+      if (schema2.disallow && !checkType(schema2.disallow, value).length) {
+        addError(" disallowed value was matched");
+      }
+      if (value !== null) {
+        if (value instanceof Array) {
+          if (schema2.items) {
+            var itemsIsArray = schema2.items instanceof Array;
+            var propDef = schema2.items;
+            for (i = 0, l = value.length; i < l; i += 1) {
+              if (itemsIsArray)
+                propDef = schema2.items[i];
+              if (options.coerce)
+                value[i] = options.coerce(value[i], propDef);
+              var errors2 = checkProp(value[i], propDef, path, i);
+              if (errors2)
+                errors.concat(errors2);
+            }
+          }
+          if (schema2.minItems && value.length < schema2.minItems) {
+            addError("There must be a minimum of " + schema2.minItems + " in the array");
+          }
+          if (schema2.maxItems && value.length > schema2.maxItems) {
+            addError("There must be a maximum of " + schema2.maxItems + " in the array");
+          }
+        } else if (schema2.properties || schema2.additionalProperties) {
+          errors.concat(checkObj(value, schema2.properties, path, schema2.additionalProperties));
+        }
+        if (schema2.pattern && typeof value == "string" && !value.match(schema2.pattern)) {
+          addError("does not match the regex pattern " + schema2.pattern);
+        }
+        if (schema2.maxLength && typeof value == "string" && value.length > schema2.maxLength) {
+          addError("may only be " + schema2.maxLength + " characters long");
+        }
+        if (schema2.minLength && typeof value == "string" && value.length < schema2.minLength) {
+          addError("must be at least " + schema2.minLength + " characters long");
+        }
+        if (typeof schema2.minimum !== "undefined" && typeof value == typeof schema2.minimum && schema2.minimum > value) {
+          addError("must have a minimum value of " + schema2.minimum);
+        }
+        if (typeof schema2.maximum !== "undefined" && typeof value == typeof schema2.maximum && schema2.maximum < value) {
+          addError("must have a maximum value of " + schema2.maximum);
+        }
+        if (schema2["enum"]) {
+          var enumer = schema2["enum"];
+          l = enumer.length;
+          var found;
+          for (var j = 0; j < l; j++) {
+            if (enumer[j] === value) {
+              found = 1;
+              break;
+            }
+          }
+          if (!found) {
+            addError("does not have a value in the enumeration " + enumer.join(", "));
+          }
+        }
+        if (typeof schema2.maxDecimal == "number" && value.toString().match(new RegExp("\\.[0-9]{" + (schema2.maxDecimal + 1) + ",}"))) {
+          addError("may only have " + schema2.maxDecimal + " digits of decimal places");
+        }
+        if (value !== "") {
+          if (schema2.format === "wallet-address") {
+            const regex = new RegExp("^((0x[a-fA-F0-9]{40})|([13][a-km-zA-HJ-NP-Z1-9]{25,34})|(X[1-9A-HJ-NP-Za-km-z]{33})|(4[0-9AB][1-9A-HJ-NP-Za-km-z]{93}))$");
+            if (!regex.test(value))
+              addError("is not a valid wallet address");
+          } else if (schema2.format === "cid") {
+            const regex = new RegExp("^(Qm[1-9A-HJ-NP-Za-km-z]{44,}|b[A-Za-z2-7]{58,}|B[A-Z2-7]{58,}|z[1-9A-HJ-NP-Za-km-z]{48,}|F[0-9A-F]{50,})$");
+            if (!regex.test(value))
+              addError("is not a valid cid");
+          } else if (schema2.format === "cid-v0") {
+            const regex = new RegExp("^(Qm[1-9A-HJ-NP-Za-km-z]{44,})$");
+            if (!regex.test(value))
+              addError("is not a valid version 0 cid");
+          } else if (schema2.format === "cid-v1") {
+            const regex = new RegExp("^(b[A-Za-z2-7]{58,}|B[A-Z2-7]{58,}|z[1-9A-HJ-NP-Za-km-z]{48,}|F[0-9A-F]{50,})$");
+            if (!regex.test(value))
+              addError("is not a valid version 1 cid");
+          } else if (schema2.format === "uuid") {
+            const regex = new RegExp("^[0-9a-fA-F]{8}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{12}$");
+            if (!regex.test(value))
+              addError("is not a valid uuid");
+          }
+        }
+      }
+    }
+    return null;
+  }
+  function checkObj(instance2, objTypeDef, path, additionalProp) {
+    if (typeof objTypeDef == "object") {
+      if (typeof instance2 != "object" || instance2 instanceof Array) {
+        errors.push({ property: path, message: "an object is required" });
+      }
+      for (var i in objTypeDef) {
+        if (objTypeDef.hasOwnProperty(i) && i != "__proto__" && i != "constructor") {
+          var value = instance2.hasOwnProperty(i) ? instance2[i] : void 0;
+          if (value === void 0 && options.existingOnly)
+            continue;
+          var propDef = objTypeDef[i];
+          if (value === void 0 && propDef["default"]) {
+            value = instance2[i] = propDef["default"];
+          }
+          if (options.coerce && i in instance2) {
+            value = instance2[i] = options.coerce(value, propDef);
+          }
+          checkProp(value, propDef, path, i);
+        }
+      }
+    }
+    for (i in instance2) {
+      if (instance2.hasOwnProperty(i) && !(i.charAt(0) == "_" && i.charAt(1) == "_") && objTypeDef && !objTypeDef[i] && additionalProp === false) {
+        if (options.filter) {
+          delete instance2[i];
+          continue;
+        } else {
+          errors.push({
+            property: path,
+            message: "The property " + i + " is not defined in the schema and the schema does not allow additional properties"
+          });
+        }
+      }
+      var requires = objTypeDef && objTypeDef[i] && objTypeDef[i].requires;
+      if (requires && !(requires in instance2)) {
+        errors.push({
+          property: path,
+          message: "the presence of the property " + i + " requires that " + requires + " also be present"
+        });
+      }
+      value = instance2[i];
+      if (additionalProp && (!(objTypeDef && typeof objTypeDef == "object") || !(i in objTypeDef))) {
+        if (options.coerce) {
+          value = instance2[i] = options.coerce(value, additionalProp);
+        }
+        checkProp(value, additionalProp, path, i);
+      }
+      if (!_changing && value && value.$schema) {
+        const errors2 = checkProp(value, value.$schema, path, i);
+        if (errors2)
+          errors = errors.concat(errors2);
+      }
+    }
+    return errors;
+  }
+  if (schema) {
+    checkProp(instance, schema, "", _changing || "");
+  }
+  if (!_changing && instance && instance.$schema) {
+    checkProp(instance, instance.$schema, "", "");
+  }
+  return { valid: !errors.length, errors };
+};
+var mustBeValid = (result) => {
+  if (!result.valid) {
+    throw new TypeError(result.errors.map(function(error) {
+      return "for property " + error.property + ": " + error.message;
+    }).join(", \n"));
+  }
+};
+var DataSchemaValidator = {
+  checkPropertyChange,
+  mustBeValid,
+  validate
+};
+function renderUI(target, jsonSchema, callback, data, options) {
+  const controls = {};
+  const renderForm = (schema, scope = "#") => {
+    if (!schema)
+      return void 0;
+    const currentField = scope.substr(scope.lastIndexOf("/") + 1);
+    const labelName = schema.title || (scope != "#/" ? convertFieldNameToLabel(currentField) : "");
+    let groupPnl = new Panel();
+    let lbl;
+    let controlPnl;
+    const columnWidth = options && options.columnWidth ? options.columnWidth : "100px";
+    if (schema.enum && schema.enum.length > 0) {
+      const items = [];
+      for (const item of schema.enum) {
+        items.push({ label: item, value: item });
+      }
+      groupPnl = new Panel();
+      lbl = new Label(groupPnl, { caption: labelName });
+      controlPnl = new Panel(groupPnl);
+      controls[scope] = new ComboBox(controlPnl, {
+        width: "100%",
+        items,
+        icon: { name: "caret-down" }
+      });
+      return groupPnl;
+    } else if (schema.oneOf && schema.oneOf.length > 0) {
+      const items = [];
+      for (const item of schema.oneOf) {
+        items.push({ label: item.title, value: item.const });
+      }
+      groupPnl = new Panel();
+      lbl = new Label(groupPnl, { caption: labelName });
+      controlPnl = new Panel(groupPnl);
+      controls[scope] = new ComboBox(controlPnl, {
+        width: columnWidth,
+        items,
+        icon: { name: "caret-down" }
+      });
+      return groupPnl;
+    } else if (schema.type === "string") {
+      if (schema.format === "date") {
+        groupPnl = new Panel();
+        lbl = new Label(groupPnl, { caption: labelName });
+        controlPnl = new Panel(groupPnl);
+        controls[scope] = new Datepicker(controlPnl, {
+          width: columnWidth
+        });
+        return groupPnl;
+      } else if (schema.format === "time") {
+        groupPnl = new Panel();
+        lbl = new Label(groupPnl, { caption: labelName });
+        controlPnl = new Panel(groupPnl);
+        const timePicker = new Datepicker(controlPnl, {
+          width: columnWidth
+        });
+        timePicker.dateTimeFormat = "HH:mm:ss";
+        controls[scope] = timePicker;
+        return groupPnl;
+      } else if (schema.format === "date-time") {
+        groupPnl = new Panel();
+        lbl = new Label(groupPnl, { caption: labelName });
+        controlPnl = new Panel(groupPnl);
+        const dateTimePicker = new Datepicker(controlPnl, {
+          width: columnWidth
+        });
+        dateTimePicker.dateTimeFormat = "YYYY-MM-DD HH:mm:ss";
+        controls[scope] = dateTimePicker;
+        return groupPnl;
+      } else if (schema.format === "color") {
+        groupPnl = new Panel();
+        lbl = new Label(groupPnl, { caption: labelName });
+        controlPnl = new Panel(groupPnl);
+        controls[scope] = new Input(controlPnl, {
+          inputType: "color"
+        });
+        return groupPnl;
+      } else {
+        groupPnl = new Panel();
+        lbl = new Label(groupPnl, { caption: labelName });
+        controlPnl = new Panel(groupPnl);
+        controls[scope] = new Input(controlPnl, {
+          width: columnWidth,
+          inputType: "text"
+        });
+        return groupPnl;
+      }
+    } else if (schema.type === "number") {
+      groupPnl = new Panel();
+      lbl = new Label(groupPnl, { caption: labelName });
+      controlPnl = new Panel(groupPnl);
+      controls[scope] = new Input(controlPnl, {
+        width: columnWidth,
+        inputType: "number"
+      });
+      return groupPnl;
+    } else if (schema.type === "integer") {
+      groupPnl = new Panel();
+      lbl = new Label(groupPnl, { caption: labelName });
+      controlPnl = new Panel(groupPnl);
+      controls[scope] = new Input(controlPnl, {
+        width: columnWidth,
+        inputType: "number"
+      });
+      return groupPnl;
+    } else if (schema.type === "boolean") {
+      groupPnl = new Panel();
+      lbl = new Label(groupPnl, { caption: labelName });
+      controlPnl = new Panel(groupPnl);
+      controls[scope] = new Checkbox(controlPnl);
+      return groupPnl;
+    } else if (schema.type === "object") {
+      const properties = schema.properties;
+      if (!properties)
+        return void 0;
+      const borderStyle = scope === "#" ? void 0 : {
+        border: {
+          width: 1,
+          style: "solid",
+          color: "#CCC",
+          radius: 5
+        }
+      };
+      const box = new Panel(void 0, borderStyle);
+      const templateColumns = [];
+      if (options && options.columnsPerRow)
+        for (let i = 0; i < options.columnsPerRow; i++)
+          templateColumns.push("1fr");
+      let form2 = new GridLayout(void 0, {
+        templateColumns,
+        gap: {
+          row: 10,
+          column: 10
+        },
+        padding: {
+          top: 5,
+          bottom: 5,
+          left: 10,
+          right: 10
+        }
+      });
+      if (scope !== "#") {
+        const pnl = new Panel(box, {
+          padding: {
+            top: 5,
+            bottom: 5,
+            left: 10,
+            right: 10
+          },
+          border: {
+            bottom: {
+              width: 1,
+              style: "solid",
+              color: "#CCC",
+              radius: 5
+            }
+          }
+        });
+        const label = new Label(pnl, { caption: labelName });
+      }
+      for (const propertyName in properties) {
+        const currentSchema = properties[propertyName];
+        const control = renderForm(currentSchema, `${scope}/properties/${propertyName}`);
+        form2.append(control);
+      }
+      box.append(form2);
+      controls[scope] = box;
+      return box;
+    } else if (schema.type === "array") {
+      return void 0;
+    } else if (schema.type === "null") {
+      return void 0;
+    } else if (schema.type === "any") {
+      return void 0;
+    } else
+      return void 0;
+  };
+  const setData = (schema, data2, scope = "#") => {
+    if (!schema || !data2)
+      return;
+    if (schema.type === "object") {
+      if (!schema.properties)
+        return;
+      for (const propertyName in schema.properties) {
+        setData(schema.properties[propertyName], data2[propertyName], `${scope}/properties/${propertyName}`);
+      }
+    } else {
+      const control = controls[scope];
+      if (control.tagName === "I-CHECKBOX")
+        control.checked = data2;
+      else if (control.tagName === "I-DATEPICKER")
+        control.value = (0, import_moment.default)(data2);
+      else if (control.tagName === "I-COMBO-BOX") {
+        control.selectedItem = control.items.find((v) => v.value === data2) || void 0;
+      } else
+        control.value = data2;
+    }
+  };
+  const getData = (schema, scope = "#") => {
+    var _a;
+    if (!schema)
+      return null;
+    if (schema.type === "object") {
+      const properties = schema.properties;
+      if (!properties)
+        return void 0;
+      const data2 = {};
+      for (const propertyName in properties) {
+        data2[propertyName] = getData(properties[propertyName], `${scope}/properties/${propertyName}`);
+      }
+      return data2;
+    } else {
+      const control = controls[scope];
+      if (!control)
+        return void 0;
+      if (control.tagName === "I-CHECKBOX")
+        return control.checked;
+      else if (control.tagName === "I-COMBO-BOX") {
+        return (_a = control.value) == null ? void 0 : _a.value;
+      } else if (control.tagName === "I-DATEPICKER") {
+        const value = control.value;
+        if (value === void 0)
+          return void 0;
+        if (schema.format === "date")
+          return value.format("YYYY-MM-DD");
+        else if (schema.format === "time")
+          return value.format("HH:mm:ss");
+        else if (schema.format === "date-time")
+          return value.format("YYYY-MM-DD HH:mm:ss");
+      } else if (control.tagName === "I-INPUT") {
+        if (schema.type === "string")
+          return control.value;
+        else if (schema.type === "integer") {
+          const value = parseInt(control.value);
+          return isNaN(value) ? void 0 : value;
+        } else if (schema.type === "number") {
+          const value = parseFloat(control.value);
+          return isNaN(value) ? void 0 : value;
+        } else
+          return control.value;
+      }
+      if (!control)
+        return void 0;
+      return control.value;
+    }
+  };
+  const panel = new Panel();
+  const form = renderForm(jsonSchema);
+  panel.append(form);
+  const pnlButton = new HStack();
+  const confirmButtonCaption = options && options.confirmButtonCaption ? options.confirmButtonCaption : "Confirm";
+  const buttonStack = new HStack(void 0, {
+    justifyContent: "end",
+    alignItems: "center",
+    width: "100%",
+    padding: {
+      left: 5,
+      right: 5,
+      top: 5,
+      bottom: 5
+    }
+  });
+  if (options && options.showClearButton) {
+    const clearButtonCaption = options && options.clearButtonCaption ? options.clearButtonCaption : "Clear";
+    const btnClear = new Button(buttonStack, {
+      caption: clearButtonCaption,
+      padding: {
+        top: 5,
+        bottom: 5,
+        left: 5,
+        right: 5
+      },
+      margin: {
+        right: 5
+      },
+      font: {
+        color: options && options.clearButtonFontColor ? options.clearButtonFontColor : "#FFF"
+      },
+      background: {
+        color: options && options.clearButtonBackgroundColor ? options.clearButtonBackgroundColor : "#3F51B5"
+      }
+    });
+    btnClear.onClick = () => {
+      for (const scope in controls) {
+        const control = controls[scope];
+        if (control.tagName === "I-COMBO-BOX")
+          control.clear();
+        else if (control.tagName === "I-CHECKBOX")
+          control.checked = false;
+        else
+          control.value = void 0;
+      }
+    };
+  }
+  const btnConfirm = new Button(buttonStack, {
+    caption: confirmButtonCaption,
+    padding: {
+      top: 5,
+      bottom: 5,
+      left: 5,
+      right: 5
+    },
+    font: {
+      color: options && options.confirmButtonFontColor ? options.confirmButtonFontColor : "#FFF"
+    },
+    background: {
+      color: options && options.confirmButtonBackgroundColor ? options.confirmButtonBackgroundColor : "#3F51B5"
+    }
+  });
+  btnConfirm.onClick = () => {
+    if (!callback)
+      return;
+    const data2 = getData(jsonSchema);
+    const validationResult = validate(data2, jsonSchema, { changing: false });
+    if (validationResult == null ? void 0 : validationResult.valid)
+      callback(true, data2);
+    else
+      callback(false, validationResult);
+  };
+  panel.append(pnlButton);
+  if (target) {
+    target.append(panel);
+    target.append(buttonStack);
+    if (data) {
+      const validationResult = validate(data, jsonSchema, { changing: false });
+      if (validationResult == null ? void 0 : validationResult.valid)
+        setData(jsonSchema, data);
+      else
+        console.log(validationResult);
+    }
+  }
+}
+function convertFieldNameToLabel(name) {
+  let label = "";
+  for (let i = 0; i < name.length; i++) {
+    let char = name[i];
+    if (i == 0) {
+      label += char.toUpperCase();
+      continue;
+    }
+    if (char == char.toUpperCase())
+      label += ` ${char}`;
+    else
+      label += char;
+  }
+  return label;
+}
+
+// packages/application/src/index.ts
+var IpfsDataType;
+(function(IpfsDataType2) {
+  IpfsDataType2[IpfsDataType2["Raw"] = 0] = "Raw";
+  IpfsDataType2[IpfsDataType2["Directory"] = 1] = "Directory";
+  IpfsDataType2[IpfsDataType2["File"] = 2] = "File";
+  IpfsDataType2[IpfsDataType2["Metadata"] = 3] = "Metadata";
+  IpfsDataType2[IpfsDataType2["Symlink"] = 4] = "Symlink";
+  IpfsDataType2[IpfsDataType2["HAMTShard"] = 5] = "HAMTShard";
+})(IpfsDataType || (IpfsDataType = {}));
+var Application = class {
+  constructor() {
+    this.modules = {};
+    this.modulesId = {};
+    this.scripts = {};
+    this.id = 0;
+    this.LibHost = "";
+    this.packages = {};
+    this.globalEvents = new GlobalEvents();
+  }
+  get EventBus() {
+    return EventBus.getInstance();
+  }
+  static get Instance() {
+    return this._instance || (this._instance = new this());
+  }
+  assets(name) {
+    if (this._assets) {
+      let items = name.split("/");
+      let value = this._assets;
+      let item = items.shift();
+      ;
+      while (value && item) {
+        value = value[item];
+        item = items.shift();
+      }
+      ;
+      return value;
+    }
+    ;
+  }
+  async verifyScript(modulePath, script) {
+    console.dir("verifyScript: " + modulePath);
+    try {
+      let cid = hashContent(script);
+      console.dir(cid);
+    } catch (err) {
+      console.dir(err);
+    }
+    return true;
+  }
+  async getScript(modulePath) {
+    if (this.scripts[modulePath])
+      return this.scripts[modulePath];
+    try {
+      let result = await (await fetch(modulePath)).text();
+      if (typeof result == "string") {
+        if (await this.verifyScript(modulePath, result)) {
+          this.scripts[modulePath] = result;
+          return result;
+        }
+        ;
+      }
+      ;
+    } catch (err) {
+    }
+    ;
+    return "";
+  }
+  async loadScript(modulePath, script) {
+    try {
+      if (this.scripts[modulePath])
+        return true;
+      if (await this.verifyScript(modulePath, script)) {
+        this.scripts[modulePath] = script;
+        return true;
+      }
+      ;
+    } catch (err) {
+    }
+    ;
+    return false;
+  }
+  async getContent(modulePath) {
+    try {
+      return await (await fetch(modulePath)).text();
+    } catch (err) {
+    }
+    return "";
+  }
+  async fetchDirectoryInfoByCID(ipfsCid) {
+    let directoryInfo = [];
+    try {
+      const IPFS_API = `https://ipfs.scom.dev/ipfs/${ipfsCid}`;
+      let result = await fetch(IPFS_API);
+      let jsonContent = await result.json();
+      if (jsonContent.links) {
+        directoryInfo = jsonContent.links;
+      }
+    } catch (err) {
+      console.log(err);
+    }
+    return directoryInfo;
+  }
+  async getModule(modulePath, options) {
+    if (this.modules[modulePath])
+      return this.modules[modulePath];
+    let result = await this.newModule(modulePath, options);
+    if (result)
+      this.modules[modulePath] = result;
+    return result;
+  }
+  async loadPackage(packageName, modulePath, options) {
+    var _a, _b, _c;
+    options = options || this._initOptions;
+    if (options && options.modules && options.modules[packageName]) {
+      let pack = options.modules[packageName];
+      for (let i = 0; i < ((_a = pack.dependencies) == null ? void 0 : _a.length); i++) {
+        let n = pack.dependencies[i];
+        if (!RequireJS.defined(n))
+          await this.loadPackage(n);
+      }
+      ;
+    }
+    ;
+    if (!modulePath) {
+      if ((_b = options == null ? void 0 : options.modules) == null ? void 0 : _b[packageName])
+        modulePath = ((options == null ? void 0 : options.rootDir) ? options.rootDir + "/" : "") + "modules/" + ((_c = options == null ? void 0 : options.modules) == null ? void 0 : _c[packageName].path) + "/index.js";
+      else
+        return null;
+    } else if (modulePath == "*") {
+      modulePath = ((options == null ? void 0 : options.rootDir) ? options.rootDir + "/" : "") + "libs/" + packageName + "/index.js";
+    } else if (modulePath.startsWith("{LIB}/")) {
+      let libPath = LibPath || "";
+      if (LibPath && !LibPath.endsWith("/"))
+        libPath = libPath + "/";
+      modulePath = modulePath.replace("{LIB}/", libPath);
+    }
+    if (this.packages[modulePath])
+      return this.packages[modulePath];
+    let script = await this.getScript(modulePath);
+    if (script) {
+      _currentDefineModule = null;
+      this.currentModulePath = modulePath;
+      if (modulePath.indexOf("://") > 0)
+        this.currentModuleDir = modulePath.split("/").slice(0, -1).join("/");
+      else
+        this.currentModuleDir = application.LibHost + modulePath.split("/").slice(0, -1).join("/");
+      await import(`data:text/javascript,${encodeURIComponent(script)}`);
+      this.currentModulePath = "";
+      this.currentModuleDir = "";
+      let m = window["require"](packageName);
+      if (m) {
+        this.packages[modulePath] = m.default || m;
+        return m.default || m;
+      }
+    }
+    ;
+    return null;
+  }
+  async loadModule(modulePath, options) {
+    let module2 = await this.newModule(modulePath, options);
+    if (module2)
+      document.body.append(module2);
+    return module2;
+  }
+  getModulePath(module2) {
+    let options = this._initOptions;
+    let modulePath = module2;
+    if (options && options.modules && options.modules[module2] && options.modules[module2].path) {
+      modulePath = "";
+      if (options.rootDir)
+        modulePath += options.rootDir + "/";
+      if (options.moduleDir)
+        modulePath += options.moduleDir + "/";
+      modulePath += options.modules[module2].path;
+      if (!modulePath.endsWith(".js"))
+        modulePath += "/index.js";
+    } else if (options.dependencies && options.dependencies[module2])
+      modulePath = `${(options == null ? void 0 : options.rootDir) ? options.rootDir + "/" : ""}libs/${module2}/index.js`;
+    return modulePath;
+  }
+  async newModule(module2, options) {
+    if (options) {
+      this._initOptions = options;
+      if (!this._assets && this._initOptions.assets)
+        this._assets = await this.loadPackage(this._initOptions.assets) || {};
+      if (this._initOptions.dependencies) {
+        for (let p in this._initOptions.dependencies) {
+          if (p != this._initOptions.main)
+            await this.loadPackage(p, this._initOptions.dependencies[p]);
+        }
+        ;
+      }
+      ;
+    }
+    ;
+    let modulePath = module2;
+    if (this._initOptions)
+      modulePath = this.getModulePath(module2);
+    let elmId = this.modulesId[modulePath];
+    if (elmId && modulePath) {
+      return document.createElement(elmId);
+    }
+    let script;
+    if (options && options.script)
+      script = options.script;
+    else {
+      if (this._initOptions && this._initOptions.modules && this._initOptions.modules[module2] && this._initOptions.modules[module2].dependencies) {
+        let dependencies = this._initOptions.modules[module2].dependencies;
+        for (let i = 0; i < dependencies.length; i++) {
+          let dep = dependencies[i];
+          let path = this.getModulePath(dep);
+          if (!this.packages[path]) {
+            await this.loadPackage(dep, path);
+          }
+          ;
+        }
+        ;
+      }
+      ;
+      script = await this.getScript(modulePath);
+    }
+    ;
+    if (script) {
+      _currentDefineModule = null;
+      this.currentModulePath = modulePath;
+      if (modulePath.indexOf("://") > 0)
+        this.currentModuleDir = modulePath.split("/").slice(0, -1).join("/");
+      else
+        this.currentModuleDir = application.LibHost + modulePath.split("/").slice(0, -1).join("/");
+      await import(`data:text/javascript,${encodeURIComponent(script)}`);
+      document.getElementsByTagName("html")[0].classList.add(applicationStyle);
+      this.currentModulePath = "";
+      this.currentModuleDir = "";
+      if (!_currentDefineModule && this.packages[modulePath]) {
+        _currentDefineModule = this.packages[modulePath];
+      }
+      if (_currentDefineModule) {
+        let module3 = _currentDefineModule.default || _currentDefineModule;
+        if (module3) {
+          this.id++;
+          elmId = `i-module--${this.id}`;
+          this.modulesId[modulePath] = elmId;
+          let Module2 = class extends module3 {
+          };
+          customElements.define(elmId, Module2);
+          let result = new Module2(null, options);
+          return result;
+        }
+        ;
+      }
+    }
+    return null;
+  }
+  async copyToClipboard(value) {
+    if (!value)
+      return false;
+    try {
+      if (navigator.clipboard) {
+        await navigator.clipboard.writeText(value);
+        return true;
+      } else {
+        const input = document.createElement("input");
+        input.value = value;
+        input.style.position = "fixed";
+        input.style.opacity = "0";
+        document.body.appendChild(input);
+        input.focus();
+        input.select();
+        const result = document.execCommand("copy");
+        document.body.removeChild(input);
+        return result;
+      }
+    } catch (err) {
+      console.log("debug: copy", err);
+      return false;
+    }
+  }
+  xssSanitize(value) {
+    return value;
+  }
+};
+window["application"] = Application.Instance;
+var application = Application.Instance;
+
+// packages/code-editor/src/monaco.ts
+async function addFile(fileName, content) {
+  let monaco = await initMonaco();
+  if (monaco) {
+    let model = await getFileModel(fileName);
+    if (!model) {
+      if ((fileName == null ? void 0 : fileName.endsWith(".tsx")) || (fileName == null ? void 0 : fileName.endsWith(".ts")))
+        model = monaco.editor.createModel(content || "", "typescript", monaco.Uri.file(fileName));
+      else
+        model = monaco.editor.createModel(content || "");
+    }
+    return model;
+  }
+  ;
+  return null;
+}
+async function updateFile(fileName, content) {
+  let monaco = await initMonaco();
+  if (monaco) {
+    let model = await getFileModel(fileName);
+    if (model) {
+      model.setValue(content);
+    }
+    return model;
+  }
+  ;
+  return null;
+}
+async function getFileModel(fileName) {
+  let monaco = await initMonaco();
+  if (monaco) {
+    let models = monaco.editor.getModels();
+    for (let i = 0; i < models.length; i++) {
+      let model = models[i];
+      if (model.uri.path == fileName || model.uri.path == "/" + fileName)
+        return model;
+    }
+    ;
+  }
+  ;
+  return null;
+}
+async function addLib(lib, dts) {
+  let monaco = await initMonaco();
+  monaco.languages.typescript.typescriptDefaults.addExtraLib(dts, lib);
+}
+async function initMonaco() {
+  if (window.monaco)
+    return window.monaco;
+  return new Promise((resolve) => {
+    window.MonacoEnvironment = {};
+    RequireJS.config({ paths: { "vs": `${LibPath}lib/monaco-editor/0.32.1/min/vs` } });
+    RequireJS.require([`vs/editor/editor.main`], (monaco) => {
+      resolve(monaco);
+      if (monaco.$loaded)
+        return;
+      monaco.$loaded = true;
+      monaco.languages.typescript.typescriptDefaults.setCompilerOptions({
+        experimentalDecorators: true,
+        allowSyntheticDefaultImports: true,
+        jsx: monaco.languages.typescript.JsxEmit.Preserve,
+        moduleResolution: monaco.languages.typescript.ModuleResolutionKind.NodeJs,
+        allowNonTsExtensions: true,
+        target: monaco.languages.typescript.ScriptTarget.ES2020
+      });
+      monaco.languages.typescript.typescriptDefaults.setEagerModelSync(true);
+      monaco.languages.registerCompletionItemProvider("typescript", {
+        triggerCharacters: [">"],
+        provideCompletionItems: (model, position) => {
+          const code = model.getValueInRange({
+            startLineNumber: position.lineNumber,
+            startColumn: 1,
+            endLineNumber: position.lineNumber,
+            endColumn: position.column
+          });
+          const tag = code.slice(code.lastIndexOf("<") + 1, code.length);
+          if (!tag || !tag.endsWith(">") || tag.startsWith("/") || tag.indexOf(" ") > 0)
+            return;
+          const word = model.getWordUntilPosition(position);
+          return {
+            suggestions: [
+              {
+                label: `</${tag}`,
+                kind: monaco.languages.CompletionItemKind.EnumMember,
+                insertText: `$1</${tag}`,
+                insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+                range: {
+                  startLineNumber: position.lineNumber,
+                  endLineNumber: position.lineNumber,
+                  startColumn: word.startColumn,
+                  endColumn: word.endColumn
+                }
+              }
+            ]
+          };
+        }
+      });
+    });
+  });
+}
+
+// packages/code-editor/src/style/code-editor.css.ts
+cssRule("i-code-editor", {
+  $nest: {
+    "*": {
+      boxSizing: "border-box"
+    },
+    ".full-height": {
+      height: "100vh"
+    },
+    ".half-width": {
+      width: "50%"
+    },
+    ".column": {
+      display: "flex",
+      flexDirection: "column",
+      alignItems: "stretch"
+    },
+    ".row": {
+      display: "flex",
+      flexDirection: "row"
+    },
+    ".align-right": {
+      marginLeft: "auto",
+      alignSelf: "stretch"
+    },
+    "#flex-wrapper": {
+      display: "flex",
+      alignItems: "stretch"
+    },
+    "#operation-editor": {
+      height: "60vh",
+      minHeight: "260px"
+    },
+    "#variables-editor": {
+      height: "30vh",
+      alignItems: "stretch"
+    },
+    "#results-editor": {
+      height: "90vh",
+      alignItems: "stretch"
+    },
+    "#toolbar": {
+      minHeight: "40px",
+      backgroundColor: "#1e1e1e",
+      display: "inline-flex",
+      alignItems: "stretch"
+    },
+    "#toolbar > button, #toolbar > select, #toolbar > span, button#execute-op": {
+      margin: "4px",
+      padding: "4px"
+    },
+    "#toolbar button, #toolbar select": {
+      backgroundColor: "#1e1e1e",
+      color: "#eee",
+      border: "1px solid #eee",
+      borderRadius: "4px"
+    },
+    "#toolbar button:hover, select:hover, button:focus, select:focus": {
+      backgroundColor: "darkslategrey"
+    },
+    "#execution-tray": {
+      display: "inline-flex",
+      alignItems: "baseline"
+    },
+    "#schema-status": {
+      fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+      color: "#eee"
+    },
+    "#toolbar button.reload-button": {
+      border: "0 none",
+      padding: "4px",
+      width: "30px",
+      textAlign: "center"
+    }
+  }
+});
+
+// packages/code-editor/src/code-editor.ts
+var CodeEditor = class extends Control {
+  get monaco() {
+    return window.monaco;
+  }
+  init() {
+    if (!this.editor) {
+      super.init();
+      this.language = this.getAttribute("language", true);
+      this.style.display = "inline-block";
+      if (this.language)
+        this.loadContent(void 0, this.language);
+    }
+    ;
+  }
+  get editor() {
+    return this._editor;
+  }
+  get language() {
+    return this._language;
+  }
+  set language(value) {
+    this._language = value;
+    if (!this.editor) {
+      this.loadContent();
+    } else {
+      let monaco = this.monaco;
+      let model = this.editor.getModel();
+      if (model) {
+        monaco.editor.setModelLanguage(model, value);
+      }
+    }
+  }
+  async loadContent(content, language, fileName) {
+    let monaco = await initMonaco();
+    if (content == void 0)
+      content = content || this._value || "";
+    this._value = content;
+    language = language || this._language || "typescript";
+    this._language = language;
+    if (!this._editor) {
+      let captionDiv = this.createElement("div", this);
+      captionDiv.style.display = "inline-block";
+      captionDiv.style.height = "100%";
+      captionDiv.style.width = "100%";
+      const customOptions = this._options || {};
+      let options = {
+        theme: "vs-dark",
+        tabSize: 2,
+        formatOnPaste: true,
+        formatOnType: true,
+        renderWhitespace: "none",
+        automaticLayout: true,
+        minimap: {
+          enabled: false
+        },
+        ...customOptions
+      };
+      this._editor = monaco.editor.create(captionDiv, options);
+      this._editor.onDidChangeModelContent((event) => {
+        if (typeof this.onChange === "function")
+          this.onChange(this, event);
+      });
+      if (fileName) {
+        let model = await getFileModel(fileName);
+        if (model) {
+          this._editor.setModel(model);
+          model.setValue(content);
+          return;
+        }
+      }
+      ;
+      if (language == "typescript" || (fileName == null ? void 0 : fileName.endsWith(".tsx")) || (fileName == null ? void 0 : fileName.endsWith(".ts"))) {
+        let model = monaco.editor.createModel(content || this._value || "", "typescript", fileName ? monaco.Uri.file(fileName) : void 0);
+        this._editor.setModel(model);
+      } else {
+        let model = monaco.editor.createModel(content || this._value || "", language || this._language, fileName ? monaco.Uri.file(fileName) : void 0);
+        this._editor.setModel(model);
+      }
+      ;
+    } else {
+      let model = this._editor.getModel();
+      if (language == "typescript" && model && fileName && this._fileName != fileName) {
+        if (!this._fileName)
+          model.dispose();
+        model = await getFileModel(fileName);
+        if (!model)
+          model = monaco.editor.createModel(content || this._value || "", "typescript", monaco.Uri.file(fileName));
+        this._editor.setModel(model);
+      } else {
+        this._editor.setValue(content);
+        if (language && model)
+          monaco.editor.setModelLanguage(model, language);
+      }
+      ;
+    }
+    ;
+    this._fileName = fileName || "";
+    this._editor.setScrollTop(0);
+  }
+  async loadFile(fileName) {
+    var _a;
+    let model = await getFileModel(fileName);
+    if (model) {
+      if (!this._fileName)
+        (_a = this._editor.getModel()) == null ? void 0 : _a.dispose();
+      this._fileName = fileName;
+      this._editor.setModel(model);
+    }
+    ;
+  }
+  updateOptions(options) {
+    this._options = options;
+    if (this._editor)
+      this._editor.updateOptions(options);
+  }
+  get value() {
+    if (this._editor)
+      return this._editor.getValue();
+    else
+      return this._value;
+  }
+  set value(value) {
+    this._value = value;
+    if (this._editor) {
+      this._editor.setValue(value);
+      this._editor.setScrollTop(0);
+    } else
+      this.loadContent();
+  }
+};
+CodeEditor.addLib = addLib;
+CodeEditor.addFile = addFile;
+CodeEditor.getFileModel = getFileModel;
+CodeEditor.updateFile = updateFile;
+CodeEditor = __decorateClass([
+  customElements2("i-code-editor")
+], CodeEditor);
+
+// packages/code-editor/src/diff-editor.ts
+var EditorType;
+(function(EditorType2) {
+  EditorType2[EditorType2["modified"] = 0] = "modified";
+  EditorType2[EditorType2["original"] = 1] = "original";
+})(EditorType || (EditorType = {}));
+var CodeDiffEditor = class extends Control {
+  init() {
+    if (!this.editor) {
+      super.init();
+      this.language = this.getAttribute("language", true);
+      this.style.display = "inline-block";
+    }
+    ;
+  }
+  get editor() {
+    return this._editor;
+  }
+  get language() {
+    return this._language;
+  }
+  set language(value) {
+    this._language = value;
+    if (!this.editor) {
+      if (this.language) {
+        this.loadContent(1, "", this.language);
+        this.loadContent(0, "", this.language);
+      }
+    } else {
+      this.setModelLanguage(value, "getOriginalEditor");
+      this.setModelLanguage(value, "getModifiedEditor");
+    }
+  }
+  setModelLanguage(value, functionName) {
+    let monaco = window.monaco;
+    let model = this.editor[functionName]().getModel();
+    if (model) {
+      monaco.editor.setModelLanguage(model, value);
+    }
+  }
+  getEditor(type) {
+    if (type === 1)
+      return this.editor.getOriginalEditor();
+    else
+      return this.editor.getModifiedEditor();
+  }
+  getModel(type) {
+    return this.getEditor(type).getModel();
+  }
+  async loadContent(type, content, language, fileName) {
+    let monaco = await initMonaco();
+    const value = type === 0 ? this._modifiedValue : this._originalValue;
+    if (content == void 0)
+      content = content || value || "";
+    type === 0 ? this._modifiedValue = content : this._originalValue = content;
+    language = language || this._language || "typescript";
+    this._language = language;
+    if (!this._editor) {
+      let captionDiv = this.createElement("div", this);
+      captionDiv.style.display = "inline-block";
+      captionDiv.style.height = "100%";
+      captionDiv.style.width = "100%";
+      let options = {
+        theme: "vs-dark",
+        originalEditable: false,
+        automaticLayout: true
+      };
+      this._editor = monaco.editor.createDiffEditor(captionDiv, options);
+      this._editor.onDidUpdateDiff(() => {
+        if (typeof this.onChange === "function")
+          this.onChange(this);
+      });
+    }
+    if (!this._modifiedModel || !this._originalModel) {
+      let model;
+      if (fileName == null ? void 0 : fileName.endsWith(".tsx")) {
+        model = monaco.editor.createModel(content || value || "", "typescript");
+      } else
+        model = monaco.editor.createModel(content || value || "", language || this._language || "typescript");
+      type === 0 ? this._modifiedModel = model : this._originalModel = model;
+      if (this._originalModel && this._modifiedModel) {
+        this._editor.setModel({
+          original: this._originalModel,
+          modified: this._modifiedModel
+        });
+      }
+    } else {
+      let model = this.getModel(type);
+      if (model)
+        monaco.editor.setModelLanguage(model, language);
+      this.getEditor(type).setValue(content);
+    }
+  }
+  updateOptions(options) {
+    this.editor.updateOptions(options);
+  }
+  get originalValue() {
+    if (this.editor)
+      return this.editor.getOriginalEditor().getValue();
+    else
+      return this._originalValue;
+  }
+  set originalValue(value) {
+    this._originalValue = value;
+    if (this.editor) {
+      this.editor.getOriginalEditor().setValue(value);
+    } else
+      this.loadContent(1);
+  }
+  get modifiedValue() {
+    if (this.editor)
+      return this.editor.getModifiedEditor().getValue();
+    else
+      return this._modifiedValue;
+  }
+  set modifiedValue(value) {
+    this._modifiedValue = value;
+    if (this.editor) {
+      this.editor.getModifiedEditor().setValue(value);
+    } else {
+      this.loadContent(0);
+    }
+  }
+};
+CodeDiffEditor.addLib = addLib;
+CodeDiffEditor.addFile = addFile;
+CodeDiffEditor.getFileModel = getFileModel;
+CodeDiffEditor.updateFile = updateFile;
+CodeDiffEditor = __decorateClass([
+  customElements2("i-code-diff-editor")
+], CodeDiffEditor);
+
+// packages/data-grid/src/style/dataGrid.css.ts
+var Theme13 = theme_exports.ThemeVars;
+cssRule("i-data-grid", {
+  border: "0.5px solid #dadada",
+  $nest: {
+    ".scrollBox": {
+      overflow: "auto",
+      position: "absolute",
+      height: "100%",
+      width: "100%",
+      top: 0,
+      zIndex: 4
+    },
+    ".grid": {
+      position: "absolute",
+      fontSize: "12px",
+      fontFamily: '"Segoe UI", Tahoma, Arial, Helvetica, sans-serif',
+      color: "#5A5757",
+      borderSpacing: 0,
+      tableLayout: "fixed",
+      backgroundColor: "white"
+    },
+    ".grid tr": {
+      overflow: "hidden"
+    },
+    ".grid tr div": {
+      paddingLeft: "2px",
+      paddingRight: "2px"
+    },
+    ".grid_cell_hidden": {
+      display: "none"
+    },
+    ".grid_fixed_cell": {
+      background: "#F9F9F9",
+      borderBottom: "0.5px solid #dadada",
+      borderRight: "0.5px solid #dadada",
+      boxSizing: "border-box"
+    },
+    ".grid_curr_cell": {
+      border: "2px solid #5f5f5f",
+      boxSizing: "border-box"
+    },
+    ".grid_selected_cell": {
+      backgroundColor: "rgb(160, 195, 255)",
+      pointerEvents: "none",
+      opacity: 0.2
+    },
+    ".grid_cell": {
+      borderBottom: "0.5px solid #dadada",
+      borderRight: "0.5px solid #dadada",
+      boxSizing: "border-box",
+      background: "white",
+      cursor: "default"
+    },
+    ".grid_cell_value": {
+      textOverflow: "ellipsis",
+      wordWrap: "break-word",
+      whiteSpace: "pre"
+    },
+    ".grid_cell_value.image img": {
+      maxHeight: "100%",
+      maxWidth: "100%"
+    },
+    ".grid_header_splitter": {
+      position: "relative",
+      zoom: 1,
+      filter: "alpha(opacity=50)",
+      opacity: 0.5,
+      float: "right",
+      cursor: "e-resize"
+    },
+    "input": {
+      border: "none",
+      outline: "none"
+    },
+    "table": {
+      marginLeft: "1px",
+      marginTop: "1px"
+    }
+  }
+});
+
+// packages/data-grid/src/dataGrid.ts
+function parseNumber(value, decimal) {
+  if (typeof value == "string")
+    value = value.replace(/,/g, "");
+  if (decimal)
+    return parseFloat(parseFloat(value).toFixed(decimal));
+  else
+    return parseFloat(value);
+}
+function getCursorPosX(event) {
+  event = event || window.event;
+  let pos = 0;
+  if (event instanceof TouchEvent) {
+    if (event.changedTouches && event.changedTouches[0])
+      pos = event.changedTouches[0].pageX || event.changedTouches[0].clientX;
+    else if (event.touches && event.touches[0])
+      pos = event.touches[0].pageX || event.touches[0].clientX;
+  } else
+    pos = event.pageX || event.clientX;
+  return pos + document.body.scrollLeft + document.documentElement.scrollLeft;
+}
+function getCursorPosY(event) {
+  event = event || window.event;
+  let pos = 0;
+  if (event instanceof TouchEvent) {
+    if (event.changedTouches && event.changedTouches[0])
+      pos = event.changedTouches[0].pageY || event.changedTouches[0].clientY;
+    else if (event.touches && event.touches[0])
+      pos = event.touches[0].pageY || event.touches[0].clientY;
+  } else
+    pos = event.pageY || event.clientY;
+  return pos + document.body.scrollTop + document.documentElement.scrollTop;
+}
+var TGridOptions = class {
+  constructor(owner) {
+    this._autoRowHeight = false;
+    this._rowSelect = false;
+    this.autoAddRow = false;
+    this.fileDropUpload = false;
+    this.sortOnClick = true;
+    this.owner = owner;
+  }
+  get autoRowHeight() {
+    return this._autoRowHeight;
+  }
+  set autoRowHeight(value) {
+    if (value != this._autoRowHeight) {
+      this.owner.rowHeights = [];
+      this._autoRowHeight = value;
+      this.owner.enableUpdateTimer();
+    }
+    ;
+  }
+  get rowSelect() {
+    return this._rowSelect;
+  }
+  set rowSelect(value) {
+    if (this._rowSelect != value) {
+      this._rowSelect = value;
+      this.owner.enableUpdateTimer();
+    }
+    ;
+  }
+};
+var TGridCell = class {
+  constructor(grid, col, row) {
+    this._visible = true;
+    this.grid = grid;
+    this._col = col;
+    this._row = row;
+  }
+  get button() {
+    return this._button;
+  }
+  set button(value) {
+    this._button = value;
+    this.grid.enableUpdateTimer();
+  }
+  get checkBox() {
+    return this._checkBox;
+  }
+  set checkBox(value) {
+    this._checkBox = value;
+    this.grid.enableUpdateTimer();
+  }
+  get col() {
+    return this._col;
+  }
+  set col(value) {
+    this._col = value;
+  }
+  get color() {
+    return this._color;
+  }
+  set color(value) {
+    this._color = value;
+    this.grid.enableUpdateTimer();
+  }
+  get dataType() {
+    return this._dataType;
+  }
+  set dataType(value) {
+    this._dataType = value;
+    this.grid.enableUpdateTimer();
+  }
+  get displayValue() {
+    return;
+  }
+  get formula() {
+    return this._formula;
+  }
+  set formula(value) {
+    this._formula = value;
+    this.grid.enableUpdateTimer();
+  }
+  get hint() {
+    return this._hint;
+  }
+  set hint(value) {
+    this._hint = value;
+    this.grid.enableUpdateTimer();
+  }
+  get horizontalAlign() {
+    return this._horizontalAlign;
+  }
+  set horizontalAlign(value) {
+    this._horizontalAlign = value;
+    this.grid.enableUpdateTimer();
+  }
+  get html() {
+    return this._html;
+  }
+  set html(value) {
+    this._html = value;
+    this.grid.enableUpdateTimer();
+  }
+  get image() {
+    return this._image;
+  }
+  set image(value) {
+    this._image = value;
+    this.grid.enableUpdateTimer();
+  }
+  get object() {
+    return this._object;
+  }
+  set object(value) {
+    this._object = value;
+    this.grid.enableUpdateTimer();
+  }
+  get readOnly() {
+    return this._readOnly;
+  }
+  set readOnly(value) {
+    this._readOnly = value;
+    this.grid.enableUpdateTimer();
+  }
+  get row() {
+    return this._row;
+  }
+  set row(value) {
+    this._row = value;
+  }
+  get text() {
+    return this._text;
+  }
+  set text(value) {
+    this._text = value;
+    this.grid.enableUpdateTimer();
+  }
+  get value() {
+    return this._value;
+  }
+  set value(value) {
+    this._value = value;
+    this.grid.enableUpdateTimer();
+  }
+  get visible() {
+    return this._visible;
+  }
+  set visible(value) {
+    this._visible = value;
+    this.grid.enableUpdateTimer();
+  }
+};
+var TGridCells = class {
+  constructor(owner) {
+    this.data = [[]];
+    this.grid = owner;
+  }
+  assign(data) {
+    for (let r = 0; r < data.length; r++) {
+      let d = data[r]["data"];
+      let row = data[r]["row"];
+      for (let c = 0; c < d.length; c++) {
+        this.setValue(c, row, d[c]);
+      }
+    }
+  }
+  cells(aCol, aRow, refresh2) {
+    if (refresh2)
+      return this.getCell(aCol, aRow);
+    else if (this.data[aRow]) {
+      let cell = this.data[aRow][aCol];
+      if (cell && cell.mergeRect && (aCol != cell.mergeRect.startCol || aRow != cell.mergeRect.startRow)) {
+        cell = this.data[cell.mergeRect.startRow][cell.mergeRect.startCol];
+      }
+      return cell || this.getCell(aCol, aRow);
+    } else
+      return this.getCell(aCol, aRow);
+  }
+  clear() {
+    this.data = [[]];
+  }
+  deleteCol(aCol) {
+    for (let r = 0; r < this.data.length; r++) {
+      let row = this.data[r];
+      if (row)
+        row.splice(aCol, 1);
+    }
+    this.updateCellIndex();
+  }
+  deleteRow(aRow) {
+    if (this.data.length > aRow)
+      this.data.splice(aRow, 1);
+    this.updateCellIndex();
+  }
+  getCell(aCol, aRow, refresh2) {
+    if (typeof this.data[aRow] == "undefined")
+      this.data[aRow] = [];
+    if (typeof this.data[aRow][aCol] == "undefined")
+      this.data[aRow][aCol] = new TGridCell(this.grid, aCol, aRow);
+    if (refresh2 && this.data[aRow][aCol])
+      this.data[aRow][aCol]._displayValue = void 0;
+    return this.data[aRow][aCol];
+  }
+  getObject(aCol, aRow) {
+    let cell = this.cells(aCol, aRow);
+    if (cell)
+      return cell.object;
+    else
+      return void 0;
+  }
+  getValue(aCol, aRow) {
+    let cell = this.cells(aCol, aRow);
+    if (cell) {
+      if (cell.mergeRect)
+        cell = this.getCell(cell.mergeRect.startCol, cell.mergeRect.startRow);
+      if (cell.value != void 0) {
+        return cell.value;
+      } else
+        return "";
+    }
+    ;
+  }
+  getExcelValue(aCol, aRow, callback) {
+  }
+  getExcelValues(startCol, startRow, callback) {
+  }
+  getExcelValues1(startCol, startRow, callback) {
+  }
+  insertCol(aCol) {
+    for (let r = 0; r < this.data.length; r++) {
+      let row = this.data[r];
+      if (row)
+        row.splice(aCol, 0, void 0);
+    }
+    this.updateCellIndex();
+  }
+  insertRow(aRow) {
+    this.data.splice(aRow, 0, []);
+    this.updateCellIndex();
+  }
+  loadFromJSON(json) {
+    let data = json["data"];
+    for (let i = 0; i < data.length; i++) {
+      let row = data[i];
+      for (let k = 0; k < row.length; k++) {
+        let cell = row[k];
+        if (cell)
+          this.setValue(k, i, cell["v"]);
+      }
+    }
+  }
+  moveRow(fromIdx, toIdx) {
+    if (toIdx < this.data.length) {
+      this.data.splice(toIdx, 0, this.data.splice(fromIdx, 1)[0]);
+      this.updateCellIndex();
+    }
+  }
+  saveToJSON(json) {
+    let data = [];
+    json["data"] = data;
+    for (let i = 0; i < this.data.length; i++) {
+      let row = this.data[i];
+      data[i] = [];
+      for (let k = 0; k < row.length; k++) {
+        let cell = row[k];
+        if (cell)
+          data[i][k] = {
+            "v": cell._value
+          };
+      }
+    }
+  }
+  setDateValue(aCol, aRow, aValue) {
+    let cell = this.getCell(aCol, aRow);
+    cell._value = aValue;
+    cell._isDate = true;
+  }
+  setMergeCell(rect) {
+    for (let col = rect.startCol; col <= rect.endCol; col++)
+      for (let row = rect.startRow; row <= rect.endRow; row++) {
+        let cell = this.getCell(col, row);
+        cell.mergeRect = rect;
+      }
+  }
+  setObject(aCol, aRow, aObject) {
+    let cell = this.getCell(aCol, aRow);
+    cell.object = aObject;
+  }
+  setRowCount(value) {
+    if (this.data.length > value)
+      this.data.length = value;
+  }
+  setValue(aCol, aRow, aValue, disp) {
+    let cell = this.getCell(aCol, aRow);
+    if (!disp)
+      cell._value = aValue;
+    else
+      cell._dispValue = aValue;
+  }
+  setFile(aCol, aRow, aValue) {
+    let cell = this.getCell(aCol, aRow);
+    cell._file = aValue;
+  }
+  sort(col, descending) {
+    let fixedRow = this.data.slice(0, this.grid.fixedRow);
+    let data = this.data.slice(this.grid.fixedRow);
+    for (let i = 0; i < data.length; i++) {
+      if (data[i] && data[i][col])
+        data[i][col]._idx = i;
+    }
+    ;
+    let self = this;
+    data.sort(function(item1, item2) {
+      if (self.grid["onSort"]) {
+        if (item1[col] && item2[col])
+          return self.grid["onSort"](self.grid, descending, col, item1[col]._row, item2[col].row);
+        else if (item1[col]) {
+          if (descending)
+            return -1;
+          else
+            return 1;
+        } else {
+          if (descending)
+            return 1;
+          else
+            return -1;
+        }
+      } else {
+        let value1;
+        let value2;
+        let idx1 = 0;
+        let idx2 = 0;
+        ;
+        if (item1[col]) {
+          value1 = item1[col]._displayValue || item1[col]._value;
+          idx1 = item1[col]._idx;
+        }
+        if (value1 == void 0)
+          value1 = "";
+        if (item2[col]) {
+          value2 = item2[col]._displayValue || item2[col]._value;
+          idx2 = item2[col]._idx;
+        }
+        if (value2 == void 0)
+          value2 = "";
+        if (typeof value1 == "string")
+          value1 = value1.toLowerCase();
+        if (typeof value2 == "string")
+          value2 = value2.toLowerCase();
+        if (value1 == value2)
+          return idx1 > idx2 ? 1 : idx1 < idx2 ? -1 : 0;
+        else if (value1 > value2)
+          return descending ? -1 : 1;
+        else
+          return descending ? 1 : -1;
+      }
+    });
+    this.data = fixedRow.concat(data);
+    this.updateCellIndex();
+  }
+  updateCellIndex() {
+    for (let r = 0; r < this.data.length; r++) {
+      let row = this.data[r];
+      for (let c = 0; c < row.length; c++) {
+        let cell = this.data[r][c];
+        if (cell) {
+          cell._col = c;
+          cell._row = r;
+        }
+        ;
+      }
+      ;
+    }
+    ;
+  }
+};
+var TGridColumn = class {
+  constructor(grid, colIdx) {
+    this._visible = true;
+    this._resizable = true;
+    this._sortable = true;
+    this._readOnly = false;
+    this.grid = grid;
+    this._colIdx = colIdx;
+  }
+  get asJSON() {
+    return {
+      "color": this._color && this._color != "clNone" ? this._color : void 0,
+      "horizontalAlign": this._horizontalAlign != void 0 && this._horizontalAlign != 1 ? this._horizontalAlign : void 0,
+      "type": this._type && this._type != "string" ? this._type : void 0,
+      "width": this.width,
+      "readOnly": this._readOnly ? this._readOnly : void 0,
+      "visible": !this._visible ? this._visible : void 0,
+      "resizable": !this._resizable ? this._resizable : void 0,
+      "lookupContext": this._lookupContext ? this._lookupContext : void 0,
+      "lookupTable": this._lookupTable ? this._lookupTable : void 0,
+      "suggestTable": this._suggestTable ? this._suggestTable : void 0,
+      "lookupField": this._lookupField ? this._lookupField : void 0,
+      "lookupDetailField": this._lookupDetailField ? this._lookupDetailField : void 0,
+      "lookupDetailValue": this._lookupDetailValue ? this._lookupDetailValue : void 0,
+      "lookupDetailType": this._lookupDetailType ? this._lookupDetailType : void 0,
+      "listOfValue": this._listOfValue ? this._listOfValue : void 0,
+      "format": this._format ? this._format : void 0,
+      "formula": this._formula ? this._formula : void 0,
+      "displayUserName": this._displayUserName,
+      "binding": this._binding
+    };
+  }
+  set asJSON(value) {
+    this._color = value.color;
+    this._horizontalAlign = value["horizontalAlign"] != void 0 ? value["horizontalAlign"] : value["alignment"];
+    this._type = value["type"] || value["dataType"];
+    this._checkBox = value["type"] == "checkBox";
+    this._radioButton = value["type"] == "radioButton";
+    this._readOnly = value["readOnly"];
+    this._visible = value["visible"];
+    this._resizable = value["resizable"];
+    this._lookupContext = value["lookupContext"];
+    this._lookupTable = value["lookupTable"];
+    this._lookupField = value["lookupField"];
+    this._suggestTable = value["suggestTable"];
+    this._lookupDetailField = value["lookupDetailField"];
+    this._lookupDetailValue = value["lookupDetailValue"];
+    this._lookupDetailType = value["lookupDetailType"];
+    this._listOfValue = value["listOfValue"];
+    this._displayUserName = value["displayUserName"];
+    this._format = value["format"];
+    this._formula = value["formula"];
+    this._binding = value["binding"];
+    if (value["width"] != void 0)
+      this["width"] = value["width"];
+    if (value["rows"] && value["rows"] > 1)
+      this._rows = value["rows"];
+    this.grid.enableUpdateTimer();
+  }
+  get binding() {
+    return this._binding;
+  }
+  set binding(value) {
+    this._binding = value;
+  }
+  get button() {
+    return this._type == "button";
+  }
+  set button(value) {
+    if (value) {
+      this._type = "button";
+      this._button = true;
+    } else if (this._type == "button") {
+      this._type = "string";
+      this._button = false;
+    }
+    ;
+    this.grid.enableUpdateTimer();
+  }
+  get checkBox() {
+    return this._type == "checkBox";
+  }
+  set checkBox(value) {
+    if (value) {
+      this._type = "checkBox";
+      this._checkBox = true;
+    } else if (this._type == "checkBox") {
+      this._type = "string";
+      this._checkBox = false;
+    }
+    ;
+    this.grid.enableUpdateTimer();
+  }
+  get colIdx() {
+    return this._colIdx;
+  }
+  set colIdx(value) {
+    if (this.colIdx > -1)
+      this.grid.columns[this.colIdx] = null;
+    this._colIdx = value;
+    this.grid.columns[value] = this;
+    this.grid.enableUpdateTimer();
+  }
+  get color() {
+    return this._color || "clNone";
+  }
+  set color(value) {
+    this._color = value;
+    this.grid.enableUpdateTimer();
+  }
+  get dataType() {
+    return this._dataType;
+  }
+  set dataType(value) {
+    this._dataType = value;
+    this.grid.enableUpdateTimer();
+  }
+  get default() {
+    return (!this._color || this._color == "clNone") && (this._horizontalAlign == void 0 || this._horizontalAlign == 1) && (!this._type || this._type == "string") && !this._readOnly && this._visible && (!this._dataType || this._dataType == 0) && this._resizable && !this._lookupContext && !this._lookupTable && !this._lookupField && !this._listOfValue;
+  }
+  get format() {
+    return this._format;
+  }
+  set format(value) {
+    this._format = value;
+    this.grid.enableUpdateTimer();
+  }
+  get formula() {
+    return this._formula;
+  }
+  set formula(value) {
+    this._formula = value;
+    this.grid.enableUpdateTimer();
+  }
+  get horizontalAlign() {
+    return this._horizontalAlign || 1;
+  }
+  set horizontalAlign(value) {
+    this._horizontalAlign = value;
+    this.grid.enableUpdateTimer();
+  }
+  get radioButton() {
+    return this._type == "radioButton";
+  }
+  set radioButton(value) {
+    if (value) {
+      this._type = "radioButton";
+      this._radioButton = true;
+    } else if (this._type == "radioButton") {
+      this._type = "string";
+      this._radioButton = false;
+    }
+    this.grid.enableUpdateTimer();
+  }
+  get readOnly() {
+    return this._readOnly;
+  }
+  set readOnly(value) {
+    this._readOnly = value;
+    this.grid.enableUpdateTimer();
+  }
+  get resizable() {
+    return this._resizable !== false;
+  }
+  set resizable(value) {
+    this._resizable = value;
+    this.grid.enableUpdateTimer();
+  }
+  get sortable() {
+    return this._sortable !== false;
+  }
+  set sortable(value) {
+    this._sortable = value;
+  }
+  get type() {
+    return this._type || "string";
+  }
+  set type(value) {
+    this._type = value;
+    this.grid.enableUpdateTimer();
+  }
+  get visible() {
+    return this._visible !== false;
+  }
+  set visible(value) {
+    this._visible = value;
+    this.grid.enableUpdateTimer();
+  }
+  get width() {
+    return this.grid.getColWidth(this._colIdx);
+  }
+  set width(value) {
+    this.grid.setColWidth(this._colIdx, value);
+    this.grid.enableUpdateTimer();
+  }
+};
+var TGridColumns = class {
+  constructor(grid) {
+    this.columns = [];
+    this.grid = grid;
+  }
+  clear() {
+    this.columns = [];
+  }
+  deleteCol(aCol) {
+    this.columns.splice(aCol, 1);
+    this.updateColIndex();
+  }
+  getColumn(index) {
+    if (index > this.columns.length) {
+      let len = this.columns.length;
+      for (let i = len; i <= index; i++)
+        this.columns.push("");
+    }
+    let col = this.columns[index];
+    if (!col) {
+      col = new TGridColumn(this.grid, index);
+      this.columns[index] = col;
+    }
+    return col;
+  }
+  insertCol(colIdx) {
+    let col = new TGridColumn(this.grid, colIdx);
+    this.columns.splice(colIdx, 0, col);
+    this.updateColIndex();
+  }
+  loadFromJSON(value) {
+    this.count = value.length;
+    for (let i = 0; i < value.length; i++) {
+      if (value[i]) {
+        let col = this.getColumn(i);
+        if (value[i]["colIdx"] == void 0)
+          value[i]["colIdx"] = i;
+        col["asJSON"] = value[i];
+      }
+    }
+    this.grid.colCount = this.count;
+  }
+  _loadFromJSON(value) {
+    this.loadFromJSON(value);
+  }
+  saveToJSON() {
+    let result = [];
+    let withValue = false;
+    for (let i = 0; i < this.columns.length; i++) {
+      if (this.columns[i] && !this.columns[i]["default"]) {
+        withValue = true;
+        result.push(this.columns[i]["asJSON"]);
+      } else
+        result.push("");
+    }
+    if (withValue)
+      return result;
+  }
+  setColCount(value) {
+    this.columns.length = value;
+  }
+  updateColIndex() {
+    for (let i = 0; i < this.columns.length; i++)
+      this.columns[i]._colIdx = i;
+  }
+};
+var TGridRow = class {
+  constructor(grid) {
+    this._visible = true;
+    this._resizable = false;
+    this.grid = grid;
+  }
+  get color() {
+    return this._color;
+  }
+  set color(value) {
+    this._color = value;
+    this.grid.enableUpdateTimer();
+  }
+  get height() {
+    return this._height;
+  }
+  set height(value) {
+    this._height = value;
+    this.grid.enableUpdateTimer();
+  }
+  get readOnly() {
+    return this._readOnly;
+  }
+  set readOnly(value) {
+    this._readOnly = value;
+    this.grid.enableUpdateTimer();
+  }
+  get resizable() {
+    return this._resizable;
+  }
+  set resizable(value) {
+    this._resizable = value;
+    this.grid.enableUpdateTimer();
+  }
+  get visible() {
+    return this._visible;
+  }
+  set visible(value) {
+    this._visible = value;
+    this.grid.enableUpdateTimer();
+  }
+};
+var TGridRows = class {
+  constructor(grid, defaultHeight) {
+    this.rows = [];
+    this.grid = grid;
+    this.defaultHeight = defaultHeight;
+  }
+  clear() {
+    this.rows = [];
+  }
+  getHeight(index) {
+    let row = this.rows[index];
+    if (row)
+      return row.height;
+    else
+      return this.defaultHeight;
+  }
+  getRow(index) {
+    let row = this.rows[index];
+    if (!row) {
+      row = new TGridRow(this.grid);
+      this.rows[index] = row;
+    }
+    ;
+    return row;
+  }
+};
+var DataGrid = class extends Control {
+  constructor(parent, options) {
+    super(parent, options);
+    this._listOfValue = {};
+    this._defaultRowHeight = 19;
+    this._defaultColWidth = 64;
+    this._layout = "grid";
+    this.mergeRect = [];
+    this.tableCells = [[]];
+    this.tableSplitters = [];
+    this.selectedCells = [];
+    this.selectedCellsHighlight = [];
+    this._colCount = 3;
+    this._rowCount = 3;
+    this.colWidths = [];
+    this._rowHeights = [];
+    this._fixedCol = 0;
+    this._fixedRow = 1;
+    this._leftCol = 0;
+    this._topRow = 1;
+    this._row = 0;
+    this._col = 0;
+    this._scrollLeft = 0;
+    this._scrollTop = 0;
+    this.showDataInternalFlag = false;
+    this._sorting = false;
+    this._updateTableInternalFlag = false;
+    this._totalColWidth = 0;
+    this._totalRowHeight = 0;
+    this.visibleRowCount = 0;
+    this.visibleColCount = 0;
+    this.sortingDescending = false;
+  }
+  static async create(options, parent) {
+    let self = new this(parent, options);
+    await self.ready();
+    return self;
+  }
+  get fixedCol() {
+    return this._fixedCol;
+  }
+  set fixedCol(value) {
+    this._fixedCol = value;
+  }
+  get fixedRow() {
+    return this._fixedRow;
+  }
+  set fixedRow(value) {
+    this._fixedRow = value;
+  }
+  get layout() {
+    return this._layout;
+  }
+  set layout(value) {
+    this._layout = value;
+  }
+  async init() {
+    await super.init();
+    this._init();
+  }
+  _init() {
+    this.options = new TGridOptions(this);
+    this.placeHolder = this.createElement("div", this);
+    this._table = this.createElement("table", this);
+    this.data = new TGridCells(this);
+    this.columns = new TGridColumns(this);
+    this.gridRows = new TGridRows(this, this._defaultRowHeight);
+    this.cellHighlight = this.createElement("div", this);
+    this.placeHolder.style.position = "absolute";
+    this.cellHighlight.className = "grid_curr_cell";
+    this.cellHighlight.style.position = "absolute";
+    this.cellHighlight.style.display = "none";
+    this.cellHighlight.style.zIndex = "3";
+    this.selectedRangeHighlight = this.createElement("div", this);
+    this.selectedRangeHighlight.className = "grid_selected_cell";
+    this.selectedRangeHighlight.style.position = "absolute";
+    this.selectedRangeHighlight.style.display = "none";
+    this.selectedRangeHighlight.style.zIndex = "3";
+    this._table.className = "grid";
+    this._table.style.tableLayout = "fixed";
+    this._table.style.position = "relative";
+    this.tableContainer = this.createElement("div", this);
+    this.tableContainer.className = "container";
+    this.tableContainer.style.overflow = "hidden";
+    this.tableContainer.style.width = "100%";
+    this.tableContainer.style.height = "100%";
+    this.tableContainer.appendChild(this._table);
+    this._scrollBox = this.createElement("div", this);
+    this._scrollBox.className = "scrollBox";
+    this._scrollBox.tabIndex = 0;
+    this._scrollBox.appendChild(this.placeHolder);
+    this.edit = this.createElement("input", this);
+    this.edit.setAttribute("autocomplete", "disabled");
+    this.edit.className = "grid_edit";
+    this.edit.style.border = "0px";
+    this.edit.style.width = "10px";
+    this.edit.style.height = "10px";
+    this.edit.style.position = "absolute";
+    this.edit.style.top = "-100px";
+    this.edit.style.left = "-100px";
+    this.style.overflow = "hidden";
+    this.style.backgroundColor = "#FFFFFF";
+    this._height = 89;
+    this._width = 324;
+    this.colWidths = [];
+    this._scrollLeft = 0;
+    this._scrollTop = 0;
+    this._scrollBox.addEventListener("mousewheel", (event) => {
+      console.dir(event);
+      let delta = Math.max(-1, Math.min(1, event.wheelDelta || -event.detail));
+      this._handleMouseWheel(event, delta);
+    });
+    this.edit.addEventListener("input", this._handleInput.bind(this));
+    this.edit.addEventListener("propertychange", this._handleInput.bind(this));
+    this.addEventListener("dragover", this._handleDragOver.bind(this));
+    this.addEventListener("drop", this._handleFileDrop.bind(this));
+    this._scrollBox.onscroll = this._handleScroll.bind(this);
+    this.setCurrCell(this._fixedCol, this._fixedRow);
+    this._updateLanguage();
+    this._updateListOfValues();
+    this.enableUpdateTimer(true, true);
+  }
+  calcTopRow(rowIdx) {
+    if (rowIdx == this._fixedRow)
+      return rowIdx;
+    let row = rowIdx;
+    let height = this._scrollBox.clientHeight;
+    if (this.layout == "card") {
+    } else {
+      for (let i = 0; i < this._fixedRow; i++)
+        height = height - this.getRowHeight(i) - 0.8;
+      height = height - this.getRowHeight(row);
+      while (row > this._fixedRow) {
+        let h = this.getRowHeight(row) + 0.8;
+        height = height - h;
+        if (height < h - 4) {
+          return row - 1;
+        }
+        ;
+        row--;
+      }
+    }
+    return row;
+  }
+  cells(aCol, aRow, refresh2) {
+    return this.data.getCell(aCol, aRow, refresh2);
+  }
+  get col() {
+    return this._col;
+  }
+  set col(value) {
+    this._col = value;
+  }
+  get row() {
+    return this._row;
+  }
+  set row(value) {
+    this._row = value;
+  }
+  get colCount() {
+    return this._colCount;
+  }
+  set colCount(value) {
+    this._colCount = value;
+    this.enableUpdateTimer(false, true);
+  }
+  get readOnly() {
+    return this._readOnly;
+  }
+  set readOnly(value) {
+    this._readOnly = value;
+  }
+  get rowCount() {
+    return this._rowCount;
+  }
+  set rowCount(value) {
+    this._rowCount = value;
+    this.enableUpdateTimer(true, false);
+  }
+  get topRow() {
+    return this._topRow;
+  }
+  set topRow(value) {
+    this._topRow = value;
+  }
+  _updateRowHeights(row) {
+    let height = this._defaultRowHeight;
+    for (let col = 0; col < this._colCount; col++) {
+      let cell = this.data.cells(col, row);
+      if (cell && cell._height && cell._height > height) {
+        height = cell._height;
+      }
+    }
+    ;
+    this._rowHeights[row] = height;
+    this._updateTotalRowHeight();
+    return height;
+  }
+  setObject(aCol, aRow, aObject) {
+    if (this.data)
+      this.data.setObject(aCol, aRow, aObject);
+  }
+  setJSONValue(value, prop, newValue) {
+    let obj;
+    try {
+      if (value)
+        obj = JSON.parse(value);
+      else
+        obj = {};
+    } catch (err) {
+      obj = {};
+    }
+    obj[prop] = newValue;
+    return JSON.stringify(obj);
+  }
+  updateBindingData(cell, column) {
+    column = column || this.columns.getColumn(cell._col);
+    if (column && column.binding) {
+      let obj = this.getObject(0, cell._row);
+      if (!obj) {
+        obj = {};
+        this.setObject(0, this._row, obj);
+      }
+      obj[column.binding] = cell._value;
+    }
+  }
+  _updateCurrCellValue(editor) {
+    console.dir("### _updateCurrCellValue");
+    let cardViewEditor = false;
+    if (editor)
+      cardViewEditor = true;
+    if (this.editorMode || this._cardPanel) {
+      let oldValue = this.data.getValue(this._col, this._row);
+      editor = editor || this.editor;
+      if (!editor || editor._isModified === false)
+        return;
+      let newValue;
+      if (editor.valueCode)
+        newValue = editor.valueCode;
+      else if (editor.getText)
+        newValue = editor.getText();
+      else
+        newValue = application.xssSanitize(editor.value);
+      let text = "";
+      if (editor.getText)
+        text = editor.getText();
+      else
+        text = newValue;
+      let cell = this.data.getCell(this._col, this._row);
+      if (cell.mergeRect && (this._col != cell.mergeRect.startCol || this._row != cell.mergeRect.startRow))
+        cell = this.data.getCell(cell.mergeRect.startCol, cell.mergeRect.startRow);
+      if (true) {
+        if (this.options._autoRowHeight) {
+          let div = this._currCell.div;
+          div.textContent = text;
+          let height = div.clientHeight + 3;
+          if (cell.mergeRect) {
+            height = height / (cell.mergeRect.endRow - cell.mergeRect.startRow + 1);
+            for (let i = cell.mergeRect.startRow; i <= cell.mergeRect.endRow; i++) {
+              cell._height = height;
+              this._updateRowHeights(i);
+            }
+          } else {
+            cell._height = height;
+            this._updateRowHeights(this._row);
+          }
+        } else
+          this._currCell.div.textContent = text;
+      }
+      cell._value = newValue;
+      this.origValue = void 0;
+      if (!cardViewEditor)
+        this.enableUpdateTimer();
+      if (cell._field) {
+        if (!cell._record) {
+          let column = this.columns.getColumn(cell._col);
+          let record = this.getObject(0, cell._row);
+          let rs = record[cell._lookupTable];
+          cell._record = rs.append();
+          let v = column._lookupDetailValue;
+          switch (column._lookupDetailType) {
+            case "date":
+              v = new Date(v);
+              v.setHours(0, 0, 0, 0);
+              break;
+            case "numeric":
+              if (typeof v == "string")
+                v = parseFloat(v);
+              break;
+          }
+          ;
+          cell._record[column._lookupDetailField] = v;
+        }
+        cell._record[cell._field] = newValue;
+      } else if (this._dataBindingContext) {
+        let record = this.getObject(0, this._row);
+        let field = this.getObject(this._col, 0);
+        let idx = 0;
+        let jsonValue;
+        if (typeof field == "number") {
+          idx = field;
+          field = this.dataBinding["fields"][idx];
+          if (this.dataBinding["jsonValues"])
+            jsonValue = this.dataBinding["jsonValues"][idx];
+        }
+        this.data.getCell(0, this._row)._newRow = false;
+        let fieldType = this.dataBinding["fieldTypes"][idx];
+        if (fieldType == "float")
+          newValue = parseNumber(newValue);
+        else if (fieldType == "integer")
+          newValue == Math.round(parseNumber(newValue));
+        else if (editor && editor["dataType"] == "dtNumber")
+          newValue = parseNumber(newValue);
+        if (!record && field) {
+          record = this._dataBindingContext["append"]();
+          this.setObject(0, this._row, record);
+        }
+        if (record && field) {
+          if (jsonValue)
+            newValue = this.setJSONValue(record[field], jsonValue, newValue);
+          if (record[field] != newValue)
+            record[field] = newValue;
+        }
+        if (true)
+          this.enableUpdateTimer();
+      }
+      this.updateBindingData(cell);
+      if (this.onCellChange)
+        this.onCellChange(this, cell, oldValue, newValue);
+    }
+    ;
+  }
+  hideEditor(updateValue) {
+    this.edit.value = "";
+    if (updateValue && this.editor && this.editor["dataType"] == "dtUserAccount") {
+      let editor = this.editor;
+      editor["dataType"] = "";
+      this.editor = null;
+      let self = this;
+      return;
+    }
+    if (updateValue && this.editor && this.editor["dataType"] == "dtFile")
+      updateValue = false;
+    else if (this.editor && this.editor.buildInEditor && this.editor["dataType"] == "dtLookup") {
+      this.editor["onChange"] = void 0;
+      this.editor.hide(updateValue);
+    }
+    if (updateValue)
+      this._updateCurrCellValue();
+    if (this.editor) {
+      this.editorMode = false;
+      let editor = this.editor;
+      this.editor = void 0;
+      this.removeChild(editor);
+      this.edit.removeEventListener("propertychange", this._handleInput.bind(this));
+      this.edit.removeEventListener("input", this._handleInput.bind(this));
+      this.edit.value = "";
+      this.edit.addEventListener("propertychange", this._handleInput.bind(this));
+      this.edit.addEventListener("input", this._handleInput.bind(this));
+      this.focus();
+      this.edit.focus();
+      if (this.onEditModeChanged)
+        this.onEditModeChanged(this);
+    }
+    ;
+  }
+  checkEmptyRow(row) {
+    let cell = this.data.getCell(0, row);
+    if (cell._newRow != void 0)
+      return cell._newRow;
+    for (let i = 0; i < this._colCount; i++) {
+      if (this.data.getValue(i, row) != "" && this.data.getValue(i, row) != void 0) {
+        return false;
+      }
+    }
+    return true;
+  }
+  setRowCount(aRowCount) {
+    if (this._rowCount != aRowCount) {
+      this._rowCount = aRowCount;
+      if (this._row >= this._rowCount || this._row < this._fixedRow)
+        this._row = this._fixedRow;
+      this.data.setRowCount(aRowCount);
+      this.refresh();
+      this.enableUpdateTimer(true);
+    }
+  }
+  refresh() {
+    super.refresh();
+    this.enableUpdateTimer();
+  }
+  deleteRow(row) {
+    if (this._dataBindingContext && this._dataBindingContext["readOnly"])
+      return;
+    this.data.deleteRow(row);
+    if (this._rowHeights.length > row)
+      this._rowHeights.splice(row, 1);
+    this.setRowCount(this._rowCount - 1);
+    if (this._dataBindingContext) {
+      let record = this.getObject(0, this._row);
+      if (record && this._dataBindingContext["current"] !== record) {
+        if (this._bindingRecordSet)
+          this._bindingRecordSet["current"] = record;
+        this._dataBindingContext["current"] = record;
+      }
+    }
+    ;
+    this.enableUpdateTimer();
+  }
+  getObject(aCol, aRow) {
+    return this.data.getObject(aCol, aRow);
+  }
+  getValue(col, row) {
+    return this.data.getValue(col, row);
+  }
+  setScrollLeft() {
+    console.dir("#setScrollLeft");
+    this._scrollBox.onscroll = null;
+    clearTimeout(this._restScrollboxHandler);
+    clearTimeout(this._setScrollLeftInterval);
+    this._setScrollLeftInterval = setTimeout(() => {
+      this.setScrollLeftInternal();
+      this._restScrollboxHandler = setTimeout(() => {
+        this._scrollBox.onscroll = this._handleScroll.bind(this);
+      }, 10);
+    }, 10);
+  }
+  setScrollLeftInternal() {
+    if (this._leftCol == this._fixedCol) {
+      this._scrollBox.scrollLeft = 0;
+      this._scrollLeft = this._scrollBox.scrollLeft;
+    } else {
+      let w = 0;
+      for (let i = 0; i < this._fixedCol; i++)
+        w = w + this.getColWidth(i) + 0.8;
+      for (let i = this._leftCol; i < this._colCount; i++)
+        w = w + this.getColWidth(i) + 0.8;
+      this._scrollBox.scrollLeft = this._scrollBox.scrollWidth - w;
+      this._scrollLeft = this._scrollBox.scrollLeft;
+    }
+    ;
+  }
+  setScrollTop() {
+    this._scrollBox.onscroll = null;
+    clearInterval(this._restScrollboxHandler);
+    clearInterval(this._setScrollTopInterval);
+    this._setScrollTopInterval = setTimeout(() => {
+      this.setScrollTopInternal();
+      this._restScrollboxHandler = setTimeout(() => {
+        this._scrollBox.onscroll = this._handleScroll.bind(this);
+      }, 10);
+    }, 10);
+  }
+  setScrollTopInternal() {
+    console.dir("setScrollTopInternal");
+    if (this._topRow == this._fixedRow) {
+      this._scrollBox.scrollTop = 0;
+      this._scrollTop = this._scrollBox.scrollTop;
+    }
+    if (this.layout == "card") {
+    } else {
+      let h = 0;
+      for (let i = 0; i < this._fixedRow; i++)
+        h = h + this.getRowHeight(i) + 0.8;
+      for (let i = this._topRow; i < this._rowCount; i++)
+        h = h + this.getRowHeight(i) + 0.8;
+      this._scrollBox.scrollTop = this._scrollBox.scrollHeight - h;
+      this._scrollTop = this._scrollBox.scrollTop;
+    }
+    ;
+  }
+  setLeftCol(aLeftCol, skipSetScroll) {
+    console.log("setLeftCol", aLeftCol, skipSetScroll);
+    if (aLeftCol != this._leftCol) {
+      if (this.editorMode) {
+        this.hideEditor(true);
+      }
+      ;
+      if (aLeftCol < this._fixedCol)
+        this._leftCol = this._fixedCol;
+      else if (aLeftCol >= this._colCount)
+        this._leftCol = this._colCount - 1;
+      else
+        this._leftCol = aLeftCol;
+      this.showData(100);
+      if (!skipSetScroll)
+        this.setScrollLeft();
+      this.enableUpdateTimer();
+    }
+  }
+  setTopRow(row, skipSetScroll) {
+    console.log("setTopRow", row, skipSetScroll);
+    if (row != this._topRow) {
+      if (this.editorMode) {
+        this.hideEditor(true);
+      }
+      ;
+      if (row < this._fixedRow)
+        this._topRow = this._fixedRow;
+      else if (row >= this._rowCount)
+        this._topRow = this._rowCount - 1;
+      else
+        this._topRow = row;
+      this.showData(100);
+      if (!skipSetScroll)
+        this.setScrollTop();
+      this.enableUpdateTimer();
+    }
+    ;
+  }
+  showData(interval) {
+    let self = this;
+    self.showDataFlag = true;
+    if (self._showDataTimeout) {
+      clearTimeout(self._showDataTimeout);
+    }
+    if (interval && !self._refreshDataTimeout) {
+      self._refreshDataTimeout = setTimeout(function() {
+        clearTimeout(self._refreshDataTimeout);
+        self._refreshDataTimeout = void 0;
+        if (!self._destroyed)
+          self.showDataInternal();
+      }, 10);
+    }
+    ;
+    self._showDataTimeout = setTimeout(function() {
+      if (self._refreshDataTimeout) {
+        clearTimeout(self._refreshDataTimeout);
+        self._refreshDataTimeout = void 0;
+      }
+      clearTimeout(self._showDataTimeout);
+      self._showDataTimeout = void 0;
+      if (self.showDataFlag) {
+        self.showDataFlag = false;
+        self._updateTableInternal();
+        if (!self["_destroyed"])
+          self.showDataInternal();
+      }
+    }, 100);
+  }
+  getTableCellByActualIndex(aColIdx, aRowIdx) {
+    let aCol;
+    let aRow;
+    if (aColIdx < this._fixedCol)
+      aCol = aColIdx;
+    else
+      aCol = aColIdx - this._leftCol + this._fixedCol;
+    if (aRowIdx < this._fixedRow)
+      aRow = aRowIdx;
+    else
+      aRow = aRowIdx - this._topRow + this._fixedRow;
+    for (let i = this._topRow; i < aRow; i++) {
+      if (this.gridRows.rows[i] && this.gridRows.rows[i]._visible == false)
+        aRow--;
+    }
+    if (aRow >= this._fixedRow && this.tableCells[aRow])
+      return this.tableCells[aRow][aCol];
+    else
+      return void 0;
+  }
+  getTableCell(aColIdx, aRowIdx) {
+    if (this.tableCells && this.tableCells[aRowIdx])
+      return this.tableCells[aRowIdx][aColIdx];
+    else
+      return void 0;
+  }
+  highlightCurrCell() {
+    var _a, _b, _c;
+    this._currCell = this.getTableCellByActualIndex(this._col, this._row);
+    if (!this.options._rowSelect) {
+      if (!this._currCell) {
+        return this.cellHighlight.style.display = "none";
+      }
+    }
+    this.highlightSelectedCell();
+    this.selectedRangeHighlight.style.display = "none";
+    if (this._currCell || this.options._rowSelect && this._row < this._rowCount) {
+      if (this.options._rowSelect) {
+        this.cellHighlight.style.display = "block";
+        if (this._currCell) {
+          this.cellHighlight.style.display = "";
+          this.cellHighlight.style.top = this._currCell.offsetTop - 1 + "px";
+          this.cellHighlight.style.height = this._currCell.offsetHeight + 1 + "px";
+        } else
+          this.cellHighlight.style.display = "none";
+        this.cellHighlight.style.left = "0px";
+        if (this._totalColWidth + 2 < this.tableContainer.clientWidth)
+          this.cellHighlight.style.width = this._totalColWidth + 2 + "px";
+        else
+          this.cellHighlight.style.width = this.tableContainer.clientWidth + 2 + "px";
+      } else if (this._currCell) {
+        let tableCell = this.getTableCell(this._col, this._row);
+        if (tableCell && this._currCell.cell) {
+          let edit = this.edit;
+          edit.value = this._currCell.cell._displayValue || this._currCell.cell._value || "";
+          edit.setSelectionRange(0, edit.value.length);
+        } else {
+          this.edit.value = "";
+        }
+        ;
+        this.cellHighlight.style.display = "block";
+        let parentRect = this.getBoundingClientRect();
+        let elemRect = (_a = this._currCell) == null ? void 0 : _a.getBoundingClientRect();
+        this.cellHighlight.style.top = this._currCell.offsetTop + "px";
+        this.cellHighlight.style.left = this._currCell.offsetLeft + "px";
+        if ((_b = this._currCell) == null ? void 0 : _b.offsetWidth)
+          this.cellHighlight.style.width = this._currCell.offsetWidth + 1 + "px";
+        else
+          this.cellHighlight.style.width = "0px";
+        if ((_c = this._currCell) == null ? void 0 : _c.offsetHeight)
+          this.cellHighlight.style.height = this._currCell.offsetHeight + 1 + "px";
+        else
+          this.cellHighlight.style.height = "0px";
+      }
+      ;
+    } else {
+      this.cellHighlight.style.display = "none";
+    }
+    if (this._currCell && this._currCell.cell)
+      this.cellHighlight.title = this._currCell.cell._hint || "";
+    else
+      this.cellHighlight.title = "";
+  }
+  setCurrCell(aCol, aRow, triggerEvent) {
+    if (this._col == aCol && this._row == aRow)
+      return;
+    this.selectedCells = [];
+    let cell = this.data.getCell(aCol, aRow);
+    let idx = this.selectedCells.indexOf(cell);
+    if (idx < 0) {
+      this.selectedCells.push(cell);
+    } else {
+      this.selectedCells.splice(idx, 1);
+    }
+    this.highlightSelectedCell();
+    if (this.editorMode) {
+      this.hideEditor(true);
+    }
+    ;
+    if (aCol < 0)
+      aCol = 0;
+    if (aRow < this._fixedRow)
+      aRow = this._fixedRow;
+    let rowChange = false;
+    if (aCol < this._colCount && aRow < this._rowCount) {
+      this._col = aCol;
+      if (this._row != aRow) {
+        rowChange = true;
+        if (!this._readOnly && this.options._autoAddRow && this._row == this._rowCount - 1 && this.checkEmptyRow(this._row)) {
+          if (this._dataBindingContext) {
+            let record = this.getObject(0, this._row);
+            if (record)
+              this._dataBindingContext["delete"](record);
+            this.deleteRow(this._row);
+          } else
+            this._rowCount = this._rowCount - 1;
+          this.enableUpdateTimer();
+        }
+      }
+      this._row = aRow;
+      if (aCol < this._leftCol)
+        this.setLeftCol(aCol);
+      if (aRow < this._topRow)
+        this.setTopRow(aRow);
+      if (this._scrollBox.clientWidth > 0) {
+        let topRow = this.calcTopRow(aRow);
+        if (topRow > this._topRow)
+          this.setTopRow(topRow);
+        let leftCol = this.calcLeftCol(aCol);
+        if (leftCol > this._leftCol)
+          this.setLeftCol(leftCol);
+      }
+      this.highlightCurrCell();
+      if (rowChange) {
+        let record = this.getObject(0, this._row);
+        if (this._bindingRecordSet && this._bindingRecordSet["current"] !== record)
+          this._bindingRecordSet["current"] = record;
+        if (this._dataBindingContext && this._dataBindingContext["current"] !== record) {
+          this._skipRefreshData = true;
+          if (this._bindingRecordSet)
+            this._bindingRecordSet["current"] = record;
+          this._dataBindingContext["current"] = record;
+        }
+        if (triggerEvent && this.onRowChange) {
+          this.onRowChange(this);
+        }
+      }
+      if (triggerEvent && this.onCellSelect) {
+        this.onCellSelect(this, cell);
+      }
+    }
+    ;
+  }
+  highlightSelectedCell() {
+    if (this.selectedCells.length > 1) {
+      let idx = {};
+      for (let i = 0; i < this.selectedCells.length; i++) {
+        let cell = this.selectedCells[i];
+        idx[cell.col + "-" + cell.row] = false;
+      }
+      for (let i = this.selectedCellsHighlight.length - 1; i > -1; i--) {
+        let div = this.selectedCellsHighlight[i];
+        if (typeof idx[div.col + "-" + div.row] == "undefined") {
+          this.removeChild(this.selectedCellsHighlight[i]);
+          this.selectedCellsHighlight["splice"](i, 1);
+        } else
+          idx[div.col + "-" + div.row] = true;
+      }
+      for (let i = 0; i < this.selectedCells.length; i++) {
+        let cell = this.selectedCells[i];
+        if (idx[cell["col"] + "-" + cell["row"]] == false) {
+          let tableCell = this.getTableCellByActualIndex(cell.col, cell.row);
+          if (tableCell) {
+            let div = this.createElement("div", this);
+            this.appendChild(div);
+            this.selectedCellsHighlight.push(div);
+            div.className = "grid_selected_cell";
+            div.style.position = "absolute";
+            div.style.display = "block";
+            div.style.zIndex = "3";
+            div.col = cell["col"];
+            div.row = cell["row"];
+            div.style.top = tableCell.offsetTop + "px";
+            div.style.left = tableCell.offsetLeft + "px";
+            div.style.width = tableCell.offsetWidth + "px";
+            div.style.height = tableCell.offsetHeight + "px";
+          }
+          ;
+        }
+        ;
+      }
+      ;
+    } else {
+      for (let i = this.selectedCellsHighlight.length - 1; i > -1; i--)
+        this.removeChild(this.selectedCellsHighlight[i]);
+      this.selectedCellsHighlight = [];
+    }
+    ;
+  }
+  _updateLanguage() {
+  }
+  _updateListOfValues() {
+  }
+  _handleScrollHorizontal(sender) {
+    if (sender.scrollLeft == 0) {
+      this.setLeftCol(this._fixedCol, true);
+      return;
+    }
+    let width = sender.scrollWidth - sender.scrollLeft - sender.clientWidth;
+    for (let i = 0; i < this._fixedCol; i++)
+      width = width - this.getColWidth(i) - 1;
+    for (let i = this._colCount - 1; i > 0; i--) {
+      let w = this.getColWidth(i);
+      width = width - w - 1;
+      if (width <= 0) {
+        let col = this.calcLeftCol(i);
+        this.setLeftCol(col, true);
+        break;
+      }
+    }
+    this.highlightCurrCell();
+  }
+  _handleScrollVertical(sender) {
+    if (sender.scrollTop == 0) {
+      if (this._cardPanel)
+        this._cardPanel["setTop"](0);
+      this.setTopRow(this._fixedRow, true);
+      return;
+    }
+    if (this.layout == "card") {
+    } else {
+      let height = sender.scrollHeight - sender.scrollTop - sender.clientHeight;
+      for (let i = 0; i < this._fixedRow; i++) {
+        height = height - this.getRowHeight(i);
+      }
+      for (let i = this._rowCount - 1; i > 0; i--) {
+        let h = this.getRowHeight(i);
+        height = height - h;
+        if (height <= 0) {
+          let row = this.calcTopRow(i);
+          this.setTopRow(row, true);
+          break;
+        }
+      }
+      ;
+    }
+    this.highlightCurrCell();
+  }
+  _handleScroll(event) {
+    console.dir("_handleScroll");
+    let target = event.target;
+    clearTimeout(this.scrollHorizontalTimer);
+    clearTimeout(this.scrollVerticalTimer);
+    if (this._scrollLeft != target.scrollLeft) {
+      this._scrollLeft = target.scrollLeft;
+      this.scrollHorizontalTimer = setTimeout(() => {
+        this._handleScrollHorizontal(target);
+      }, 10);
+    } else if (this._scrollTop != target.scrollTop) {
+      this._scrollTop = target.scrollTop;
+      this.scrollVerticalTimer = setTimeout(() => {
+        this._handleScrollVertical(target);
+      }, 10);
+    }
+  }
+  _handleFileDrop(event) {
+    console.dir("## _handleFileDrop");
+  }
+  _handleDragOver(event) {
+    console.dir("## _handleDragOver");
+  }
+  _handleInput(event) {
+    this.showEditor(this.edit.value);
+  }
+  _handleMouseWheel(event, delta) {
+    console.dir("## _handleMouseWheel");
+  }
+  getColLeft(aCol) {
+    let cell = this.getTableCellByActualIndex(aCol, 1);
+    if (cell)
+      return cell.offsetLeft;
+    let r = 0;
+    for (let i = 0; i < this._fixedCol; i++) {
+      r = r + this.getColWidth(i);
+    }
+    for (let i = this._leftCol; i < aCol; i++) {
+      r = r + this.getColWidth(i);
+    }
+    return r;
+  }
+  getColRight(aCol) {
+    let cell = this.getTableCellByActualIndex(aCol, 1);
+    if (cell)
+      return cell.offsetLeft + this.getColWidth(aCol);
+    let r = 0;
+    for (let i = 0; i < this._fixedCol; i++) {
+      r = r + this.getColWidth(i);
+    }
+    for (let i = this._leftCol; i < aCol; i++) {
+      r = r + this.getColWidth(i);
+    }
+    return r + this.getColWidth(aCol);
+  }
+  getColWidth(col) {
+    let column = this.cols(col);
+    if (column && column._visible === false)
+      return 0;
+    let w = this.colWidths[col];
+    if (w != void 0)
+      return w;
+    else
+      return this._defaultColWidth;
+  }
+  getRowHeight(row) {
+    let h = this._rowHeights[row];
+    if (h)
+      return h;
+    else
+      return this._defaultRowHeight;
+  }
+  _updateTotalRowHeight() {
+    this._totalRowHeight = 0;
+    for (let i = 0; i < this._rowCount; i++) {
+      this._totalRowHeight = this._totalRowHeight + this.getRowHeight(i) + 0.8;
+    }
+    this.placeHolder.style.height = this._totalRowHeight + "px";
+  }
+  _updateTotalColWidth() {
+    this._totalColWidth = 0;
+    for (let i = 0; i < this._colCount; i++) {
+      this._totalColWidth = this._totalColWidth + this.getColWidth(i);
+    }
+    if (this._totalColWidth < this["width"])
+      this.placeHolder.style.width = "100%";
+    else
+      this.placeHolder.style.width = this._totalColWidth + "px";
+  }
+  _updateTableRows() {
+    for (let i = this._table.rows.length - 1; i >= 0; i--) {
+      this._table.deleteRow(i);
+    }
+    this.visibleRowCount = Math.round(this.heightValue / this._defaultRowHeight) + 1;
+    if (this.visibleRowCount > this._rowCount)
+      this.visibleRowCount = this._rowCount;
+    for (let i = this._table.rows.length; i < this.visibleRowCount; i++) {
+      let r = this._table.insertRow(this._table.rows.length);
+    }
+    ;
+  }
+  getActualColIdx(col) {
+    if (col < this._fixedCol)
+      return col;
+    else
+      return col + this._leftCol - this._fixedCol;
+  }
+  getActualRowIdx(row) {
+    if (row < this._fixedRow)
+      return row;
+    else {
+      let result = row + this._topRow - this._fixedRow;
+      for (let i = this._topRow; i <= result; i++) {
+        if (this.gridRows.rows[i] && this.gridRows.rows[i]._visible == false)
+          result++;
+      }
+      ;
+      return result;
+    }
+    ;
+  }
+  cols(colIdx) {
+    return this.columns.getColumn(colIdx);
+  }
+  _updateTableCellDiv(tableCell, col, row) {
+    if (!tableCell.div) {
+      let div = this.createElement("div");
+      tableCell.div = div;
+      div.owner = this;
+      if (row < this._fixedRow)
+        tableCell.className = "header grid_fixed_cell";
+      else if (col < this._fixedCol)
+        tableCell.className = "grid_fixed_cell";
+      let actCol = this.getActualColIdx(col);
+      let actRow = this.getActualRowIdx(row);
+      let cell = this.data.cells(actCol, actRow);
+      let w = 0;
+      let h = 0;
+      if (cell && cell.mergeRect) {
+        let divRect = this.createElement("div");
+        divRect.style.overflow = "hidden";
+        divRect.style.position = "relative";
+        tableCell.appendChild(divRect);
+        w = this.getColWidth(cell.mergeRect.startCol) - 2;
+        h = this.getRowHeight(cell.mergeRect.startRow) - 1;
+        for (let i = cell.mergeRect.startCol + 1; i <= cell.mergeRect.endCol; i++)
+          w = w + this.getColWidth(i) - 2;
+        for (let i = cell.mergeRect.startRow + 1; i <= cell.mergeRect.endRow; i++)
+          h = h + this.getRowHeight(i) - 2;
+        let left = 0;
+        let top = 0;
+        if (cell.mergeRect.startCol > this._fixedCol && cell.mergeRect.startCol < this._leftCol) {
+          for (let i = cell.mergeRect.startCol; i < this._leftCol; i++)
+            left = left + this.getColWidth(i) - 2;
+        }
+        if (cell.mergeRect.startRow > this._fixedRow && cell.mergeRect.startRow < this._topRow) {
+          for (let i = cell.mergeRect.startRow; i < this._topRow; i++)
+            top = top + this.getRowHeight(i) - 1;
+        }
+        divRect.appendChild(div);
+        divRect.style.width = w - left + "px";
+        divRect.style.height = h - top + "px";
+        div.style.position = "absolute";
+        div.style.left = -left + "px";
+        div.style.top = -top + "px";
+      } else {
+        w = this.getColWidth(actCol) - 2;
+        let column = this.cols(actCol);
+        if (column && column._visible === false)
+          tableCell.className += " grid_cell_hidden";
+        h = this.getRowHeight(actRow) - 2;
+        if (row < this._fixedRow)
+          tableCell.style.minWidth = w + "px";
+        tableCell.style.position = "relative";
+        tableCell.appendChild(div);
+      }
+      div.style.width = w + "px";
+      div.style.height = "auto";
+      div.style.whiteSpace = "wrap";
+      div.style.maxHeight = h + "px";
+      div.style.overflow = "hidden";
+      if (col == 0)
+        div.style.minHeight = h + "px";
+      div.className = "grid_cell_value";
+    }
+    ;
+  }
+  _updateTableCols() {
+    let w = 0;
+    for (let i = 0; i < this._fixedCol; i++)
+      w = w + this.getColWidth(i);
+    this.visibleColCount = this._fixedCol;
+    let width = this.widthValue;
+    if (width == 0)
+      this._needUpdate = true;
+    else
+      this._needUpdate = false;
+    for (let i = this._leftCol; i < this._colCount; i++) {
+      w = w + this.getColWidth(i);
+      this.visibleColCount++;
+      if (w >= width)
+        break;
+    }
+    ;
+    for (let row = 0; row < this._table.rows.length; row++) {
+      let r = this._table.rows[row];
+      this.tableCells[row] = [];
+      for (let col = 0; col < this.visibleColCount; col++) {
+        let tableCell = r.insertCell(r.cells.length);
+        if (col == 0)
+          tableCell.style.height = this._defaultRowHeight + "px";
+        tableCell.owner = this;
+        if ((col + this._leftCol) % 2 == 0)
+          tableCell.className = "grid_cell even_col";
+        else
+          tableCell.className = "grid_cell odd_col";
+        if ((row + this._topRow) % 2 == 0)
+          tableCell.className += " even_row";
+        else
+          tableCell.className += " odd_row";
+        this._updateTableCellDiv(tableCell, col, row);
+        this.tableCells[row][col] = tableCell;
+        if (row == 0 && (col < this._fixedCol && col == this.sortingCol || (col >= this._fixedCol && col + (this._leftCol > 0 ? this._leftCol - this._fixedCol : 0)) == this.sortingCol)) {
+          tableCell.style.position = "relative";
+          let elm = this.createElement("div");
+          elm.style.position = "absolute";
+          elm.style.width = "6px";
+          elm.style.height = "6px";
+          elm.style.right = "4px";
+          if (this.sortingDescending) {
+            elm.style.top = "2px";
+            elm.className = "fa fa-sort-desc";
+          } else {
+            elm.style.top = "6px";
+            elm.className = "fa fa-sort-asc";
+          }
+          tableCell.appendChild(elm);
+        }
+      }
+    }
+  }
+  setColWidth(aColIndex, width, trigerEvent) {
+    let orig = 0;
+    orig = this.colWidths[aColIndex];
+    this.colWidths[aColIndex] = width;
+    for (let i = 0; i < this.tableCells.length; i++) {
+      let tableCell = this.getTableCell(aColIndex, i);
+      let tableCellDiv = tableCell == null ? void 0 : tableCell.div;
+      let column = this.cols(aColIndex);
+      if (tableCell && tableCell.div && !column._checkBox && !column._radioButton)
+        tableCellDiv.style.width = width - 3 + "px";
+    }
+    for (let i = 0; i < this._rowCount; i++) {
+      let cell = this.cells(aColIndex, i);
+      if (cell)
+        cell._height = void 0;
+    }
+    if (trigerEvent && this.onColResize) {
+      if (this.resizeTimer)
+        clearTimeout(this.resizeTimer);
+      this.resizeTimer = setTimeout(() => {
+        this.onColResize(this, aColIndex, width);
+      }, 50);
+    }
+    this.enableUpdateTimer(true, true);
+  }
+  _updateTableMergedCells() {
+    console.dir("### _updateTableMergedCells");
+  }
+  sort(col, descending) {
+    let currRow = this.data.data[this._row];
+    if (this.editorMode)
+      this.hideEditor();
+    this._rowHeights = [];
+    if (this.data.data.length > this._rowCount)
+      this.data.data.length = this._rowCount;
+    if (col >= 0)
+      this.data.sort(col, descending);
+    this.sortingDescending = descending || false;
+    this.sortingCol = col;
+    if (currRow)
+      this._row = this.data.data.indexOf(currRow);
+    this.enableUpdateTimer();
+  }
+  getEditor(col, cell) {
+    let editor = this.createElement("input", this);
+    editor.setAttribute("autocomplete", "disabled");
+    editor.className = "grid_edit";
+    this.appendChild(editor);
+    return editor;
+  }
+  handleEditControlChange(event) {
+    console.dir("## handleEditControlChange");
+  }
+  _handleDblClick(event, stopPropagation) {
+    return true;
+  }
+  colLeft() {
+    let aRow = this._row;
+    let aCol = this._col - 1;
+    while (aCol > this._fixedCol) {
+      let column = this.cols(aCol);
+      if (column && column.visible === false)
+        aCol--;
+      else
+        break;
+    }
+    ;
+    if (aCol < this._colCount) {
+      let cell = this.data.cells(aCol, aRow);
+      if (cell && cell.mergeRect) {
+        if (cell.mergeRect.startRow != aRow) {
+          aRow = cell.mergeRect.endRow + 1;
+        }
+        ;
+        this.setCurrCell(aCol, aRow, true);
+      } else
+        this.setCurrCell(aCol, aRow, true);
+    }
+    ;
+  }
+  colRight() {
+    let aRow = this._row;
+    let aCol = this._col + 1;
+    while (aCol < this._colCount - 1) {
+      let column = this.cols(aCol);
+      if (column && column.visible === false)
+        aCol++;
+      else
+        break;
+    }
+    ;
+    if (aCol < this._colCount) {
+      let cell = this.data.cells(aCol, aRow);
+      if (cell && cell.mergeRect) {
+        if (cell.mergeRect.startRow != aRow) {
+          aRow = cell.mergeRect.endRow + 1;
+        }
+        this.setCurrCell(aCol, aRow, true);
+      } else
+        this.setCurrCell(aCol, aRow, true);
+    }
+    ;
+  }
+  autoAddRow() {
+    if (!this._readOnly && !this.options._rowSelect && this.options._autoAddRow && this._row == this._rowCount - 1) {
+      let emptyRow = this.checkEmptyRow(this._row);
+      if (!emptyRow) {
+        this._rowCount = this._rowCount + 1;
+        this.setCurrCell(this._col, this._row + 1, true);
+        let cell = this.data.getCell(0, this._row);
+        if (this._dataBindingContext) {
+          cell._newRow = true;
+          let rd = this._dataBindingContext["append"]();
+          this.setObject(0, this._row, rd);
+          this._skipRefreshData = true;
+          if (this._bindingRecordSet)
+            this._bindingRecordSet["current"] = rd;
+          this._dataBindingContext["current"] = rd;
+        }
+        this._updateTotalRowHeight();
+        this.enableUpdateTimer();
+      }
+    }
+  }
+  rowDown(disableAutoAddRow) {
+    let aCol = this._col;
+    let aRow = this._row + 1;
+    while (aRow < this._rowCount - 1 && this.gridRows.rows[aRow] && this.gridRows.rows[aRow]._visible == false) {
+      aRow++;
+    }
+    if (this.gridRows.rows[aRow] && this.gridRows.rows[aRow]._visible == false)
+      aRow = this._row;
+    this.gridRows.rows[aRow] && this.gridRows.rows[aRow]._visible == false;
+    if (!disableAutoAddRow)
+      this.autoAddRow();
+    if (aRow < this._rowCount) {
+      let cell = this.data.cells(aCol, aRow);
+      if (cell && cell.mergeRect) {
+        if (cell.mergeRect.startRow != aRow) {
+          aRow = cell.mergeRect.endRow + 1;
+        }
+        this.setCurrCell(aCol, aRow, true);
+      } else
+        this.setCurrCell(aCol, aRow, true);
+    }
+    ;
+  }
+  calcBottomRow(topRowIdx) {
+    if (topRowIdx == this._rowCount - 1)
+      return topRowIdx;
+    let row = topRowIdx;
+    let height = this._scrollBox.clientHeight;
+    if (this.layout == "card") {
+    } else {
+      for (let i = 0; i < this._fixedRow; i++)
+        height = height - this.getRowHeight(i) - 0.8;
+      height = height - this.getRowHeight(row);
+      while (row < this._rowCount - 1) {
+        let h = this.getRowHeight(row - 1) + 0.8;
+        height = height - h;
+        if (height <= 0)
+          return row;
+        row++;
+      }
+      ;
+    }
+    ;
+    return row;
+  }
+  calcLeftCol(colIdx) {
+    if (colIdx == this._fixedCol)
+      return colIdx;
+    let col = colIdx;
+    let width = this._scrollBox.clientWidth;
+    for (let i = 0; i < this._fixedCol; i++)
+      width = width - this.getColWidth(i) - 0.8;
+    width = width - this.getColWidth(col) - 0.8;
+    while (col > this._fixedCol - 1) {
+      let w = this.getColWidth(col - 1) + 0.8;
+      width = width - w;
+      if (width <= 0) {
+        return col;
+      }
+      col--;
+    }
+    return col;
+  }
+  rowUp() {
+    let aCol = this._col;
+    let aRow = this._row - 1;
+    let cell = this.data.cells(aCol, aRow);
+    if (cell && cell.mergeRect) {
+      if (cell.mergeRect.endRow != aRow) {
+        aRow = cell.mergeRect.startRow - 1;
+      }
+      ;
+      this.setCurrCell(aCol, aRow, true);
+    } else
+      this.setCurrCell(aCol, aRow, true);
+  }
+  restoreOrigCellValue() {
+    if (this.origValue != void 0) {
+      if (this.editorMode)
+        this.editor.value = this.origValue;
+      else
+        this._currCell.div.textContent = this.origValue;
+    }
+    ;
+  }
+  _handleKeyDown(event, stopPropagation) {
+    if (!this.editorMode)
+      this.edit.focus();
+    if (!this.enabled)
+      return false;
+    else if (event.keyCode == 229) {
+      setTimeout(() => {
+      }, 10);
+      return true;
+    }
+    ;
+    let keyCode = event.keyCode;
+    switch (keyCode) {
+      case 9: {
+        if (event.shiftKey)
+          this.colLeft();
+        else
+          this.colRight();
+        return true;
+      }
+      case 13: {
+        if (this.editorMode) {
+          if (!event.shiftKey) {
+            this.hideEditor(true);
+            this.colRight();
+          }
+        } else {
+          this.setCurrCell(this._col + 1, this._row, true);
+        }
+        return true;
+      }
+      case 32: {
+        let col = this.cols(this._col);
+        let cell = this.cells(this._col, this._row);
+        if (cell && cell.checkBox || col && (col.checkBox || col.radioButton)) {
+          if (this._currCell) {
+            this.toggleCellValue(col, cell);
+            this._updateCell(this._currCell, cell, col);
+          }
+          ;
+          event.stopPropagation();
+        }
+        break;
+      }
+      case 33: {
+        let bottomRow = this.calcBottomRow(this._topRow);
+        let row = this.calcTopRow(bottomRow);
+        row = this.calcTopRow(row);
+        this.setCurrCell(this._col, row);
+        return true;
+      }
+      case 34: {
+        let bottomRow = this.calcBottomRow(this._topRow);
+        let row = this.calcBottomRow(bottomRow);
+        this.setCurrCell(this._col, row);
+        return true;
+      }
+      case 35: {
+        if (!this.editorMode) {
+          if (event.ctrlKey) {
+            this.setCurrCell(this._colCount - 1, this._rowCount - 1);
+          } else
+            this.setCurrCell(this._colCount - 1, this._row);
+        }
+        return true;
+      }
+      case 36: {
+        if (!this.editorMode) {
+          if (event.ctrlKey)
+            this.setCurrCell(this._fixedCol, this._fixedRow);
+          else
+            this.setCurrCell(this._fixedCol, this._row);
+        }
+        return true;
+      }
+      case 38: {
+        this.rowUp();
+        return true;
+      }
+      case 40: {
+        if (this.editorMode) {
+          this.hideEditor(true);
+        }
+        this.rowDown();
+        return true;
+      }
+      default: {
+        let col = this.cols(this._col);
+        let cell = this.cells(this._col, this._row);
+        if (cell && cell.checkBox || col && (col.checkBox || col.radioButton))
+          event.stopPropagation();
+      }
+    }
+    ;
+    if (this.editorMode) {
+      switch (keyCode) {
+        case 27:
+          this.restoreOrigCellValue();
+          this.hideEditor();
+          this.focus();
+          return true;
+        case 37:
+          return;
+        case 39:
+          return;
+      }
+      ;
+    } else {
+      switch (keyCode) {
+        case 37:
+          this.colLeft();
+          return true;
+        case 39:
+          this.colRight();
+          return true;
+      }
+    }
+    ;
+  }
+  _handleBlur(event, stopPropagation) {
+    return true;
+  }
+  showEditor(inputValue) {
+    let column = this.columns.getColumn(this._col);
+    let contextReadonly = false;
+    if (this._dataBindingContext) {
+      contextReadonly = this._dataBindingContext["readOnly"] || this._dataBindingContext["_context"]["options"]["_readOnly"];
+    }
+    if (!column._file && contextReadonly)
+      return;
+    if (!column._file && this.checkCellReadOnly())
+      return;
+    let cell = this.data.cells(this._col, this._row);
+    this._currCell = this.getTableCellByActualIndex(this._col, this._row);
+    if (this._currCell && !this.editorMode) {
+      let top = this._currCell.offsetTop - 1;
+      this.editorMode = true;
+      this.origValue = this._currCell.div.innerHTML || "";
+      if (this.editor) {
+        this.editor.owner = null;
+        this.editor["onChange"] = null;
+        this.editor["onDblClick"] = null;
+        this.editor["onKeyDown"] = null;
+        this.editor["onHideDropDownPanel"] = null;
+      }
+      let editor;
+      if (this.onGetEditControl) {
+        editor = this.onGetEditControl(this, cell);
+        if (editor)
+          this.appendChild(editor);
+      }
+      if (!editor) {
+        editor = this.getEditor(this._col, cell);
+      }
+      if (editor) {
+        editor.onchange = this.handleEditControlChange.bind(this);
+        editor.ondblclick = this._handleDblClick.bind(this);
+        editor.onkeydown = this._handleKeyDown.bind(this);
+        editor.onblur = this._handleBlur.bind(this);
+        this.editor = editor;
+        editor.style.position = "absolute";
+        editor.style.display = "block";
+        editor.value = this.edit.value;
+        editor.focus();
+        if (cell.mergeRect) {
+          let w = 0;
+          let h = 0;
+          for (let i = cell.mergeRect.startCol; i < cell.mergeRect.endCol; i++)
+            w += this.getColWidth(i);
+          editor.style.width = w - 1 + "px";
+          for (let i = cell.mergeRect.startCol; i < cell.mergeRect.endCol; i++)
+            h += this.getRowHeight(i) + 0.8;
+          editor.style.height = h - 1 + "px";
+          this.editor["setTop"](this._currCell.offsetTop + 1);
+          this.editor["setLeft"](this._currCell.offsetLeft + 1);
+        } else {
+          editor.style.width = this.getColWidth(this._col) - 2 + "px";
+          editor.style.height = this.getRowHeight(this._row) - 2 + "px";
+          editor.style.top = this._currCell.offsetTop + 2 + "px";
+          editor.style.left = this._currCell.offsetLeft + 2 + "px";
+        }
+      }
+      if (this.onEditModeChanged) {
+        this.onEditModeChanged(this);
+      }
+      ;
+      this.editor = editor;
+      let self = this;
+      setTimeout(() => {
+        if (editor) {
+          editor.style.zIndex = "9999";
+        }
+        ;
+      }, 10);
+    } else
+      this.edit.value = "";
+  }
+  _handleMouseDown(event) {
+    if (!this.enabled)
+      return true;
+    let target = event.target;
+    if (target && target.isSpliter)
+      return true;
+    let aCol = 0;
+    let aRow = 0;
+    if (target == this.editor) {
+      return true;
+    } else {
+      let rect = this.getBoundingClientRect();
+      let x = getCursorPosX(event) - rect.left;
+      let y = getCursorPosY(event) - rect.top;
+      if (x > this._scrollBox.clientWidth || y > this._scrollBox.clientHeight)
+        return true;
+      for (let row = 0; row < this._table.rows.length; row++) {
+        let tableCell = this.tableCells[row][0];
+        if (tableCell.offsetTop + tableCell.clientHeight >= y) {
+          let r = this.tableCells[row];
+          for (let col = 0; col < r.length; col++) {
+            tableCell = r[col];
+            if (tableCell && tableCell.offsetLeft + tableCell.clientWidth >= x && tableCell.offsetTop + tableCell.clientHeight >= y) {
+              let tableCellDiv = tableCell == null ? void 0 : tableCell.div;
+              aCol = this.getActualColIdx(col);
+              aRow = this.getActualRowIdx(row);
+              let cell = this.cells(aCol, aRow);
+              this.lastClickCell = cell;
+              let elms = tableCellDiv.querySelectorAll("button");
+              if (elms.length > 0) {
+                let offsetX = x - tableCell.offsetLeft;
+                for (let i = 0; i < elms.length; i++) {
+                  if (elms[i].offsetLeft + elms[i].clientWidth > offsetX) {
+                    this.setCurrCell(aCol, aRow, true);
+                    let btn;
+                    if (Array.isArray(cell._value))
+                      btn = cell._value[i];
+                    else
+                      btn = cell._value;
+                    if (this.onButtonClick) {
+                      this.onButtonClick(this, cell, btn);
+                    }
+                    if (this.onCellClick) {
+                      this.onCellClick(this, cell);
+                    }
+                  }
+                }
+                return true;
+              }
+              let column = this.columns.getColumn(aCol);
+              if (column && (cell && cell._checkBox || column._checkBox || column._radioButton)) {
+                if (aRow >= this._fixedRow || !cell.readOnly && cell._checkBox) {
+                  this.toggleCellValue(column, cell);
+                  this._updateCell(tableCell, cell, column);
+                  this.setCurrCell(aCol, aRow, true);
+                } else if (this.options._sortOnClick && column._sortable) {
+                  if (aCol == this.sortingCol)
+                    this.sort(aCol, !this.sortingDescending);
+                  else
+                    this.sort(aCol);
+                }
+              } else if (aCol == this._col && aRow == this._row) {
+                if (!this.editorMode) {
+                  let cell2 = this.data.cells(aCol, aRow);
+                  this.edit.value = cell2._displayValue || cell2._value || "";
+                  this.showEditor();
+                }
+              } else if (aRow < this._fixedRow) {
+                application.globalEvents.abortEvent(event);
+                if (this.editorMode)
+                  this.hideEditor();
+                if (this.options._sortOnClick) {
+                  if (aCol == this.sortingCol)
+                    this.sort(aCol, !this.sortingDescending);
+                  else
+                    this.sort(aCol);
+                }
+              } else {
+                this.setCurrCell(aCol, aRow, true);
+              }
+              if (cell && this.onCellClick)
+                this.onCellClick(this, cell);
+              break;
+            }
+          }
+          if (aRow != void 0)
+            break;
+        }
+      }
+    }
+    if (aRow == void 0 && this.editorMode) {
+      this.hideEditor(true);
+    }
+    if (!this.editorMode) {
+      this.edit.focus();
+    }
+    ;
+    return true;
+  }
+  _updateCell(tableCell, cell, column) {
+    let tableCellDiv = tableCell == null ? void 0 : tableCell.div;
+    let _cell = cell;
+    let _column = column;
+    let _tableCell = tableCell;
+    let withDispValue = false;
+    let disp;
+    if (tableCellDiv) {
+      tableCell.style.display = "";
+      if (cell._encrypted)
+        tableCellDiv.style.color = "green";
+      else
+        tableCellDiv.style.color = "";
+      tableCellDiv.style.display = "";
+      if (cell) {
+        _cell._tableCell = tableCellDiv;
+        let font = {
+          "bold": this.font.bold,
+          "color": this.font.color,
+          "italic": this.font.italic,
+          "name": this.font.name,
+          "size": this.font.size,
+          "underline": this.font.underline
+        };
+        let value;
+        if (this.onDisplayCell) {
+          disp = {
+            "button": _cell._button,
+            "checkBox": _cell._checkBox,
+            "col": _cell._col,
+            "color": _cell._color,
+            "dataType": _cell._dataType,
+            "font": font,
+            "formula": _cell._formula,
+            "horizontalAlign": _cell._horizontalAlign,
+            "html": _cell._html,
+            "image": _cell._image,
+            "object": _cell._object,
+            "readOnly": _cell._readOnly,
+            "row": _cell._row,
+            "text": _cell._text,
+            "value": _cell._value,
+            "visible": _cell._visible
+          };
+          try {
+            this.onDisplayCell(this, disp);
+            if (disp.value != _cell._value) {
+              _cell._displayValue = disp["value"];
+              withDispValue = true;
+            }
+            value = disp["value"];
+          } catch (e) {
+            value = "";
+          }
+        } else if (column && _column._formula) {
+          if (this.formula) {
+            this.formulaCell = cell;
+            value = this.formula["parse"](column._formula)["result"];
+          } else {
+          }
+        } else
+          value = _cell._value;
+        let c = (_cell ? _cell._color : "") || (_column ? _column._color : "");
+        tableCell.classList.remove("bg-warning", "bg-success", "bg-info", "bg-danger", "bg-highlight");
+        if (c) {
+          if (["warning", "success", "info", "danger", "highlight"].indexOf(c) > -1)
+            tableCell.classList.add("bg-" + c);
+          else
+            tableCell.style.backgroundColor = c;
+        } else
+          tableCellDiv.style.backgroundColor = "";
+        let align;
+        if (_cell._horizontalAlign != void 0)
+          align = _cell._horizontalAlign;
+        else if (_column && _column._horizontalAlign != void 0) {
+          align = _column._horizontalAlign;
+        }
+        if (align != void 0) {
+          switch (align) {
+            case 0:
+              tableCellDiv.style.textAlign = "center";
+              break;
+            case 1:
+              tableCellDiv.style.textAlign = "left";
+              break;
+            case 2:
+              tableCellDiv.style.textAlign = "right";
+              break;
+          }
+        }
+        if (!_cell.visible)
+          tableCellDiv.style.display = "none";
+        else
+          tableCellDiv.style.display = "";
+        if (_column && _column._type == "image" && _cell._file && _cell._file["url"]) {
+          tableCellDiv.classList.add("image");
+          tableCellDiv.style.height = this._defaultRowHeight + "px";
+          tableCellDiv.innerHTML = '<img src="' + withDispValue ? _cell._displayValue : _cell._file["url"] + '?size=t" style="max-height:100%;max-width=100%"/>';
+        } else if (disp && disp.image) {
+          tableCellDiv.classList.add("image");
+          tableCellDiv.style.height = this._defaultRowHeight + "px";
+          tableCellDiv.innerHTML = '<img src="' + withDispValue ? value : disp.value + '"/>';
+        } else if (disp && disp.html) {
+          tableCellDiv.innerHTML = withDispValue ? value : application.xssSanitize(disp.value);
+        } else if (_cell && (_cell.image || _cell._dataType == 5) || _column && _column._dataType == 5) {
+          tableCellDiv.classList.add("image");
+          tableCellDiv.style.height = this._defaultRowHeight + "px";
+          tableCellDiv.innerHTML = '<img src="' + withDispValue ? value : _cell._value + '"/>';
+        } else if (_cell && (_cell.html || _cell._dataType == 6) || _column && _column._dataType == 6) {
+          tableCellDiv.innerHTML = withDispValue ? value : application.xssSanitize(_cell._value);
+        } else if (value && !Array.isArray(value) && !(value instanceof Date) && typeof value == "object") {
+          if (Array.isArray(value)) {
+            let html = "";
+            for (let i = 0; i < value.length; i++)
+              html += "<button>" + (value[i]["caption"] || "...") + "</button>";
+            tableCellDiv.innerHTML = html;
+          } else
+            tableCellDiv.innerHTML = "<button>" + (value["caption"] || "...") + "</button>";
+        } else if (_column && _column._button) {
+          tableCellDiv.innerHTML = "<button>" + (value || "...") + "</button>";
+        } else if (_cell && _cell._checkBox || _column && _column._checkBox) {
+          if (value)
+            tableCellDiv.className = "check_box_checked";
+          else
+            tableCellDiv.className = "check_box_unchecked";
+          tableCellDiv.style.position = "relative";
+          tableCellDiv.style.margin = "auto";
+          tableCellDiv.style.top = (this._defaultRowHeight - 13) / 2 + "px";
+          tableCellDiv.style.left = "1px";
+          tableCellDiv.style["height"] = "100%";
+          tableCellDiv.style["width"] = "13px";
+        } else if (_column && _column._radioButton) {
+          if (value)
+            tableCellDiv.className = "radio_button.checked";
+          else
+            tableCellDiv.className = "radio_button.unchecked";
+          tableCellDiv.style.position = "relative";
+          tableCellDiv.style.margin = "auto";
+          tableCellDiv.style.top = (this._defaultRowHeight - 13) / 2 + "px";
+          tableCellDiv.style.left = "1px";
+          tableCellDiv.style["height"] = "100%";
+          tableCellDiv.style["width"] = "13px";
+        } else {
+          if (_cell._dispValue && tableCell.classList.contains("grid_fixed_cell")) {
+            tableCellDiv.textContent = _cell._dispValue;
+          } else if (withDispValue) {
+            tableCellDiv.textContent = value;
+          } else if (_cell.row < this._fixedRow) {
+            tableCellDiv.textContent = value;
+          } else {
+            if (column && _column._type == "lookupDetail") {
+              let rd;
+              if (_cell._record)
+                rd = _cell._record;
+              else {
+                let record = this.getObject(0, _cell._row);
+                if (record) {
+                  let rs = record[_column._lookupTable];
+                  if (rs) {
+                    rd = rs.first;
+                    _cell._field = _column._lookupField;
+                    let v1 = _column._lookupDetailValue;
+                    switch (_column._lookupDetailType) {
+                      case "date":
+                        v1 = new Date(v1);
+                        v1.setHours(0, 0, 0, 0);
+                        break;
+                      case "numeric":
+                        if (typeof v1 == "string")
+                          v1 = parseFloat(v1);
+                        break;
+                    }
+                    while (rd) {
+                      let v2 = rd[_column._lookupField];
+                      switch (_column._lookupDetailType) {
+                        case "date":
+                          v2 = new Date(rd[_column._lookupDetailField]);
+                          v2.setHours(0, 0, 0, 0);
+                          break;
+                        case "numeric":
+                          if (typeof v2 == "string")
+                            v2 = parseFloat(v2);
+                          break;
+                      }
+                      if (v1 == v2)
+                        break;
+                      else if (_column._lookupDetailType == "date" && v1.getTime() == v2.getTime())
+                        break;
+                      rd = rs["next"];
+                    }
+                  }
+                }
+              }
+              if (rd) {
+                _cell._value = rd[_column._lookupField];
+                _cell._record = rd;
+                tableCellDiv.textContent = rd[_column._lookupField];
+              }
+            } else if (column && _column._type == "listOfValue" && _column._listOfValue) {
+              let lsv = this._listOfValue[_column._listOfValue];
+              if (lsv != void 0)
+                tableCellDiv.textContent = lsv[value] || value;
+              else
+                tableCellDiv.textContent = value;
+            } else if (column && (_column._type == "lookup" || _column._type == "lookupCombo")) {
+            } else if (_column && _column._type == "{userAccount}") {
+            } else {
+              let type = typeof value;
+              if (type != "undefined") {
+                if (type == "number")
+                  tableCellDiv.textContent = parseNumber(value.toPrecision(12)).toString();
+                else {
+                  tableCellDiv.textContent = value;
+                }
+              } else
+                tableCellDiv.textContent = "";
+            }
+          }
+        }
+      } else {
+        if (cell && _cell._checkBox || column && _column._checkBox) {
+          tableCellDiv.className = "check_box_unchecked";
+          tableCellDiv.style.position = "relative";
+          tableCellDiv.style.top = "1px";
+          tableCellDiv.style.left = "1px";
+          tableCellDiv.style["height"] = "13px";
+          tableCellDiv.style["width"] = "13px";
+        } else if (column && _column._radioButton) {
+          tableCellDiv.className = "radio_button.unchecked";
+          tableCellDiv.style.position = "relative";
+          tableCellDiv.style.top = "1px";
+          tableCellDiv.style.left = "1px";
+          tableCellDiv.style["height"] = "13px";
+          tableCellDiv.style["width"] = "13px";
+        } else
+          tableCellDiv.textContent = "";
+      }
+    }
+  }
+  checkCellReadOnly(col, row) {
+    if (!this._enabled || this._readOnly || this.options._rowSelect)
+      return true;
+    else {
+      if (col == void 0)
+        col = this._col;
+      if (row == void 0)
+        row = this._row;
+      if ((col < this._fixedCol || row < this._fixedRow) && this.layout != "card")
+        return true;
+      let column = this.cols(col);
+      if (column._readOnly)
+        return true;
+      else {
+        let record = this.getObject(0, row);
+        if (record && record["_isReadOnly"])
+          return true;
+        let cell = this.data.cells(col, row);
+        if (cell)
+          return cell.readOnly || !cell.visible;
+        else
+          return false;
+      }
+      ;
+    }
+    ;
+  }
+  toggleCellValue(column, cell) {
+    if (!this.checkCellReadOnly(cell.col, cell.row)) {
+      cell._value = !cell._value;
+      if (this._dataBindingContext) {
+        let record = this.getObject(0, cell._row);
+        let field = this.getObject(cell._col, 0);
+        if (!record && field) {
+          record = this._dataBindingContext["append"]();
+          this.setObject(0, cell._row, record);
+        }
+        if (record && field) {
+          record[field] = cell._value;
+        }
+        this.enableUpdateTimer();
+      }
+      this.updateBindingData(cell, column);
+      if (this.onCellChange)
+        this.onCellChange(this, cell, !cell._value, cell._value);
+    }
+  }
+  _handleMouseMove(event) {
+    if (application.globalEvents._leftMouseButtonDown) {
+    }
+    if (this._colResizing) {
+      let pos = getCursorPosX(event);
+      this.setColWidth(this.resizeCol, this.origColWidth + (pos - this.mouseDownPosX), true);
+      this.showData(100);
+      this.highlightCurrCell();
+      return true;
+    }
+    return true;
+  }
+  _handleMouseUp(event) {
+    if (this._colResizing) {
+      this._colResizing = false;
+      this._updateTableSplitter();
+    }
+    return true;
+  }
+  _handleColumnResizeStart(event) {
+    if (this.editorMode) {
+      this.hideEditor(true);
+    }
+    ;
+    let pos = getCursorPosX(event);
+    this.mouseDownPosX = pos;
+    this.resizeCol = this.getActualColIdx(event.target.cellIndex);
+    this.origColWidth = this.getColWidth(this.resizeCol);
+    this._colResizing = true;
+  }
+  _updateTableSplitter() {
+    let splitter;
+    for (let i = this.tableSplitters.length - 1; i < this.visibleColCount; i++) {
+      splitter = this.tableSplitters[i];
+      if (splitter)
+        splitter.style.display = "none";
+    }
+    ;
+    for (let col = 0; col < this.visibleColCount; col++) {
+      splitter = this.tableSplitters[col];
+      if (!splitter) {
+        splitter = this.createElement("div", this);
+        this.tableSplitters[col] = splitter;
+        splitter.isSpliter = true;
+        splitter.owner = this;
+        splitter.cellIndex = col;
+        splitter.onmousedown = this._handleColumnResizeStart.bind(this);
+        this.appendChild(splitter);
+        splitter.style.zIndex = 5;
+        splitter.style.cursor = "e-resize";
+        splitter.style.position = "absolute";
+        splitter.style.top = "0px";
+        splitter.style.width = "6px";
+      }
+      ;
+      let colIdx = this.getActualColIdx(col);
+      let left = this.getColRight(colIdx);
+      let height = 0;
+      for (let row = 0; row < this._fixedRow; row++) {
+        height = height + this.getRowHeight(row) + 0.8;
+      }
+      splitter.style.left = left + "px";
+      if (this._fixedCol > 0 && col == this._fixedCol - 1)
+        splitter.style.height = this.heightValue + "px";
+      else
+        splitter.style.height = height + "px";
+      splitter.style.display = "";
+    }
+  }
+  _showDataInternalGrid() {
+    if (!this._table)
+      return;
+    for (let r = 0; r < this._fixedRow; r++) {
+      for (let c = 0; c < this._fixedCol; c++) {
+        let tableCell = this.getTableCell(c, r);
+        let column = null;
+        if (this.columns)
+          column = this.columns.getColumn(c);
+        if (tableCell) {
+          let cell = this.data.cells(c, r);
+          this._updateCell(tableCell, cell, column);
+        }
+      }
+    }
+    for (let r = 0; r < this._fixedRow; r++) {
+      for (let c = this._fixedCol; c < this.visibleColCount; c++) {
+        let tableCell = this.getTableCell(c, r);
+        if (tableCell) {
+          let cell = this.data.cells(this.getActualColIdx(c), r);
+          if (cell)
+            tableCell.cell = cell;
+          this._updateCell(tableCell, cell);
+        }
+      }
+    }
+    for (let r = this._fixedRow; r < this.visibleRowCount; r++) {
+      for (let c = 0; c < this._fixedCol; c++) {
+        let column = this.columns.getColumn(c);
+        let tableCell = this.getTableCell(c, r);
+        if (tableCell) {
+          let cell = this.data.cells(c, this.getActualRowIdx(r));
+          if (cell)
+            tableCell.cell = cell;
+          this._updateCell(tableCell, cell, column);
+        }
+      }
+    }
+    for (let c = this._fixedCol; c < this.visibleColCount; c++) {
+      let colIdx = this.getActualColIdx(c);
+      let _column = this.columns.getColumn(colIdx);
+      if (_column && (_column._type == "lookup" || _column._type == "lookupCombo")) {
+      }
+    }
+    for (let r = this._fixedRow; r < this.visibleRowCount; r++) {
+      let rowIdx = this.getActualRowIdx(r);
+      for (let c = this._fixedCol; c < this.visibleColCount; c++) {
+        let colIdx = this.getActualColIdx(c);
+        let column = this.columns.getColumn(colIdx);
+        let tableCell = this.getTableCell(c, r);
+        if (tableCell) {
+          let cell = this.data.cells(colIdx, rowIdx);
+          tableCell.cell = cell;
+          this._updateCell(tableCell, cell, column);
+        }
+        ;
+      }
+      ;
+    }
+    ;
+    if (this.options._autoRowHeight) {
+      for (let r = 0; r < this.visibleRowCount; r++) {
+        if (this._table.rows[r].clientHeight > this._defaultRowHeight) {
+          for (let c = 0; c < this.visibleColCount; c++) {
+            let tableCell = this.getTableCell(c, r);
+            if (tableCell && tableCell.cell) {
+              let cell = tableCell.cell;
+              let row2 = this.getActualRowIdx(r);
+              if (!cell._height) {
+                cell._height = tableCell.div.clientHeight + 3;
+              }
+              if (!this._rowHeights[row2] || this._rowHeights[row2] < cell._height) {
+                this._rowHeights[row2] = cell._height;
+              }
+            }
+          }
+        }
+      }
+    }
+    ;
+    let row = this._table.rows[0];
+    if (row) {
+      if (row.cells.length > this._colCount - this._leftCol + this._fixedCol) {
+        for (let r = 0; r < this._table.rows.length; r++) {
+          let row2 = this._table.rows[r];
+          for (let c = this._colCount - this._leftCol + this._fixedCol; c < row2.cells.length; c++) {
+            row2.cells[c].style.display = "none";
+          }
+          ;
+        }
+        ;
+      }
+      ;
+    }
+    ;
+    if (this._table.rows.length > this._rowCount - this._topRow + this._fixedRow) {
+      for (let c = this._rowCount - this._topRow + this._fixedRow; c < this._table.rows.length; c++) {
+        if (c > -1) {
+          this._table.rows[c].style.display = "none";
+        }
+        ;
+      }
+      ;
+    }
+    ;
+    this.highlightCurrCell();
+  }
+  showDataInternal() {
+    this.showDataFlag = false;
+    if (!this.showDataInternalFlag) {
+      this.showDataInternalFlag = true;
+      try {
+        if (this.layout == "card") {
+        } else
+          this._showDataInternalGrid();
+      } finally {
+        this.showDataInternalFlag = false;
+      }
+      ;
+    }
+    ;
+  }
+  _updateTableInternal(updateRowHeightFlag, updateColWidthFlag) {
+    if (!this._updateTableInternalFlag) {
+      this._updateTableInternalFlag = true;
+      try {
+        if (this.layout == "card") {
+        } else {
+          if (updateRowHeightFlag) {
+            this._updateTotalRowHeight();
+          }
+          ;
+          if (updateColWidthFlag) {
+            this._updateTotalColWidth();
+          }
+          ;
+          this.tableCells = [[]];
+          if (this._totalColWidth < this.width)
+            this.placeHolder.style.width = "100%";
+          else
+            this.placeHolder.style.width = this._totalColWidth + "px";
+          this.placeHolder.style.height = this._totalRowHeight + "px";
+          this._updateTableRows();
+          this._updateTableCols();
+          this._updateTableMergedCells();
+          this._updateTableSplitter();
+        }
+      } catch (err) {
+      } finally {
+        this._updateTableInternalFlag = false;
+      }
+      ;
+    }
+    ;
+  }
+  enableUpdateTimer(updateRowHeightFlag, updateColWidthFlag) {
+    updateRowHeightFlag = updateRowHeightFlag || false;
+    updateColWidthFlag = updateColWidthFlag || false;
+    clearTimeout(this._updateTableTimer);
+    this._updateTableTimer = setTimeout(() => {
+      if (this._scrollBox.clientWidth) {
+        this._updateTableTimer = void 0;
+        this._sorting = false;
+        if (updateRowHeightFlag)
+          this._rowHeights = [];
+        this._updateTableInternal(updateRowHeightFlag, updateColWidthFlag);
+        this.showDataInternal();
+      } else {
+        this._updateTableTimer = setTimeout(() => {
+          this._sorting = false;
+          if (updateRowHeightFlag)
+            this._rowHeights = [];
+          this._updateTableInternal(updateRowHeightFlag, updateColWidthFlag);
+          this.showDataInternal();
+        }, 100);
+      }
+    }, 10);
+  }
+};
+DataGrid = __decorateClass([
+  customElements2("i-data-grid")
+], DataGrid);
+
+// packages/markdown/src/style/markdown.css.ts
+var Theme14 = theme_exports.ThemeVars;
 cssRule("i-markdown", {
   display: "inline-block",
-  color: Theme11.text.primary,
-  fontFamily: Theme11.typography.fontFamily,
-  fontSize: Theme11.typography.fontSize,
+  color: Theme14.text.primary,
+  fontFamily: Theme14.typography.fontFamily,
+  fontSize: Theme14.typography.fontSize,
   $nest: {
     h1: {
       fontSize: "48px",
@@ -16973,10 +25191,11 @@ cssRule("i-markdown", {
         "thead": {
           background: "#FFF"
         },
-        "th, td": {
+        "th": {
           padding: "10px"
         },
         "td": {
+          padding: "10px",
           borderTop: "1px solid #393939"
         },
         "tbody": {
@@ -17103,782 +25322,289 @@ Markdown = __decorateClass([
   customElements2("i-markdown")
 ], Markdown);
 
-// packages/tab/src/style/tab.css.ts
-var Theme12 = theme_exports.ThemeVars;
-cssRule("i-tabs", {
-  display: "block",
-  $nest: {
-    ".tabs-nav-wrap": {
-      display: "flex",
-      flex: "none",
-      overflow: "hidden"
-    },
-    "&:not(.vertical) .tabs-nav-wrap": {
-      $nest: {
-        "&:hover": {
-          overflowX: "auto",
-          overflowY: "hidden"
-        },
-        "&::-webkit-scrollbar-thumb": {
-          background: "#4b4b4b",
-          borderRadius: "5px"
-        },
-        "&::-webkit-scrollbar": {
-          height: "3px"
-        }
-      }
-    },
-    ".tabs-nav": {
-      position: "relative",
-      display: "flex",
-      flex: "none",
-      overflow: "hidden",
-      whiteSpace: "nowrap",
-      borderBottom: `1px solid #252525`,
-      margin: 0
-    },
-    "&.vertical": {
-      display: "flex",
-      $nest: {
-        ".tabs-nav": {
-          display: "flex",
-          flexDirection: "column"
-        },
-        ".tabs-nav:hover": {
-          overflowY: "auto"
-        },
-        ".tabs-nav::-webkit-scrollbar-thumb": {
-          background: "#4b4b4b",
-          borderRadius: "5px"
-        },
-        ".tabs-nav::-webkit-scrollbar": {
-          width: "3px"
-        }
-      }
-    },
-    "i-tab": {
-      position: "relative",
-      display: "inline-flex",
-      overflow: "hidden",
-      color: "rgba(255, 255, 255, 0.55)",
-      background: "#2e2e2e",
-      marginBottom: "-1px",
-      border: `1px solid #252525`,
-      alignItems: "center",
-      font: "inherit",
-      textAlign: "center",
-      minHeight: "36px",
-      $nest: {
-        "&:not(.disabled):hover": {
-          cursor: "pointer",
-          color: "#fff"
-        },
-        "&:not(.disabled).active.border": {
-          borderColor: `${Theme12.divider} ${Theme12.divider} #fff`,
-          borderBottomWidth: "1.5px"
-        },
-        ".tab-item": {
-          position: "relative",
-          display: "flex",
-          alignItems: "center",
-          cursor: "pointer",
-          padding: "0.5rem 1rem",
-          gap: "5px",
-          $nest: {
-            "i-image": {
-              display: "flex"
-            }
-          }
-        }
-      }
-    },
-    "i-tab:not(.disabled).active": {
-      backgroundColor: "#1d1d1d",
-      borderBottomColor: "transparent",
-      color: "#fff"
-    },
-    ".tabs-content": {
-      position: "relative",
-      overflow: "hidden",
-      display: "flex",
-      width: "100%",
-      height: "100%",
-      minHeight: "200px",
-      $nest: {
-        "&::after": {
-          clear: "both"
-        },
-        "i-label .f1yauex0": {
-          whiteSpace: "normal"
-        },
-        ".content-pane": {
-          position: "relative",
-          width: "100%",
-          height: "100%",
-          flex: "none"
-        }
-      }
-    },
-    "span.close": {
-      width: "18px",
-      height: "18px",
-      marginLeft: "5px",
-      marginRight: "-5px",
-      borderRadius: "5px",
-      lineHeight: "18px",
-      fontSize: "18px",
-      visibility: "hidden",
-      opacity: 0,
-      $nest: {
-        "&:hover": {
-          background: "rgba(78, 78, 78, 0.48)"
-        }
-      }
-    },
-    ".tabs-nav:not(.is-closable) span.close": {
-      display: "none"
-    },
-    ".tabs-nav.is-closable i-tab:not(.disabled):hover span.close, .tabs-nav.is-closable i-tab:not(.disabled).active span.close": {
-      visibility: "visible",
-      opacity: 1
-    }
-  }
-});
-var getTabMediaQueriesStyleClass = (mediaQueries) => {
-  let styleObj = getControlMediaQueriesStyle(mediaQueries);
-  for (let mediaQuery of mediaQueries) {
-    let mediaQueryRule;
-    if (mediaQuery.minWidth && mediaQuery.maxWidth) {
-      mediaQueryRule = `@media (min-width: ${mediaQuery.minWidth}) and (max-width: ${mediaQuery.maxWidth})`;
-    } else if (mediaQuery.minWidth) {
-      mediaQueryRule = `@media (min-width: ${mediaQuery.minWidth})`;
-    } else if (mediaQuery.maxWidth) {
-      mediaQueryRule = `@media (max-width: ${mediaQuery.maxWidth})`;
-    }
-    if (mediaQueryRule) {
-      const nestObj = styleObj["$nest"][mediaQueryRule]["$nest"] || {};
-      const ruleObj = styleObj["$nest"][mediaQueryRule];
-      styleObj["$nest"][mediaQueryRule] = {
-        ...ruleObj,
-        $nest: {
-          ...nestObj,
-          ".tabs-nav": {}
-        }
-      };
-      if (mediaQuery.properties.mode) {
-        const mode = mediaQuery.properties.mode;
-        styleObj["$nest"][mediaQueryRule]["display"] = mode === "vertical" ? "flex !important" : "block !important";
-        if (mode === "horizontal") {
-          styleObj["$nest"][mediaQueryRule]["$nest"][".tabs-nav"]["flexDirection"] = "row !important";
-          styleObj["$nest"][mediaQueryRule]["$nest"][".tabs-nav"]["width"] = "100%";
-          styleObj["$nest"][mediaQueryRule]["$nest"][".tabs-nav"]["justifyContent"] = "center";
-        } else {
-          styleObj["$nest"][mediaQueryRule]["$nest"][".tabs-nav"]["flexDirection"] = "column !important";
-          styleObj["$nest"][mediaQueryRule]["$nest"][".tabs-nav"]["width"] = "auto";
-          styleObj["$nest"][mediaQueryRule]["$nest"][".tabs-nav"]["justifyContent"] = "start";
-        }
-      }
-      if (typeof mediaQuery.properties.visible === "boolean") {
-        const visible = mediaQuery.properties.visible;
-        styleObj["$nest"][mediaQueryRule]["display"] = visible ? "block !important" : "none !important";
-      }
-    }
-  }
-  return style(styleObj);
-};
-
-// packages/tab/src/tab.ts
-var Tabs = class extends Container {
-  constructor(parent, options) {
-    super(parent, options);
-    this.accumTabIndex = 0;
-    this.dragStartHandler = this.dragStartHandler.bind(this);
-    this.dragOverHandler = this.dragOverHandler.bind(this);
-    this.dropHandler = this.dropHandler.bind(this);
-  }
-  get activeTab() {
-    return this._tabs[this.activeTabIndex];
-  }
-  get activeTabIndex() {
-    return this._activeTabIndex;
-  }
-  set activeTabIndex(index) {
-    var _a;
-    if (index < 0 || this._activeTabIndex === index)
-      return;
-    const prevTab = this._tabs[this._activeTabIndex];
-    if (prevTab) {
-      prevTab.classList.remove("active");
-      this.contentPanes[this._activeTabIndex].style.display = "none";
-    }
-    this._activeTabIndex = index;
-    (_a = this.activeTab) == null ? void 0 : _a.classList.add("active");
-    if (this.contentPanes[index])
-      this.contentPanes[index].style.display = "";
-  }
-  get items() {
-    return this._tabs;
-  }
-  get closable() {
-    return this._closable;
-  }
-  set closable(value) {
-    this._closable = value;
-    if (value) {
-      this.tabsNavElm.classList.add("is-closable");
-    } else {
-      this.tabsNavElm.classList.remove("is-closable");
-    }
-  }
-  get draggable() {
-    return this._draggable;
-  }
-  set draggable(value) {
-    if (this._draggable === value)
-      return;
-    this._draggable = value;
-    if (this.draggable) {
-      this.tabsNavElm.ondragover = this.dragOverHandler;
-      this.tabsNavElm.ondrop = this.dropHandler;
-    } else {
-      this.tabsNavElm.ondragover = null;
-      this.tabsNavElm.ondrop = null;
-    }
-    this.handleTagDrag(this._tabs);
-  }
-  get mode() {
-    const isVertical = this.classList.contains("vertical");
-    return isVertical ? "vertical" : "horizontal";
-  }
-  set mode(type) {
-    if (type === "vertical") {
-      this.classList.add("vertical");
-    } else {
-      this.classList.remove("vertical");
-    }
-  }
-  get mediaQueries() {
-    return this._mediaQueries;
-  }
-  set mediaQueries(value) {
-    this._mediaQueries = value;
-    let style2 = getTabMediaQueriesStyleClass(this._mediaQueries);
-    this._mediaStyle && this.classList.remove(this._mediaStyle);
-    this._mediaStyle = style2;
-    this.classList.add(style2);
-  }
-  add(options) {
-    const tab = new Tab(this, options);
-    if (options == null ? void 0 : options.children) {
-      tab.append(options == null ? void 0 : options.children);
-    }
-    if (this.draggable) {
-      this.handleTagDrag([tab]);
-    }
-    this.appendTab(tab);
-    this.activeTabIndex = tab.index;
-    return tab;
-  }
-  delete(tab) {
-    const index = this._tabs.findIndex((t) => t.id === tab.id);
-    const activeIndex = this.activeTabIndex;
-    if (index >= 0) {
-      this._tabs.splice(index, 1);
-      const pane = this.contentPanes[index];
-      this.contentPanes.splice(index, 1);
-      pane.remove();
-      if (activeIndex >= index) {
-        let newActiveIndex = activeIndex > index ? activeIndex - 1 : this._tabs[activeIndex] ? activeIndex : this._tabs.length - 1;
-        this._activeTabIndex = newActiveIndex;
-        if (this.activeTab) {
-          this.activeTab.classList.add("active");
-          this.contentPanes[newActiveIndex].style.display = "";
-        }
-      }
-    }
-    tab.remove();
-  }
-  appendTab(tab) {
-    tab._container = this.tabsContentElm;
-    tab.parent = this;
-    this._tabs.push(tab);
-    if (!tab.id)
-      tab.id = `tab-${this.accumTabIndex++}`;
-    this.tabsNavElm.appendChild(tab);
-    const contentPane = this.createElement("div", this.tabsContentElm);
-    tab._contentElm = contentPane;
-    contentPane.classList.add("content-pane");
-    contentPane.style.display = "none";
-    this.contentPanes.push(contentPane);
-    const children = tab.children;
-    for (let i = 0; i < children.length; i++) {
-      if (children[i].classList.contains("tab-item"))
-        continue;
-      if (children[i] instanceof Control) {
-        children[i].parent = tab;
-      }
-    }
-    ;
-  }
-  handleTagDrag(tabs) {
-    tabs.forEach((tab) => {
-      if (this.draggable) {
-        tab.setAttribute("draggable", "true");
-        tab.ondragstart = this.dragStartHandler;
-      } else {
-        tab.removeAttribute("draggable");
-        tab.ondragstart = null;
-      }
-    });
-  }
-  _handleClick(event) {
-    return super._handleClick(event, true);
-  }
-  dragStartHandler(event) {
-    if (!(event.target instanceof Tab))
-      return;
-    this.curDragTab = event.target;
-  }
-  dragOverHandler(event) {
-    event.preventDefault();
-  }
-  dropHandler(event) {
-    event.preventDefault();
-    if (!this.curDragTab)
-      return;
-    const target = event.target;
-    const dropTab = target instanceof Tab ? target : target.closest("i-tab");
-    if (dropTab && !this.curDragTab.isSameNode(dropTab)) {
-      const curActiveTab = this.activeTab;
-      const dragIndex = this.curDragTab.index;
-      const dropIndex = dropTab.index;
-      const [dragTab] = this._tabs.splice(dragIndex, 1);
-      this._tabs.splice(dropIndex, 0, dragTab);
-      const [dragContent] = this.contentPanes.splice(dragIndex, 1);
-      this.contentPanes.splice(dropIndex, 0, dragContent);
-      if (dragIndex > dropIndex) {
-        this.tabsNavElm.insertBefore(this.curDragTab, dropTab);
-      } else {
-        dropTab.after(this.curDragTab);
-      }
-      this.activeTabIndex = curActiveTab.index;
-      if (this.onChanged)
-        this.onChanged(this, this.activeTab);
-    }
-    this.curDragTab = null;
-  }
-  refresh() {
-    if (this.dock) {
-      super.refresh(true);
-      const height = this.mode === "horizontal" ? this.clientHeight - this.tabsNavElm.clientHeight : this.clientHeight;
-      this.tabsContentElm.style.height = height + "px";
-      this.refreshControls();
-    }
-  }
-  init() {
-    super.init();
-    if (!this.tabsNavElm) {
-      this.contentPanes = [];
-      this._tabs = [];
-      const _tabs = [];
-      this.childNodes.forEach((node) => {
-        if (node instanceof Tab) {
-          _tabs.push(node);
-        } else {
-          node.remove();
-        }
-      });
-      const tabsNavWrapElm = this.createElement("div", this);
-      tabsNavWrapElm.classList.add("tabs-nav-wrap");
-      tabsNavWrapElm.addEventListener("wheel", (event) => {
-        if (this.mode !== "horizontal")
-          return;
-        event.preventDefault();
-        tabsNavWrapElm.scrollLeft += event.deltaY;
-      });
-      this.tabsNavElm = this.createElement("div", tabsNavWrapElm);
-      this.tabsNavElm.classList.add("tabs-nav");
-      this.tabsContentElm = this.createElement("div", this);
-      this.tabsContentElm.classList.add("tabs-content");
-      this.closable = this.getAttribute("closable", true) || false;
-      this.mode = this.getAttribute("mode", true) || "horizontal";
-      for (const tab of _tabs) {
-        this.appendTab(tab);
-      }
-      this.draggable = this.getAttribute("draggable", true) || false;
-      const activeTabIndex = this.getAttribute("activeTabIndex", true);
-      if (this._tabs.length)
-        this.activeTabIndex = activeTabIndex || 0;
-      this.mediaQueries = this.getAttribute("mediaQueries", true, []);
-    }
-  }
-  static async create(options, parent) {
-    let self = new this(parent, options);
-    await self.ready();
-    return self;
-  }
-};
-Tabs = __decorateClass([
-  customElements2("i-tabs")
-], Tabs);
-var Tab = class extends Container {
-  active() {
-    this._parent.activeTabIndex = this.index;
-  }
-  addChildControl(control) {
-    if (this._contentElm)
-      this._contentElm.appendChild(control);
-  }
-  removeChildControl(control) {
-    if (this._contentElm && this._contentElm.contains(control))
-      this._contentElm.removeChild(control);
-  }
-  get caption() {
-    return this.captionElm.innerHTML;
-  }
-  set caption(value) {
-    this.captionElm.innerHTML = value;
-  }
-  close() {
-    this.handleCloseTab();
-  }
-  get index() {
-    return this._parent.items.findIndex((t) => t.id === this.id);
-  }
-  get icon() {
-    if (!this._icon) {
-      this._icon = Icon.create({
-        width: 16,
-        height: 16
-      }, this);
-    }
-    ;
-    return this._icon;
-  }
-  set icon(elm) {
-    if (this._icon)
-      this.tabContainer.removeChild(this._icon);
-    this._icon = elm;
-    if (this._icon)
-      this.tabContainer.prepend(this._icon);
-  }
-  get innerHTML() {
-    return this._contentElm.innerHTML;
-  }
-  set innerHTML(value) {
-    this._contentElm.innerHTML = value;
-  }
-  get font() {
-    return {
-      color: this.captionElm.style.color,
-      name: this.captionElm.style.fontFamily,
-      size: this.captionElm.style.fontSize,
-      bold: this.captionElm.style.fontStyle.indexOf("bold") >= 0,
-      style: this.captionElm.style.fontStyle,
-      transform: this.captionElm.style.textTransform,
-      weight: this.captionElm.style.fontWeight
-    };
-  }
-  set font(value) {
-    if (this.captionElm) {
-      this.captionElm.style.color = value.color || "";
-      this.captionElm.style.fontSize = value.size || "";
-      this.captionElm.style.fontFamily = value.name || "";
-      this.captionElm.style.fontStyle = value.style || "";
-      this.captionElm.style.textTransform = value.transform || "none";
-      this.captionElm.style.fontWeight = value.bold ? "bold" : `${value.weight}` || "";
-    }
-  }
-  _handleClick(event) {
-    if (!this._parent || !this.enabled || this._parent.activeTab.isSameNode(this))
-      return false;
-    if (this._parent) {
-      if (this._parent.activeTab != this)
-        this._parent.activeTabIndex = this.index;
-      if (this._parent.onChanged)
-        this._parent.onChanged(this._parent, this._parent.activeTab);
-    }
-    return super._handleClick(event);
-  }
-  handleCloseTab(event) {
-    if (event) {
-      event.stopPropagation();
-      event.preventDefault();
-    }
-    if (!this._parent || !this.enabled || event && !this._parent.closable)
-      return;
-    const isActiveChange = this._parent.activeTab.isSameNode(this);
-    if (this._parent.onCloseTab)
-      this._parent.onCloseTab(this._parent, this);
-    this._parent.delete(this);
-    if (isActiveChange && this._parent.onChanged)
-      this._parent.onChanged(this._parent, this._parent.activeTab);
-  }
-  init() {
-    if (!this.captionElm) {
-      super.init();
-      this.tabContainer = this.createElement("div", this);
-      this.tabContainer.classList.add("tab-item");
-      this.captionElm = this.createElement("div", this.tabContainer);
-      this.caption = this.getAttribute("caption", true) || "";
-      const font = this.getAttribute("font", true);
-      if (font)
-        this.font = font;
-      const icon = this.getAttribute("icon", true);
-      if (icon) {
-        icon.height = icon.height || "16px";
-        icon.width = icon.width || "16px";
-        this.icon = new Icon(void 0, icon);
-      }
-      ;
-      const closeButton = this.createElement("span", this.tabContainer);
-      closeButton.classList.add("close");
-      closeButton.innerHTML = "&times;";
-      closeButton.onclick = this.handleCloseTab.bind(this);
-    }
-  }
-  static async create(options, parent) {
-    let self = new this(parent, options);
-    await self.ready();
-    return self;
-  }
-};
-Tab = __decorateClass([
-  customElements2("i-tab")
-], Tab);
-
-// packages/markdown-editor/src/style/markdown-editor.css.ts
-var Theme13 = theme_exports.ThemeVars;
-cssRule("i-markdown-editor", {
-  display: "block",
-  $nest: {
-    ".editor-container": {
-      marginRight: "auto",
-      marginLeft: "auto"
-    },
-    ".editor-tabs": {
-      display: "block",
-      position: "relative",
-      border: `1px solid ${Theme13.divider}`,
-      borderRadius: "6px",
-      $nest: {
-        ".tabs": {
-          backgroundColor: Theme13.background.paper,
-          borderBottom: `1px solid ${Theme13.divider}`,
-          borderTopLeftRadius: "6px",
-          borderTopRightRadius: "6px",
-          marginBottom: 0,
-          zIndex: 1,
-          $nest: {
-            "i-tab": {
-              display: "inline-block",
-              padding: "12px 16px",
-              textDecoration: "none",
-              backgroundColor: "transparent",
-              border: "1px solid transparent",
-              borderBottom: 0,
-              borderRadius: 0,
-              transition: "color .2s cubic-bezier(0.3, 0, 0.5, 1)",
-              cursor: "pointer",
-              $nest: {
-                ".tab-link": {
-                  display: "none"
-                },
-                "&::after": {
-                  content: "none!important"
-                },
-                "i-icon": {
-                  display: "inline-block",
-                  verticalAlign: "middle",
-                  fill: Theme13.text.secondary
-                },
-                "span": {
-                  marginLeft: "6px",
-                  fontSize: "14px",
-                  lineHeight: "23px",
-                  color: Theme13.text.secondary,
-                  verticalAlign: "middle"
-                },
-                "&.active": {
-                  borderTopLeftRadius: "6px",
-                  borderTopRightRadius: "6px",
-                  backgroundColor: Theme13.colors.primary.main,
-                  borderColor: Theme13.divider,
-                  $nest: {
-                    "&:first-of-type": {
-                      borderColor: "transparent",
-                      borderTopRightRadius: 0,
-                      borderRightColor: Theme13.divider
-                    },
-                    "i-icon": {
-                      fill: Theme13.text.primary
-                    },
-                    "span": {
-                      fontWeight: 600,
-                      color: Theme13.text.primary
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "#preview": {
-          padding: "32px 85px"
-        }
-      }
-    }
-  }
-});
-
 // packages/markdown-editor/src/markdown-editor.ts
+var TOOLBAR_ITEMS_DEFAULT = [
+  ["heading", "bold", "italic", "strike"],
+  ["hr", "quote"],
+  ["ul", "ol", "task", "indent", "outdent"],
+  ["table", "image", "link"],
+  ["code", "codeblock"]
+];
+RequireJS.config({
+  paths: {
+    "tui-color-picker": `${LibPath}lib/tui-editor/tui-color-picker.min.js`
+  }
+});
+var libs2 = [`${LibPath}lib/tui-editor/toastui-editor-all.min.js`];
+var libPlugins = [
+  { name: "colorSyntax", path: [`${LibPath}lib/tui-editor/toastui-editor-plugin-color-syntax.min.js`] },
+  { name: "codeSyntaxHighlight", path: [`${LibPath}lib/tui-editor/toastui-editor-plugin-code-syntax-highlight-all.min.js`] },
+  { name: "tableMergedCell", path: [`${LibPath}lib/tui-editor/toastui-editor-plugin-table-merged-cell.min.js`] },
+  { name: "uml", path: [`${LibPath}lib/tui-editor/toastui-editor-plugin-uml.min.js`] }
+];
+var editorCSS = [
+  { name: "toastui-editor", href: `${LibPath}lib/tui-editor/toastui-editor.min.css` },
+  { name: "toastui-plugins", href: `${LibPath}lib/tui-editor/toastui-plugins.min.css` }
+];
 var MarkdownEditor = class extends Control {
   constructor(parent, options) {
-    super(parent, options, {
-      width: "100%",
-      height: "auto"
-    });
+    super(parent, options);
+    this.editorPlugins = {};
+    this._theme = "light";
+    this._mode = "markdown";
+    this._previewStyle = "vertical";
+    this._value = "";
+    this._viewer = false;
+    this._heightValue = "500px";
+    this._toolbarItems = TOOLBAR_ITEMS_DEFAULT;
+    this._customPlugins = [];
+    this._widgetRules = [];
   }
-  onViewPreview() {
-    const value = this.mdEditor.value;
-    this.mdPreviewer.load(value);
+  get mode() {
+    return this._mode;
   }
-  getValue() {
-    return this.mdEditor.value;
-  }
-  setValue(value) {
-    this.mdEditor.value = value;
-    if (this.tabs.activeTabIndex === 1) {
-      this.mdPreviewer.load(value);
+  set mode(value) {
+    this._mode = value;
+    if (this.viewer)
+      return;
+    if (this.editorObj) {
+      this.editorObj.changeMode(value, false);
     }
   }
-  init() {
+  get theme() {
+    return this._theme;
+  }
+  set theme(value) {
+    this._theme = value;
+    if (!this.editor)
+      return;
+    this.renderEditor(true);
+  }
+  get previewStyle() {
+    return this._previewStyle;
+  }
+  set previewStyle(value) {
+    this._previewStyle = value;
+    if (this.viewer)
+      return;
+    if (this.editorObj) {
+      this.editorObj.changePreviewStyle(value);
+    }
+  }
+  get viewer() {
+    return this._viewer;
+  }
+  set viewer(value) {
+    if (this._viewer === value)
+      return;
+    this._viewer = value;
+    if (!this.editor)
+      return;
+    this.renderEditor(true);
+  }
+  get value() {
+    return this._value;
+  }
+  set value(value) {
+    this._value = value;
+    const targetObj = this.viewer ? this.viewerObj : this.editorObj;
+    if (targetObj) {
+      targetObj.setMarkdown(value);
+    }
+  }
+  get height() {
+    return this._heightValue;
+  }
+  set height(value) {
+    this._heightValue = value;
+    if (this.viewer)
+      return;
+    if (this.editorObj) {
+      this.editorObj.setHeight(value);
+    }
+  }
+  get toolbarItems() {
+    return this._toolbarItems || TOOLBAR_ITEMS_DEFAULT;
+  }
+  set toolbarItems(items) {
+    this._toolbarItems = items;
+    if (!this.editor)
+      return;
+    this.renderEditor(true);
+  }
+  get plugins() {
+    return this._customPlugins || [];
+  }
+  set plugins(plugins) {
+    this._customPlugins = plugins;
+    if (!this.editor)
+      return;
+    this.renderEditor(true);
+  }
+  get widgetRules() {
+    return this._widgetRules || [];
+  }
+  set widgetRules(rules) {
+    this._widgetRules = rules;
+    if (!this.editor)
+      return;
+    this.renderEditor(true);
+  }
+  static async create(options, parent) {
+    let self = new this(parent, options);
+    await self.ready();
+    return self;
+  }
+  async loadLib() {
+    return new Promise((resolve, reject) => {
+      RequireJS.require(libs2, async (marked) => {
+        resolve(marked);
+      });
+    });
+  }
+  async loadPlugin(plugin) {
+    return new Promise((resolve, reject) => {
+      RequireJS.require(plugin, async (marked) => {
+        resolve(marked);
+      });
+    });
+  }
+  async loadPlugins() {
+    for (const _plugin of libPlugins) {
+      this.editorPlugins[_plugin.name] = await this.loadPlugin(_plugin.path);
+    }
+  }
+  addCSS(href, name) {
+    const css = document.head.querySelector(`[name="${name}"]`);
+    if (css)
+      return;
+    let link = document.createElement("link");
+    link.setAttribute("type", "text/css");
+    link.setAttribute("rel", "stylesheet");
+    link.setAttribute("name", name);
+    link.href = href;
+    document.head.append(link);
+  }
+  async initEditor() {
+    for (const item of editorCSS) {
+      this.addCSS(item.href, item.name);
+    }
+    this.editor = await this.loadLib();
+    await this.loadPlugins();
+    try {
+      this.renderEditor();
+    } catch (e) {
+    }
+  }
+  renderEditor(valueChanged) {
+    const editorPlugins = Object.values(this.editorPlugins);
+    if (this.viewer) {
+      if (this.editorObj) {
+        this.editorObj.destroy();
+      }
+      if (!this.elm) {
+        this.elm = this.createElement("div", this);
+      } else {
+        this.elm.innerHTML = "";
+        this.elm.style.height = "auto";
+      }
+      this.viewerObj = this.editor.factory({
+        el: this.elm,
+        viewer: true,
+        initialValue: this.value,
+        theme: this.theme,
+        plugins: [...editorPlugins, ...this.plugins],
+        widgetRules: this.widgetRules
+      });
+    } else {
+      if (this.viewerObj) {
+        this.viewerObj.destroy();
+      }
+      if (!this.elm) {
+        this.elm = this.createElement("div", this);
+      } else {
+        this.elm.innerHTML = "";
+      }
+      const currentValue = valueChanged && this.editorObj ? this.editorObj.getMarkdown() : this.value;
+      this.editorObj = new this.editor({
+        el: this.elm,
+        previewStyle: this.previewStyle,
+        height: this.height,
+        initialEditType: this.mode,
+        initialValue: currentValue,
+        theme: this.theme,
+        toolbarItems: this.toolbarItems,
+        plugins: [...editorPlugins, ...this.plugins],
+        widgetRules: this.widgetRules
+      });
+    }
+  }
+  getMarkdownValue() {
+    if (this.editorObj && !this.viewer) {
+      return this.editorObj.getMarkdown();
+    }
+    return "";
+  }
+  getEditorElm() {
+    if (this.editorObj && !this.viewer) {
+      return this.editorObj;
+    }
+    return null;
+  }
+  getViewerElm() {
+    if (this.viewerObj && this.viewer) {
+      return this.viewerObj;
+    }
+    return null;
+  }
+  async init() {
     super.init();
-    const container = this.createElement("div", this);
-    container.classList.add("editor-container");
-    this.tabs = new Tabs(void 0, {
-      width: "auto"
-    });
-    container.appendChild(this.tabs);
-    this.mdEditor = new CodeEditor();
-    this.mdEditor.width = "100%";
-    this.mdEditor.height = "646px";
-    this.mdEditor.language = "markdown";
-    this.editTab = this.tabs.add({
-      caption: "Edit file",
-      icon: {
-        name: "code",
-        width: "16px",
-        height: "16px",
-        fill: "currentColor"
-      },
-      children: this.mdEditor
-    });
-    this.mdPreviewer = new Markdown();
-    this.previewTab = this.tabs.add({
-      caption: "Preview",
-      icon: {
-        name: "eye",
-        width: "16px",
-        height: "16px",
-        fill: "currentColor"
-      },
-      children: this.mdPreviewer
-    });
-    this.previewTab.onClick = this.onViewPreview.bind(this);
-    this.tabs.activeTabIndex = 0;
+    const mode = this.getAttribute("mode", true, "");
+    if (mode) {
+      this._mode = mode;
+    }
+    const previewStyle = this.getAttribute("previewStyle", true, "");
+    if (previewStyle) {
+      this._previewStyle = previewStyle;
+    }
+    const value = this.getAttribute("value", true, "");
+    if (value) {
+      this._value = value;
+    }
+    const viewer = this.getAttribute("viewer", true, null);
+    if (viewer !== null) {
+      this.viewer = viewer;
+    }
+    const height = this.getAttribute("height", true, "");
+    if (height) {
+      this._heightValue = height;
+    }
+    const width = this.getAttribute("width", true, "");
+    if (width) {
+      this.width = width;
+    }
+    const theme = this.getAttribute("theme", true, "");
+    if (theme) {
+      this._theme = theme;
+    }
+    const toolbarItems = this.getAttribute("toolbarItems", true, "");
+    if (toolbarItems) {
+      this._toolbarItems = toolbarItems;
+    }
+    const plugins = this.getAttribute("plugins", true, "");
+    if (plugins) {
+      this._customPlugins = plugins;
+    }
+    const widgetRules = this.getAttribute("widgetRules", true, "");
+    if (widgetRules) {
+      this._widgetRules = widgetRules;
+    }
+    this.initEditor();
   }
 };
 MarkdownEditor = __decorateClass([
   customElements2("i-markdown-editor")
 ], MarkdownEditor);
-
-// packages/link/src/style/link.css.ts
-var Theme14 = theme_exports.ThemeVars;
-cssRule("i-link", {
-  display: "block",
-  cursor: "pointer",
-  textTransform: "inherit",
-  $nest: {
-    "&:hover *": {
-      color: Theme14.colors.primary.dark
-    },
-    "> a": {
-      display: "inline",
-      transition: "all .3s",
-      textDecoration: "underline",
-      color: "inherit",
-      fontSize: "inherit",
-      fontWeight: "inherit",
-      fontFamily: "inherit",
-      textTransform: "inherit"
-    }
-  }
-});
-
-// packages/link/src/link.ts
-var Link = class extends Control {
-  constructor(parent, options) {
-    super(parent, options, {
-      target: "_blank"
-    });
-  }
-  get href() {
-    return this._href;
-  }
-  set href(value) {
-    this._href = typeof value === "string" ? value : "";
-    if (this._linkElm)
-      this._linkElm.href = this._href;
-  }
-  get target() {
-    return this._target;
-  }
-  set target(value) {
-    this._target = value;
-    if (this._linkElm)
-      this._linkElm.target = value;
-  }
-  append(children) {
-    if (!this._linkElm) {
-      this._linkElm = this.createElement("a", this);
-    }
-    this._linkElm.appendChild(children);
-  }
-  _handleClick(event, stopPropagation) {
-    event.preventDefault();
-    window.open(this._linkElm.href, this._linkElm.target);
-    return super._handleClick(event);
-  }
-  addChildControl(control) {
-    if (this._linkElm)
-      this._linkElm.appendChild(control);
-  }
-  removeChildControl(control) {
-    if (this._linkElm && this._linkElm.contains(control))
-      this._linkElm.removeChild(control);
-  }
-  init() {
-    if (!this.initialized) {
-      super.init();
-      if (!this._linkElm)
-        this._linkElm = this.createElement("a", this);
-      this.classList.add("i-link");
-      const hrefAttr = this.getAttribute("href", true);
-      hrefAttr && (this.href = hrefAttr);
-      const targetAttr = this.getAttribute("target", true);
-      targetAttr && (this._linkElm.target = targetAttr);
-    }
-  }
-  static async create(options, parent) {
-    let self = new this(parent, options);
-    await self.ready();
-    return self;
-  }
-};
-Link = __decorateClass([
-  customElements2("i-link")
-], Link);
 
 // packages/modal/src/style/modal.css.ts
 var Theme15 = theme_exports.ThemeVars;
@@ -17893,7 +25619,7 @@ var wrapperStyle = style({
   visibility: "hidden",
   transform: "scale(1.1)",
   transition: "visibility 0s linear .25s,opacity .25s 0s,transform .25s",
-  zIndex: 10,
+  zIndex: 1e3,
   overflow: "auto"
 });
 var noBackdropStyle = style({
@@ -17904,7 +25630,7 @@ var noBackdropStyle = style({
   visibility: "hidden",
   transform: "scale(1.1)",
   transition: "visibility 0s linear .25s,opacity .25s 0s,transform .25s",
-  zIndex: 10,
+  zIndex: 1e3,
   overflow: "auto",
   width: "100%",
   maxWidth: "inherit",
@@ -17960,7 +25686,8 @@ var Modal = class extends Container {
     });
   }
   get visible() {
-    return this.wrapperDiv.classList.contains(visibleStyle);
+    var _a;
+    return ((_a = this.wrapperDiv) == null ? void 0 : _a.classList.contains(visibleStyle)) || false;
   }
   set visible(value) {
     var _a, _b;
@@ -18299,602 +26026,6 @@ var Modal = class extends Container {
 Modal = __decorateClass([
   customElements2("i-modal")
 ], Modal);
-
-// packages/layout/src/style/panel.css.ts
-var panelStyle = style({
-  display: "block",
-  clear: "both",
-  position: "relative"
-});
-var overflowStyle = style({
-  overflow: "hidden"
-});
-var vStackStyle = style({
-  display: "flex",
-  flexDirection: "column"
-});
-var hStackStyle = style({
-  display: "flex",
-  flexDirection: "row"
-});
-var gridStyle = style({
-  display: "grid"
-});
-var getStackDirectionStyleClass = (direction) => {
-  return style({
-    display: "flex",
-    flexDirection: direction == "vertical" ? "column" : "row"
-  });
-};
-var getStackMediaQueriesStyleClass = (mediaQueries) => {
-  let styleObj = getControlMediaQueriesStyle(mediaQueries);
-  for (let mediaQuery of mediaQueries) {
-    let mediaQueryRule;
-    if (mediaQuery.minWidth && mediaQuery.maxWidth) {
-      mediaQueryRule = `@media (min-width: ${mediaQuery.minWidth}) and (max-width: ${mediaQuery.maxWidth})`;
-    } else if (mediaQuery.minWidth) {
-      mediaQueryRule = `@media (min-width: ${mediaQuery.minWidth})`;
-    } else if (mediaQuery.maxWidth) {
-      mediaQueryRule = `@media (max-width: ${mediaQuery.maxWidth})`;
-    }
-    if (mediaQueryRule) {
-      styleObj["$nest"][mediaQueryRule] = styleObj["$nest"][mediaQueryRule] || {};
-      if (mediaQuery.properties.direction) {
-        styleObj["$nest"][mediaQueryRule]["flexDirection"] = mediaQuery.properties.direction == "vertical" ? "column" : "row";
-      }
-      if (mediaQuery.properties.justifyContent) {
-        styleObj["$nest"][mediaQueryRule]["justifyContent"] = mediaQuery.properties.justifyContent;
-      }
-      if (mediaQuery.properties.alignItems) {
-        styleObj["$nest"][mediaQueryRule]["alignItems"] = mediaQuery.properties.alignItems;
-      }
-      if (mediaQuery.properties.width !== void 0 && mediaQuery.properties.width !== null) {
-        const width = mediaQuery.properties.width;
-        styleObj["$nest"][mediaQueryRule]["width"] = typeof width === "string" ? `${width} !important` : `${width}px !important`;
-      }
-      if (mediaQuery.properties.height !== void 0 && mediaQuery.properties.height !== null) {
-        const height = mediaQuery.properties.height;
-        styleObj["$nest"][mediaQueryRule]["height"] = typeof height === "string" ? `${height} !important` : `${height}px !important`;
-      }
-      if (mediaQuery.properties.gap !== void 0 && mediaQuery.properties.gap !== null) {
-        const gap = mediaQuery.properties.gap;
-        styleObj["$nest"][mediaQueryRule]["gap"] = typeof gap === "string" ? `${gap} !important` : `${gap}px !important`;
-      }
-      if (mediaQuery.properties.position) {
-        styleObj["$nest"][mediaQueryRule]["position"] = `${mediaQuery.properties.position} !important`;
-      }
-      if (mediaQuery.properties.top !== null && mediaQuery.properties.top !== void 0) {
-        styleObj["$nest"][mediaQueryRule]["top"] = `${mediaQuery.properties.top} !important`;
-      }
-      if (typeof mediaQuery.properties.visible === "boolean") {
-        const visible = mediaQuery.properties.visible;
-        styleObj["$nest"][mediaQueryRule]["display"] = visible ? "flex !important" : "none !important";
-      }
-    }
-  }
-  return style(styleObj);
-};
-var justifyContentStartStyle = style({
-  justifyContent: "flex-start"
-});
-var justifyContentCenterStyle = style({
-  justifyContent: "center"
-});
-var justifyContentEndStyle = style({
-  justifyContent: "flex-end"
-});
-var justifyContentSpaceBetweenStyle = style({
-  justifyContent: "space-between"
-});
-var alignItemsStretchStyle = style({
-  alignItems: "stretch"
-});
-var alignItemsStartStyle = style({
-  alignItems: "flex-start"
-});
-var alignItemsCenterStyle = style({
-  alignItems: "center"
-});
-var alignItemsEndStyle = style({
-  alignItems: "flex-end"
-});
-var getTemplateColumnsStyleClass = (columns) => {
-  return style({
-    gridTemplateColumns: columns.join(" ")
-  });
-};
-var getTemplateRowsStyleClass = (rows) => {
-  return style({
-    gridTemplateRows: rows.join(" ")
-  });
-};
-var getTemplateAreasStyleClass = (templateAreas) => {
-  let templateAreasStr = "";
-  for (let i = 0; i < templateAreas.length; i++) {
-    templateAreasStr += '"' + templateAreas[i].join(" ") + '" ';
-  }
-  return style({
-    gridTemplateAreas: templateAreasStr
-  });
-};
-var getGridLayoutMediaQueriesStyleClass = (mediaQueries) => {
-  let styleObj = getControlMediaQueriesStyle(mediaQueries);
-  for (let mediaQuery of mediaQueries) {
-    let mediaQueryRule;
-    if (mediaQuery.minWidth && mediaQuery.maxWidth) {
-      mediaQueryRule = `@media (min-width: ${mediaQuery.minWidth}) and (max-width: ${mediaQuery.maxWidth})`;
-    } else if (mediaQuery.minWidth) {
-      mediaQueryRule = `@media (min-width: ${mediaQuery.minWidth})`;
-    } else if (mediaQuery.maxWidth) {
-      mediaQueryRule = `@media (max-width: ${mediaQuery.maxWidth})`;
-    }
-    if (mediaQueryRule) {
-      styleObj["$nest"][mediaQueryRule] = styleObj["$nest"][mediaQueryRule] || {};
-      if (mediaQuery.properties.templateColumns) {
-        styleObj["$nest"][mediaQueryRule]["gridTemplateColumns"] = mediaQuery.properties.templateColumns.join(" ");
-      }
-      if (mediaQuery.properties.templateRows) {
-        styleObj["$nest"][mediaQueryRule]["gridTemplateRows"] = mediaQuery.properties.templateRows.join(" ");
-      }
-      if (mediaQuery.properties.templateAreas) {
-        let templateAreasStr = "";
-        for (let i = 0; i < mediaQuery.properties.templateAreas.length; i++) {
-          templateAreasStr += '"' + mediaQuery.properties.templateAreas[i].join(" ") + '" ';
-        }
-        styleObj["$nest"][mediaQueryRule]["gridTemplateAreas"] = templateAreasStr;
-      }
-      if (mediaQuery.properties.display) {
-        styleObj["$nest"][mediaQueryRule]["display"] = mediaQuery.properties.display;
-      }
-      if (mediaQuery.properties.gap) {
-        const gap = mediaQuery.properties.gap;
-        if (gap.row) {
-          styleObj["$nest"][mediaQueryRule]["rowGap"] = typeof gap.row === "string" ? gap.row : `${gap.row}px`;
-        }
-        if (gap.column) {
-          styleObj["$nest"][mediaQueryRule]["columnGap"] = typeof gap.column === "string" ? gap.column : `${gap.column}px`;
-        }
-      }
-      if (typeof mediaQuery.properties.visible === "boolean") {
-        const visible = mediaQuery.properties.visible;
-        const display = mediaQuery.properties.display || "grid";
-        styleObj["$nest"][mediaQueryRule]["display"] = visible ? display + " !important" : "none !important";
-      }
-    }
-  }
-  return style(styleObj);
-};
-
-// packages/layout/src/stack.ts
-var StackLayout = class extends Container {
-  constructor(parent, options) {
-    super(parent, options);
-  }
-  static async create(options, parent) {
-    let self = new this(parent, options);
-    await self.ready();
-    return self;
-  }
-  get direction() {
-    return this._direction;
-  }
-  set direction(value) {
-    this._direction = value;
-    if (value) {
-      let style2 = getStackDirectionStyleClass(value);
-      this.classList.add(style2);
-    }
-  }
-  get justifyContent() {
-    return this._justifyContent;
-  }
-  set justifyContent(value) {
-    this._justifyContent = value || "start";
-    switch (this._justifyContent) {
-      case "start":
-        this.classList.add(justifyContentStartStyle);
-        break;
-      case "center":
-        this.classList.add(justifyContentCenterStyle);
-        break;
-      case "end":
-        this.classList.add(justifyContentEndStyle);
-        break;
-      case "space-between":
-        this.classList.add(justifyContentSpaceBetweenStyle);
-        break;
-    }
-  }
-  get alignItems() {
-    return this._alignItems;
-  }
-  set alignItems(value) {
-    this._alignItems = value || "stretch";
-    switch (this._alignItems) {
-      case "stretch":
-        this.classList.add(alignItemsStretchStyle);
-        break;
-      case "start":
-        this.classList.add(alignItemsStartStyle);
-        break;
-      case "center":
-        this.classList.add(alignItemsCenterStyle);
-        break;
-      case "end":
-        this.classList.add(alignItemsEndStyle);
-        break;
-    }
-  }
-  get gap() {
-    return this._gap;
-  }
-  set gap(value) {
-    this._gap = value || "initial";
-    if (typeof this._gap === "number") {
-      this.style.gap = this._gap + "px";
-    } else {
-      this.style.gap = this._gap;
-    }
-  }
-  get wrap() {
-    return this._wrap;
-  }
-  set wrap(value) {
-    if (!value)
-      return;
-    this._wrap = value;
-    this.style.flexWrap = this._wrap;
-  }
-  get mediaQueries() {
-    return this._mediaQueries;
-  }
-  set mediaQueries(value) {
-    this._mediaQueries = value;
-    let style2 = getStackMediaQueriesStyleClass(this._mediaQueries);
-    this._mediaStyle && this.classList.remove(this._mediaStyle);
-    this._mediaStyle = style2;
-    this.classList.add(style2);
-  }
-  setAttributeToProperty(propertyName) {
-    const prop = this.getAttribute(propertyName, true);
-    if (prop)
-      this[propertyName] = prop;
-  }
-  init() {
-    super.init();
-    this.setAttributeToProperty("direction");
-    this.setAttributeToProperty("justifyContent");
-    this.setAttributeToProperty("alignItems");
-    this.setAttributeToProperty("gap");
-    this.setAttributeToProperty("wrap");
-    this.setAttributeToProperty("mediaQueries");
-  }
-};
-StackLayout = __decorateClass([
-  customElements2("i-stack")
-], StackLayout);
-var HStack = class extends StackLayout {
-  constructor(parent, options) {
-    super(parent, options);
-  }
-  get horizontalAlignment() {
-    return this._horizontalAlignment;
-  }
-  set horizontalAlignment(value) {
-    this._horizontalAlignment = value || "start";
-    this.justifyContent = value;
-  }
-  get verticalAlignment() {
-    return this._verticalAlignment;
-  }
-  set verticalAlignment(value) {
-    this._verticalAlignment = value || "stretch";
-    this.alignItems = value;
-  }
-  setAttributeToProperty(propertyName) {
-    const prop = this.getAttribute(propertyName, true);
-    if (prop)
-      this[propertyName] = prop;
-  }
-  init() {
-    super.init();
-    this.direction = "horizontal";
-    this.setAttributeToProperty("horizontalAlignment");
-    this.setAttributeToProperty("verticalAlignment");
-  }
-  static async create(options, parent) {
-    let self = new this(parent, options);
-    await self.ready();
-    return self;
-  }
-};
-HStack = __decorateClass([
-  customElements2("i-hstack")
-], HStack);
-var VStack = class extends StackLayout {
-  constructor(parent, options) {
-    super(parent, options);
-  }
-  get horizontalAlignment() {
-    return this._horizontalAlignment;
-  }
-  set horizontalAlignment(value) {
-    this._horizontalAlignment = value || "stretch";
-    this.alignItems = value;
-  }
-  get verticalAlignment() {
-    return this._verticalAlignment;
-  }
-  set verticalAlignment(value) {
-    this._verticalAlignment = value || "start";
-    this.justifyContent = value;
-  }
-  setAttributeToProperty(propertyName) {
-    const prop = this.getAttribute(propertyName, true);
-    if (prop)
-      this[propertyName] = prop;
-  }
-  init() {
-    super.init();
-    this.direction = "vertical";
-    this.setAttributeToProperty("horizontalAlignment");
-    this.setAttributeToProperty("verticalAlignment");
-  }
-  static async create(options, parent) {
-    let self = new this(parent, options);
-    await self.ready();
-    return self;
-  }
-};
-VStack = __decorateClass([
-  customElements2("i-vstack")
-], VStack);
-
-// packages/layout/src/panel.ts
-var Panel = class extends Container {
-  constructor(parent, options) {
-    super(parent, options);
-  }
-  init() {
-    super.init();
-    this.classList.add(panelStyle);
-    if (this.dock) {
-      this.classList.add(overflowStyle);
-    }
-  }
-  connectedCallback() {
-    if (this.connected) {
-      return;
-    }
-    super.connectedCallback();
-  }
-  static async create(options, parent) {
-    let self = new this(parent, options);
-    await self.ready();
-    return self;
-  }
-};
-Panel = __decorateClass([
-  customElements2("i-panel")
-], Panel);
-
-// packages/layout/src/grid.ts
-var GridLayout = class extends Container {
-  constructor(parent, options) {
-    super(parent, options);
-    this._styleClassMap = {};
-    this.removeStyleClass = this.removeStyleClass.bind(this);
-  }
-  static async create(options, parent) {
-    let self = new this(parent, options);
-    await self.ready();
-    return self;
-  }
-  get templateColumns() {
-    return this._templateColumns;
-  }
-  set templateColumns(columns) {
-    this._templateColumns = columns;
-    this.removeStyleClass("columns");
-    if (columns) {
-      let style2 = getTemplateColumnsStyleClass(columns);
-      this._styleClassMap["columns"] = style2;
-      this.classList.add(style2);
-    }
-  }
-  get templateRows() {
-    return this._templateRows;
-  }
-  set templateRows(rows) {
-    this._templateRows = rows;
-    this.removeStyleClass("rows");
-    if (rows) {
-      let style2 = getTemplateRowsStyleClass(rows);
-      this._styleClassMap["rows"] = style2;
-      this.classList.add(style2);
-    }
-  }
-  get templateAreas() {
-    return this._templateAreas;
-  }
-  set templateAreas(value) {
-    this._templateAreas = value;
-    this.removeStyleClass("areas");
-    if (value) {
-      let style2 = getTemplateAreasStyleClass(value);
-      this._styleClassMap["areas"] = style2;
-      this.classList.add(style2);
-    }
-  }
-  get autoColumnSize() {
-    return this._autoColumnSize;
-  }
-  set autoColumnSize(value) {
-    this._autoColumnSize = value;
-    if (value) {
-      this.style.gridAutoColumns = value;
-    }
-  }
-  get autoRowSize() {
-    return this._autoRowSize;
-  }
-  set autoRowSize(value) {
-    this._autoRowSize = value;
-    if (value) {
-      this.style.gridAutoRows = value;
-    }
-  }
-  get columnsPerRow() {
-    return this._columnsPerRow;
-  }
-  set columnsPerRow(value) {
-    this._columnsPerRow = value;
-    this.style.gridTemplateColumns = `repeat(${this._columnsPerRow}, 1fr)`;
-  }
-  get gap() {
-    return this._gap;
-  }
-  set gap(value) {
-    this._gap = value;
-    if (value) {
-      if (value.row) {
-        if (typeof value.row == "number") {
-          this.style.rowGap = value.row + "px";
-        } else {
-          this.style.rowGap = value.row;
-        }
-      }
-      if (value.column) {
-        if (typeof value.column == "number") {
-          this.style.columnGap = value.column + "px";
-        } else {
-          this.style.columnGap = value.column;
-        }
-      }
-    }
-  }
-  get horizontalAlignment() {
-    return this._horizontalAlignment;
-  }
-  set horizontalAlignment(value) {
-    this._horizontalAlignment = value;
-    this.style.justifyItems = value;
-  }
-  get verticalAlignment() {
-    return this._verticalAlignment;
-  }
-  set verticalAlignment(value) {
-    this._verticalAlignment = value;
-    this.style.alignItems = value;
-  }
-  get autoFillInHoles() {
-    return this._autoFillInHoles;
-  }
-  set autoFillInHoles(value) {
-    this._autoFillInHoles = value;
-    this.style.gridAutoFlow = this._autoFillInHoles ? "dense" : "row";
-  }
-  get mediaQueries() {
-    return this._mediaQueries;
-  }
-  set mediaQueries(value) {
-    this._mediaQueries = value;
-    let style2 = getGridLayoutMediaQueriesStyleClass(this._mediaQueries);
-    this._mediaStyle && this.classList.remove(this._mediaStyle);
-    this._mediaStyle = style2;
-    this.classList.add(style2);
-  }
-  setAttributeToProperty(propertyName) {
-    const prop = this.getAttribute(propertyName, true);
-    if (this.id == "thisPnl") {
-      console.log(propertyName, prop);
-    }
-    if (prop)
-      this[propertyName] = prop;
-  }
-  removeStyleClass(name) {
-    if (this._styleClassMap && this._styleClassMap[name]) {
-      this.classList.remove(this._styleClassMap[name]);
-      delete this._styleClassMap[name];
-    }
-  }
-  init() {
-    super.init();
-    this._styleClassMap = {};
-    this.classList.add(gridStyle);
-    this.setAttributeToProperty("templateColumns");
-    this.setAttributeToProperty("templateRows");
-    this.setAttributeToProperty("templateAreas");
-    this.setAttributeToProperty("gap");
-    this.setAttributeToProperty("horizontalAlignment");
-    this.setAttributeToProperty("verticalAlignment");
-    this.setAttributeToProperty("columnsPerRow");
-    this.setAttributeToProperty("autoFillInHoles");
-    this.setAttributeToProperty("autoColumnSize");
-    this.setAttributeToProperty("autoRowSize");
-    this.setAttributeToProperty("mediaQueries");
-  }
-};
-GridLayout = __decorateClass([
-  customElements2("i-grid-layout")
-], GridLayout);
-
-// packages/layout/src/card.ts
-var CardLayout = class extends GridLayout {
-  constructor(parent, options) {
-    super(parent, options);
-  }
-  static async create(options, parent) {
-    let self = new this(parent, options);
-    await self.ready();
-    return self;
-  }
-  get cardMinWidth() {
-    return this._cardMinWidth;
-  }
-  set cardMinWidth(value) {
-    this._cardMinWidth = value;
-    this.updateGridTemplateColumns();
-  }
-  get columnsPerRow() {
-    return this._columnsPerRow;
-  }
-  set columnsPerRow(value) {
-    this._columnsPerRow = value;
-    this.updateGridTemplateColumns();
-  }
-  get cardHeight() {
-    return this._cardHeight;
-  }
-  set cardHeight(value) {
-    this._cardHeight = typeof value == "number" ? value + "px" : value;
-    this.style.gridAutoRows = this._cardHeight;
-  }
-  updateGridTemplateColumns() {
-    if (this.cardMinWidth && this.columnsPerRow) {
-      let minmaxFirstParam = this.gap && this.gap.column ? `max(${this.cardMinWidth}, calc(100%/${this.columnsPerRow} - ${this.gap.column}))` : `max(${this.cardMinWidth}, 100%/${this.columnsPerRow})`;
-      this.style.gridTemplateColumns = `repeat(auto-fill, minmax(${minmaxFirstParam}, 1fr))`;
-    } else if (this.cardMinWidth) {
-      this.style.gridTemplateColumns = `repeat(auto-fill, minmax(min(${this.cardMinWidth}, 100%), 1fr))`;
-    } else if (this.columnsPerRow) {
-      this.style.gridTemplateColumns = `repeat(${this.columnsPerRow}, 1fr)`;
-    }
-  }
-  setAttributeToProperty(propertyName) {
-    const prop = this.getAttribute(propertyName, true);
-    if (prop)
-      this[propertyName] = prop;
-  }
-  init() {
-    super.init();
-    this.autoRowSize = "1fr";
-    this.setAttributeToProperty("cardMinWidth");
-    this.setAttributeToProperty("cardHeight");
-  }
-};
-CardLayout = __decorateClass([
-  customElements2("i-card-layout")
-], CardLayout);
 
 // packages/menu/src/style/menu.css.ts
 var Theme17 = theme_exports.ThemeVars;
@@ -19595,7 +26726,7 @@ var Module = class extends Container {
         if (value == null ? void 0 : value.__target) {
           let target = value.__target;
           let paths = value.__path;
-          let targetValue = this.getValue(target, paths);
+          let targetValue = this.getAttributeValue(target, paths);
           let observable3 = getObservable(target, paths);
           if (isObservable(observable3)) {
             if (paths.length > 0)
@@ -19662,120 +26793,14 @@ Module = __decorateClass([
   customElements2("i-module")
 ], Module);
 
-// packages/label/src/style/label.css.ts
-var Theme18 = theme_exports.ThemeVars;
-var captionStyle2 = style({
-  display: "inline-block",
-  color: Theme18.text.primary,
-  fontFamily: Theme18.typography.fontFamily,
-  fontSize: Theme18.typography.fontSize
-});
-
-// packages/label/src/label.ts
-var Label = class extends Control {
-  constructor(parent, options) {
-    super(parent, options);
-  }
-  get caption() {
-    return this.captionSpan.innerHTML;
-  }
-  set caption(value) {
-    this.captionSpan.innerHTML = value || "";
-  }
-  get link() {
-    if (!this._link) {
-      this._link = new Link(this, {
-        href: "#",
-        target: "_blank",
-        font: this.font
-      });
-      this._link.append(this.captionSpan);
-      this.appendChild(this._link);
-    }
-    return this._link;
-  }
-  set link(value) {
-    if (this._link) {
-      this._link.prepend(this.captionSpan);
-      this._link.remove();
-    }
-    this._link = value;
-    if (this._link) {
-      this._link.append(this.captionSpan);
-      this.appendChild(this._link);
-    }
-  }
-  set height(value) {
-    this.setPosition("height", value);
-    if (this.captionSpan)
-      this.captionSpan.style.height = value + "px";
-  }
-  set width(value) {
-    this.setPosition("width", value);
-    if (this.captionSpan)
-      this.captionSpan.style.width = value + "px";
-  }
-  get wordBreak() {
-    return this.style.wordBreak;
-  }
-  set wordBreak(value) {
-    this.style.wordBreak = value;
-  }
-  get overflowWrap() {
-    return this.style.overflowWrap;
-  }
-  set overflowWrap(value) {
-    this.style.overflowWrap = value;
-  }
-  init() {
-    if (!this.captionSpan) {
-      let childNodes = [];
-      for (let i = 0; i < this.childNodes.length; i++) {
-        childNodes.push(this.childNodes[i]);
-      }
-      this.captionSpan = this.createElement("span", this);
-      this.classList.add(captionStyle2);
-      this.caption = this.getAttribute("caption", true) || "";
-      if (childNodes && childNodes.length) {
-        for (let i = 0; i < childNodes.length; i++) {
-          this.captionSpan.appendChild(childNodes[i]);
-        }
-      }
-      const linkAttr = this.getAttribute("link", true);
-      if (linkAttr) {
-        const link = new Link(this, {
-          ...linkAttr,
-          font: this.font
-        });
-        this.link = link;
-      }
-      const wordBreak = this.getAttribute("wordBreak", true);
-      if (wordBreak)
-        this.wordBreak = wordBreak;
-      const overflowWrap = this.getAttribute("overflowWrap", true);
-      if (overflowWrap)
-        this.overflowWrap = overflowWrap;
-      super.init();
-    }
-  }
-  static async create(options, parent) {
-    let self = new this(parent, options);
-    await self.ready();
-    return self;
-  }
-};
-Label = __decorateClass([
-  customElements2("i-label")
-], Label);
-
 // packages/tree-view/src/style/treeView.css.ts
-var Theme19 = theme_exports.ThemeVars;
+var Theme18 = theme_exports.ThemeVars;
 cssRule("i-tree-view", {
   display: "block",
   overflowY: "auto",
   overflowX: "hidden",
-  fontFamily: Theme19.typography.fontFamily,
-  fontSize: Theme19.typography.fontSize,
+  fontFamily: Theme18.typography.fontFamily,
+  fontSize: Theme18.typography.fontSize,
   $nest: {
     ".i-tree-node_content": {
       display: "flex",
@@ -19809,7 +26834,7 @@ cssRule("i-tree-view", {
     ".i-tree-node_label": {
       position: "relative",
       display: "inline-block",
-      color: Theme19.text.primary,
+      color: Theme18.text.primary,
       cursor: "pointer",
       fontSize: 14
     },
@@ -19843,7 +26868,7 @@ cssRule("i-tree-view", {
       position: "relative",
       $nest: {
         ".is-checked:before": {
-          borderLeft: `1px solid ${Theme19.divider}`,
+          borderLeft: `1px solid ${Theme18.divider}`,
           height: "calc(100% - 1em)",
           top: "1em"
         },
@@ -19852,12 +26877,12 @@ cssRule("i-tree-view", {
           top: 25
         },
         "i-tree-node.active > .i-tree-node_content": {
-          backgroundColor: Theme19.action.selected,
-          border: `1px solid ${Theme19.colors.info.dark}`,
-          color: Theme19.text.primary
+          backgroundColor: Theme18.action.selected,
+          border: `1px solid ${Theme18.colors.info.dark}`,
+          color: Theme18.text.primary
         },
         ".i-tree-node_content:hover": {
-          backgroundColor: Theme19.action.hover,
+          backgroundColor: Theme18.action.hover,
           $nest: {
             "> .is-right .button-group *": {
               display: "inline-flex"
@@ -19885,8 +26910,8 @@ cssRule("i-tree-view", {
           marginLeft: "1em"
         },
         "input ~ .i-tree-node_label:before": {
-          background: Theme19.colors.primary.main,
-          color: Theme19.colors.primary.contrastText,
+          background: Theme18.colors.primary.main,
+          color: Theme18.colors.primary.contrastText,
           position: "relative",
           zIndex: "1",
           float: "left",
@@ -19927,7 +26952,7 @@ cssRule("i-tree-view", {
           left: "-.1em",
           display: "block",
           width: "1px",
-          borderLeft: `1px solid ${Theme19.divider}`,
+          borderLeft: `1px solid ${Theme18.divider}`,
           content: "''"
         },
         ".i-tree-node_icon:not(.custom-icon)": {
@@ -19943,15 +26968,15 @@ cssRule("i-tree-view", {
           display: "block",
           height: "0.5em",
           width: "1em",
-          borderBottom: `1px solid ${Theme19.divider}`,
-          borderLeft: `1px solid ${Theme19.divider}`,
+          borderBottom: `1px solid ${Theme18.divider}`,
+          borderLeft: `1px solid ${Theme18.divider}`,
           borderRadius: " 0 0 0 0",
           content: "''"
         },
         "i-tree-node input:checked ~ .i-tree-node_label:after": {
           borderRadius: "0 .1em 0 0",
-          borderTop: `1px solid ${Theme19.divider}`,
-          borderRight: `0.5px solid ${Theme19.divider}`,
+          borderTop: `1px solid ${Theme18.divider}`,
+          borderRight: `0.5px solid ${Theme18.divider}`,
           borderBottom: "0",
           borderLeft: "0",
           bottom: "0",
@@ -19970,7 +26995,7 @@ cssRule("i-tree-view", {
       width: "100%",
       $nest: {
         "&:focus": {
-          borderBottom: `2px solid ${Theme19.colors.primary.main}`
+          borderBottom: `2px solid ${Theme18.colors.primary.main}`
         }
       }
     },
@@ -19997,11 +27022,11 @@ cssRule("i-tree-view", {
 });
 
 // packages/tree-view/src/treeView.ts
-var Theme20 = theme_exports.ThemeVars;
+var Theme19 = theme_exports.ThemeVars;
 var beforeExpandEvent = new Event("beforeExpand");
 var defaultIcon3 = {
   name: "caret-right",
-  fill: Theme20.text.secondary,
+  fill: Theme19.text.secondary,
   width: 12,
   height: 12
 };
@@ -20011,6 +27036,7 @@ var TreeView = class extends Control {
       editable: false
     });
     this._items = [];
+    this._alwaysExpanded = false;
   }
   get activeItem() {
     return this._activeItem;
@@ -20021,6 +27047,12 @@ var TreeView = class extends Control {
     treeNodes.forEach((treeNode) => treeNode.active = false);
     if (value)
       value.active = true;
+  }
+  get alwaysExpanded() {
+    return this._alwaysExpanded;
+  }
+  set alwaysExpanded(value) {
+    this._alwaysExpanded = value;
   }
   get data() {
     return this._items.map((node) => node.data);
@@ -20055,6 +27087,7 @@ var TreeView = class extends Control {
     const childNode = new TreeNode(this, { ...childData });
     this.initNode(childNode);
     childNode.editable = this.editable;
+    childNode.alwaysExpanded = this.alwaysExpanded;
     if (this.onRenderNode)
       this.onRenderNode(this, childNode);
     if (parentNode) {
@@ -20180,6 +27213,7 @@ var TreeView = class extends Control {
       this.classList.add("i-tree-view");
       if ((_a = this.options) == null ? void 0 : _a.onRenderNode)
         this.onRenderNode = this.options.onRenderNode;
+      this.alwaysExpanded = this.getAttribute("alwaysExpanded", true, false);
       this.editable = this.getAttribute("editable", true, false);
       this.actionButtons = this.getAttribute("actionButtons", true);
       this.data = this.getAttribute("data", true);
@@ -20200,6 +27234,7 @@ var TreeNode = class extends Control {
   constructor(parent, options) {
     super(parent, options);
     this._editable = false;
+    this._alwaysExpanded = false;
     options && (this.data = options);
     this.handleEdit = this.handleEdit.bind(this);
   }
@@ -20245,6 +27280,12 @@ var TreeNode = class extends Control {
         this._expandElm.checked = false;
       this.classList.remove("is-checked");
     }
+  }
+  get alwaysExpanded() {
+    return this._alwaysExpanded;
+  }
+  set alwaysExpanded(value) {
+    this._alwaysExpanded = value;
   }
   get active() {
     return this._active;
@@ -20356,7 +27397,7 @@ var TreeNode = class extends Control {
       this._expandElm.checked = !this._expandElm.checked;
       if (this._expandElm.checked)
         this.classList.add("is-checked");
-      else
+      else if (!this.alwaysExpanded)
         this.classList.remove("is-checked");
     }
     ;
@@ -20449,11 +27490,11 @@ TreeNode = __decorateClass([
 ], TreeNode);
 
 // packages/switch/src/style/switch.css.ts
-var Theme21 = theme_exports.ThemeVars;
+var Theme20 = theme_exports.ThemeVars;
 cssRule("i-switch", {
   display: "block",
-  fontFamily: Theme21.typography.fontFamily,
-  fontSize: Theme21.typography.fontSize,
+  fontFamily: Theme20.typography.fontFamily,
+  fontSize: Theme20.typography.fontSize,
   $nest: {
     ".wrapper": {
       width: "48px",
@@ -20874,7 +27915,7 @@ ScatterLineChart = __decorateClass([
 ], ScatterLineChart);
 
 // packages/upload/src/style/upload.css.ts
-var Theme22 = theme_exports.ThemeVars;
+var Theme21 = theme_exports.ThemeVars;
 cssRule("i-upload", {
   margin: "1rem 0",
   listStyle: "none",
@@ -20887,7 +27928,7 @@ cssRule("i-upload", {
   $nest: {
     ".i-upload-wrapper": {
       position: "relative",
-      border: `2px dashed ${Theme22.divider}`,
+      border: `2px dashed ${Theme21.divider}`,
       width: "100%",
       display: "flex",
       flexDirection: "column",
@@ -20907,8 +27948,8 @@ cssRule("i-upload", {
       marginTop: "4rem"
     },
     ".i-upload-dragger_active": {
-      border: `2px dashed ${Theme22.colors.primary.main}`,
-      backgroundColor: Theme22.colors.info.light,
+      border: `2px dashed ${Theme21.colors.primary.main}`,
+      backgroundColor: Theme21.colors.info.light,
       opacity: "0.8"
     },
     'input[type="file"]': {
@@ -20933,7 +27974,7 @@ cssRule("i-upload", {
     },
     ".i-upload_preview-crop": {
       position: "absolute",
-      border: `1px dashed ${Theme22.background.paper}`,
+      border: `1px dashed ${Theme21.background.paper}`,
       width: 150,
       height: 150,
       left: "50%",
@@ -21019,7 +28060,7 @@ cssRule("i-upload", {
 });
 
 // packages/upload/src/upload.ts
-var Theme23 = theme_exports.ThemeVars;
+var Theme22 = theme_exports.ThemeVars;
 var fileId = 1;
 var genFileId = () => Date.now() + fileId++;
 var UploadDrag = class extends Control {
@@ -21104,7 +28145,7 @@ var UploadDrag = class extends Control {
       this._wrapperElm = this.createElement("div", this);
       this._wrapperElm.classList.add("i-upload-drag_area");
       this._labelElm = this.createElement("span", this._wrapperElm);
-      this._labelElm.style.color = Theme23.text.primary;
+      this._labelElm.style.color = Theme22.text.primary;
       this.caption = this.getAttribute("caption", true);
       this.disabled = this.getAttribute("disabled", true);
       this.addEventListener("dragenter", this.handleOnDragEnter.bind(this));
@@ -21133,9 +28174,9 @@ var Upload = class extends Control {
       if (!this.isPreviewing || !this.enabled)
         return;
       event.stopPropagation();
-      const file = this._dt.files.length ? this._dt.files[0] : null;
+      const file = this._dt.files.length ? this._dt.files[0] : void 0;
       this.clear();
-      if (this.onRemoved && file)
+      if (this.onRemoved)
         this.onRemoved(this, file);
     };
     this.toBase64 = (file) => new Promise((resolve, reject) => {
@@ -21277,7 +28318,7 @@ var Upload = class extends Control {
         const removeIcon = new Icon(void 0, {
           width: 12,
           height: 12,
-          fill: Theme23.action.active,
+          fill: Theme22.action.active,
           name: "trash"
         });
         itemElm.appendChild(removeIcon);
@@ -21300,7 +28341,7 @@ var Upload = class extends Control {
     this._previewRemoveElm.classList.add("i-upload_preview-remove");
     this._previewRemoveElm.onclick = this.handleRemoveImagePreview;
     const span = this.createElement("span", this._previewRemoveElm);
-    span.style.fontFamily = Theme23.typography.fontFamily;
+    span.style.fontFamily = Theme22.typography.fontFamily;
     span.innerHTML = "Click to remove";
   }
   handleRemove(file) {
@@ -21406,6 +28447,550 @@ Upload = __decorateClass([
   customElements2("i-upload")
 ], Upload);
 
+// packages/tab/src/style/tab.css.ts
+var Theme23 = theme_exports.ThemeVars;
+cssRule("i-tabs", {
+  display: "block",
+  $nest: {
+    ".tabs-nav-wrap": {
+      display: "flex",
+      flex: "none",
+      overflow: "hidden"
+    },
+    "&:not(.vertical) .tabs-nav-wrap": {
+      $nest: {
+        "&:hover": {
+          overflowX: "auto",
+          overflowY: "hidden"
+        },
+        "&::-webkit-scrollbar-thumb": {
+          background: "#4b4b4b",
+          borderRadius: "5px"
+        },
+        "&::-webkit-scrollbar": {
+          height: "3px"
+        }
+      }
+    },
+    ".tabs-nav": {
+      position: "relative",
+      display: "flex",
+      flex: "none",
+      overflow: "hidden",
+      whiteSpace: "nowrap",
+      borderBottom: `1px solid #252525`,
+      margin: 0
+    },
+    "&.vertical": {
+      display: "flex",
+      $nest: {
+        ".tabs-nav": {
+          display: "flex",
+          flexDirection: "column"
+        },
+        ".tabs-nav:hover": {
+          overflowY: "auto"
+        },
+        ".tabs-nav::-webkit-scrollbar-thumb": {
+          background: "#4b4b4b",
+          borderRadius: "5px"
+        },
+        ".tabs-nav::-webkit-scrollbar": {
+          width: "3px"
+        }
+      }
+    },
+    "i-tab": {
+      position: "relative",
+      display: "inline-flex",
+      overflow: "hidden",
+      color: "rgba(255, 255, 255, 0.55)",
+      background: "#2e2e2e",
+      marginBottom: "-1px",
+      border: `1px solid #252525`,
+      alignItems: "center",
+      font: "inherit",
+      textAlign: "center",
+      minHeight: "36px",
+      $nest: {
+        "&:not(.disabled):hover": {
+          cursor: "pointer",
+          color: "#fff"
+        },
+        "&:not(.disabled).active.border": {
+          borderColor: `${Theme23.divider} ${Theme23.divider} #fff`,
+          borderBottomWidth: "1.5px"
+        },
+        ".tab-item": {
+          position: "relative",
+          display: "flex",
+          alignItems: "center",
+          cursor: "pointer",
+          padding: "0.5rem 1rem",
+          gap: "5px",
+          $nest: {
+            "i-image": {
+              display: "flex"
+            }
+          }
+        }
+      }
+    },
+    "i-tab:not(.disabled).active": {
+      backgroundColor: "#1d1d1d",
+      borderBottomColor: "transparent",
+      color: "#fff"
+    },
+    ".tabs-content": {
+      position: "relative",
+      overflow: "hidden",
+      display: "flex",
+      width: "100%",
+      height: "100%",
+      minHeight: "200px",
+      $nest: {
+        "&::after": {
+          clear: "both"
+        },
+        "i-label .f1yauex0": {
+          whiteSpace: "normal"
+        },
+        ".content-pane": {
+          position: "relative",
+          width: "100%",
+          height: "100%",
+          flex: "none"
+        }
+      }
+    },
+    "span.close": {
+      width: "18px",
+      height: "18px",
+      marginLeft: "5px",
+      marginRight: "-5px",
+      borderRadius: "5px",
+      lineHeight: "18px",
+      fontSize: "18px",
+      visibility: "hidden",
+      opacity: 0,
+      $nest: {
+        "&:hover": {
+          background: "rgba(78, 78, 78, 0.48)"
+        }
+      }
+    },
+    ".tabs-nav:not(.is-closable) span.close": {
+      display: "none"
+    },
+    ".tabs-nav.is-closable i-tab:not(.disabled):hover span.close, .tabs-nav.is-closable i-tab:not(.disabled).active span.close": {
+      visibility: "visible",
+      opacity: 1
+    }
+  }
+});
+var getTabMediaQueriesStyleClass = (mediaQueries) => {
+  let styleObj = getControlMediaQueriesStyle(mediaQueries);
+  for (let mediaQuery of mediaQueries) {
+    let mediaQueryRule;
+    if (mediaQuery.minWidth && mediaQuery.maxWidth) {
+      mediaQueryRule = `@media (min-width: ${mediaQuery.minWidth}) and (max-width: ${mediaQuery.maxWidth})`;
+    } else if (mediaQuery.minWidth) {
+      mediaQueryRule = `@media (min-width: ${mediaQuery.minWidth})`;
+    } else if (mediaQuery.maxWidth) {
+      mediaQueryRule = `@media (max-width: ${mediaQuery.maxWidth})`;
+    }
+    if (mediaQueryRule) {
+      const nestObj = styleObj["$nest"][mediaQueryRule]["$nest"] || {};
+      const ruleObj = styleObj["$nest"][mediaQueryRule];
+      styleObj["$nest"][mediaQueryRule] = {
+        ...ruleObj,
+        $nest: {
+          ...nestObj,
+          ".tabs-nav": {}
+        }
+      };
+      if (mediaQuery.properties.mode) {
+        const mode = mediaQuery.properties.mode;
+        styleObj["$nest"][mediaQueryRule]["display"] = mode === "vertical" ? "flex !important" : "block !important";
+        if (mode === "horizontal") {
+          styleObj["$nest"][mediaQueryRule]["$nest"][".tabs-nav"]["flexDirection"] = "row !important";
+          styleObj["$nest"][mediaQueryRule]["$nest"][".tabs-nav"]["width"] = "100%";
+          styleObj["$nest"][mediaQueryRule]["$nest"][".tabs-nav"]["justifyContent"] = "center";
+        } else {
+          styleObj["$nest"][mediaQueryRule]["$nest"][".tabs-nav"]["flexDirection"] = "column !important";
+          styleObj["$nest"][mediaQueryRule]["$nest"][".tabs-nav"]["width"] = "auto";
+          styleObj["$nest"][mediaQueryRule]["$nest"][".tabs-nav"]["justifyContent"] = "start";
+        }
+      }
+      if (typeof mediaQuery.properties.visible === "boolean") {
+        const visible = mediaQuery.properties.visible;
+        styleObj["$nest"][mediaQueryRule]["display"] = visible ? "block !important" : "none !important";
+      }
+    }
+  }
+  return style(styleObj);
+};
+
+// packages/tab/src/tab.ts
+var Tabs = class extends Container {
+  constructor(parent, options) {
+    super(parent, options);
+    this.accumTabIndex = 0;
+    this.dragStartHandler = this.dragStartHandler.bind(this);
+    this.dragOverHandler = this.dragOverHandler.bind(this);
+    this.dropHandler = this.dropHandler.bind(this);
+  }
+  get activeTab() {
+    return this._tabs[this.activeTabIndex];
+  }
+  get activeTabIndex() {
+    return this._activeTabIndex;
+  }
+  set activeTabIndex(index) {
+    var _a;
+    if (index < 0 || this._activeTabIndex === index)
+      return;
+    const prevTab = this._tabs[this._activeTabIndex];
+    if (prevTab) {
+      prevTab.classList.remove("active");
+      this.contentPanes[this._activeTabIndex].style.display = "none";
+    }
+    this._activeTabIndex = index;
+    (_a = this.activeTab) == null ? void 0 : _a.classList.add("active");
+    if (this.contentPanes[index])
+      this.contentPanes[index].style.display = "";
+  }
+  get items() {
+    return this._tabs;
+  }
+  get closable() {
+    return this._closable;
+  }
+  set closable(value) {
+    this._closable = value;
+    if (value) {
+      this.tabsNavElm.classList.add("is-closable");
+    } else {
+      this.tabsNavElm.classList.remove("is-closable");
+    }
+  }
+  get draggable() {
+    return this._draggable;
+  }
+  set draggable(value) {
+    if (this._draggable === value)
+      return;
+    this._draggable = value;
+    if (this.draggable) {
+      this.tabsNavElm.ondragover = this.dragOverHandler;
+      this.tabsNavElm.ondrop = this.dropHandler;
+    } else {
+      this.tabsNavElm.ondragover = null;
+      this.tabsNavElm.ondrop = null;
+    }
+    this.handleTagDrag(this._tabs);
+  }
+  get mode() {
+    const isVertical = this.classList.contains("vertical");
+    return isVertical ? "vertical" : "horizontal";
+  }
+  set mode(type) {
+    if (type === "vertical") {
+      this.classList.add("vertical");
+    } else {
+      this.classList.remove("vertical");
+    }
+  }
+  get mediaQueries() {
+    return this._mediaQueries;
+  }
+  set mediaQueries(value) {
+    this._mediaQueries = value;
+    let style2 = getTabMediaQueriesStyleClass(this._mediaQueries);
+    this._mediaStyle && this.classList.remove(this._mediaStyle);
+    this._mediaStyle = style2;
+    this.classList.add(style2);
+  }
+  add(options) {
+    const tab = new Tab(this, options);
+    if (options == null ? void 0 : options.children) {
+      tab.append(options == null ? void 0 : options.children);
+    }
+    if (this.draggable) {
+      this.handleTagDrag([tab]);
+    }
+    this.appendTab(tab);
+    this.activeTabIndex = tab.index;
+    return tab;
+  }
+  delete(tab) {
+    const index = this._tabs.findIndex((t) => t.id === tab.id);
+    const activeIndex = this.activeTabIndex;
+    if (index >= 0) {
+      this._tabs.splice(index, 1);
+      const pane = this.contentPanes[index];
+      this.contentPanes.splice(index, 1);
+      pane.remove();
+      if (activeIndex >= index) {
+        let newActiveIndex = activeIndex > index ? activeIndex - 1 : this._tabs[activeIndex] ? activeIndex : this._tabs.length - 1;
+        this._activeTabIndex = newActiveIndex;
+        if (this.activeTab) {
+          this.activeTab.classList.add("active");
+          this.contentPanes[newActiveIndex].style.display = "";
+        }
+      }
+    }
+    tab.remove();
+  }
+  appendTab(tab) {
+    tab._container = this.tabsContentElm;
+    tab.parent = this;
+    this._tabs.push(tab);
+    if (!tab.id)
+      tab.id = `tab-${this.accumTabIndex++}`;
+    this.tabsNavElm.appendChild(tab);
+    const contentPane = this.createElement("div", this.tabsContentElm);
+    tab._contentElm = contentPane;
+    contentPane.classList.add("content-pane");
+    contentPane.style.display = "none";
+    this.contentPanes.push(contentPane);
+    const children = tab.children;
+    for (let i = 0; i < children.length; i++) {
+      if (children[i].classList.contains("tab-item"))
+        continue;
+      if (children[i] instanceof Control) {
+        children[i].parent = tab;
+      }
+    }
+    ;
+  }
+  handleTagDrag(tabs) {
+    tabs.forEach((tab) => {
+      if (this.draggable) {
+        tab.setAttribute("draggable", "true");
+        tab.ondragstart = this.dragStartHandler;
+      } else {
+        tab.removeAttribute("draggable");
+        tab.ondragstart = null;
+      }
+    });
+  }
+  _handleClick(event) {
+    return super._handleClick(event, true);
+  }
+  dragStartHandler(event) {
+    if (!(event.target instanceof Tab))
+      return;
+    this.curDragTab = event.target;
+  }
+  dragOverHandler(event) {
+    event.preventDefault();
+  }
+  dropHandler(event) {
+    event.preventDefault();
+    if (!this.curDragTab)
+      return;
+    const target = event.target;
+    const dropTab = target instanceof Tab ? target : target.closest("i-tab");
+    if (dropTab && !this.curDragTab.isSameNode(dropTab)) {
+      const curActiveTab = this.activeTab;
+      const dragIndex = this.curDragTab.index;
+      const dropIndex = dropTab.index;
+      const [dragTab] = this._tabs.splice(dragIndex, 1);
+      this._tabs.splice(dropIndex, 0, dragTab);
+      const [dragContent] = this.contentPanes.splice(dragIndex, 1);
+      this.contentPanes.splice(dropIndex, 0, dragContent);
+      if (dragIndex > dropIndex) {
+        this.tabsNavElm.insertBefore(this.curDragTab, dropTab);
+      } else {
+        dropTab.after(this.curDragTab);
+      }
+      this.activeTabIndex = curActiveTab.index;
+      if (this.onChanged)
+        this.onChanged(this, this.activeTab);
+    }
+    this.curDragTab = null;
+  }
+  refresh() {
+    if (this.dock) {
+      super.refresh(true);
+      const height = this.mode === "horizontal" ? this.clientHeight - this.tabsNavElm.clientHeight : this.clientHeight;
+      this.tabsContentElm.style.height = height + "px";
+      this.refreshControls();
+    }
+  }
+  init() {
+    super.init();
+    if (!this.tabsNavElm) {
+      this.contentPanes = [];
+      this._tabs = [];
+      const _tabs = [];
+      this.childNodes.forEach((node) => {
+        if (node instanceof Tab) {
+          _tabs.push(node);
+        } else {
+          node.remove();
+        }
+      });
+      const tabsNavWrapElm = this.createElement("div", this);
+      tabsNavWrapElm.classList.add("tabs-nav-wrap");
+      tabsNavWrapElm.addEventListener("wheel", (event) => {
+        if (this.mode !== "horizontal")
+          return;
+        event.preventDefault();
+        tabsNavWrapElm.scrollLeft += event.deltaY;
+      });
+      this.tabsNavElm = this.createElement("div", tabsNavWrapElm);
+      this.tabsNavElm.classList.add("tabs-nav");
+      this.tabsContentElm = this.createElement("div", this);
+      this.tabsContentElm.classList.add("tabs-content");
+      this.closable = this.getAttribute("closable", true) || false;
+      this.mode = this.getAttribute("mode", true) || "horizontal";
+      for (const tab of _tabs) {
+        this.appendTab(tab);
+      }
+      this.draggable = this.getAttribute("draggable", true) || false;
+      const activeTabIndex = this.getAttribute("activeTabIndex", true);
+      if (this._tabs.length)
+        this.activeTabIndex = activeTabIndex || 0;
+      this.mediaQueries = this.getAttribute("mediaQueries", true, []);
+    }
+  }
+  static async create(options, parent) {
+    let self = new this(parent, options);
+    await self.ready();
+    return self;
+  }
+};
+Tabs = __decorateClass([
+  customElements2("i-tabs")
+], Tabs);
+var Tab = class extends Container {
+  active() {
+    this._parent.activeTabIndex = this.index;
+  }
+  addChildControl(control) {
+    if (this._contentElm)
+      this._contentElm.appendChild(control);
+  }
+  removeChildControl(control) {
+    if (this._contentElm && this._contentElm.contains(control))
+      this._contentElm.removeChild(control);
+  }
+  get caption() {
+    return this.captionElm.innerHTML;
+  }
+  set caption(value) {
+    this.captionElm.innerHTML = value;
+  }
+  close() {
+    this.handleCloseTab();
+  }
+  get index() {
+    return this._parent.items.findIndex((t) => t.id === this.id);
+  }
+  get icon() {
+    if (!this._icon) {
+      this._icon = Icon.create({
+        width: 16,
+        height: 16
+      }, this);
+    }
+    ;
+    return this._icon;
+  }
+  set icon(elm) {
+    if (this._icon)
+      this.tabContainer.removeChild(this._icon);
+    this._icon = elm;
+    if (this._icon)
+      this.tabContainer.prepend(this._icon);
+  }
+  get innerHTML() {
+    return this._contentElm.innerHTML;
+  }
+  set innerHTML(value) {
+    this._contentElm.innerHTML = value;
+  }
+  get font() {
+    return {
+      color: this.captionElm.style.color,
+      name: this.captionElm.style.fontFamily,
+      size: this.captionElm.style.fontSize,
+      bold: this.captionElm.style.fontStyle.indexOf("bold") >= 0,
+      style: this.captionElm.style.fontStyle,
+      transform: this.captionElm.style.textTransform,
+      weight: this.captionElm.style.fontWeight
+    };
+  }
+  set font(value) {
+    if (this.captionElm) {
+      this.captionElm.style.color = value.color || "";
+      this.captionElm.style.fontSize = value.size || "";
+      this.captionElm.style.fontFamily = value.name || "";
+      this.captionElm.style.fontStyle = value.style || "";
+      this.captionElm.style.textTransform = value.transform || "none";
+      this.captionElm.style.fontWeight = value.bold ? "bold" : `${value.weight}` || "";
+    }
+  }
+  _handleClick(event) {
+    if (!this._parent || !this.enabled || this._parent.activeTab.isSameNode(this))
+      return false;
+    if (this._parent) {
+      if (this._parent.activeTab != this)
+        this._parent.activeTabIndex = this.index;
+      if (this._parent.onChanged)
+        this._parent.onChanged(this._parent, this._parent.activeTab);
+    }
+    return super._handleClick(event);
+  }
+  handleCloseTab(event) {
+    if (event) {
+      event.stopPropagation();
+      event.preventDefault();
+    }
+    if (!this._parent || !this.enabled || event && !this._parent.closable)
+      return;
+    const isActiveChange = this._parent.activeTab.isSameNode(this);
+    if (this._parent.onCloseTab)
+      this._parent.onCloseTab(this._parent, this);
+    this._parent.delete(this);
+    if (isActiveChange && this._parent.onChanged)
+      this._parent.onChanged(this._parent, this._parent.activeTab);
+  }
+  init() {
+    if (!this.captionElm) {
+      super.init();
+      this.tabContainer = this.createElement("div", this);
+      this.tabContainer.classList.add("tab-item");
+      this.captionElm = this.createElement("div", this.tabContainer);
+      this.caption = this.getAttribute("caption", true) || "";
+      const font = this.getAttribute("font", true);
+      if (font)
+        this.font = font;
+      const icon = this.getAttribute("icon", true);
+      if (icon) {
+        icon.height = icon.height || "16px";
+        icon.width = icon.width || "16px";
+        this.icon = new Icon(void 0, icon);
+      }
+      ;
+      const closeButton = this.createElement("span", this.tabContainer);
+      closeButton.classList.add("close");
+      closeButton.innerHTML = "&times;";
+      closeButton.onclick = this.handleCloseTab.bind(this);
+    }
+  }
+  static async create(options, parent) {
+    let self = new this(parent, options);
+    await self.ready();
+    return self;
+  }
+};
+Tab = __decorateClass([
+  customElements2("i-tab")
+], Tab);
+
 // packages/iframe/src/iframe.ts
 var Iframe = class extends Control {
   constructor(parent, options) {
@@ -21474,34 +29059,36 @@ cssRule("i-pagination", {
   color: Theme24.text.primary,
   "$nest": {
     ".pagination": {
-      display: "inline-flex"
+      display: "inline-flex",
+      flexWrap: "wrap",
+      justifyContent: "center"
     },
     ".pagination a": {
       color: Theme24.text.primary,
       float: "left",
-      padding: "8px 16px",
+      padding: "4px 8px",
+      textAlign: "center",
       textDecoration: "none",
       transition: "background-color .3s",
-      border: "1px solid #ddd"
+      border: "1px solid #ddd",
+      minWidth: 36
     },
     ".pagination a.active": {
       backgroundColor: "#4CAF50",
       color: "white",
-      border: "1px solid #4CAF50"
+      border: "1px solid #4CAF50",
+      cursor: "default"
     },
     ".pagination a.disabled": {
       color: Theme24.text.disabled,
       pointerEvents: "none"
-    },
-    ".pagination-main": {
-      display: "flex"
     }
   }
 });
 
 // packages/pagination/src/pagination.ts
 var pagerCount = 7;
-var pagerCountMobile = 3;
+var pagerCountMobile = 5;
 var defaultCurrentPage = 1;
 var pageSize = 10;
 var Pagination = class extends Control {
@@ -21584,10 +29171,10 @@ var Pagination = class extends Control {
     if (!this.enabled)
       return;
     const target = event.target;
-    target.innerHTML = direction === -1 ? "<<" : ">>";
+    target.innerHTML = direction === -1 ? "&laquo;" : "&raquo;";
   }
   renderEllipsis(step) {
-    let item = this.createElement("a", this._mainPagiElm);
+    let item = this.createElement("a", this._paginationDiv);
     item.id = step === -1 ? "prevMoreElm" : "nextMoreElm";
     item.setAttribute("href", "#");
     item.innerHTML = "...";
@@ -21607,7 +29194,7 @@ var Pagination = class extends Control {
     });
   }
   renderPage(index) {
-    let item = this.createElement("a", this._mainPagiElm);
+    let item = this.createElement("a", this._paginationDiv);
     this.pageItems.push(item);
     item.setAttribute("href", "#");
     item.innerHTML = `${index}`;
@@ -21660,7 +29247,10 @@ var Pagination = class extends Control {
   }
   renderPageItem(size) {
     this.visible = size > 0;
-    this._mainPagiElm.innerHTML = "";
+    this._paginationDiv.innerHTML = "";
+    if (this._prevElm) {
+      this._paginationDiv.appendChild(this._prevElm);
+    }
     this.pageItems = [];
     if (size > 0) {
       if (size > this.pagerCount) {
@@ -21680,9 +29270,12 @@ var Pagination = class extends Control {
     } else if (size < 0) {
       const _s = this.pageItems.length + size;
       for (let i = this.pageItems.length - 1; i >= _s; i--) {
-        this._mainPagiElm.removeChild(this.pageItems[i]);
+        this._paginationDiv.removeChild(this.pageItems[i]);
         this.pageItems.pop();
       }
+    }
+    if (this._nextElm) {
+      this._paginationDiv.append(this._nextElm);
     }
   }
   init() {
@@ -21690,7 +29283,7 @@ var Pagination = class extends Control {
     if (!this._paginationDiv) {
       this.pageItems = [];
       this._paginationDiv = this.createElement("div", this);
-      this._paginationDiv.classList.add("pagination");
+      this._paginationDiv.classList.add("pagination", "pagination-main");
       this._prevElm = this.createElement("a", this._paginationDiv);
       this._prevElm.setAttribute("href", "#");
       this._prevElm.innerHTML = "&laquo;";
@@ -21700,8 +29293,6 @@ var Pagination = class extends Control {
         e.stopPropagation();
         this._handleOnPrev(e);
       });
-      this._mainPagiElm = this.createElement("div", this._paginationDiv);
-      this._mainPagiElm.classList.add("pagination-main");
       this.currentPage = +this.getAttribute("currentPage", true, defaultCurrentPage);
       this.totalPages = +this.getAttribute("totalPages", true, 0);
       this.pageSize = +this.getAttribute("pageSize", true, pageSize);
@@ -22438,10 +30029,12 @@ var TableColumn = class extends Control {
     this.sortElm.style.display = "block";
   }
   async appendNode(params) {
-    if (!this.columnElm || !this.onRenderCell)
+    if (!params)
       return;
     const { tdElm, rowData, rowIndex, cell } = params;
     this.rowData = rowData;
+    if (!this.columnElm || !this.onRenderCell)
+      return;
     let node = await this.onRenderCell(this, this.data, rowData, rowIndex, cell);
     if (!node)
       return;
@@ -22587,6 +30180,9 @@ var Table = class extends Control {
   set filteredData(value) {
     this._filteredData = value;
   }
+  get hasData() {
+    return this.filteredData && this.filteredData.length;
+  }
   get sortConfig() {
     if (!this._sortConfig || !Object.keys(this._sortConfig).length)
       return [];
@@ -22697,7 +30293,7 @@ var Table = class extends Control {
   }
   _handleClick(event) {
     const target = event.target;
-    if (target) {
+    if (target && this.hasData) {
       const rowElm = target.closest(".i-table-row");
       let colElm = target.closest("i-table-column");
       if (!colElm)
@@ -22767,7 +30363,7 @@ var Table = class extends Control {
   renderBody() {
     var _a, _b;
     this.tBodyElm.innerHTML = "";
-    if (this.filteredData && this.filteredData.length) {
+    if (this.hasData) {
       const currentPage = ((_a = this.pagination) == null ? void 0 : _a.currentPage) || 1;
       const pageSize2 = ((_b = this.pagination) == null ? void 0 : _b.pageSize) || 10;
       const dataList = this.pagination ? paginate(this.filteredData, pageSize2, currentPage) : this.filteredData;
@@ -22953,6 +30549,9 @@ var CarouselSlider = class extends Control {
   constructor(parent, options) {
     super(parent, options, { activeSlide: 0 });
     this._type = "dot";
+    this.posX1 = 0;
+    this.posX2 = 0;
+    this.threshold = 30;
   }
   get slidesToShow() {
     return this._slidesToShow;
@@ -23039,9 +30638,36 @@ var CarouselSlider = class extends Control {
     } else {
       this.renderDotPagination();
     }
+    if (this.arrowPrev)
+      this.arrowPrev.visible = this.isArrow;
+    if (this.arrowNext)
+      this.arrowNext.visible = this.isArrow;
+  }
+  get swipe() {
+    return this._swipe;
+  }
+  set swipe(value) {
+    this._swipe = value;
+    if (this._swipe) {
+      this.sliderListElm.onmousedown = this.dragStartHandler;
+      this.sliderListElm.addEventListener("touchstart", this.dragStartHandler);
+      this.sliderListElm.addEventListener("touchend", this.dragEndHandler);
+      this.sliderListElm.addEventListener("touchmove", this.dragHandler);
+    } else {
+      this.sliderListElm.onmousedown = null;
+      this.sliderListElm.removeEventListener("touchstart", this.dragStartHandler);
+      this.sliderListElm.removeEventListener("touchend", this.dragEndHandler);
+      this.sliderListElm.removeEventListener("touchmove", this.dragHandler);
+    }
   }
   get isArrow() {
     return this.type === "arrow";
+  }
+  disconnectCallback() {
+    this.sliderListElm.onmousedown = null;
+    this.sliderListElm.removeEventListener("touchstart", this.dragStartHandler);
+    this.sliderListElm.removeEventListener("touchend", this.dragEndHandler);
+    this.sliderListElm.removeEventListener("touchmove", this.dragHandler);
   }
   updateArrows(prev, next) {
     if (this.arrowPrev && this.arrowNext) {
@@ -23059,6 +30685,8 @@ var CarouselSlider = class extends Control {
   }
   updateSliderByArrows(value) {
     var _a;
+    if (!this._slider)
+      return;
     const lastIdx = value + this.slidesToShow;
     const validValue = value >= 0 && lastIdx <= this._slider.length ? value : 0;
     this.updateArrows(validValue > 0, lastIdx < this._slider.length);
@@ -23177,12 +30805,18 @@ var CarouselSlider = class extends Control {
     }
   }
   prev() {
-    const index = this.activeSlide - 1 < 0 ? this._slider.length - 1 : this.activeSlide - 1;
+    const index = this.activeSlide - 1 < 0 ? this.activeSlide : this.activeSlide - 1;
     this.activeSlide = index;
     this.setAutoplay();
   }
   next() {
-    const index = this.activeSlide + 1 >= this._slider.length ? 0 : this.activeSlide + 1;
+    let index;
+    if (!this.isArrow) {
+      const total = this.slidesToShow > 0 ? Math.ceil(this._slider.length / this.slidesToShow) : this._slider.length;
+      index = this.activeSlide + 1 >= total ? this.activeSlide : this.activeSlide + 1;
+    } else {
+      index = this.activeSlide + this.slidesToShow >= this._slider.length ? this.activeSlide : this.activeSlide + 1;
+    }
     this.activeSlide = index;
     this.setAutoplay();
   }
@@ -23198,8 +30832,61 @@ var CarouselSlider = class extends Control {
       this.sliderListElm.style.transform = `translateX(${tx}px)`;
     }
   }
+  dragStartHandler(event) {
+    if (event instanceof TouchEvent) {
+      this.posX1 = event.touches[0].clientX;
+      this.posX2 = 0;
+    } else {
+      event.preventDefault();
+      this.posX1 = event.clientX;
+      this.posX2 = 0;
+      this.sliderListElm.onmouseup = this.dragEndHandler;
+      this.sliderListElm.onmouseleave = this.dragEndHandler;
+      this.sliderListElm.onmousemove = this.dragHandler;
+    }
+    this.isSwiping = false;
+    if (this.onSwipeStart)
+      this.onSwipeStart();
+  }
+  dragHandler(event) {
+    var _a, _b;
+    if (event instanceof TouchEvent) {
+      this.posX2 = this.posX1 - event.touches[0].clientX;
+    } else {
+      this.posX2 = this.posX1 - event.clientX;
+    }
+    if (this.isArrow) {
+      const fixedWidth = this.slidesToShow === 1 && this._slider && ((_a = this._slider[0]) == null ? void 0 : _a.offsetWidth) && this._slider[0].offsetWidth !== this.offsetWidth - 50;
+      const itemWidth = this._slider && this._slider[0] ? this._slider[0].offsetWidth : (this.offsetWidth - 50) / this.slidesToShow;
+      const tx = fixedWidth ? -this._slider[0].offsetWidth * this._activeSlide : -itemWidth * this._activeSlide;
+      const tx2 = Math.min(Math.abs(this.posX2), itemWidth);
+      this.sliderListElm.style.transform = `translateX(${tx - (this.posX2 > 0 ? tx2 : -tx2)}px)`;
+    } else {
+      const fixedWidth = this.slidesToShow === 1 && this._slider && ((_b = this._slider[0]) == null ? void 0 : _b.offsetWidth) && this._slider[0].offsetWidth !== this.offsetWidth;
+      const tx = fixedWidth ? -this._slider[0].offsetWidth * this._activeSlide : -this.offsetWidth * this._activeSlide;
+      this.sliderListElm.style.transform = `translateX(${tx - this.posX2}px)`;
+    }
+    this.isSwiping = Math.abs(this.posX2) > this.threshold;
+  }
+  dragEndHandler(event) {
+    if (this.posX2 < -this.threshold) {
+      this.prev();
+    } else if (this.posX2 > this.threshold) {
+      this.next();
+    } else {
+      this.refresh();
+    }
+    this.sliderListElm.onmouseup = null;
+    this.sliderListElm.onmouseleave = null;
+    this.sliderListElm.onmousemove = null;
+    if (this.onSwipeEnd)
+      this.onSwipeEnd(this.isSwiping);
+  }
   init() {
     super.init();
+    this.dragStartHandler = this.dragStartHandler.bind(this);
+    this.dragHandler = this.dragHandler.bind(this);
+    this.dragEndHandler = this.dragEndHandler.bind(this);
     this.type = this.getAttribute("type", true, "dot");
     this.wrapperSliderElm = this.createElement("div", this);
     this.updateWrapperClass();
@@ -23209,8 +30896,8 @@ var CarouselSlider = class extends Control {
     this.sliderListElm = this.createElement("div", wrapper);
     this.sliderListElm.classList.add("slider-list");
     this.transitionSpeed = this.getAttribute("transitionSpeed", true, 500);
-    this.arrowPrev = new Icon(void 0, { name: "angle-left" });
-    this.arrowNext = new Icon(void 0, { name: "angle-right" });
+    this.arrowPrev = new Icon(void 0, { name: "angle-left", visible: this.isArrow });
+    this.arrowNext = new Icon(void 0, { name: "angle-right", visible: this.isArrow });
     this.arrowPrev.classList.add("slider-arrow");
     this.arrowNext.classList.add("slider-arrow");
     this.arrowPrev.onClick = () => this.prev();
@@ -23225,6 +30912,7 @@ var CarouselSlider = class extends Control {
     this.autoplay = this.getAttribute("autoplay", true);
     this.items = this.getAttribute("items", true, []);
     this.activeSlide = this.getAttribute("activeSlide", true, 0);
+    this.swipe = this.getAttribute("swipe", true, false);
   }
   static async create(options, parent) {
     let self = new this(parent, options);
@@ -23266,38 +30954,6 @@ CarouselItem = __decorateClass([
   customElements2("i-carousel-item")
 ], CarouselItem);
 
-// packages/ipfs/src/index.ts
-var src_exports2 = {};
-__export(src_exports2, {
-  hashContent: () => hashContent,
-  hashItems: () => hashItems,
-  parse: () => parse
-});
-var import_ipfs_utils = __toModule(require("@ijstech/ipfs-utils"));
-function parse(cid) {
-  return import_ipfs_utils.default.parse(cid);
-}
-async function hashItems(items, version) {
-  return await import_ipfs_utils.default.hashItems(items || [], version);
-}
-async function hashContent(content, version) {
-  if (version == void 0)
-    version = 1;
-  if (content.length == 0) {
-    return await import_ipfs_utils.default.hashContent("", version);
-  }
-  let result;
-  if (version == 1) {
-    result = await import_ipfs_utils.default.hashFile(content, version, {
-      rawLeaves: true,
-      maxChunkSize: 1048576,
-      maxChildrenPerNode: 1024
-    });
-  } else
-    result = await import_ipfs_utils.default.hashFile(content, version);
-  return result.cid;
-}
-
 // packages/moment/src/index.ts
 RequireJS.config({
   paths: {
@@ -23308,10 +30964,92 @@ var moment;
 RequireJS.require(["@moment"], (_moment) => {
   moment = _moment;
 });
+
+// packages/video/src/style/video.css.ts
+cssRule("i-video", {
+  $nest: {}
+});
+
+// packages/video/src/video.ts
+var reqs = ["video-js"];
+RequireJS.config({
+  baseUrl: `${LibPath}lib/video-js`,
+  paths: {
+    "video-js": "video-js"
+  }
+});
+function loadCss() {
+  const cssId = "videoCss";
+  if (!document.getElementById(cssId)) {
+    const head = document.getElementsByTagName("head")[0];
+    const link = document.createElement("link");
+    link.id = cssId;
+    link.rel = "stylesheet";
+    link.type = "text/css";
+    link.href = `${LibPath}lib/video-js/video-js.css`;
+    link.media = "all";
+    head.appendChild(link);
+  }
+}
+var Video = class extends Container {
+  get url() {
+    return this._url;
+  }
+  set url(value) {
+    this._url = value;
+    if (value && !this.sourceElm)
+      this.sourceElm = this.createElement("source", this.videoElm);
+    if (this.sourceElm)
+      this.sourceElm.src = value;
+  }
+  init() {
+    if (!this.initialized) {
+      super.init();
+      loadCss();
+      const self = this;
+      let id = `video-${new Date().getTime()}`;
+      this.videoElm = this.createElement("video-js", this);
+      this.videoElm.id = id;
+      this.videoElm.setAttribute("controls", "true");
+      this.videoElm.setAttribute("preload", "auto");
+      this.videoElm.classList.add("vjs-default-skin");
+      this.sourceElm = this.createElement("source", this.videoElm);
+      this.sourceElm.type = "application/x-mpegURL";
+      this.url = this.getAttribute("url", true);
+      RequireJS.require(reqs, function(videojs) {
+        self.player = videojs(id, {
+          playsinline: true,
+          autoplay: false,
+          controls: true,
+          fluid: true,
+          aspectRatio: "16:9",
+          responsive: true,
+          inactivityTimeout: 500,
+          preload: "auto",
+          techOrder: ["html5"],
+          plugins: {}
+        });
+      });
+    }
+  }
+  static async create(options, parent) {
+    let self = new this(parent, options);
+    await self.ready();
+    return self;
+  }
+};
+Video = __decorateClass([
+  customElements2("i-video")
+], Video);
 /*!-----------------------------------------------------------
 * Copyright (c) IJS Technologies. All rights reserved.
 * Released under dual AGPLv3/commercial license
 * https://ijs.network
 *-----------------------------------------------------------*/
+//! authors : Tim Wood, Iskren Chernev, Moment.js contributors
+//! license : MIT
+//! moment.js
+//! momentjs.com
+//! version : 2.29.4
   
 });

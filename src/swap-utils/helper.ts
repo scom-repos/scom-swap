@@ -1,7 +1,7 @@
 import { BigNumber } from "@ijstech/eth-wallet";
 import { initCrossChainWallet } from "@swap/crosschain-utils";
 import { BridgeVaultConstant, BridgeVaultGroupList, MockOracleMap } from "@swap/store";
-import { Contracts as SolidityContracts } from "@openswap/chainlink-sdk"
+import { Contracts as SolidityContracts } from "@scom/oswap-chainlink-contract"
 import { Control } from "@ijstech/components";
 
 export function debounce(func: any, timeout = 500, target: Control){

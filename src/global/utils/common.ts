@@ -1,5 +1,5 @@
 import { Wallet, Erc20, BigNumber, ISendTxEventsOptions } from "@ijstech/eth-wallet";
-import { Contracts } from "@openswap/sdk";
+import { Contracts } from "@scom/oswap-openswap-contract";
 
 export interface ITokenObject {
   address?: string;
@@ -18,12 +18,12 @@ export interface ITokenObject {
 export type TokenMapType = { [token: string]: ITokenObject; };
 
 export const isTransactionConfirmed = async (txHash: string) => {
-  const tx = await Wallet.getInstance().getTransactionReceipt(txHash);
+  const tx = await Wallet.getClientInstance().getTransactionReceipt(txHash);
   return tx && !!tx.blockNumber;
 }
 
 export const registerSendTxEvents = (sendTxEventHandlers: ISendTxEventsOptions) => {
-  const wallet = Wallet.getInstance();
+  const wallet = Wallet.getClientInstance();
   wallet.registerSendTxEvents({
       transactionHash: (error: Error, receipt?: string) => {
           if (sendTxEventHandlers.transactionHash) {

@@ -1,5 +1,5 @@
 import { Wallet, BigNumber, Utils, Erc20, TransactionReceipt } from "@ijstech/eth-wallet";
-import { Contracts } from "@openswap/sdk";
+import { Contracts } from "@scom/oswap-openswap-contract";
 // import { Contracts as BakeryContracts } from '@validapp/bakery-swap-sdk';
 // import { Contracts as TraderJoeContracts } from '@validapp/trader-joe-sdk';
 // import { Contracts as ImpossibleContracts } from '@scom/impossible-swap-sdk';
