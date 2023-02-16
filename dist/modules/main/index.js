@@ -1606,7 +1606,7 @@ define("@swap/main", ["require", "exports", "@ijstech/components", "@ijstech/eth
         async setData(value) {
             this._data = value;
             this.cardConfig.data = value;
-            store_1.setProviderList(value.providers);
+            this.setProviders();
             await this.initData();
             this.onSetupPage(store_1.isWalletConnected());
         }
@@ -1621,7 +1621,7 @@ define("@swap/main", ["require", "exports", "@ijstech/components", "@ijstech/eth
             this._data = this.cardConfig.data;
             this.swapContainer.visible = true;
             this.cardConfig.visible = false;
-            store_1.setProviderList(this._data.providers);
+            this.setProviders();
             if ((_b = (_a = this._data) === null || _a === void 0 ? void 0 : _a.providers) === null || _b === void 0 ? void 0 : _b.length) {
                 await this.initData();
                 this.onSetupPage(store_1.isWalletConnected());
@@ -1638,6 +1638,16 @@ define("@swap/main", ["require", "exports", "@ijstech/components", "@ijstech/eth
             this.cardConfig.visible = true;
         }
         async config() { }
+        setProviders() {
+            var _a, _b;
+            const providers = ((_a = this._data) === null || _a === void 0 ? void 0 : _a.providers) || [];
+            if (((_b = this._data) === null || _b === void 0 ? void 0 : _b.category) === 'fixed-pair') {
+                store_1.setProviderList([providers[0]]);
+            }
+            else {
+                store_1.setProviderList(providers);
+            }
+        }
         isEmptyObject(obj) {
             for (let prop in obj) {
                 if (!obj[prop] && prop !== 'dexId') {
