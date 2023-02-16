@@ -1,4 +1,4 @@
-import { Wallet, BigNumber, Erc20, Utils, TransactionReceipt } from "@ijstech/eth-wallet";
+import { Wallet, BigNumber, Erc20, Utils, TransactionReceipt, Contracts } from "@ijstech/eth-wallet";
 import {
   ITokenObject,
   getAPI,
@@ -15,11 +15,11 @@ import {
   crossChainNativeTokenList,
   CrossChainAddressMap,
   nullAddress,
-  getTokenList,
   getChainId,
   getNetworkInfo,
   getMatchNetworks,
-  getProviderList
+  getProviderList,
+  tokenStore
 } from "@swap/store"
 import { Contracts as CrossChainContracts } from "@scom/oswap-cross-chain-bridge-contract"
 
@@ -250,7 +250,7 @@ const getTokenByVaultAddress = (chainId:number, vaultAddress: string) => {
 }
 
 const getTargetChainTokenMap = (chainId: number) => {
-    let tokenList = getTokenList(chainId);
+    let tokenList = tokenStore.getTokenList(chainId);
     tokenList = tokenList.map(v => v = {...v, address: v.address ? v.address.toLowerCase() : undefined}).sort((a, b) => {
         if(a.symbol.toLowerCase() < b.symbol.toLowerCase()) { return -1; }
         if(a.symbol.toLowerCase() > b.symbol.toLowerCase()) { return 1; }
@@ -265,7 +265,7 @@ const getTargetChainTokenMap = (chainId: number) => {
 }
 
 const initCrossChainWallet = (chainId: number) => {
-  const wallet: any = Wallet.getInstance();
+  const wallet: any = Wallet.getClientInstance();
   const networkInfo = getNetworkInfo(chainId);
   let rpcEndpoint = networkInfo.rpc
   let crossChainWallet = new Wallet(rpcEndpoint, {address: wallet.address})
@@ -278,30 +278,54 @@ const getTargetChainTokenInfoObj = async (chainId: number) => {
 
   let tokenMap = getTargetChainTokenMap(chainId);
   if (!chainId || !DefaultTokens[chainId]) return { tokenMap, balances };
-  const tokenList = getTokenList(chainId);
-  let promises: Promise<void>[] = [];
-  promises.push(...tokenList.map(async (token, index) => {
-      try {
-        if (token.address) {
-          let erc20 = new Erc20(targetChainWallet, token.address.toLowerCase(), token.decimals);
-          let balance = (await erc20.balance).toFixed();
-          balances[token.address.toLowerCase()] = balance;
-        }
-        else {
-          let balance = (await targetChainWallet.balance).toFixed();
-          balances[token.symbol] = balance;
-        }
-      } catch (error) {
-        balances[token.address? token.address.toLowerCase(): token.symbol] = '0'
-        //console.log(`Failed to get token(${token.address}) balance`)
+  const tokenList = tokenStore.getTokenList(chainId).filter((token) => token.address);
+  const erc20TokenList = tokenList.filter(token => token.address);
+  const nativeToken = tokenList.find(token => !token.address);
+  try {
+    const erc20 = new Contracts.ERC20(targetChainWallet);
+    const data = targetChainWallet.encodeFunctionCall(erc20, 'balanceOf', [targetChainWallet.address]);
+    const result = await targetChainWallet.multiCall(erc20TokenList.map((v: any) => {
+      return {
+        to: v.address,
+        data
       }
-  }));
-  await Promise.all(promises);
+    }))
+    if (result) {
+      for (let i = 0; i < erc20TokenList.length; i++) {
+        const token = erc20TokenList[i];
+        if (token.address) {
+          balances[token.address.toLowerCase()] = new BigNumber(result.results[i]).shiftedBy(-token.decimals).toFixed()
+        }
+      }
+      if (nativeToken) {
+        let balance = (await targetChainWallet.balance).toFixed();
+        balances[nativeToken.symbol] = balance;
+      }
+    } else {
+      let promises: Promise<void>[] = [];
+      promises.push(...tokenList.map(async (token, index) => {
+        try {
+          if (token.address) {
+            let erc20 = new Erc20(targetChainWallet, token.address.toLowerCase(), token.decimals);
+            let balance = (await erc20.balance).toFixed();
+            balances[token.address.toLowerCase()] = balance;
+          }
+          else {
+            let balance = (await targetChainWallet.balance).toFixed();
+            balances[token.symbol] = balance;
+          }
+        } catch (error) {
+          balances[token.address ? token.address.toLowerCase() : token.symbol] = '0';
+        }
+      }));
+      await Promise.all(promises);
+    }
+  } catch (error) {}
 
   return {
     tokenMap,
     balances
-};
+  };
 }
 
 const getVaultTokenMap = () => {
@@ -339,7 +363,7 @@ const createBridgeVaultOrder: (params: CreateBridgeVaultOrderParams) => Promise<
 }> = async (params: CreateBridgeVaultOrderParams) => {
   try {
     const { vaultAddress, targetChainId, tokenIn, tokenOut, amountIn, minAmountOut, transactionSetting, sourceRouteInfo } = params;
-    const wallet: any = Wallet.getInstance();
+    const wallet: any = Wallet.getClientInstance();
     const transactionDeadlineInMinutes = transactionSetting.transactionDeadlineInMinutes;
     const transactionDeadline = Math.floor(Date.now() / 1000 + (transactionDeadlineInMinutes * 60));
     const slippageTolerance = transactionSetting.slippageTolerance;
@@ -468,7 +492,7 @@ const getExtendedRouteObjDataForDirectRoute = async (bestRouteObj: any, swapPric
 }
 
 const checkIsApproveButtonShown = async (tokenIn: ITokenObject, fromInput: BigNumber, address: string) => {
-  const wallet: any = Wallet.getInstance()
+  const wallet: any = Wallet.getClientInstance()
   let erc20 = new Erc20(wallet, tokenIn.address)
   let allowance = await erc20.allowance({
     owner: wallet.address,
@@ -506,7 +530,7 @@ const getAvailableRouteOptions = async (params: GetAvailableRouteOptionsParams, 
 
   const composeRoutes = async (routeObj: ICrossChainRouteFromAPI['sourceRoute'] | ICrossChainRouteFromAPI['targetRoute'], chainId: number, fromAmount: string | BigNumber) => {
       const providerConfigByDexId = getProviderList()
-        .filter(({ supportedChains }) => supportedChains?.includes(chainId!))
+        .filter((item) => item.contractInfo && Object.keys(item.contractInfo)?.includes((chainId!).toString()))
         .reduce((acc, cur) => {
           if (cur.dexId || (cur.dexId && cur.dexId === 0)) acc[cur.dexId] = cur;
           return acc;

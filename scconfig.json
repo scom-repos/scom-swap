@@ -37,6 +37,15 @@
     },
     "@swap/swap-config": {
       "path": "swap-config"
+    },
+    "@swap/transaction-settings-layout": {
+      "path": "transaction-settings-layout"
+    },
+    "@swap/transaction-settings": {
+      "path": "transaction-settings"
+    },
+    "@swap/expert-mode-settings": {
+      "path": "expert-mode-settings"
     }
   },
   "dependencies": {

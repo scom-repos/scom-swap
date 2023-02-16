@@ -1,4 +1,4 @@
-import { Styles, Module, Panel, Icon, Button, Label, VStack, Image, Container, Range, IEventBus, application, customModule, Modal, Input, observable, HStack, Control } from '@ijstech/components';
+import { Module, Panel, Icon, Button, Label, VStack, Image, Container, Range, IEventBus, application, customModule, Modal, Input, observable, HStack, Control } from '@ijstech/components';
 import { BigNumber, Wallet, WalletPlugin } from '@ijstech/eth-wallet';
 import '@ijstech/eth-contract';
 import Assets from '@swap/assets';
@@ -6,16 +6,13 @@ import './index.css';
 import {
   ChainNativeTokenByChainId,
   getChainId,
-  getTokenBalances,
   isExpertMode,
   projectNativeTokenSymbol,
-  getTokenMap,
   getSlippageTolerance,
   isWalletConnected, 
   hasWallet, 
   switchNetwork,
   getTokenIconPath,
-  updateAllTokenBalances,
   getWalletProvider,
   BridgeVaultGroupList,
   getSiteEnv,
@@ -23,16 +20,17 @@ import {
   getOpenSwapToken,
 	connectWallet,
 	hasMetaMask,
-	setTokenMap,
 	getDefaultChainId,
 	setDataFromSCConfig,
 	setCurrentChainId,
 	InfuraId,
 	Networks,
   setProviderList,
-  getProviderList,
   getProviderByKey,
+  tokenStore,
+  setTokenStore,
 } from "@swap/store";
+
 import {
   getAllRoutesData,
   executeSwap,
@@ -45,6 +43,7 @@ import {
 	getOraclePriceMap,
 	bridgeVaultConstantMap
 } from '@swap/swap-utils'
+
 import {
   ITokenObject,
   formatNumber,
@@ -56,18 +55,24 @@ import {
   isInvalidInput,
   SITE_ENV,
   registerSendTxEvents,
-  PageBlock
-} from '@swap/global'
+  PageBlock,
+  IProvider,
+  ISwapConfig
+} from '@swap/global';
+
 import {
   getTargetChainTokenInfoObj,
   ICrossChainRouteResult,
   getBridgeVault,
   getBondsInBridgeVault,
-} from '@swap/crosschain-utils'
-import { PriceInfo } from '@swap/price-info'
+} from '@swap/crosschain-utils';
+
+import { PriceInfo } from '@swap/price-info';
 import { TokenSelection } from '@swap/token-selection';
-import { IConfig, IProvider, SwapConfig } from '@swap/swap-config';
+import { SwapConfig } from '@swap/swap-config';
 import { Result } from '@swap/result';
+import { ExpertModeSettings } from '@swap/expert-mode-settings'
+import { TransactionSettings } from '@swap/transaction-settings'
 
 const priceImpactTooHighMsg = 'Price Impact Too High. If you want to bypass this check, please turn on Expert Mode';
 const defaultInput = '1';
@@ -77,7 +82,7 @@ declare const window: any;
 
 @customModule
 export class SwapBlock extends Module implements PageBlock {
-  private _data: IConfig;
+  private _data: ISwapConfig;
   tag: any
   defaultEdit: boolean = true
   readonly onConfirm: () => Promise<void>
@@ -206,14 +211,18 @@ export class SwapBlock extends Module implements PageBlock {
   private showCaption: Label;
   private showIcon: Icon;
 
+  private transactionModal: TransactionSettings;
+  private expertModal: ExpertModeSettings;
+
 	async getData() {
 		return this._data;
 	}
 
-	async setData(value: IConfig) {
+	async setData(value: ISwapConfig) {
     this._data = value;
     this.cardConfig.data = value;
-    setProviderList(value.data);
+    setProviderList(value.providers);
+    await this.initData();
     this.onSetupPage(isWalletConnected());
 	}
 
@@ -226,11 +235,11 @@ export class SwapBlock extends Module implements PageBlock {
   }
 
   async confirm() {
-    this._data = this.cardConfig.data
+    this._data = this.cardConfig.data;
     this.swapContainer.visible = true
     this.cardConfig.visible = false
-    setProviderList(this._data.data);
-    if (this._data?.data?.length) {
+    setProviderList(this._data.providers);
+    if (this._data?.providers?.length) {
       await this.initData();
       this.onSetupPage(isWalletConnected());
     }
@@ -243,6 +252,7 @@ export class SwapBlock extends Module implements PageBlock {
 
   async edit() {
     this.cardConfig.data = this._data;
+    this.cardConfig.showConfig();
     this.swapContainer.visible = false;
 		this.cardConfig.visible = true;
 	}
@@ -250,28 +260,34 @@ export class SwapBlock extends Module implements PageBlock {
   async config() { }
 
   private isEmptyObject(obj: any): boolean {
-    let result = false;
     for (let prop in obj) {
-      if (!obj[prop] && (prop !== 'dexId' && prop !== 'supportedChains')) {
-        result = true;
-        break;
+      if (!obj[prop] && prop !== 'dexId') {
+        return true;
       }
     }
-    return result;
+    return false;
   }
-  
+
   validate() {
-    const data = this.cardConfig.data?.data || [];
+    const data = this.cardConfig.data?.providers || [];
     if (!data || !data.length) return false;
-    let emptyProp = false;
     for (let item of data) {
-      const hasTradeFee = !this.isEmptyObject(item.tradeFee);
-      if (!hasTradeFee || this.isEmptyObject(item)) {
-        emptyProp = true;
-        break;
+      if (this.isEmptyObject(item)) {
+        return false;
+      }
+      const contractInfo = item.contractInfo || {};
+      const contractChainIds = Object.keys(contractInfo);
+      if (!contractChainIds.length) {
+        return false;
+      }
+      for (const chainId of contractChainIds) {
+        const hasTradeFee = !this.isEmptyObject(contractInfo[chainId].tradeFee);
+        if (!hasTradeFee || this.isEmptyObject(contractInfo[chainId])) {
+          return false;
+        }
       }
     }
-    return !emptyProp;
+    return true;
   }
 
 	constructor(parent?: Container, options?: any) {
@@ -299,7 +315,7 @@ export class SwapBlock extends Module implements PageBlock {
     if (connected && (this.chainId == null || this.chainId == undefined)) {
       this.onChainChange();
     } else {
-      if (this._data?.data?.length) this.onSetupPage(connected);
+      if (this._data?.providers?.length) this.onSetupPage(connected);
     }
   }
 
@@ -316,7 +332,7 @@ export class SwapBlock extends Module implements PageBlock {
     if (this.chainId != null && this.chainId != undefined)
       this.swapBtn.classList.remove('hidden');
     // this.availableMarkets = getAvailableMarkets() || [];
-    if (this._data?.data?.length) this.onSetupPage(true);
+    if (this._data?.providers?.length) this.onSetupPage(true);
     this.swapButtonText = this.getSwapButtonText()
   }
   
@@ -359,23 +375,23 @@ export class SwapBlock extends Module implements PageBlock {
     return false;
   }
   get targetTokenMap() {
-    return this.isCrossChain ? this.targetChainTokenMap : getTokenMap();
+    return this.isCrossChain ? this.targetChainTokenMap : tokenStore.tokenMap;
   };
 
 	private initWalletData = async () => {
 		let accountsChangedEventHandler = async (account: string) => {
-			setTokenMap();
+			tokenStore.updateTokenMapData();
 		}
 		let chainChangedEventHandler = async (hexChainId: number) => {
-			setTokenMap();
+			tokenStore.updateTokenMapData();
 		}
 		let selectedProvider = localStorage.getItem('walletProvider') as WalletPlugin;
 		if (!selectedProvider && hasMetaMask()) {
 			selectedProvider = WalletPlugin.MetaMask;
 		}
 		const isValidProvider = Object.values(WalletPlugin).includes(selectedProvider);
-		if (!Wallet.getInstance().chainId) {
-			Wallet.getInstance().chainId = getDefaultChainId();
+		if (!Wallet.getClientInstance().chainId) {
+			Wallet.getClientInstance().chainId = getDefaultChainId();
 		}
 		if (hasWallet() && isValidProvider) {
 			await connectWallet(selectedProvider, {
@@ -431,10 +447,10 @@ export class SwapBlock extends Module implements PageBlock {
     if (!this.isCrossChainEnabled) {
       delete queryRouter['toChainId'];
     }
-    if (!window.location.hash.includes('#/swap')) return;
-    const queryString = new URLSearchParams(queryRouter).toString();
-    const newURL = window.location.protocol + "//" + window.location.host + '/' + location.hash.split("?")[0] + '?' + queryString;
-    window.history.pushState({ path: newURL }, '', newURL);
+    // if (!window.location.hash.includes('#/swap')) return;
+    // const queryString = new URLSearchParams(queryRouter).toString();
+    // const newURL = window.location.protocol + "//" + window.location.host + '/' + location.hash.split("?")[0] + '?' + queryString;
+    // window.history.pushState({ path: newURL }, '', newURL);
   };
 
   private fixedNumber = (value: BigNumber | string | number) => {
@@ -449,9 +465,57 @@ export class SwapBlock extends Module implements PageBlock {
     return formatted.replace(/,/g, '');
   }
 
+  private setFixedPairData() {
+    const providers = this._data?.providers;
+    if (providers && providers.length) {
+      const contractInfo = (providers[0].contractInfo || {})[this.chainId];
+      if (contractInfo) {
+        const fromTokenAddress = contractInfo.fromToken || '';
+        const toTokenAddress = contractInfo.toToken || '';
+        const fromToken = fromTokenAddress.toLowerCase().startsWith('0x') ? fromTokenAddress.toLowerCase() : fromTokenAddress;
+        const toToken = toTokenAddress.toLowerCase().startsWith('0x') ? toTokenAddress.toLowerCase() : toTokenAddress;
+        this.fromToken = tokenStore.tokenMap[fromToken];
+        this.toToken = tokenStore.tokenMap[toToken];
+        this.fromTokenSymbol = this.fromToken?.symbol;
+        this.toTokenSymbol = this.toToken?.symbol;
+        this.fromInputValue = new BigNumber(defaultInput);
+        this.onUpdateToken(this.fromToken, true);
+        this.onUpdateToken(this.toToken, false);
+      } else {
+        this.fromToken = undefined;
+        this.toToken = undefined;
+        this.fromTokenSymbol = '';
+        this.toTokenSymbol = '';
+        this.fromInputValue = new BigNumber(defaultInput);
+        this.payBalance.caption = `Balance: 0`;
+        this.receiveBalance.caption = `Balance: 0`;
+        this.initRoutes();
+        this.onUpdateSliderValue(0);
+        const pay = this.payCol.children[0] as Input;
+        if (pay) {
+          pay.value = '-';
+        }
+        const receive = this.receiveCol.children[0] as Input;
+        if (receive) {
+          receive.value = '-';
+        }
+      }
+      this.firstTokenSelection.token = this.fromToken;
+      this.secondTokenSelection.token = this.toToken;
+      this.toggleReverseImage.classList.add('cursor-default');
+    }
+  }
+
   private onSetupPage = async (connected: boolean) => {
-    this.getAddressFromUrl();
+    // this.getAddressFromUrl();
     this.chainId = getChainId();
+    const isFixedPair = this._data?.category === 'fixed-pair';
+    if (isFixedPair) {
+      this.setFixedPairData();
+    }
+    this.toggleReverseImage.enabled = !isFixedPair;
+    this.firstTokenSelection.disableSelect = isFixedPair;
+    this.secondTokenSelection.disableSelect = isFixedPair;
     // this.checkHasWallet = hasWallet();
     this.swapButtonText = this.getSwapButtonText();
     await this.updateBalance();
@@ -472,7 +536,9 @@ export class SwapBlock extends Module implements PageBlock {
       if (input) {
         input.readOnly = false;
       }
-      this.toggleReverseImage.classList.remove('cursor-default');
+      if (!isFixedPair) {
+        this.toggleReverseImage.classList.remove('cursor-default');
+      }
     }
     if (this.fromInputValue.isGreaterThanOrEqualTo(0)) {
       this.onUpdateEstimatedPosition(false, true);
@@ -487,10 +553,11 @@ export class SwapBlock extends Module implements PageBlock {
         input.value = this.fixedNumber(this.toInputValue);
       }
     }
-
-    this.setDefaultToken();
+    if (!isFixedPair) {
+      this.setDefaultToken();
+    }
     // TODO Only allow Oswap to be selected in Mainnet Oswap2Oswap Pilot launch, BSC <-> AVAX, should be changed when any2any is ready
-    if (this.chainId === 56 && this.desChain?.chainId === 43114 || this.chainId === 43114 && this.desChain?.chainId === 56) {
+    if (!isFixedPair && (this.chainId === 56 && this.desChain?.chainId === 43114 || this.chainId === 43114 && this.desChain?.chainId === 56)) {
       // Use hardcode map for Oswap2Oswap pilot launch
       const fromOswapTokenObj = getOpenSwapToken(this.chainId)!;
       this.firstTokenSelection.tokenDataListProp = [{
@@ -556,9 +623,11 @@ export class SwapBlock extends Module implements PageBlock {
 	}
 	
 	private initTokenSelection() {
+    this.firstTokenSelection.disableSelect = false;
     this.firstTokenSelection.onSelectToken = (token: ITokenObject) => this.onSelectToken(token, true);
     this.firstTokenSelection.isBtnMaxShown = false;
     this.firstTokenSelection.isCommonShown = true;
+    this.secondTokenSelection.disableSelect = false;
     this.secondTokenSelection.onSelectToken = (token: ITokenObject) => this.onSelectToken(token, false);
     this.secondTokenSelection.isBtnMaxShown = false;
     this.secondTokenSelection.isCommonShown = true;
@@ -614,7 +683,7 @@ export class SwapBlock extends Module implements PageBlock {
   }
 
   setDefaultToken = () => {
-    let lstTokenMap: any = Object.values(getTokenMap());
+    let lstTokenMap: any = Object.values(tokenStore.tokenMap);
     const defaultCrossChainToken = lstTokenMap.find((v: any) => !v.address);
     let lstTargetTokenMap = Object.values(this.targetTokenMap);
     const oswapIndex = lstTargetTokenMap.findIndex((item : any) => item.symbol === 'OSWAP');
@@ -859,8 +928,8 @@ export class SwapBlock extends Module implements PageBlock {
     this.firstTokenSelection.enabled = false;
     this.secondTokenSelection.enabled = false;
     if (token.isNew && isWalletConnected()) {
-      await updateAllTokenBalances();
-      this.allTokenBalancesMap = getTokenBalances();
+      await tokenStore.updateAllTokenBalances();
+      this.allTokenBalancesMap = tokenStore.tokenBalances;
     }
     this.onUpdateToken(token, isFrom);
     this.redirectToken();
@@ -1635,8 +1704,8 @@ export class SwapBlock extends Module implements PageBlock {
   }
   async updateBalance() {
     if (this.isCrossChain) await this.updateTargetChainBalances();
-    if (isWalletConnected()) await updateAllTokenBalances();
-    this.allTokenBalancesMap = isWalletConnected() ? getTokenBalances() : [];
+    if (isWalletConnected()) await tokenStore.updateAllTokenBalances();
+    this.allTokenBalancesMap = isWalletConnected() ? tokenStore.tokenBalances : [];
     if (this.fromToken) {
       const balance = this.getBalance(this.fromToken);
       this.payBalance.caption = `Balance: ${formatNumber(balance, 4)} ${this.fromToken.symbol}`;
@@ -1888,7 +1957,7 @@ export class SwapBlock extends Module implements PageBlock {
         fromAmount: this.record.fromAmount,
         toAmount: this.record.toAmount,
         isFromEstimated: this.isFrom,
-        providerList: this._data.data
+        providerList: this._data.providers
       }
 
       const { error } = await executeSwap(swapData);
@@ -1988,12 +2057,15 @@ export class SwapBlock extends Module implements PageBlock {
     await this.handleAddRoute();
     source.enabled = true;
   }
+
   onSetting = () => {
-    this.$eventBus.dispatch(EventId.ShowTransactionModal);
+    this.transactionModal.showModal();
   }
 
   // Cross Chain
   get isCrossChainEnabled() {
+    return false;
+
     if (getSiteEnv() === SITE_ENV.MAINNET) {
       this.srcChainBox?.classList.add('hidden');
       this.desChainBox?.classList.add('hidden');
@@ -2384,11 +2456,18 @@ export class SwapBlock extends Module implements PageBlock {
 		result.message = { ...params };
 		result.showModal();
   }
+
+  private initExpertModal() {
+    this.expertModal = new ExpertModeSettings();
+    this.swapComponent.appendChild(this.expertModal);
+    this.$eventBus.register(this, EventId.ShowExpertModal, () => {
+      this.expertModal.showModal();
+    })
+  }
   
   private async initData() {
     if (!this.isInited) {
       await this.initWalletData();
-      setDataFromSCConfig(Networks, InfuraId);
       setCurrentChainId(getDefaultChainId());
       this.initTokenSelection();
       await this.initApprovalModelAction();
@@ -2398,11 +2477,16 @@ export class SwapBlock extends Module implements PageBlock {
 
   init = async () => {
     this.chainId = getChainId();
+    setDataFromSCConfig({ infuraId: InfuraId, networks: Networks });
+    setTokenStore();
     // this.availableMarkets = getAvailableMarkets() || [];
     this.swapButtonText = this.getSwapButtonText();
     super.init();
     this.openswapResult = new Result();
     this.swapComponent.appendChild(this.openswapResult);
+    this.transactionModal = new TransactionSettings();
+    this.swapComponent.appendChild(this.transactionModal);
+    this.initExpertModal();
   }
 
 	render() {
@@ -2428,7 +2512,7 @@ export class SwapBlock extends Module implements PageBlock {
               <i-hstack class="my-2" verticalAlignment="center" horizontalAlignment="space-between">
                 <i-label class="custom-label" caption="You Pay"></i-label>
               </i-hstack>
-              <i-vstack id="srcChainBox" class="my-2 w-100">
+              <i-vstack id="srcChainBox" visible={false} class="my-2 w-100">
                 <i-hstack verticalAlignment="center" horizontalAlignment="space-between">
                   <i-label class="text--grey" caption="Selected Source Chain" />
                   <i-label id="srcChainLabel" caption="-" />
@@ -2455,7 +2539,7 @@ export class SwapBlock extends Module implements PageBlock {
                   <i-panel class="bg-box" width="100%">
                     <i-hstack class="input--token-box" verticalAlignment="center" horizontalAlignment="space-between" width="100%">
                       <i-vstack>
-                        <swap-token-selection id="firstTokenSelection"></swap-token-selection>
+                        <swap-token-selection disableSelect={true} id="firstTokenSelection"></swap-token-selection>
                       </i-vstack>
                       <i-vstack id="payCol">
                         <i-label class="text-value text-right" caption=" - "></i-label>
@@ -2464,7 +2548,7 @@ export class SwapBlock extends Module implements PageBlock {
                   </i-panel>
                 </i-vstack>
               </i-panel>
-              <i-panel id="minSwapHintLabel" class="hints">
+              <i-panel id="minSwapHintLabel" visible={false} class="hints">
                 <i-icon name="star" fill="#f7d063" width={13} height={13} />
                 <i-label caption="No crosschain routes are found. You may try updating the input amount or selecting another token." />
               </i-panel>
@@ -2477,7 +2561,7 @@ export class SwapBlock extends Module implements PageBlock {
                     <i-vstack width="100%">
                       <i-label class="custom-label" caption="You Receive"></i-label>
                     </i-vstack>
-                    <i-vstack id="desChainBox" class="my-2 w-100">
+                    <i-vstack id="desChainBox" visible={false} class="my-2 w-100">
                       <i-hstack verticalAlignment="center" horizontalAlignment="space-between">
                         <i-label class="text--grey" caption="Selected Destination Chain" />
                         <i-label id="desChainLabel" class="ml-auto" caption="-" />
@@ -2491,7 +2575,7 @@ export class SwapBlock extends Module implements PageBlock {
                   <i-panel class="bg-box" width="100%">
                     <i-hstack class="input--token-box" verticalAlignment="center" horizontalAlignment="space-between" width="100%">
                       <i-vstack>
-                        <swap-token-selection id="secondTokenSelection"></swap-token-selection>
+                        <swap-token-selection disableSelect={true} id="secondTokenSelection"></swap-token-selection>
                       </i-vstack>
                       <i-vstack id="receiveCol">
                         <i-label class="text-value text-right" caption=" - "></i-label>

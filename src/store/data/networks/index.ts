@@ -24,8 +24,9 @@ const Networks = [
     explorerName: "Etherscan",
     explorerTxUrl: "https://kovan.etherscan.io/tx/",
     explorerAddressUrl: "https://kovan.etherscan.io/address/",
-    isTestnet: true
-  },    
+    isTestnet: true,
+    isDisabled: true
+  },
   {
     name: "Binance Smart Chain",
     chainId: 56,
@@ -44,7 +45,7 @@ const Networks = [
     explorerName: "PolygonScan",
     explorerTxUrl: "https://polygonscan.com/tx/",
     explorerAddressUrl: "https://polygonscan.com/address/"
-  },    
+  },
   {
     name: "Fantom Opera",
     chainId: 250,
@@ -53,12 +54,13 @@ const Networks = [
     explorerName: "FTMScan",
     explorerTxUrl: "https://ftmscan.com/tx/",
     explorerAddressUrl: "https://ftmscan.com/address/"
-  },    
+  },
   {
     name: "BSC Testnet",
     chainId: 97,
     img: "img/network/bscMainnet.svg",
-    rpc: "https://data-seed-prebsc-1-s1.binance.org:8545/",
+    rpc: "https://rpc.ankr.com/bsc_testnet_chapel",
+    isMainChain: true,
     isCrossChainSupported: true,
     explorerName: "BSCScan",
     explorerTxUrl: "https://testnet.bscscan.com/tx/",
@@ -70,7 +72,7 @@ const Networks = [
     chainId: 338,
     img: "img/network/cronosMainnet.svg",
     isDisabled: true
-  },  
+  },
   {
     name: "Amino Testnet",
     chainId: 31337,
@@ -83,24 +85,22 @@ const Networks = [
     chainId: 80001,
     img: "img/network/polygon.svg",
     rpc: "https://matic-mumbai.chainstacklabs.com",
-    isCrossChainSupported: true,
     explorerName: "PolygonScan",
     explorerTxUrl: "https://mumbai.polygonscan.com/tx/",
     explorerAddressUrl: "https://mumbai.polygonscan.com/address/",
     isTestnet: true
-  },    
+  },
   {
     name: "Avalanche FUJI C-Chain",
     chainId: 43113,
-    img: "img/network/avax.svg",	
+    img: "img/network/avax.svg",
     rpc: "https://api.avax-test.network/ext/bc/C/rpc",
     isCrossChainSupported: true,
-    isMainChain: true,
     explorerName: "SnowTrace",
     explorerTxUrl: "https://testnet.snowtrace.io/tx/",
     explorerAddressUrl: "https://testnet.snowtrace.io/address/",
     isTestnet: true
-  },    
+  },
   {
     name: "Avalanche Mainnet C-Chain",
     chainId: 43114,

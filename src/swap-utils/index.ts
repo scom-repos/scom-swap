@@ -22,7 +22,6 @@ import {
   CoreContractAddressesByChainId,
   ChainNativeTokenByChainId,
   WETHByChainId,
-  getWallet, 
   getSlippageTolerance, 
   getTransactionDeadline,
   isWalletConnected,
@@ -113,7 +112,8 @@ const getFactoryAddress = (key: string): string => {
   //     return Address[Factory];
   // }
   const providers = getProviderList();
-  return providers.find(item => item.key === key)?.factoryAddress || ''
+  const contractInfo = providers.find(item => item.key === key)?.contractInfo || {};
+  return contractInfo[getChainId()]?.factoryAddress || '';
 }
 function getRouterAddress(key: string): string {
   // let Address = getAddresses();
@@ -154,7 +154,8 @@ function getRouterAddress(key: string): string {
   //     return Address[Router];
   // }
   const providers = getProviderList();
-  return providers.find(item => item.key === key)?.routerAddress || ''
+  const contractInfo = providers.find(item => item.key === key)?.contractInfo || {};
+  return contractInfo[getChainId()]?.routerAddress || '';
 }
 
 async function allowanceRouter(wallet: any, market: string, token: ITokenObject, owner: string, callback?: any) {
@@ -300,7 +301,7 @@ async function composeRouteObj(wallet: any, routeObj: any, market: string, first
 async function getTradeFeeMap() {
   let tradeFeeMap: TradeFeeMap = {};
   const providers = getProviderList();
-  providers.forEach(item => tradeFeeMap[item.key] = item.tradeFee);
+  providers.forEach(item => tradeFeeMap[item.key] = (item.contractInfo || {})[getChainId()]?.tradeFee);
   return tradeFeeMap;
 }
 
@@ -322,7 +323,7 @@ async function getBestAmountInRouteFromAPI(wallet: any, tokenIn: ITokenObject, t
   })
   if (!routeObjArr) return [];
   let providerConfigByDexId: any = {};
-  getProviderList().filter(v => !!v.supportedChains && v.supportedChains.includes(chainId!)).forEach((v, i) => {
+  getProviderList().filter(v => {!!v.contractInfo && Object.keys(v.contractInfo).includes((chainId!).toString())}).forEach((v, i) => {
     if (v.dexId == undefined) return;
     providerConfigByDexId[v.dexId] = v;
   });
@@ -387,7 +388,7 @@ async function getBestAmountOutRouteFromAPI(wallet: any, tokenIn: ITokenObject, 
   })
   if (!routeObjArr) return [];
   let providerConfigByDexId: any = {};
-  getProviderList().filter(v => !!v.supportedChains && v.supportedChains.includes(chainId!)).forEach((v, i) => {
+  getProviderList().filter(v => {!!v.contractInfo && Object.keys(v.contractInfo).includes((chainId!).toString())}).forEach((v, i) => {
     if (v.dexId == undefined) return;
     providerConfigByDexId[v.dexId] = v;
   });
@@ -434,7 +435,7 @@ async function getBestAmountOutRouteFromAPI(wallet: any, tokenIn: ITokenObject, 
 }
 
 const getAllAvailableRoutes = async (markets: string[], tokenList: ITokenObject[], tokenIn: ITokenObject, tokenOut: ITokenObject) => {
-  const wallet: any = Wallet.getInstance();
+  const wallet: any = Wallet.getClientInstance();
   let getPairPromises:Promise<void>[] = [];
   let availableRoutes: AvailableRoute[] = [];
 
@@ -813,7 +814,7 @@ const getBestAmountInRoute = async (markets: string[], tokenIn: ITokenObject, to
   //     allAvailableRoutes = [...allAvailableRoutes, ...allQueueAvailableRoutes];
   // }
 
-  let wallet: any = Wallet.getInstance();
+  let wallet: any = Wallet.getClientInstance();
   let tradeFeeMap = await getTradeFeeMap();
   let allPaths = await getAllExactAmountOutPaths(tradeFeeMap, allAvailableRoutes, tokenIn, tokenOut, amountOut);
   if (allPaths.length == 0) {
@@ -849,7 +850,7 @@ const getBestAmountOutRoute = async (markets: string[], tokenIn: ITokenObject, t
   //   let allQueueAvailableRoutes = await getAllAvailableQueueRoutes(queueTypes, tokenList, tokenIn, tokenOut);
   //   allAvailableRoutes = [...allAvailableRoutes, ...allQueueAvailableRoutes];
   // }
-  let wallet: any = Wallet.getInstance();
+  let wallet: any = Wallet.getClientInstance();
   let tradeFeeMap = await getTradeFeeMap();
   let allPaths = await getAllExactAmountInPaths(tradeFeeMap, allAvailableRoutes, tokenIn, tokenOut, amountIn);
   if (allPaths.length == 0) {
@@ -1109,7 +1110,7 @@ async function getExtendedRouteObjData(wallet: any, bestRouteObj: any, tradeFeeM
 // }
 
 async function getAllRoutesData(firstTokenObject: ITokenObject, secondTokenObject: ITokenObject, firstInput: BigNumber, secondInput: BigNumber, isFromEstimated: boolean, targetChainId?: number) {
-  let wallet: any = getWallet();
+  let wallet: any = Wallet.getClientInstance();
   let resultArr: any[] = [];
   if (firstTokenObject && secondTokenObject && (firstInput.gt(0) || secondInput.gt(0))) {
     let routeDataArr = [];
@@ -1121,7 +1122,7 @@ async function getAllRoutesData(firstTokenObject: ITokenObject, secondTokenObjec
         if (routeObj && routeObj.market.length == 1) {
           let providerConfigByKey: any = {};
           let _chainId = getChainId();
-          getProviderList().filter(v => !!v.supportedChains && v.supportedChains.includes(_chainId!)).forEach((v, i) => {
+          getProviderList().filter(v => {!!v.contractInfo && Object.keys(v.contractInfo).includes((_chainId!).toString())}).forEach((v, i) => {
             providerConfigByKey[v.key] = v;
           });
           let price = parseFloat(routeObj.price);
@@ -1151,7 +1152,7 @@ async function getAllRoutesData(firstTokenObject: ITokenObject, secondTokenObjec
           let providerConfigByMarketCode: any = {};
           let _chainId = getChainId();
           getProviderList().filter(v => {
-            return !!v.supportedChains && v.supportedChains.includes(_chainId!)
+            return !!v.contractInfo && Object.keys(v.contractInfo).includes((_chainId!).toString())
           }).forEach((v, i) => {
             providerConfigByMarketCode[v.key] = v;
           });
@@ -1861,7 +1862,7 @@ const executeSwap: (swapData: SwapData) => Promise<{
   error: Record<string, string> | null;
 }> = async (swapData: SwapData) => {
   let receipt: TransactionReceipt | null = null;
-  const wallet: any = getWallet();
+  const wallet: any = Wallet.getClientInstance();
   try {
     const toAddress = wallet.account.address;
     const slippageTolerance = getSlippageTolerance();
@@ -2001,7 +2002,7 @@ const executeSwap: (swapData: SwapData) => Promise<{
 
 //For testing only
 const setERC20AllowanceToZero = async (token: ITokenObject, spenderAddress: string) => {
-  let wallet: any = getWallet();
+  let wallet: any = Wallet.getClientInstance();
   let erc20 = new Contracts.ERC20(wallet, token.address);
   let receipt = await erc20.approve({
     spender: spenderAddress,
@@ -2023,7 +2024,7 @@ const getApprovalModelAction = async (options: IERC20ApprovalEventOptions) => {
 }
 
 const setApprovalModalSpenderAddress = (market: string, contractAddress?: string) => {
-  // let wallet: any = Wallet.getInstance();
+  // let wallet: any = Wallet.getClientInstance();
   // let spender;
   // if (contractAddress) {
   //   spender = contractAddress
@@ -2072,7 +2073,7 @@ const createBridgeVaultOrder: (newOrderParams: NewOrderParams) => Promise<{
 
 
 const registerPairsByAddress = async (market: string[], pairAddresses: string[]) => {
-  let wallet: any = Wallet.getInstance();
+  let wallet: any = Wallet.getClientInstance();
   let registryAddress = getAddresses()["OSWAP_HybridRouterRegistry"]
   let registry = new Contracts.OSWAP_HybridRouterRegistry(wallet,registryAddress);
   let factory = market.map(m=>getFactoryAddress(m));

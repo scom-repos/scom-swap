@@ -20,18 +20,17 @@
             "path": "store",
             "dependencies": [
                 "@ijstech/eth-wallet",
+                "@scom/oswap-openswap-contract",
                 "@swap/global",
-                "@swap/assets",
-                "@scom/oswap-openswap-contract"
+                "@swap/assets"
             ]
         },
         "@swap/result": {
             "path": "result",
             "dependencies": [
                 "@ijstech/eth-wallet",
-                "@ijstech/eth-contract",
-                "@scom/oswap-openswap-contract",
                 "@swap/global",
+                "@scom/oswap-openswap-contract",
                 "@swap/store",
                 "@swap/assets"
             ]
@@ -54,15 +53,18 @@
                 "@swap/price-info",
                 "@swap/token-selection",
                 "@swap/swap-config",
-                "@swap/result"
+                "@swap/result",
+                "@swap/expert-mode-settings",
+                "@swap/transaction-settings-layout",
+                "@swap/transaction-settings"
             ]
         },
         "@swap/token-selection": {
             "path": "token-selection",
             "dependencies": [
-                "@scom/oswap-openswap-contract",
                 "@swap/store",
                 "@swap/global",
+                "@scom/oswap-openswap-contract",
                 "@swap/assets",
                 "@ijstech/eth-wallet"
             ]
@@ -113,7 +115,47 @@
         },
         "@swap/swap-config": {
             "path": "swap-config",
-            "dependencies": []
+            "dependencies": [
+                "@ijstech/eth-wallet",
+                "@scom/oswap-openswap-contract",
+                "@swap/global",
+                "@swap/assets",
+                "@swap/token-selection",
+                "@scom/oswap-cross-chain-bridge-contract",
+                "@swap/crosschain-utils",
+                "@swap/store"
+            ]
+        },
+        "@swap/transaction-settings-layout": {
+            "path": "transaction-settings-layout",
+            "dependencies": [
+                "@ijstech/eth-wallet",
+                "@scom/oswap-openswap-contract",
+                "@swap/global",
+                "@swap/assets",
+                "@swap/store"
+            ]
+        },
+        "@swap/transaction-settings": {
+            "path": "transaction-settings",
+            "dependencies": [
+                "@swap/store",
+                "@swap/assets",
+                "@swap/global",
+                "@scom/oswap-openswap-contract",
+                "@ijstech/eth-wallet",
+                "@swap/transaction-settings-layout"
+            ]
+        },
+        "@swap/expert-mode-settings": {
+            "path": "expert-mode-settings",
+            "dependencies": [
+                "@ijstech/eth-wallet",
+                "@scom/oswap-openswap-contract",
+                "@swap/global",
+                "@swap/assets",
+                "@swap/store"
+            ]
         }
     },
     "dependencies": {
