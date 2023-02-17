@@ -13,7 +13,7 @@ import {
 } from '@ijstech/components'; 
 import { Wallet } from '@ijstech/eth-wallet';
 import { EventId, ITokenObject } from '@swap/global';
-import { addUserTokens, setTokenBalances, setTokenMap, viewOnExplorerByAddress } from '@swap/store';
+import { addUserTokens, tokenStore, viewOnExplorerByAddress } from '@swap/store';
 
 declare global {
 	namespace JSX {
@@ -69,8 +69,8 @@ export class ImportToken extends Module {
     event.stopPropagation();
     const tokenObj = this.token;
     addUserTokens(tokenObj);
-    setTokenMap();
-    await setTokenBalances();
+    tokenStore.updateTokenMapData();
+    await tokenStore.updateAllTokenBalances();
     this.$eventBus.dispatch(EventId.EmitNewToken, tokenObj);
     if (typeof this.onUpdate === 'function') {
       this.onUpdate(tokenObj);
@@ -83,7 +83,7 @@ export class ImportToken extends Module {
   }
 
   viewContract() {
-    const chainId = Wallet.getInstance().chainId;
+    const chainId = Wallet.getClientInstance().chainId;
     viewOnExplorerByAddress(chainId, this._state.address);
   }
 

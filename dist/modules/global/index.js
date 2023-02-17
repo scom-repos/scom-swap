@@ -40,7 +40,7 @@ define("@swap/global/utils/common.ts", ["require", "exports", "@ijstech/eth-wall
     }
     exports.getERC20Amount = getERC20Amount;
     const approveERC20Max = async (token, spenderAddress, callback, confirmationCallback) => {
-        let wallet = eth_wallet_1.Wallet.getInstance();
+        let wallet = eth_wallet_1.Wallet.getClientInstance();
         let amount = new eth_wallet_1.BigNumber(2).pow(256).minus(1);
         let erc20 = new oswap_openswap_contract_1.Contracts.ERC20(wallet, token.address);
         exports.registerSendTxEvents({
@@ -57,7 +57,7 @@ define("@swap/global/utils/common.ts", ["require", "exports", "@ijstech/eth-wall
     const getERC20Allowance = async (token, spenderAddress) => {
         if (!(token === null || token === void 0 ? void 0 : token.address))
             return null;
-        let wallet = eth_wallet_1.Wallet.getInstance();
+        let wallet = eth_wallet_1.Wallet.getClientInstance();
         let erc20 = new oswap_openswap_contract_1.Contracts.ERC20(wallet, token.address);
         let allowance = await erc20.allowance({
             owner: wallet.account.address,
@@ -565,6 +565,10 @@ define("@swap/global/utils/approvalModel.ts", ["require", "exports", "@ijstech/e
         }
     }
     exports.ERC20ApprovalModel = ERC20ApprovalModel;
+});
+define("@swap/global/utils/swapInterface.ts", ["require", "exports"], function (require, exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
 });
 define("@swap/global/utils/index.ts", ["require", "exports", "@swap/global/utils/helper.ts", "@swap/global/utils/error.ts", "@swap/global/utils/common.ts", "@swap/global/utils/approvalModel.ts"], function (require, exports, helper_1, error_1, common_2, approvalModel_1) {
     "use strict";

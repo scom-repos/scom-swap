@@ -3,22 +3,19 @@ import {
   ChainNativeTokenByChainId, 
   isWalletConnected, 
   getChainId, 
-  getTokenBalances, 
   hasMetaMask, 
-  getTokenObject, 
   getTokenIcon,
   getTokenIconPath,
-  updateAllTokenBalances,
   hasUserToken,
-  setTokenBalances,
   setUserTokens,
-  setTokenMap,
-  getTokenList,
+  tokenStore,
 } from '@swap/store';
 import { ITokenObject, formatNumber, EventId } from '@swap/global';
+import { Contracts } from '@scom/oswap-openswap-contract';
 import Assets from '@swap/assets';
 import './tokenSelection.css';
 import { ImportToken } from './importToken';
+import { Wallet } from '@ijstech/eth-wallet';
 const Theme = Styles.Theme.ThemeVars;
 
 interface TokenSelectionElement extends ControlElement{
@@ -181,19 +178,19 @@ export class TokenSelection extends Module {
       this.currentChainId = getChainId();
     }
     if (isWalletConnected()) {
-      this.tokenBalancesMap = getTokenBalances();
+      this.tokenBalancesMap = tokenStore.tokenBalances || {};
     }
     this.renderTokenItems();
   }
 
   private async updateDataByChain() {
-    this.tokenBalancesMap = await updateAllTokenBalances();
+    this.tokenBalancesMap = await tokenStore.updateAllTokenBalances();
     this.renderTokenItems();
     this.updateButton();
   }
 
   private async updateDataByNewToken() {
-    this.tokenBalancesMap = getTokenBalances();
+    this.tokenBalancesMap = tokenStore.tokenBalances || {};
     this.renderTokenItems();
   }
 
@@ -231,7 +228,7 @@ export class TokenSelection extends Module {
     if (this.tokenDataListProp && this.tokenDataListProp.length) {
       return this.tokenDataListProp;
     }
-    const tokenList = getTokenList(this.chainId);
+    const tokenList = tokenStore.getTokenList(this.chainId);
     return tokenList.map((token: ITokenObject) => {
       const tokenObject = { ...token };
       const nativeToken = ChainNativeTokenByChainId[this.chainId];
@@ -321,7 +318,7 @@ export class TokenSelection extends Module {
 
         this.commonTokenList.appendChild(
           <i-hstack
-            background={{color:"var(--background-default)"}}
+            background={{ color: '#0c1234' }}
             onClick={() => this.onSelect(token)}
             tooltip={{ content: token.name }}
             verticalAlignment="center"
@@ -359,7 +356,7 @@ export class TokenSelection extends Module {
                       name="copy"
                       width="14px"
                       height="14px"
-                      fill={Theme.text.primary}
+                      fill={'#fff'}
                       margin={{ right: 8 }}
                       tooltip={{ content: `${token.symbol} has been copied`, trigger: 'click' }}
                       onClick={() => application.copyToClipboard(token.address || '')}
@@ -399,6 +396,24 @@ export class TokenSelection extends Module {
     )
   }
 
+  private getTokenObject = async (address: string, showBalance?: boolean) => {
+    const ERC20Contract = new Contracts.ERC20(Wallet.getClientInstance() as any, address);
+    const symbol = await ERC20Contract.symbol();
+    const name = await ERC20Contract.name();
+    const decimals = (await ERC20Contract.decimals()).toFixed();
+    let balance;
+    if (showBalance && isWalletConnected()) {
+      balance =  (await (ERC20Contract.balanceOf(Wallet.getClientInstance().account.address))).shiftedBy(-decimals).toFixed();
+    }
+    return {
+      address: address.toLowerCase(),
+      decimals: +decimals,
+      name,
+      symbol,
+      balance
+    }
+  }
+
   private async renderTokenItems() {
     if (!this.tokenList) return;
     this.renderCommonItems();
@@ -411,14 +426,14 @@ export class TokenSelection extends Module {
       this.tokenList.append(<i-label class="text-center mt-1 mb-1" caption="No tokens found" />)
     } else  {
       try {
-        const tokenObj = await getTokenObject(this.filterValue, true);
+        const tokenObj = await this.getTokenObject(this.filterValue, true);
         if (!tokenObj) throw new Error('Token is invalid');
         this.tokenList.innerHTML = '';
         this.tokenList.appendChild(this.renderToken({ ...tokenObj, isNew: true }));
       } catch (err) {
         this.tokenList.innerHTML = '';
         this.tokenList.append(
-          <i-label class="text-center mt-1 mb-1" caption="No tokens found" />
+          <i-label class="text-center mt-1 mb-1" font={{ color: '#fff' }} caption="No tokens found" />
         )
       }
     }
@@ -504,8 +519,8 @@ export class TokenSelection extends Module {
     // The token has been not imported
     if (!isNew && token.isNew && !hasUserToken(token.address || '', this.chainId)) {
       setUserTokens(token, this.chainId);
-      setTokenMap();
-      await setTokenBalances();
+      tokenStore.updateTokenMapData();
+      await tokenStore.updateAllTokenBalances();
       this.$eventBus.dispatch(EventId.EmitNewToken, token);
       isNew = true;
     }
@@ -522,12 +537,10 @@ export class TokenSelection extends Module {
   async init() {
     await this.onWalletConnect();
     super.init();
-    this.disableSelect = this.getAttribute("disableSelect", true);
+    this.disableSelect = !!this.getAttribute("disableSelect", true);
     this.disabledMaxBtn = this.getAttribute("disabledMaxBtn", true);
     this.updateStatusButton();
     this.updateButton(this._token);
-    if (!isWalletConnected())
-      this.disableSelect = false;
   }
   showImportTokenModal(event: Event, token: ITokenObject) {
     event.stopPropagation();
@@ -549,7 +562,7 @@ export class TokenSelection extends Module {
       <i-panel class='token-selection'>
         <i-panel class="flex">
           <i-button id="btnMax" enabled={false} class="custom-btn hidden" caption="Max" onClick={() => this.onSetMaxBalance()} />
-          <i-button id="btnToken" enabled={false} class="custom-btn" rightIcon={{ name: "caret-down" }} caption="Select a token" onClick={() => this.showModal()} />
+          <i-button id="btnToken" enabled={false} class="custom-btn" rightIcon={{ name: "caret-down", fill: '#fff' }} caption="Select a token" onClick={() => this.showModal()} />
         </i-panel>
         <i-modal id="tokenSelectionModal" class="bg-modal" title="Select Token" closeIcon={{ name: 'times' }} onClose={() => this.onCloseModal()}>
           <i-panel class="search">

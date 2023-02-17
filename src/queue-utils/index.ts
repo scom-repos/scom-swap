@@ -5,16 +5,15 @@ import {
   numberToBytes32,
   ITokenObject,
 } from '@swap/global';
-import { BigNumber, Utils } from '@ijstech/eth-wallet';
+import { BigNumber, Utils, Wallet } from '@ijstech/eth-wallet';
 import { 
   getChainNativeToken,
   getAddresses,
   WETHByChainId, 
   ToUSDPriceFeedAddressesMap,
   tokenPriceAMMReference,
-  getWallet, 
-  getChainId, 
-  getTokenMap
+  getChainId,
+  tokenStore, 
 } from '@swap/store';
 import { Contracts } from "@scom/oswap-openswap-contract";
 import { Contracts as SolidityContracts } from "@scom/oswap-chainlink-contract"
@@ -40,7 +39,7 @@ function toTokenAmount(token: any, amount: any) {
 }
 
 const getTokenPrice = async (token: string) => { // in USD value
-  const wallet = getWallet() as any;
+  const wallet = Wallet.getClientInstance();
   let chainId = wallet.chainId ?? getChainId();
   let tokenPrice: number | string;
 
@@ -113,7 +112,7 @@ const getTokenObjectByAddress = (address: string) => {
   if (address.toLowerCase() === getAddressByKey('WETH9').toLowerCase()) {
     return getWETH(chainId);
   }
-  let tokenMap = getTokenMap();
+  let tokenMap = tokenStore.tokenMap;
   return tokenMap[address.toLowerCase()];
 }
 
@@ -155,7 +154,7 @@ const getTradeFee = (queueType: QueueType) => {
 }
 
 const getPair = async (queueType: QueueType, tokenA: any, tokenB: any) => {
-  const wallet = getWallet() as any;
+  const wallet = Wallet.getClientInstance();
   let tokens = mapTokenObjectSet({ tokenA, tokenB });
   let params = { param1: tokens.tokenA.address, param2: tokens.tokenB.address };
   let factoryAddress = getFactoryAddress(queueType);
@@ -191,7 +190,7 @@ interface GroupQueueOfferDetail {
 }
 
 const getGroupQueueItemsForTrader = async (pairAddress: string, tokenIn: any, tokenOut: any):Promise<GroupQueueOfferDetail[]> => {
-  let wallet = getWallet() as any;
+  let wallet = Wallet.getClientInstance();
   let chainId = getChainId();
   const nativeToken = getChainNativeToken(chainId);
   var direction = new BigNumber(tokenIn.address.toLowerCase()).lt(tokenOut.address.toLowerCase());
@@ -237,7 +236,7 @@ const getGroupQueueItemsForTrader = async (pairAddress: string, tokenIn: any, to
 }
 
 const getGroupQueueItemsForAllowAll = async (pairAddress: string, tokenIn: any, tokenOut: any):Promise<GroupQueueOfferDetail[]> => {
-  let wallet = getWallet() as any;
+  let wallet = Wallet.getClientInstance();
   let chainId = getChainId();
   const nativeToken = getChainNativeToken(chainId);
   var direction = new BigNumber(tokenIn.address.toLowerCase()).lt(tokenOut.address.toLowerCase());
@@ -332,12 +331,12 @@ const getGroupQueueTraderDataObj = async (pairAddress: string, tokenIn: any, tok
 
 const getGroupQueueAllocation = async (traderAddress: string, offerIndex: number, pairAddress: string, tokenIn: any, tokenOut: any) => {
   let direction = new BigNumber(tokenIn.address.toLowerCase()).lt(tokenOut.address.toLowerCase());
-  return await new Contracts.OSWAP_RestrictedPair(getWallet() as any, pairAddress).traderAllocation({ param1: direction, param2: offerIndex, param3: traderAddress });
+  return await new Contracts.OSWAP_RestrictedPair(Wallet.getClientInstance(), pairAddress).traderAllocation({ param1: direction, param2: offerIndex, param3: traderAddress });
 };
 
 const getLatestOraclePrice = async (queueType: QueueType, token: ITokenObject, againstToken: ITokenObject) => {
   let tokens = mapTokenObjectSet({ token, againstToken });
-  let wallet = getWallet() as any;
+  let wallet = Wallet.getClientInstance();
   let address = getFactoryAddress(queueType);
   let factory = new Contracts.OSWAP_OracleFactory(wallet, address);
   let oracleAdapterAddress = await factory.oracles({ param1: tokens.token.address, param2: tokens.againstToken.address });
@@ -360,7 +359,7 @@ const getRestrictedPairCustomParams = async () => {
   const FEE_PER_ORDER = "RestrictedPair.feePerOrder";
   const FEE_PER_TRADER = "RestrictedPair.feePerTrader";
   const MAX_DUR = "RestrictedPair.maxDur";
-  let wallet = getWallet() as any;
+  let wallet = Wallet.getClientInstance();
   const address = getAddressByKey(ConfigStore);
   const configStoreContract = new Contracts.OSWAP_ConfigStore(wallet, address);
   let feePerOrderRaw = await configStoreContract.customParam(Utils.stringToBytes32(FEE_PER_ORDER).toString());
@@ -377,7 +376,7 @@ const getRestrictedPairCustomParams = async () => {
 }
 
 const getGroupQueuePairInfo = async (pairAddress: string, tokenAddress: string, provider?: string, offerIndex?: number) => {
-  let wallet = getWallet() as any;
+  let wallet = Wallet.getClientInstance();
   let chainId = getChainId();
   const nativeToken = getChainNativeToken(chainId);
   const WETH9Address = getAddressByKey('WETH9');
@@ -478,7 +477,7 @@ interface ProviderGroupQueueInfo {
 }
 
 const getProviderGroupQueueInfoByIndex = async (pairAddress: string, tokenInAddress: string, offerIndex: number):Promise<ProviderGroupQueueInfo> => {
-  let wallet = getWallet() as any;
+  let wallet: any = Wallet.getClientInstance();
   let chainId = getChainId();
   if (!wallet.provider) wallet.provider = wallet.networksMap[chainId].rpcUrls[0];
   const nativeToken = getChainNativeToken(chainId);
@@ -558,7 +557,7 @@ interface QueueBasicInfo {
 
 const getRangeQueueData = async (pair: string, tokenA: ITokenObject, tokenB: ITokenObject, amountOut: BigNumber) => {
   let data = '0x';
-  let wallet = getWallet() as any;
+  let wallet = Wallet.getClientInstance();
   let chainId = getChainId();
 
   if (!tokenA.address) tokenA = getWETH(chainId);

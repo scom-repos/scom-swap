@@ -2615,7 +2615,8 @@ define("@swap/store/data/networks/index.ts", ["require", "exports"], function (r
             explorerName: "Etherscan",
             explorerTxUrl: "https://kovan.etherscan.io/tx/",
             explorerAddressUrl: "https://kovan.etherscan.io/address/",
-            isTestnet: true
+            isTestnet: true,
+            isDisabled: true
         },
         {
             name: "Binance Smart Chain",
@@ -2649,7 +2650,8 @@ define("@swap/store/data/networks/index.ts", ["require", "exports"], function (r
             name: "BSC Testnet",
             chainId: 97,
             img: "img/network/bscMainnet.svg",
-            rpc: "https://data-seed-prebsc-1-s1.binance.org:8545/",
+            rpc: "https://rpc.ankr.com/bsc_testnet_chapel",
+            isMainChain: true,
             isCrossChainSupported: true,
             explorerName: "BSCScan",
             explorerTxUrl: "https://testnet.bscscan.com/tx/",
@@ -2674,7 +2676,6 @@ define("@swap/store/data/networks/index.ts", ["require", "exports"], function (r
             chainId: 80001,
             img: "img/network/polygon.svg",
             rpc: "https://matic-mumbai.chainstacklabs.com",
-            isCrossChainSupported: true,
             explorerName: "PolygonScan",
             explorerTxUrl: "https://mumbai.polygonscan.com/tx/",
             explorerAddressUrl: "https://mumbai.polygonscan.com/address/",
@@ -2686,7 +2687,6 @@ define("@swap/store/data/networks/index.ts", ["require", "exports"], function (r
             img: "img/network/avax.svg",
             rpc: "https://api.avax-test.network/ext/bc/C/rpc",
             isCrossChainSupported: true,
-            isMainChain: true,
             explorerName: "SnowTrace",
             explorerTxUrl: "https://testnet.snowtrace.io/tx/",
             explorerAddressUrl: "https://testnet.snowtrace.io/address/",
@@ -3341,13 +3341,160 @@ define("@swap/store/data/index.ts", ["require", "exports", "@swap/store/data/tok
     Object.defineProperty(exports, "CoreContractAddressesByChainId", { enumerable: true, get: function () { return index_5.CoreContractAddressesByChainId; } });
     __exportStar(index_6, exports);
 });
-define("@swap/store", ["require", "exports", "@ijstech/eth-wallet", "@ijstech/components", "@swap/global", "@swap/assets", "@scom/oswap-openswap-contract", "@swap/store/data/index.ts", "@swap/store/data/index.ts"], function (require, exports, eth_wallet_1, components_1, global_1, assets_1, oswap_openswap_contract_1, index_7, index_8) {
+define("@swap/store/utils.ts", ["require", "exports", "@ijstech/components", "@ijstech/eth-wallet", "@swap/global", "@swap/store/data/index.ts", "@swap/store/data/index.ts"], function (require, exports, components_1, eth_wallet_1, global_1, index_7, index_8) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.getBridgeVaultVersion = exports.maxHeight = exports.maxWidth = exports.isMultiple = exports.isThemeApplied = exports.getTokenUrl = exports.baseUrl = exports.hasMetaMask = exports.hasWallet = exports.logoutWallet = exports.switchNetwork = exports.connectWallet = exports.isWalletConnected = exports.getWalletOptions = exports.walletList = exports.viewOnExplorerByAddress = exports.viewOnExplorerByTxHash = exports.hasUserToken = exports.getProviderByKey = exports.getProviderList = exports.setProviderList = exports.setUserTokens = exports.tokenSymbol = exports.getTokenIcon = exports.getTokenDecimals = exports.getTokensDataList = exports.getTokenMap = exports.setTokenMap = exports.getTokenObject = exports.projectNativeTokenSymbol = exports.projectNativeToken = exports.getNetworkImg = exports.getNetworkExplorerName = exports.getSiteSupportedNetworks = exports.getMatchNetworks = exports.getFilteredNetworks = exports.getNetworkInfo = exports.getInfuraId = exports.getDefaultChainId = exports.setDataFromSCConfig = exports.state = exports.setTokenBalances = exports.getTokenBalance = exports.getTokenBalances = exports.updateAllTokenBalances = exports.getTokenList = exports.setTransactionDeadline = exports.getTransactionDeadline = exports.setSlippageTolerance = exports.getSlippageTolerance = exports.toggleExpertMode = exports.isExpertMode = exports.getErc20 = exports.getWalletProvider = exports.getWallet = exports.getChainId = exports.getWETH = exports.getChainNativeToken = exports.getAddresses = exports.getCurrentChainId = exports.setCurrentChainId = exports.getSiteEnv = exports.setSiteEnv = exports.addUserTokens = exports.getUserTokens = exports.nullAddress = exports.fallBackUrl = void 0;
-    exports.fallBackUrl = assets_1.default.fullPath('img/tokens/token-placeholder.svg');
-    exports.nullAddress = "0x0000000000000000000000000000000000000000";
+    exports.getGovToken = exports.getChainNativeToken = exports.getAddresses = exports.getChainId = exports.getBridgeVaultVersion = exports.getWalletOptions = exports.walletList = exports.truncateAddress = exports.hasMetaMask = exports.hasWallet = exports.switchNetwork = exports.isWalletConnected = exports.getWalletProvider = exports.viewOnExplorerByAddress = exports.viewOnExplorerByTxHash = exports.getProviderByKey = exports.getProviderList = exports.setProviderList = exports.hasUserToken = exports.setUserTokens = exports.getTokensDataList = exports.getNetworkExplorerName = exports.getSiteSupportedNetworks = exports.getMatchNetworks = exports.addUserTokens = exports.getUserTokens = exports.getFilteredNetworks = exports.getNetworkInfo = exports.getInfuraId = exports.getDefaultChainId = exports.setTransactionDeadline = exports.getTransactionDeadline = exports.setSlippageTolerance = exports.getSlippageTolerance = exports.toggleExpertMode = exports.isExpertMode = exports.getCurrentChainId = exports.setCurrentChainId = exports.getSiteEnv = exports.setSiteEnv = exports.getAPIGatewayUrl = exports.setAPIGatewayUrls = exports.getIPFSGatewayUrl = exports.setIPFSGatewayUrl = exports.getProxyAddress = exports.setProxyAddresses = exports.setDataFromSCConfig = exports.state = exports.CoreContractAddressesByChainId = exports.ChainNativeTokenByChainId = void 0;
+    Object.defineProperty(exports, "ChainNativeTokenByChainId", { enumerable: true, get: function () { return index_8.ChainNativeTokenByChainId; } });
+    Object.defineProperty(exports, "CoreContractAddressesByChainId", { enumerable: true, get: function () { return index_8.CoreContractAddressesByChainId; } });
     const TOKENS = "oswap_user_tokens_";
+    exports.state = {
+        siteEnv: global_1.SITE_ENV.TESTNET,
+        currentChainId: 0,
+        isExpertMode: false,
+        slippageTolerance: 0.5,
+        transactionDeadline: 30,
+        userTokens: {},
+        infuraId: "",
+        networkMap: {},
+        providerList: [],
+        proxyAddresses: {},
+        ipfsGatewayUrl: "",
+        apiGatewayUrls: {},
+    };
+    const setDataFromSCConfig = (options) => {
+        if (options.infuraId) {
+            setInfuraId(options.infuraId);
+        }
+        if (options.networks) {
+            setNetworkList(options.networks, options.infuraId);
+        }
+        if (options.proxyAddresses) {
+            exports.setProxyAddresses(options.proxyAddresses);
+        }
+        if (options.ipfsGatewayUrl) {
+            exports.setIPFSGatewayUrl(options.ipfsGatewayUrl);
+        }
+        if (options.apiGatewayUrls) {
+            exports.setAPIGatewayUrls(options.apiGatewayUrls);
+        }
+    };
+    exports.setDataFromSCConfig = setDataFromSCConfig;
+    const setProxyAddresses = (data) => {
+        exports.state.proxyAddresses = data;
+    };
+    exports.setProxyAddresses = setProxyAddresses;
+    const getProxyAddress = (chainId) => {
+        const _chainId = chainId || eth_wallet_1.Wallet.getInstance().chainId;
+        const proxyAddresses = exports.state.proxyAddresses;
+        if (proxyAddresses) {
+            return proxyAddresses[_chainId];
+        }
+        return null;
+    };
+    exports.getProxyAddress = getProxyAddress;
+    const setIPFSGatewayUrl = (url) => {
+        exports.state.ipfsGatewayUrl = url;
+    };
+    exports.setIPFSGatewayUrl = setIPFSGatewayUrl;
+    const getIPFSGatewayUrl = () => {
+        return exports.state.ipfsGatewayUrl;
+    };
+    exports.getIPFSGatewayUrl = getIPFSGatewayUrl;
+    const setAPIGatewayUrls = (urls) => {
+        exports.state.apiGatewayUrls = urls;
+    };
+    exports.setAPIGatewayUrls = setAPIGatewayUrls;
+    const getAPIGatewayUrl = (key) => {
+        return exports.state.apiGatewayUrls[key];
+    };
+    exports.getAPIGatewayUrl = getAPIGatewayUrl;
+    const setSiteEnv = (value) => {
+        if (Object.values(global_1.SITE_ENV).includes(value)) {
+            exports.state.siteEnv = value;
+        }
+        else {
+            exports.state.siteEnv = global_1.SITE_ENV.TESTNET;
+        }
+    };
+    exports.setSiteEnv = setSiteEnv;
+    const getSiteEnv = () => {
+        return exports.state.siteEnv;
+    };
+    exports.getSiteEnv = getSiteEnv;
+    const setCurrentChainId = (value) => {
+        exports.state.currentChainId = value;
+    };
+    exports.setCurrentChainId = setCurrentChainId;
+    const getCurrentChainId = () => {
+        return exports.state.currentChainId;
+    };
+    exports.getCurrentChainId = getCurrentChainId;
+    const isExpertMode = () => {
+        return exports.state.isExpertMode;
+    };
+    exports.isExpertMode = isExpertMode;
+    function toggleExpertMode() {
+        exports.state.isExpertMode = !exports.state.isExpertMode;
+    }
+    exports.toggleExpertMode = toggleExpertMode;
+    const getSlippageTolerance = () => {
+        return exports.state.slippageTolerance;
+    };
+    exports.getSlippageTolerance = getSlippageTolerance;
+    const setSlippageTolerance = (value) => {
+        exports.state.slippageTolerance = value;
+    };
+    exports.setSlippageTolerance = setSlippageTolerance;
+    const getTransactionDeadline = () => {
+        return exports.state.transactionDeadline;
+    };
+    exports.getTransactionDeadline = getTransactionDeadline;
+    const setTransactionDeadline = (value) => {
+        exports.state.transactionDeadline = value;
+    };
+    exports.setTransactionDeadline = setTransactionDeadline;
+    const getDefaultChainId = () => {
+        switch (exports.getSiteEnv()) {
+            case global_1.SITE_ENV.TESTNET:
+                return 97;
+            case global_1.SITE_ENV.DEV:
+            case global_1.SITE_ENV.MAINNET:
+            default:
+                return 56;
+        }
+    };
+    exports.getDefaultChainId = getDefaultChainId;
+    const setInfuraId = (infuraId) => {
+        exports.state.infuraId = infuraId;
+    };
+    const getInfuraId = () => {
+        return exports.state.infuraId;
+    };
+    exports.getInfuraId = getInfuraId;
+    const setNetworkList = (networkList, infuraId) => {
+        const wallet = eth_wallet_1.Wallet.getClientInstance();
+        exports.state.networkMap = {};
+        for (let network of networkList) {
+            if (infuraId && network.rpc) {
+                network.rpc = network.rpc.replace(/{InfuraId}/g, infuraId);
+            }
+            exports.state.networkMap[network.chainId] = network;
+            if (network.rpc) {
+                const networkInfo = wallet.getNetworkInfo(network.chainId);
+                wallet.setNetworkInfo(Object.assign(Object.assign({}, networkInfo), { rpcUrls: [network.rpc] }));
+            }
+        }
+    };
+    const getNetworkInfo = (chainId) => {
+        return exports.state.networkMap[chainId];
+    };
+    exports.getNetworkInfo = getNetworkInfo;
+    const getFilteredNetworks = (filter) => {
+        let networkFullList = Object.values(exports.state.networkMap);
+        return networkFullList.filter(filter);
+    };
+    exports.getFilteredNetworks = getFilteredNetworks;
     const getUserTokens = (chainId) => {
         let tokens = localStorage[TOKENS + chainId];
         if (tokens) {
@@ -3380,201 +3527,6 @@ define("@swap/store", ["require", "exports", "@ijstech/eth-wallet", "@ijstech/co
         localStorage[TOKENS + chainId] = JSON.stringify(tokens);
     };
     exports.addUserTokens = addUserTokens;
-    const setSiteEnv = (value) => {
-        if (Object.values(global_1.SITE_ENV).includes(value)) {
-            exports.state.siteEnv = value;
-        }
-        else {
-            exports.state.siteEnv = global_1.SITE_ENV.TESTNET;
-        }
-    };
-    exports.setSiteEnv = setSiteEnv;
-    const getSiteEnv = () => {
-        return exports.state.siteEnv;
-    };
-    exports.getSiteEnv = getSiteEnv;
-    const setCurrentChainId = (value) => {
-        exports.state.currentChainId = value;
-    };
-    exports.setCurrentChainId = setCurrentChainId;
-    const getCurrentChainId = () => {
-        return exports.state.currentChainId;
-    };
-    exports.getCurrentChainId = getCurrentChainId;
-    function getAddresses(chainId) {
-        return index_7.CoreContractAddressesByChainId[chainId];
-    }
-    exports.getAddresses = getAddresses;
-    ;
-    const getChainNativeToken = (chainId) => {
-        return index_7.ChainNativeTokenByChainId[chainId];
-    };
-    exports.getChainNativeToken = getChainNativeToken;
-    const getWETH = (chainId) => {
-        let wrappedToken = index_7.WETHByChainId[chainId];
-        return wrappedToken;
-    };
-    exports.getWETH = getWETH;
-    function getChainId() {
-        return eth_wallet_1.Wallet.getInstance().chainId;
-    }
-    exports.getChainId = getChainId;
-    function getWallet() {
-        const network = exports.getNetworkInfo(exports.state.currentChainId || exports.getDefaultChainId());
-        return isWalletConnected() ? eth_wallet_1.Wallet.getClientInstance() : new eth_wallet_1.Wallet(network.rpc);
-    }
-    exports.getWallet = getWallet;
-    function getWalletProvider() {
-        return localStorage.getItem('walletProvider') || '';
-    }
-    exports.getWalletProvider = getWalletProvider;
-    function getErc20(address) {
-        const wallet = getWallet();
-        return new eth_wallet_1.Erc20(wallet, address);
-    }
-    exports.getErc20 = getErc20;
-    // export function getAvailableMarkets() {
-    //   let chainId = getChainId();
-    //   let markets = availableMarketsByChainId[chainId];
-    //   return markets;
-    // }
-    const isExpertMode = () => {
-        return exports.state.isExpertMode;
-    };
-    exports.isExpertMode = isExpertMode;
-    function toggleExpertMode() {
-        exports.state.isExpertMode = !exports.state.isExpertMode;
-    }
-    exports.toggleExpertMode = toggleExpertMode;
-    const getSlippageTolerance = () => {
-        return exports.state.slippageTolerance;
-    };
-    exports.getSlippageTolerance = getSlippageTolerance;
-    const setSlippageTolerance = (value) => {
-        exports.state.slippageTolerance = value;
-    };
-    exports.setSlippageTolerance = setSlippageTolerance;
-    const getTransactionDeadline = () => {
-        return exports.state.transactionDeadline;
-    };
-    exports.getTransactionDeadline = getTransactionDeadline;
-    const setTransactionDeadline = (value) => {
-        exports.state.transactionDeadline = value;
-    };
-    exports.setTransactionDeadline = setTransactionDeadline;
-    const getTokenList = (chainId) => {
-        const tokenList = [...index_7.DefaultTokens[chainId]];
-        const userCustomTokens = exports.getUserTokens(chainId);
-        if (userCustomTokens) {
-            userCustomTokens.forEach(v => tokenList.push(Object.assign(Object.assign({}, v), { isNew: false, isCustom: true })));
-        }
-        return tokenList;
-    };
-    exports.getTokenList = getTokenList;
-    async function updateAllTokenBalances() {
-        const wallet = getWallet();
-        let allTokenBalancesMap = {};
-        if (!wallet.chainId || !index_7.DefaultTokens[wallet.chainId])
-            return allTokenBalancesMap;
-        const tokenList = exports.getTokenList(wallet.chainId);
-        let promises = [];
-        promises.push(...tokenList.map(async (token, index) => {
-            try {
-                if (token.address) {
-                    let balance = (await global_1.getERC20Amount(wallet, token.address, token.decimals)).toFixed();
-                    allTokenBalancesMap[token.address.toLowerCase()] = balance;
-                }
-                else {
-                    let balance = (await getWallet().balance).toFixed();
-                    allTokenBalancesMap[token.symbol] = balance;
-                }
-            }
-            catch (error) { }
-        }));
-        await Promise.all(promises);
-        exports.state.tokenBalances = allTokenBalancesMap;
-        return allTokenBalancesMap;
-    }
-    exports.updateAllTokenBalances = updateAllTokenBalances;
-    const getTokenBalances = () => {
-        return exports.state.tokenBalances;
-    };
-    exports.getTokenBalances = getTokenBalances;
-    const getTokenBalance = (token) => {
-        let balance = '0';
-        if (!token)
-            return balance;
-        if (token.address) {
-            balance = exports.state.tokenBalances[token.address.toLowerCase()];
-        }
-        else {
-            balance = exports.state.tokenBalances[token.symbol];
-        }
-        return balance;
-    };
-    exports.getTokenBalance = getTokenBalance;
-    const setTokenBalances = async (value) => {
-        exports.state.tokenBalances = value ? value : await updateAllTokenBalances();
-    };
-    exports.setTokenBalances = setTokenBalances;
-    exports.state = {
-        siteEnv: global_1.SITE_ENV.TESTNET,
-        currentChainId: 0,
-        isExpertMode: false,
-        slippageTolerance: 0.5,
-        transactionDeadline: 30,
-        tokenBalances: {},
-        tokenMap: {},
-        userTokens: {},
-        infuraId: "",
-        networkMap: {},
-        providerList: []
-    };
-    const setDataFromSCConfig = (Networks, InfuraId) => {
-        if (InfuraId) {
-            setInfuraId(InfuraId);
-        }
-        if (Networks) {
-            setNetworkList(Networks, InfuraId);
-        }
-    };
-    exports.setDataFromSCConfig = setDataFromSCConfig;
-    const getDefaultChainId = () => {
-        switch (exports.getSiteEnv()) {
-            case global_1.SITE_ENV.TESTNET:
-                return 97;
-            case global_1.SITE_ENV.DEV:
-            case global_1.SITE_ENV.MAINNET:
-            default:
-                return 56;
-        }
-    };
-    exports.getDefaultChainId = getDefaultChainId;
-    const setInfuraId = (infuraId) => {
-        exports.state.infuraId = infuraId;
-    };
-    const getInfuraId = () => {
-        return exports.state.infuraId;
-    };
-    exports.getInfuraId = getInfuraId;
-    const setNetworkList = (networkList, infuraId) => {
-        exports.state.networkMap = {};
-        for (let network of networkList) {
-            if (infuraId && network.rpc) {
-                network.rpc = network.rpc.replace(/{InfuraId}/g, infuraId);
-            }
-            exports.state.networkMap[network.chainId] = network;
-        }
-    };
-    const getNetworkInfo = (chainId) => {
-        return exports.state.networkMap[chainId];
-    };
-    exports.getNetworkInfo = getNetworkInfo;
-    const getFilteredNetworks = (filter) => {
-        let networkFullList = Object.values(exports.state.networkMap);
-        return networkFullList.filter(filter);
-    };
-    exports.getFilteredNetworks = getFilteredNetworks;
     function matchFilter(list, filter) {
         let filters = Object.keys(filter);
         return list.filter(item => filters.every(f => {
@@ -3620,89 +3572,6 @@ define("@swap/store", ["require", "exports", "@ijstech/eth-wallet", "@ijstech/co
         return 'Unknown';
     };
     exports.getNetworkExplorerName = getNetworkExplorerName;
-    const getNetworkImg = (chainId) => {
-        try {
-            const network = exports.getNetworkInfo(chainId);
-            if (network) {
-                return assets_1.default.fullPath(network.img);
-            }
-        }
-        catch (_a) { }
-        return assets_1.default.fullPath('img/tokens/token-placeholder.svg');
-    };
-    exports.getNetworkImg = getNetworkImg;
-    const projectNativeToken = () => {
-        let chainId = getChainId();
-        if (chainId == null || chainId == undefined)
-            return null;
-        let stakeToken = index_7.DefaultTokens[chainId].find(v => v.symbol == 'OSWAP');
-        return stakeToken ? Object.assign(Object.assign({}, stakeToken), { address: stakeToken.address.toLowerCase() }) : null;
-    };
-    exports.projectNativeToken = projectNativeToken;
-    const projectNativeTokenSymbol = () => {
-        const token = exports.projectNativeToken();
-        return token ? token.symbol : '';
-    };
-    exports.projectNativeTokenSymbol = projectNativeTokenSymbol;
-    const getTokenObject = async (address, showBalance) => {
-        const ERC20Contract = new oswap_openswap_contract_1.Contracts.ERC20(eth_wallet_1.Wallet.getInstance(), address);
-        const symbol = await ERC20Contract.symbol();
-        const name = await ERC20Contract.name();
-        const decimals = (await ERC20Contract.decimals()).toFixed();
-        let balance;
-        if (showBalance && getWallet().isConnected) {
-            balance = (await (ERC20Contract.balanceOf(getWallet().account.address))).shiftedBy(-decimals).toFixed();
-        }
-        return {
-            address: address.toLowerCase(),
-            decimals: +decimals,
-            name,
-            symbol,
-            balance
-        };
-    };
-    exports.getTokenObject = getTokenObject;
-    const getTokenMapData = () => {
-        let allTokensMap = {};
-        let chainId = getChainId();
-        if (index_7.DefaultTokens[chainId]) {
-            let defaultTokenList = index_7.DefaultTokens[chainId].sort((a, b) => {
-                if (a.symbol.toLowerCase() < b.symbol.toLowerCase()) {
-                    return -1;
-                }
-                if (a.symbol.toLowerCase() > b.symbol.toLowerCase()) {
-                    return 1;
-                }
-                return 0;
-            });
-            for (let i = 0; i < defaultTokenList.length; i++) {
-                let defaultTokenItem = defaultTokenList[i];
-                if (defaultTokenItem.address)
-                    allTokensMap[defaultTokenItem.address.toLowerCase()] = defaultTokenItem;
-                else
-                    allTokensMap[defaultTokenItem.symbol] = defaultTokenItem;
-            }
-            const userCustomTokens = exports.getUserTokens(chainId);
-            if (userCustomTokens) {
-                userCustomTokens.forEach(v => allTokensMap[v.address] = Object.assign(Object.assign({}, v), { isCustom: true }));
-            }
-        }
-        return allTokensMap;
-    };
-    let tokenMapChainId = 0;
-    const setTokenMap = () => {
-        exports.state.tokenMap = getTokenMapData();
-    };
-    exports.setTokenMap = setTokenMap;
-    const getTokenMap = () => {
-        let chainId = getChainId();
-        if (tokenMapChainId != chainId) {
-            exports.state.tokenMap = getTokenMapData();
-            tokenMapChainId = chainId;
-        }
-        return exports.state.tokenMap;
-    };
-    exports.getTokenMap = getTokenMap;
     const getTokensDataList = async (tokenMapData, tokenBalances) => {
         let dataList = [];
         for (let i = 0; i < Object.keys(tokenMapData).length; i++) {
@@ -3718,43 +3587,6 @@ define("@swap/store", ["require", "exports", "@ijstech/eth-wallet", "@ijstech/co
         return dataList;
     };
     exports.getTokensDataList = getTokensDataList;
-    const getTokenDecimals = (address) => {
-        let chainId = getChainId();
-        const Address = getAddresses(chainId);
-        const ChainNativeToken = exports.getChainNativeToken(chainId);
-        const tokenObject = (!address || address.toLowerCase() === Address['WETH9'].toLowerCase()) ?
-            ChainNativeToken :
-            exports.getTokenMap()[address];
-        return tokenObject ? tokenObject.decimals : 18;
-    };
-    exports.getTokenDecimals = getTokenDecimals;
-    const getTokenIcon = (address) => {
-        if (!address)
-            return '';
-        const tokenMap = exports.getTokenMap();
-        let ChainNativeToken;
-        let tokenObject;
-        if (isWalletConnected()) {
-            ChainNativeToken = exports.getChainNativeToken(getChainId());
-            tokenObject = address == ChainNativeToken.symbol ? ChainNativeToken : tokenMap[address.toLowerCase()];
-        }
-        else {
-            tokenObject = tokenMap[address.toLowerCase()];
-        }
-        return assets_1.default.fullPath(index_7.getTokenIconPath(tokenObject, getChainId()));
-    };
-    exports.getTokenIcon = getTokenIcon;
-    const tokenSymbol = (address) => {
-        if (!address)
-            return '';
-        const tokenMap = exports.getTokenMap();
-        let tokenObject = tokenMap[address.toLowerCase()];
-        if (!tokenObject) {
-            tokenObject = tokenMap[address];
-        }
-        return tokenObject ? tokenObject.symbol : '';
-    };
-    exports.tokenSymbol = tokenSymbol;
     const setUserTokens = (token, chainId) => {
         if (!exports.state.userTokens[chainId]) {
             exports.state.userTokens[chainId] = [token];
@@ -3764,6 +3596,11 @@ define("@swap/store", ["require", "exports", "@ijstech/eth-wallet", "@ijstech/co
         }
     };
     exports.setUserTokens = setUserTokens;
+    const hasUserToken = (address, chainId) => {
+        var _a;
+        return (_a = exports.state.userTokens[chainId]) === null || _a === void 0 ? void 0 : _a.some((token) => { var _a; return ((_a = token.address) === null || _a === void 0 ? void 0 : _a.toLocaleLowerCase()) === (address === null || address === void 0 ? void 0 : address.toLocaleLowerCase()); });
+    };
+    exports.hasUserToken = hasUserToken;
     const setProviderList = (value) => {
         exports.state.providerList = value;
     };
@@ -3777,11 +3614,6 @@ define("@swap/store", ["require", "exports", "@ijstech/eth-wallet", "@ijstech/co
         return providers.find(item => item.key === providerKey) || null;
     };
     exports.getProviderByKey = getProviderByKey;
-    const hasUserToken = (address, chainId) => {
-        var _a;
-        return (_a = exports.state.userTokens[chainId]) === null || _a === void 0 ? void 0 : _a.some((token) => { var _a; return ((_a = token.address) === null || _a === void 0 ? void 0 : _a.toLocaleLowerCase()) === (address === null || address === void 0 ? void 0 : address.toLocaleLowerCase()); });
-    };
-    exports.hasUserToken = hasUserToken;
     const viewOnExplorerByTxHash = (chainId, txHash) => {
         let network = exports.getNetworkInfo(chainId);
         if (network && network.explorerTxUrl) {
@@ -3798,7 +3630,51 @@ define("@swap/store", ["require", "exports", "@ijstech/eth-wallet", "@ijstech/co
         }
     };
     exports.viewOnExplorerByAddress = viewOnExplorerByAddress;
-    // Wallet
+    // wallet
+    function getWalletProvider() {
+        return localStorage.getItem('walletProvider') || '';
+    }
+    exports.getWalletProvider = getWalletProvider;
+    function isWalletConnected() {
+        const wallet = eth_wallet_1.Wallet.getClientInstance();
+        return wallet.isConnected;
+    }
+    exports.isWalletConnected = isWalletConnected;
+    async function switchNetwork(chainId) {
+        var _a;
+        if (!isWalletConnected()) {
+            exports.setCurrentChainId(chainId);
+            eth_wallet_1.Wallet.getClientInstance().chainId = chainId;
+            components_1.application.EventBus.dispatch("chainChanged" /* chainChanged */, chainId);
+            return;
+        }
+        const wallet = eth_wallet_1.Wallet.getClientInstance();
+        if (((_a = wallet === null || wallet === void 0 ? void 0 : wallet.clientSideProvider) === null || _a === void 0 ? void 0 : _a.walletPlugin) === eth_wallet_1.WalletPlugin.MetaMask) {
+            await wallet.switchNetwork(chainId);
+        }
+    }
+    exports.switchNetwork = switchNetwork;
+    const hasWallet = function () {
+        let hasWallet = false;
+        for (let wallet of exports.walletList) {
+            if (eth_wallet_1.Wallet.isInstalled(wallet.name)) {
+                hasWallet = true;
+                break;
+            }
+        }
+        return hasWallet;
+    };
+    exports.hasWallet = hasWallet;
+    const hasMetaMask = function () {
+        return eth_wallet_1.Wallet.isInstalled(eth_wallet_1.WalletPlugin.MetaMask);
+    };
+    exports.hasMetaMask = hasMetaMask;
+    const truncateAddress = (address) => {
+        if (address === undefined || address === null)
+            return '';
+        return address.substr(0, 6) + '...' + address.substr(-4);
+    };
+    exports.truncateAddress = truncateAddress;
     exports.walletList = [
         {
             name: eth_wallet_1.WalletPlugin.MetaMask,
@@ -3844,110 +3720,391 @@ define("@swap/store", ["require", "exports", "@ijstech/eth-wallet", "@ijstech/co
             if (rpc)
                 rpcs[network.chainId] = rpc;
         }
-        return {
-            [eth_wallet_1.WalletPlugin.WalletConnect]: {
-                infuraId: exports.getInfuraId(),
-                bridge: "https://bridge.walletconnect.org",
-                rpc: rpcs
+        let walletOptionsMap = {};
+        for (let walletItem of exports.walletList) {
+            if (walletItem.name == eth_wallet_1.WalletPlugin.WalletConnect) {
+                walletOptionsMap[walletItem.name] = {
+                    infuraId: exports.getInfuraId(),
+                    bridge: "https://bridge.walletconnect.org",
+                    rpc: rpcs,
+                    callWithDefaultProvider: true
+                };
             }
-        };
+            walletOptionsMap[walletItem.name] = {
+                infuraId: exports.getInfuraId(),
+                rpc: rpcs,
+                callWithDefaultProvider: true
+            };
+        }
+        return walletOptionsMap;
     };
     exports.getWalletOptions = getWalletOptions;
-    function isWalletConnected() {
-        const wallet = eth_wallet_1.Wallet.getClientInstance();
-        return wallet.isConnected;
-    }
-    exports.isWalletConnected = isWalletConnected;
-    async function connectWallet(walletPlugin, eventHandlers) {
-        let wallet = eth_wallet_1.Wallet.getClientInstance();
-        const walletOptions = exports.getWalletOptions();
-        let providerOptions = walletOptions[walletPlugin];
-        if (!wallet.chainId) {
-            wallet.chainId = exports.getDefaultChainId();
-        }
-        await wallet.connect(walletPlugin, {
-            onAccountChanged: async (account) => {
-                var _a, _b;
-                if (eventHandlers && eventHandlers.accountsChanged) {
-                    eventHandlers.accountsChanged(account);
-                }
-                const connected = !!account;
-                if (connected) {
-                    localStorage.setItem('walletProvider', ((_b = (_a = eth_wallet_1.Wallet.getClientInstance()) === null || _a === void 0 ? void 0 : _a.clientSideProvider) === null || _b === void 0 ? void 0 : _b.walletPlugin) || '');
-                    if (wallet.chainId !== exports.getCurrentChainId()) {
-                        exports.setCurrentChainId(wallet.chainId);
-                        components_1.application.EventBus.dispatch("chainChanged" /* chainChanged */, wallet.chainId);
-                    }
-                    await updateAllTokenBalances();
-                }
-                components_1.application.EventBus.dispatch("isWalletConnected" /* IsWalletConnected */, connected);
-            },
-            onChainChanged: async (chainIdHex) => {
-                //console.log('onChainChanged', chainIdHex);
-                const chainId = Number(chainIdHex);
-                if (eventHandlers && eventHandlers.chainChanged) {
-                    eventHandlers.chainChanged(chainId);
-                }
-                exports.setCurrentChainId(chainId);
-                await updateAllTokenBalances();
-                components_1.application.EventBus.dispatch("chainChanged" /* chainChanged */, chainId);
-            }
-        }, providerOptions);
-        return wallet;
-    }
-    exports.connectWallet = connectWallet;
-    async function switchNetwork(chainId) {
-        var _a;
-        if (!isWalletConnected()) {
-            exports.setCurrentChainId(chainId);
-            eth_wallet_1.Wallet.getInstance().chainId = chainId;
-            components_1.application.EventBus.dispatch("chainChanged" /* chainChanged */, chainId);
-            return;
-        }
-        const wallet = eth_wallet_1.Wallet.getClientInstance();
-        if (((_a = wallet === null || wallet === void 0 ? void 0 : wallet.clientSideProvider) === null || _a === void 0 ? void 0 : _a.walletPlugin) === eth_wallet_1.WalletPlugin.MetaMask) {
-            await wallet.switchNetwork(chainId);
-        }
-    }
-    exports.switchNetwork = switchNetwork;
-    async function logoutWallet() {
-        const wallet = eth_wallet_1.Wallet.getClientInstance();
-        await wallet.disconnect();
-        localStorage.setItem('walletProvider', '');
-        components_1.application.EventBus.dispatch("IsWalletDisconnected" /* IsWalletDisconnected */, false);
-    }
-    exports.logoutWallet = logoutWallet;
-    const hasWallet = function () {
-        let hasWallet = false;
-        for (let wallet of exports.walletList) {
-            if (eth_wallet_1.Wallet.isInstalled(wallet.name)) {
-                hasWallet = true;
-                break;
-            }
-        }
-        return hasWallet;
-    };
-    exports.hasWallet = hasWallet;
-    const hasMetaMask = function () {
-        return eth_wallet_1.Wallet.isInstalled(eth_wallet_1.WalletPlugin.MetaMask);
-    };
-    exports.hasMetaMask = hasMetaMask;
-    exports.baseUrl = 'https://openswap.xyz/#';
-    exports.getTokenUrl = `${exports.baseUrl}/swap`;
-    exports.isThemeApplied = false;
-    exports.isMultiple = false;
-    exports.maxWidth = '690px';
-    exports.maxHeight = '321px';
-    // mover from cross-chain
     const getBridgeVaultVersion = (chainId) => {
         let network = exports.getNetworkInfo(chainId);
         const isTestnet = !network.isDisabled && network.isCrossChainSupported && network.isTestnet;
         // Testnet
         if (isTestnet)
-            return '0.1.5';
+            return '0.1.9';
         // Mainnet
         return '1.1.1';
     };
     exports.getBridgeVaultVersion = getBridgeVaultVersion;
-    __exportStar(index_8, exports);
+    // export function getAvailableMarkets() {
+    //   let chainId = getChainId();
+    //   let markets = availableMarketsByChainId[chainId];
+    //   return markets;
+    // }
+    function getChainId() {
+        return isWalletConnected() ? eth_wallet_1.Wallet.getInstance().chainId : exports.getDefaultChainId();
+        // return Wallet.getInstance().chainId;
+    }
+    exports.getChainId = getChainId;
+    function getAddresses(chainId) {
+        return index_7.CoreContractAddressesByChainId[chainId];
+    }
+    exports.getAddresses = getAddresses;
+    ;
+    const getChainNativeToken = (chainId) => {
+        return index_7.ChainNativeTokenByChainId[chainId];
+    };
+    exports.getChainNativeToken = getChainNativeToken;
+    const getGovToken = (chainId) => {
+        let govToken;
+        let Address = getAddresses(chainId);
+        if (chainId == 43113 || chainId == 43114) {
+            govToken = { address: Address["GOV_TOKEN"], decimals: 18, symbol: "veOSWAP", name: 'Vote-escrowed OSWAP' };
+        }
+        else {
+            govToken = { address: Address["GOV_TOKEN"], decimals: 18, symbol: "OSWAP", name: 'OpenSwap' };
+        }
+        return govToken;
+    };
+    exports.getGovToken = getGovToken;
+});
+define("@swap/store/tokens.ts", ["require", "exports", "@ijstech/eth-wallet", "@swap/store/utils.ts"], function (require, exports, eth_wallet_2, utils_1) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.TokenStore = void 0;
+    class TokenStore {
+        constructor(defaultTokensByChain) {
+            this._defaultTokensByChain = defaultTokensByChain;
+            const defaultChainId = utils_1.getDefaultChainId();
+            this._tokenMap = this._updateTokenMapData(defaultChainId);
+        }
+        get tokenBalances() {
+            return this._tokenBalances;
+        }
+        get tokenMap() {
+            return this._tokenMap;
+        }
+        get projectToken() {
+            return this._projectToken;
+        }
+        get govToken() {
+            return this._govToken;
+        }
+        getTokenList(chainId) {
+            if (!chainId)
+                return [];
+            const tokenList = [...this._defaultTokensByChain[chainId]];
+            const userCustomTokens = utils_1.getUserTokens(chainId);
+            if (userCustomTokens) {
+                userCustomTokens.forEach(v => tokenList.push(Object.assign(Object.assign({}, v), { isNew: false, isCustom: true })));
+            }
+            return tokenList;
+        }
+        async getERC20Balance(wallet, token) {
+            const erc20 = new eth_wallet_2.Contracts.ERC20(wallet, token);
+            const balance = await erc20.balanceOf(wallet.address);
+            return balance;
+        }
+        getTokenBalance(token) {
+            let balance = '0';
+            if (!token || !this._tokenBalances)
+                return balance;
+            if (token.address) {
+                balance = this._tokenBalances[token.address.toLowerCase()];
+            }
+            else {
+                balance = this._tokenBalances[token.symbol];
+            }
+            return balance;
+        }
+        getProjectTokenBalance() {
+            let balance = '0';
+            if (this._projectToken && this._projectToken.address && this._tokenBalances) {
+                balance = this._tokenBalances[this._projectToken.address.toLowerCase()];
+            }
+            return balance;
+        }
+        async _updateAllTokenBalances(erc20TokenList, nativeToken) {
+            let allTokenBalancesMap = {};
+            try {
+                const wallet = eth_wallet_2.Wallet.getClientInstance();
+                const erc20 = new eth_wallet_2.Contracts.ERC20(wallet);
+                const data = wallet.encodeFunctionCall(erc20, 'balanceOf', [wallet.address]);
+                const result = await wallet.multiCall(erc20TokenList.map((v) => {
+                    return {
+                        to: v.address,
+                        data
+                    };
+                }));
+                if (result) {
+                    for (let i = 0; i < erc20TokenList.length; i++) {
+                        const token = erc20TokenList[i];
+                        if (token.address) {
+                            allTokenBalancesMap[token.address.toLowerCase()] = new eth_wallet_2.BigNumber(result.results[i]).shiftedBy(-token.decimals).toFixed();
+                        }
+                    }
+                    let balance = (await eth_wallet_2.Wallet.getClientInstance().balance).toFixed();
+                    allTokenBalancesMap[nativeToken.symbol] = balance;
+                }
+                else {
+                    let promises = [];
+                    const tokenList = [...erc20TokenList, nativeToken];
+                    promises.push(...tokenList.map(async (token, index) => {
+                        try {
+                            if (token.address) {
+                                let balance = await this.getERC20Balance(wallet, token.address);
+                                allTokenBalancesMap[token.address.toLowerCase()] = new eth_wallet_2.BigNumber(balance).shiftedBy(-token.decimals).toFixed();
+                            }
+                            else {
+                                let balance = await eth_wallet_2.Wallet.getClientInstance().balance;
+                                allTokenBalancesMap[token.symbol] = balance.toFixed();
+                            }
+                        }
+                        catch (error) { }
+                    }));
+                    await Promise.all(promises);
+                }
+            }
+            catch (error) { }
+            return allTokenBalancesMap;
+        }
+        async updateAllTokenBalances() {
+            const wallet = eth_wallet_2.Wallet.getClientInstance();
+            let allTokenBalancesMap = {};
+            const tokenList = this.getTokenList(wallet.chainId);
+            if (!wallet.chainId || !tokenList)
+                return allTokenBalancesMap;
+            const nativeToken = tokenList.find(v => !v.address);
+            const erc20TokenList = tokenList.filter(v => !!v.address);
+            allTokenBalancesMap = await this._updateAllTokenBalances(erc20TokenList, nativeToken);
+            this._tokenBalances = allTokenBalancesMap;
+            return this._tokenBalances;
+        }
+        async updateTokenBalances(erc20TokenList) {
+            const wallet = eth_wallet_2.Wallet.getClientInstance();
+            let tokenBalancesMap = {};
+            if (!wallet.chainId)
+                return tokenBalancesMap;
+            const nativeToken = utils_1.getChainNativeToken(wallet.chainId);
+            tokenBalancesMap = await this._updateAllTokenBalances(erc20TokenList, nativeToken);
+            for (let tokenAddress of Object.keys(tokenBalancesMap)) {
+                this._tokenBalances[tokenAddress] = tokenBalancesMap[tokenAddress];
+            }
+            return this._tokenBalances;
+        }
+        _updateTokenMapData(chainId) {
+            let allTokensMap = {};
+            let govToken = utils_1.getGovToken(chainId);
+            let GovTokenObj;
+            if (govToken && govToken.address) {
+                GovTokenObj = Object.assign(Object.assign({}, govToken), { address: govToken.address.toLowerCase() });
+                allTokensMap[GovTokenObj.address] = GovTokenObj;
+            }
+            if (this._defaultTokensByChain[chainId]) {
+                let defaultTokenList = this._defaultTokensByChain[chainId].sort((a, b) => {
+                    if (a.symbol.toLowerCase() < b.symbol.toLowerCase()) {
+                        return -1;
+                    }
+                    if (a.symbol.toLowerCase() > b.symbol.toLowerCase()) {
+                        return 1;
+                    }
+                    return 0;
+                });
+                for (let i = 0; i < defaultTokenList.length; i++) {
+                    let defaultTokenItem = defaultTokenList[i];
+                    if (defaultTokenItem.address)
+                        allTokensMap[defaultTokenItem.address.toLowerCase()] = defaultTokenItem;
+                    else
+                        allTokensMap[defaultTokenItem.symbol] = defaultTokenItem;
+                }
+                const userCustomTokens = utils_1.getUserTokens(chainId);
+                if (userCustomTokens) {
+                    userCustomTokens.forEach(v => allTokensMap[v.address] = Object.assign(Object.assign({}, v), { isCustom: true }));
+                }
+                let stakeToken = defaultTokenList.find(v => v.symbol == 'OSWAP');
+                this._projectToken = stakeToken ? Object.assign(Object.assign({}, stakeToken), { address: stakeToken.address.toLowerCase() }) : undefined;
+                if (GovTokenObj)
+                    this._govToken = allTokensMap[GovTokenObj.address];
+            }
+            return allTokensMap;
+        }
+        updateTokenMapData() {
+            let chainId = utils_1.getChainId();
+            let allTokensMap = this._updateTokenMapData(chainId);
+            this._tokenMap = allTokensMap;
+            return allTokensMap;
+        }
+    }
+    exports.TokenStore = TokenStore;
+});
+define("@swap/store", ["require", "exports", "@ijstech/components", "@ijstech/eth-wallet", "@swap/assets", "@swap/store/data/index.ts", "@swap/store/tokens.ts", "@swap/store/utils.ts", "@swap/store/data/index.ts", "@swap/store/tokens.ts", "@swap/store/utils.ts", "@swap/store/data/index.ts"], function (require, exports, components_2, eth_wallet_3, assets_1, index_9, tokens_1, utils_2, index_10, tokens_2, utils_3, index_11) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.projectNativeTokenSymbol = exports.projectNativeToken = exports.getEmbedLink = exports.getNetworkImg = exports.connectWallet = exports.logoutWallet = exports.tokenName = exports.tokenSymbol = exports.getTokenIcon = exports.getTokenDecimals = exports.getWETH = exports.nullAddress = exports.setTokenStore = exports.tokenStore = exports.TokenStore = exports.MockOracleMap = exports.CrossChainAddressMap = exports.ChainTrollRegistryMap = exports.BridgeVaultGroupList = exports.crossChainNativeTokenList = exports.baseRoute = exports.CoreContractAddressesByChainId = exports.getOpenSwapToken = exports.getTokenIconPath = exports.tokenPriceAMMReference = exports.ToUSDPriceFeedAddressesMap = exports.DefaultTokens = exports.WETHByChainId = exports.ChainNativeTokenByChainId = exports.DefaultERC20Tokens = void 0;
+    //token
+    Object.defineProperty(exports, "DefaultERC20Tokens", { enumerable: true, get: function () { return index_10.DefaultERC20Tokens; } });
+    Object.defineProperty(exports, "ChainNativeTokenByChainId", { enumerable: true, get: function () { return index_10.ChainNativeTokenByChainId; } });
+    Object.defineProperty(exports, "WETHByChainId", { enumerable: true, get: function () { return index_10.WETHByChainId; } });
+    Object.defineProperty(exports, "DefaultTokens", { enumerable: true, get: function () { return index_10.DefaultTokens; } });
+    Object.defineProperty(exports, "ToUSDPriceFeedAddressesMap", { enumerable: true, get: function () { return index_10.ToUSDPriceFeedAddressesMap; } });
+    Object.defineProperty(exports, "tokenPriceAMMReference", { enumerable: true, get: function () { return index_10.tokenPriceAMMReference; } });
+    Object.defineProperty(exports, "getTokenIconPath", { enumerable: true, get: function () { return index_10.getTokenIconPath; } });
+    Object.defineProperty(exports, "getOpenSwapToken", { enumerable: true, get: function () { return index_10.getOpenSwapToken; } });
+    //core
+    Object.defineProperty(exports, "CoreContractAddressesByChainId", { enumerable: true, get: function () { return index_10.CoreContractAddressesByChainId; } });
+    //cross-chain
+    Object.defineProperty(exports, "baseRoute", { enumerable: true, get: function () { return index_10.baseRoute; } });
+    Object.defineProperty(exports, "crossChainNativeTokenList", { enumerable: true, get: function () { return index_10.crossChainNativeTokenList; } });
+    Object.defineProperty(exports, "BridgeVaultGroupList", { enumerable: true, get: function () { return index_10.BridgeVaultGroupList; } });
+    Object.defineProperty(exports, "ChainTrollRegistryMap", { enumerable: true, get: function () { return index_10.ChainTrollRegistryMap; } });
+    Object.defineProperty(exports, "CrossChainAddressMap", { enumerable: true, get: function () { return index_10.CrossChainAddressMap; } });
+    Object.defineProperty(exports, "MockOracleMap", { enumerable: true, get: function () { return index_10.MockOracleMap; } });
+    Object.defineProperty(exports, "TokenStore", { enumerable: true, get: function () { return tokens_2.TokenStore; } });
+    const setTokenStore = () => {
+        exports.tokenStore = new tokens_1.TokenStore(index_9.DefaultTokens);
+    };
+    exports.setTokenStore = setTokenStore;
+    exports.nullAddress = "0x0000000000000000000000000000000000000000";
+    const getWETH = (chainId) => {
+        let wrappedToken = index_9.WETHByChainId[chainId];
+        return wrappedToken;
+    };
+    exports.getWETH = getWETH;
+    const getTokenDecimals = (address) => {
+        let chainId = utils_2.getChainId();
+        const Address = utils_2.getAddresses(chainId);
+        const ChainNativeToken = utils_2.getChainNativeToken(chainId);
+        const tokenObject = (!address || address.toLowerCase() === Address['WETH9'].toLowerCase()) ? ChainNativeToken : exports.tokenStore.tokenMap[address.toLowerCase()];
+        return tokenObject ? tokenObject.decimals : 18;
+    };
+    exports.getTokenDecimals = getTokenDecimals;
+    const getTokenIcon = (address) => {
+        if (!address)
+            return '';
+        const tokenMap = exports.tokenStore.tokenMap;
+        let ChainNativeToken;
+        let tokenObject;
+        if (utils_2.isWalletConnected()) {
+            ChainNativeToken = utils_2.getChainNativeToken(utils_2.getChainId());
+            tokenObject = address == ChainNativeToken.symbol ? ChainNativeToken : tokenMap[address.toLowerCase()];
+        }
+        else {
+            tokenObject = tokenMap[address.toLowerCase()];
+        }
+        return assets_1.default.fullPath(index_9.getTokenIconPath(tokenObject, utils_2.getChainId()));
+    };
+    exports.getTokenIcon = getTokenIcon;
+    const tokenSymbol = (address) => {
+        const tokenMap = exports.tokenStore.tokenMap;
+        if (!address || !tokenMap)
+            return '';
+        let tokenObject = tokenMap[address.toLowerCase()];
+        if (!tokenObject)
+            tokenObject = tokenMap[address];
+        return tokenObject ? tokenObject.symbol : '';
+    };
+    exports.tokenSymbol = tokenSymbol;
+    const tokenName = (address) => {
+        const tokenMap = exports.tokenStore.tokenMap;
+        if (!address || !tokenMap)
+            return '';
+        let tokenObject = tokenMap[address.toLowerCase()];
+        if (!tokenObject)
+            tokenObject = tokenMap[address];
+        return (tokenObject === null || tokenObject === void 0 ? void 0 : tokenObject.name) || '';
+    };
+    exports.tokenName = tokenName;
+    async function logoutWallet() {
+        const wallet = eth_wallet_3.Wallet.getClientInstance();
+        await wallet.disconnect();
+        localStorage.setItem('walletProvider', '');
+        components_2.application.EventBus.dispatch("IsWalletDisconnected" /* IsWalletDisconnected */, false);
+    }
+    exports.logoutWallet = logoutWallet;
+    async function connectWallet(walletPlugin, eventHandlers) {
+        // let walletProvider = localStorage.getItem('walletProvider') || '';
+        let wallet = eth_wallet_3.Wallet.getClientInstance();
+        let walletOptions = utils_2.getWalletOptions();
+        if (!wallet.chainId) {
+            wallet.chainId = utils_2.getDefaultChainId();
+        }
+        let providerOptions = walletOptions[walletPlugin];
+        await wallet.connect(walletPlugin, {
+            onAccountChanged: async (account) => {
+                var _a;
+                if (eventHandlers && eventHandlers.accountsChanged) {
+                    eventHandlers.accountsChanged(account);
+                }
+                const connected = !!account;
+                if (connected) {
+                    localStorage.setItem('walletProvider', ((_a = eth_wallet_3.Wallet.getClientInstance().clientSideProvider) === null || _a === void 0 ? void 0 : _a.walletPlugin) || '');
+                    if (wallet.chainId !== utils_2.getCurrentChainId()) {
+                        utils_2.setCurrentChainId(wallet.chainId);
+                        components_2.application.EventBus.dispatch("chainChanged" /* chainChanged */, wallet.chainId);
+                    }
+                    exports.tokenStore.updateTokenMapData();
+                    await exports.tokenStore.updateAllTokenBalances();
+                }
+                components_2.application.EventBus.dispatch("isWalletConnected" /* IsWalletConnected */, connected);
+            },
+            onChainChanged: async (chainIdHex) => {
+                const chainId = Number(chainIdHex);
+                if (eventHandlers && eventHandlers.chainChanged) {
+                    eventHandlers.chainChanged(chainId);
+                }
+                utils_2.setCurrentChainId(chainId);
+                exports.tokenStore.updateTokenMapData();
+                await exports.tokenStore.updateAllTokenBalances();
+                components_2.application.EventBus.dispatch("chainChanged" /* chainChanged */, chainId);
+            }
+        }, providerOptions);
+        return wallet;
+    }
+    exports.connectWallet = connectWallet;
+    const getNetworkImg = (chainId) => {
+        try {
+            const network = utils_2.getNetworkInfo(chainId);
+            if (network) {
+                return assets_1.default.fullPath(network.img);
+            }
+        }
+        catch (_a) { }
+        return assets_1.default.fullPath('img/tokens/token-placeholder.svg');
+    };
+    exports.getNetworkImg = getNetworkImg;
+    const EMBED_URL = "https://embed.scom.page/#/";
+    const getEmbedLink = (dataUri, params) => {
+        let queries = new URLSearchParams(params).toString();
+        let url = `${EMBED_URL}${dataUri}${queries ? "?" + queries : ""}`;
+        return url;
+    };
+    exports.getEmbedLink = getEmbedLink;
+    const projectNativeToken = () => {
+        let chainId = utils_2.getChainId();
+        if (chainId == null || chainId == undefined)
+            return null;
+        let stakeToken = index_9.DefaultTokens[chainId].find(v => v.symbol == 'OSWAP');
+        return stakeToken ? Object.assign(Object.assign({}, stakeToken), { address: stakeToken.address.toLowerCase() }) : null;
+    };
+    exports.projectNativeToken = projectNativeToken;
+    const projectNativeTokenSymbol = () => {
+        const token = exports.projectNativeToken();
+        return token ? token.symbol : '';
+    };
+    exports.projectNativeTokenSymbol = projectNativeTokenSymbol;
+    __exportStar(utils_3, exports);
+    __exportStar(index_11, exports);
 });

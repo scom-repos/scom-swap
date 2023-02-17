@@ -1,8 +1,7 @@
 import { Styles } from '@ijstech/components';
 import Assets from '@swap/assets';
-
-Styles.Theme.darkTheme.background.default = '#0c1234';
 const Theme = Styles.Theme.ThemeVars;
+
 const colorVar = {
   primaryButton: 'transparent linear-gradient(90deg, #AC1D78 0%, #E04862 100%) 0% 0% no-repeat padding-box',
   primaryGradient: 'linear-gradient(255deg,#f15e61,#b52082)',
@@ -76,6 +75,9 @@ Styles.fontFace({
 
 Styles.cssRule('.pageblock-swap', {
   $nest: {
+    'i-label': {
+      color: '#fff'
+    },
     '.btn-register':{
       padding: '0.75rem',
       display: 'flex',
@@ -141,7 +143,7 @@ Styles.cssRule('.pageblock-swap', {
       width: 520,
       maxWidth: '100%',
       padding: '1rem',
-      margin: '1.5rem auto 2rem'
+      margin: '0 auto 2rem'
     },
     '.bill-board': {
       display: 'flex',
@@ -216,6 +218,8 @@ Styles.cssRule('.pageblock-swap', {
     '.custom--slider': {
       width: '100%',
       margin: '0px 6px 22px',
+      display: 'flex',
+      alignItems: 'center',
       $nest: {
         'i-range, i-range > .slider': {
           width: '100% !important'
@@ -569,7 +573,7 @@ Styles.cssRule('.pageblock-swap', {
     },
     '.hints': {
       display: 'flex',
-      alignItems: 'center',
+      alignItems: 'start',
       marginTop: '-0.5rem',
       $nest: {
         '*': {

@@ -1,6 +1,5 @@
 import { customElements, Module, ControlElement, Modal, Panel, Label, Image, Button, Container, VStack } from '@ijstech/components';
 import { Wallet } from '@ijstech/eth-wallet';
-import '@ijstech/eth-contract';
 // import { parseContractError } from '@swap/global';
 import { getNetworkExplorerName, viewOnExplorerByTxHash } from '@swap/store';
 import styleClass from './result.css';
@@ -76,7 +75,7 @@ export class Result extends Module {
 
   async buildLink() {
     if (this.message.txtHash) {
-      const chainId: number = await Wallet.getInstance().getChainId();
+      const chainId: number = await Wallet.getClientInstance().getChainId();
       viewOnExplorerByTxHash(chainId, this.message.txtHash);
     }
   }
@@ -118,7 +117,7 @@ export class Result extends Module {
       };
       mainSection.appendChild(section);
     } else if (this.message.status === 'success') {
-      const chainId: number = await Wallet.getInstance().getChainId();
+      const chainId: number = await Wallet.getClientInstance().getChainId();
       const explorerName = getNetworkExplorerName(chainId);
       
       const image = await Image.create({
