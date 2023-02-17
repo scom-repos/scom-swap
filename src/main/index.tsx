@@ -2554,7 +2554,6 @@ export class SwapBlock extends Module implements PageBlock {
     this.transactionModal = new TransactionSettings();
     this.swapComponent.appendChild(this.transactionModal);
     this.initExpertModal();
-    this.edit();
   }
 
   render() {
