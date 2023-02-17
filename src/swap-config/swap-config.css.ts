@@ -1,16 +1,19 @@
 import { Styles } from "@ijstech/components";
-const Theme = Styles.Theme.ThemeVars;
 
 export const configStyle = Styles.style({
   $nest: {
     'i-label': {
       color: '#fff'
+    },
+    'i-button': {
+      color: '#fff',
+      background: 'transparent linear-gradient(90deg, #AC1D78 0%, #E04862 100%) 0% 0% no-repeat padding-box'
     }
   }
 })
 
 export const comboboxStyle = Styles.style({
-  maxWidth: 200,
+  maxWidth: 280,
   $nest: {
     '.selection': {
       paddingInline: 0,
@@ -19,7 +22,7 @@ export const comboboxStyle = Styles.style({
       padding: '1px 2px',
     },
     '.icon-btn i-icon': {
-      fill: `${Theme.colors.primary.main} !important`
+      fill: '#fff !important'
     },
   }
 })
@@ -50,6 +53,12 @@ export const uploadStyle = Styles.style({
     '.i-upload-wrapper': {
       maxHeight: 'inherit',
       overflow: 'hidden'
+    },
+    '.i-upload_btn': {
+      padding: '8px'
+    },
+    'i-upload-drag': {
+      cursor: 'pointer'
     }
   }
 })

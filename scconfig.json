@@ -38,9 +38,6 @@
     "@swap/swap-config": {
       "path": "swap-config"
     },
-    "@swap/transaction-settings-layout": {
-      "path": "transaction-settings-layout"
-    },
     "@swap/transaction-settings": {
       "path": "transaction-settings"
     },

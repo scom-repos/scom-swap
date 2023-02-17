@@ -16,7 +16,6 @@ import Assets from '@swap/assets';
 import './tokenSelection.css';
 import { ImportToken } from './importToken';
 import { Wallet } from '@ijstech/eth-wallet';
-const Theme = Styles.Theme.ThemeVars;
 
 interface TokenSelectionElement extends ControlElement{
   disableSelect?: boolean,
