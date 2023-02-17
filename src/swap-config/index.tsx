@@ -4,7 +4,7 @@ import { Category, IContractInfo, IProvider, ISwapConfig, ITokenObject } from '@
 import { comboboxStyle, configStyle, pointerStyle, tokenSelectionStyle, uploadStyle } from './swap-config.css';
 import { TokenSelection } from '@swap/token-selection';
 import { getTargetChainTokenInfoObj } from '@swap/crosschain-utils';
-import { isWalletConnected } from '@swap/store';
+import { getNetworkInfo, isWalletConnected } from '@swap/store';
 
 interface IContractInfoUI {
   chainId: string;
@@ -31,7 +31,7 @@ interface IChainOption {
   value: string;
 }
 
-const chainsList = [1, 42, 56, 97, 4002, 43113, 43114, 80001, 13370, 338, 137, 250, 56, 97];
+const chainsList = [1, 42, 56, 97, 4002, 43113, 43114, 80001, 13370, 338, 137, 250];
 const categories: { label: string, value: Category }[] = [
   {
     label: 'Fixed Pair',
@@ -80,12 +80,12 @@ export class SwapConfig extends Module {
   }
 
   set data(config: ISwapConfig) {
-    const categoryObj = categories.find(v => v.value === config.category);
+    const categoryObj = categories.find(v => v.value === config?.category);
     if (categoryObj) {
       this.category = config.category;
       this.cbbCategory.selectedItem = categoryObj;
     }
-    this.itemList = this.convertDataToProviderUI(config.providers || []);
+    this.itemList = this.convertDataToProviderUI(config?.providers || []);
   }
 
   private get isFixedPair() {
@@ -179,8 +179,13 @@ export class SwapConfig extends Module {
         }
       }
     }
-    if (prop === 'chainId')
-      item.contractInfo[index].chainId = ((source as ComboBox).selectedItem as IComboItem).value;
+    if (prop === 'chainId') {
+      const chainId = ((source as ComboBox).selectedItem as IComboItem).value;
+      if (chainId === item.contractInfo[index].chainId) return;
+      item.contractInfo[index].chainId = chainId;
+      item.contractInfo[index]['fromToken'] = undefined;
+      item.contractInfo[index]['toToken'] = undefined;
+    }
     else if (prop === 'fee' || prop === 'base')
       item.contractInfo[index]['tradeFee'][prop] = (source as Input).value;
     else if (prop === 'fromToken' || prop === 'toToken')
@@ -211,7 +216,17 @@ export class SwapConfig extends Module {
 
   init() {
     super.init();
-    this._chainOptions = chainsList.map(item => ({ label: `${item}`, value: `${item}` }));
+    let supportedNetworks: IChainOption[] = [];
+    chainsList.forEach(item => {
+      const network = getNetworkInfo(item);
+      if (network && !network.isDisabled) {
+        supportedNetworks.push({
+          label: `${network.name} (${network.chainId})`,
+          value: `${item}`
+        })
+      }
+    })
+    this._chainOptions = supportedNetworks;
   }
 
   private getChainTokenDataList(chainId: number) {
@@ -254,6 +269,10 @@ export class SwapConfig extends Module {
     toTokenSelection.tokenDataListProp = this.getChainTokenDataList(chainId);
     fromTokenSelection.enabled = true;
     toTokenSelection.enabled = true;
+    fromTokenSelection.disableSelect = false;
+    toTokenSelection.disableSelect = false;
+    fromTokenSelection.token = undefined;
+    toTokenSelection.token = undefined;
     if (this.isFixedPair) comboBoxChain.enabled = true;
   }
 
@@ -293,7 +312,7 @@ export class SwapConfig extends Module {
         position="relative"
       >
         <i-icon
-          name="times" fill="red" width={20} height={20}
+          name="times" fill="#f15e61" width={20} height={20}
           position="absolute"
           top={10} right={10}
           class={pointerStyle}
@@ -302,7 +321,7 @@ export class SwapConfig extends Module {
         <i-hstack gap={8} verticalAlignment="center" wrap="wrap">
           <i-hstack gap={2} width={60}>
             <i-label caption="Caption" />
-            <i-label caption="*" font={{ color: 'red' }} />
+            <i-label caption="*" font={{ color: '#f15e61' }} />
             <i-label caption=":" />
           </i-hstack>
           <i-input
@@ -314,14 +333,14 @@ export class SwapConfig extends Module {
         </i-hstack>
         <i-hstack gap={2} width={60}>
           <i-label caption="Image" />
-          <i-label caption="*" font={{ color: 'red' }} />
+          <i-label caption="*" font={{ color: '#f15e61' }} />
           <i-label caption=":" />
         </i-hstack>
         {uploadElm}
         <i-hstack gap={8} verticalAlignment="center" wrap="wrap">
           <i-hstack gap={2} width={60}>
             <i-label caption="Key" />
-            <i-label caption="*" font={{ color: 'red' }} />
+            <i-label caption="*" font={{ color: '#f15e61' }} />
             <i-label caption=":" />
           </i-hstack>
           <i-input
@@ -346,7 +365,7 @@ export class SwapConfig extends Module {
         <i-hstack gap={8} verticalAlignment="center" wrap="wrap">
           <i-hstack gap={2} width={120}>
             <i-label caption="Contract Info" />
-            <i-label caption="*" font={{ color: 'red' }} />
+            <i-label caption="*" font={{ color: '#f15e61' }} />
             <i-label caption=":" />
           </i-hstack>
           {contractInfoElm}
@@ -384,14 +403,18 @@ export class SwapConfig extends Module {
     toTokenSelection.enabled = hasChainId;
     toTokenSelection.isBtnMaxShown = false;
     toTokenSelection.onSelectToken = (token: ITokenObject) => this.updateContractInfo(toTokenSelection, providerIndex, index, 'toToken', token);
+    let network = null;
+    if (hasChainId) {
+      network = getNetworkInfo(Number(chainId));
+    }
     const comboBoxChain: ComboBox = (
       <i-combo-box
         width="100%"
         icon={{ name: 'angle-down' }}
         items={this._chainOptions}
         selectedItem={{
-          value: item?.chainId || '',
-          label: item?.chainId || ''
+          label: network ? `${network.name} (${chainId})` : '',
+          value: network ? `${chainId}` : ''
         }}
         mode="single"
         class={comboboxStyle}
@@ -410,7 +433,7 @@ export class SwapConfig extends Module {
         position='relative'
       >
         <i-icon
-          name="times" fill="red" width={20} height={20}
+          name="times" fill="#f15e61" width={20} height={20}
           position="absolute"
           top={10} right={10}
           class={pointerStyle}
@@ -419,7 +442,7 @@ export class SwapConfig extends Module {
         <i-hstack gap={8} verticalAlignment="center" wrap="wrap">
           <i-hstack gap={2} width={120}>
             <i-label caption="Chain Id" />
-            <i-label caption="*" font={{ color: 'red' }} />
+            <i-label caption="*" font={{ color: '#f15e61' }} />
             <i-label caption=":" />
           </i-hstack>
           {comboBoxChain}
@@ -427,7 +450,7 @@ export class SwapConfig extends Module {
         <i-hstack gap={8} verticalAlignment="center" wrap="wrap">
           <i-hstack gap={2} width={120}>
             <i-label caption="Factory Address" />
-            <i-label caption="*" font={{ color: 'red' }} />
+            <i-label caption="*" font={{ color: '#f15e61' }} />
             <i-label caption=":" />
           </i-hstack>
           <i-input
@@ -441,7 +464,7 @@ export class SwapConfig extends Module {
         <i-hstack gap={8} verticalAlignment="center" wrap="wrap">
           <i-hstack gap={2} width={120}>
             <i-label caption="Router Address" />
-            <i-label caption="*" font={{ color: 'red' }} />
+            <i-label caption="*" font={{ color: '#f15e61' }} />
             <i-label caption=":" />
           </i-hstack>
           <i-input
@@ -455,7 +478,7 @@ export class SwapConfig extends Module {
         <i-hstack visible={this.isFixedPair} class="wrapper-token--selection" gap={8} verticalAlignment="center" wrap="wrap">
           <i-hstack gap={2} width={120}>
             <i-label caption="From Token" />
-            <i-label caption="*" font={{ color: 'red' }} />
+            <i-label caption="*" font={{ color: '#f15e61' }} />
             <i-label caption=":" />
           </i-hstack>
           {fromTokenSelection}
@@ -463,14 +486,14 @@ export class SwapConfig extends Module {
         <i-hstack visible={this.isFixedPair} class="wrapper-token--selection" gap={8} verticalAlignment="center" wrap="wrap">
           <i-hstack gap={2} width={120}>
             <i-label caption="To Token" />
-            <i-label caption="*" font={{ color: 'red' }} />
+            <i-label caption="*" font={{ color: '#f15e61' }} />
             <i-label caption=":" />
           </i-hstack>
           {toTokenSelection}
         </i-hstack>
         <i-hstack gap={2}>
           <i-label caption="Trade Fee" />
-          <i-label caption="*" font={{ color: 'red' }} />
+          <i-label caption="*" font={{ color: '#f15e61' }} />
           <i-label caption=":" />
         </i-hstack>
         <i-vstack
@@ -481,7 +504,7 @@ export class SwapConfig extends Module {
           <i-hstack gap={8} verticalAlignment="center" wrap="wrap">
             <i-hstack gap={2} width={104}>
               <i-label caption="Fee" />
-              <i-label caption="*" font={{ color: 'red' }} />
+              <i-label caption="*" font={{ color: '#f15e61' }} />
               <i-label caption=":" />
             </i-hstack>
             <i-input
@@ -495,7 +518,7 @@ export class SwapConfig extends Module {
           <i-hstack gap={8} verticalAlignment="center" wrap="wrap">
             <i-hstack gap={2} width={104}>
               <i-label caption="Base" />
-              <i-label caption="*" font={{ color: 'red' }} />
+              <i-label caption="*" font={{ color: '#f15e61' }} />
               <i-label caption=":" />
             </i-hstack>
             <i-input
@@ -529,7 +552,7 @@ export class SwapConfig extends Module {
         <i-vstack gap="1rem" verticalAlignment="center" maxWidth={260}>
           <i-hstack gap={2} verticalAlignment="center">
             <i-label caption="Category" />
-            <i-label caption="*" font={{ color: 'red' }} />
+            <i-label caption="*" font={{ color: '#f15e61' }} />
             <i-label caption=":" />
             <i-combo-box
               id="cbbCategory"

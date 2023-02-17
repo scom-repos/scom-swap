@@ -29,6 +29,7 @@ import {
   getProviderByKey,
   tokenStore,
   setTokenStore,
+  getNetworkInfo,
 } from "@swap/store";
 
 import {
@@ -57,7 +58,8 @@ import {
   registerSendTxEvents,
   PageBlock,
   IProvider,
-  ISwapConfig
+  ISwapConfig,
+  uniqWith
 } from '@swap/global';
 
 import {
@@ -213,6 +215,8 @@ export class SwapBlock extends Module implements PageBlock {
 
   private transactionModal: TransactionSettings;
   private expertModal: ExpertModeSettings;
+  private networkErrModal: Modal;
+  private supportedNetworksElm: VStack;
 
   async getData() {
     return this._data;
@@ -343,6 +347,18 @@ export class SwapBlock extends Module implements PageBlock {
     // this.availableMarkets = getAvailableMarkets() || [];
     if (this._data?.providers?.length) this.onSetupPage(true);
     this.swapButtonText = this.getSwapButtonText()
+  }
+
+  get supportedNetworks() {
+    let providers: IProvider[] = [];
+    if (this._data?.providers) {
+      providers = this._data?.category === 'fixed-pair' ? [this._data.providers[0]] : this._data.providers;
+    }
+    let supportedNetworks = [];
+    for (const provider of providers) {
+      supportedNetworks.push(...Object.keys(provider.contractInfo));
+    }
+    return uniqWith(supportedNetworks, (cur: any, oth: any) => { return cur == oth });
   }
 
   get isApproveButtonShown(): boolean {
@@ -490,34 +506,54 @@ export class SwapBlock extends Module implements PageBlock {
         this.fromInputValue = new BigNumber(defaultInput);
         this.onUpdateToken(this.fromToken, true);
         this.onUpdateToken(this.toToken, false);
+        this.firstTokenSelection.token = this.fromToken;
+        this.secondTokenSelection.token = this.toToken;
+        this.toggleReverseImage.classList.add('cursor-default');
       } else {
-        this.fromToken = undefined;
-        this.toToken = undefined;
-        this.fromTokenSymbol = '';
-        this.toTokenSymbol = '';
-        this.fromInputValue = new BigNumber(defaultInput);
-        this.payBalance.caption = `Balance: 0`;
-        this.receiveBalance.caption = `Balance: 0`;
-        this.initRoutes();
-        this.onUpdateSliderValue(0);
-        const pay = this.payCol.children[0] as Input;
-        if (pay) {
-          pay.value = '-';
-        }
-        const receive = this.receiveCol.children[0] as Input;
-        if (receive) {
-          receive.value = '-';
-        }
+        this.resetUI();
       }
-      this.firstTokenSelection.token = this.fromToken;
-      this.secondTokenSelection.token = this.toToken;
-      this.toggleReverseImage.classList.add('cursor-default');
     }
+  }
+
+  private resetUI() {
+    this.record = undefined;
+    this.fromToken = undefined;
+    this.toToken = undefined;
+    this.fromTokenSymbol = '';
+    this.toTokenSymbol = '';
+    this.fromInputValue = new BigNumber(defaultInput);
+    this.payBalance.caption = `Balance: 0`;
+    this.receiveBalance.caption = `Balance: 0`;
+    this.initRoutes();
+    this.onUpdateSliderValue(0);
+    const pay = this.payCol.children[0] as Input;
+    if (pay) {
+      pay.value = '-';
+    }
+    const receive = this.receiveCol.children[0] as Input;
+    if (receive) {
+      receive.value = '-';
+    }
+    this.firstTokenSelection.token = undefined;
+    this.secondTokenSelection.token = undefined;
+    this.firstTokenSelection.disableSelect = true;
+    this.secondTokenSelection.disableSelect = true;
+    this.toggleReverseImage.enabled = false;
+    this.toggleReverseImage.classList.add('cursor-default');
+    clearInterval(this.timer);
+    this.lastUpdated = 0;
+    this.swapBtn.classList.add('hidden');
+    this.onRenderPriceInfo();
   }
 
   private onSetupPage = async (connected: boolean) => {
     // this.getAddressFromUrl();
     this.chainId = getChainId();
+    if (this.supportedNetworks.every((v: string | number) => v != this.chainId)) {
+      this.showNetworkErrModal();
+      this.resetUI();
+      return;
+    }
     const isFixedPair = this._data?.category === 'fixed-pair';
     if (isFixedPair) {
       this.setFixedPairData();
@@ -2474,6 +2510,28 @@ export class SwapBlock extends Module implements PageBlock {
     })
   }
 
+  private showNetworkErrModal() {
+    this.supportedNetworksElm.clearInnerHTML();
+    if (!this.supportedNetworks.length) {
+      this.supportedNetworksElm.appendChild(<i-label caption={`No networks are supported. Please configure the swap!`} font={{ size: '16px' }} />)
+      return;
+    }
+    this.supportedNetworksElm.appendChild(<i-label caption={`We only support the following ${this.supportedNetworks.length > 1 ? 'networks' : 'network'}:`} font={{ size: '16px' }} />)
+    for (const chainId of this.supportedNetworks) {
+      const network = getNetworkInfo(chainId);
+      if (network) {
+        this.supportedNetworksElm.appendChild(
+          <i-label font={{ bold: true, size: '16px' }} caption={`${network.name} (${network.chainId})`} />
+        )
+      }
+    }
+    this.networkErrModal.visible = true;
+  }
+
+  private closeNetworkErrModal() {
+    this.networkErrModal.visible = false;
+  }
+
   private async initData() {
     if (!this.isInited) {
       await this.initWalletData();
@@ -2496,6 +2554,7 @@ export class SwapBlock extends Module implements PageBlock {
     this.transactionModal = new TransactionSettings();
     this.swapComponent.appendChild(this.transactionModal);
     this.initExpertModal();
+    this.edit();
   }
 
   render() {
@@ -2759,6 +2818,26 @@ export class SwapBlock extends Module implements PageBlock {
                   />
                 </i-hstack>
               </i-panel>
+            </i-panel>
+          </i-modal>
+
+          <i-modal
+            id="networkErrModal"
+            class="bg-modal custom-modal"
+            title="Supported Networks"
+            closeIcon={{ name: 'times' }}
+          >
+            <i-panel class="i-modal_content">
+              <i-vstack id="supportedNetworksElm" gap={10} verticalAlignment="center" />
+              <i-hstack verticalAlignment="center" horizontalAlignment="center" margin={{ top: 16, bottom: 8 }}>
+                <i-button
+                  caption="Close"
+                  width={150}
+                  padding={{ top: 4, bottom: 4 }}
+                  class="btn-os btn-submit text-center"
+                  onClick={() => this.closeNetworkErrModal()}
+                />
+              </i-hstack>
             </i-panel>
           </i-modal>
         </i-panel>
