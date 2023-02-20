@@ -246,6 +246,7 @@ export class SwapBlock extends Module implements PageBlock {
             },
             providers: {
               type: "array",
+              format: "card",
               required: true,
               items: {
                 type: "object",
