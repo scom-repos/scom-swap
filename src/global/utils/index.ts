@@ -45,4 +45,4 @@ export {
   ERC20ApprovalModel
 } from './approvalModel';
 
-export { IContractInfo, IProvider, ISwapConfig, Category } from './swapInterface';
+export { IContractInfo, IProvider, ISwapConfig, ISwapConfigUI, IProviderUI, Category } from './swapInterface';
