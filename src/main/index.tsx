@@ -246,7 +246,6 @@ export class SwapBlock extends Module implements PageBlock {
             },
             providers: {
               type: "array",
-              format: "card",
               required: true,
               items: {
                 type: "object",
@@ -304,6 +303,29 @@ export class SwapBlock extends Module implements PageBlock {
               }
             }
           }
+        },
+        userInputUISchema: {
+          type: "Group",
+          elements: [
+            {
+              type: "Control",
+              scope: "#/properties/category",
+              options: {
+                detail: {
+                  type: "HorizontalLayout"
+                }
+              }
+            },
+            {
+              type: "Control",
+              scope: "#/properties/providers",
+              options: {
+                detail: {
+                  type: "VerticalLayout"
+                }
+              }
+            }
+          ]
         }
       },
       // {
