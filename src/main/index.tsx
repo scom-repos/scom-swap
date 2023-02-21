@@ -59,7 +59,9 @@ import {
   PageBlock,
   IProvider,
   ISwapConfig,
-  uniqWith
+  uniqWith,
+  ISwapConfigUI,
+  IProviderUI
 } from '@swap/global';
 
 import {
@@ -71,7 +73,6 @@ import {
 
 import { PriceInfo } from '@swap/price-info';
 import { TokenSelection } from '@swap/token-selection';
-import { SwapConfig } from '@swap/swap-config';
 import { Result } from '@swap/result';
 import { ExpertModeSettings } from '@swap/expert-mode-settings'
 import { TransactionSettings } from '@swap/transaction-settings'
@@ -84,14 +85,15 @@ declare const window: any;
 
 @customModule
 export class SwapBlock extends Module implements PageBlock {
-  private _data: ISwapConfig;
+  private _oldData: ISwapConfigUI;
+  private _data: ISwapConfigUI;
+  private oldTag: any;
   tag: any
   defaultEdit: boolean = true
   readonly onConfirm: () => Promise<void>
   readonly onDiscard: () => Promise<void>
   readonly onEdit: () => Promise<void>
 
-  private cardConfig: SwapConfig;
   private swapComponent: Panel;
   private swapContainer: Container;
   private isInited: boolean = false;
@@ -143,20 +145,15 @@ export class SwapBlock extends Module implements PageBlock {
   // private availableMarkets: any;
   private chainId: number;
   private fallbackUrl: string = Assets.fullPath('img/tokens/Custom.png');
-  @observable()
-  private swapButtonText: string;
   private swapButtonStatusMap: any;
   private approveButtonStatusMap: any;
   private registerPairButtonStatusMap: any;
   private _lastUpdated: number = 0;
-  @observable()
-  private lastUpdatedText: string;
+  private lbLastUpdated: Label;
   private timer: any;
   private $eventBus: IEventBus;
-  @observable()
-  private estimateMsg: string;
-  @observable()
-  private payOrReceiveText: string;
+  private lbEstimate: Label;
+  private lbPayOrReceive: Label;
   private approvalModelAction: IERC20ApprovalAction;
   private registerPairModal: Modal;
   private registerPanel: Panel;
@@ -218,13 +215,150 @@ export class SwapBlock extends Module implements PageBlock {
   private networkErrModal: Modal;
   private supportedNetworksElm: VStack;
 
+  getActions() {
+    const actions = [
+      {
+        name: 'Settings',
+        icon: 'cog',
+        command: (builder: any, userInputData: any) => {
+          return {
+            execute: async () => {
+              this._oldData = this._data;
+              this.refreshUI();
+            },
+            undo: () => {
+              this._data = this._oldData;
+              this.refreshUI();
+            },
+            redo: () => { }
+          }
+        },
+        userInputDataSchema: {
+          type: "object",
+          properties: {
+            category: {
+              type: "string",
+              required: true,
+              enum: [
+                "fixed-pair",
+                "aggregator"
+              ]
+            },
+            providers: {
+              type: "array",
+              format: "card",
+              required: true,
+              items: {
+                type: "object",
+                properties: {
+                  caption: {
+                    type: "string",
+                    required: true
+                  },
+                  image: {
+                    type: "string",
+                    required: true
+                  },
+                  key: {
+                    type: "string",
+                    required: true
+                  },
+                  dexId: {
+                    type: "number"
+                  },
+                  chainId: {
+                    type: "number",
+                    enum: [1, 56, 137, 250, 97, 80001, 43113, 43114],
+                    required: true
+                  },
+                  factoryAddress: {
+                    type: "string",
+                    required: true
+                  },
+                  routerAddress: {
+                    type: "string",
+                    required: true
+                  },
+                  fromToken: {
+                    type: "string",
+                    title: "From Token (Fixed pair)"
+                  },
+                  toToken: {
+                    type: "string",
+                    title: "To Token (Fixed pair)"
+                  },
+                  tradeFee: {
+                    type: "object",
+                    properties: {
+                      fee: {
+                        type: "string",
+                        required: true
+                      },
+                      base: {
+                        type: "string",
+                        required: true
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      // {
+      //   name: 'Theme Settings',
+      //   icon: 'palette',
+      //   command: (builder: any, userInputData: any) => {
+      //     return {
+      //       execute: async () => {
+      //         if (userInputData) {
+      //           this.oldTag = this.tag;
+      //           this.setTag(userInputData);
+      //           if (builder) builder.setTag(userInputData);
+      //         }
+      //       },
+      //       undo: () => {
+      //         if (userInputData) {
+      //           this.setTag(this.oldTag);
+      //           if (builder) builder.setTag(this.oldTag);
+      //         }
+      //       },
+      //       redo: () => { }
+      //     }
+      //   },
+      //   userInputDataSchema: {
+      //     type: 'object',
+      //     properties: {
+      //       backgroundColor: {
+      //         type: 'string',
+      //         format: 'color'
+      //       },
+      //       fontColor: {
+      //         type: 'string',
+      //         format: 'color'
+      //       },
+      //       inputBackgroundColor: {
+      //         type: 'string',
+      //         format: 'color'
+      //       },
+      //       inputFontColor: {
+      //         type: 'string',
+      //         format: 'color'
+      //       }
+      //     }
+      //   }
+      // }
+    ]
+    return actions;
+  }
+
   async getData() {
     return this._data;
   }
 
-  async setData(value: ISwapConfig) {
+  async setData(value: ISwapConfigUI) {
     this._data = value;
-    this.cardConfig.data = value;
     this.setProviders();
     await this.initData();
     this.onSetupPage(isWalletConnected());
@@ -236,12 +370,24 @@ export class SwapBlock extends Module implements PageBlock {
 
   async setTag(value: any) {
     this.tag = value;
+    this.updateTheme();
+  }
+
+  private updateTheme() {
+    if (this.tag) {
+      const { fontColor, backgroundColor, inputFontColor, inputBackgroundColor } = this.tag;
+      if (fontColor)
+        this.style.setProperty('--text-primary', fontColor);
+      if (backgroundColor)
+        this.style.setProperty('--background-main', backgroundColor);
+      if (inputFontColor)
+        this.style.setProperty('--input-font_color', inputFontColor);
+      if (inputBackgroundColor)
+        this.style.setProperty('--input-background', inputBackgroundColor);
+    }
   }
 
   async confirm() {
-    this._data = this.cardConfig.data;
-    this.swapContainer.visible = true;
-    this.cardConfig.visible = false;
     this.setProviders();
     if (this._data?.providers?.length) {
       await this.initData();
@@ -250,57 +396,125 @@ export class SwapBlock extends Module implements PageBlock {
   }
 
   async discard() {
-    this.swapContainer.visible = false;
-    this.cardConfig.visible = false;
+    // this.swapContainer.visible = false;
   }
 
   async edit() {
-    this.cardConfig.data = this._data;
-    this.cardConfig.showConfig();
-    this.swapContainer.visible = false;
-    this.cardConfig.visible = true;
+    // this.swapContainer.visible = false;
   }
 
   async config() { }
 
   private setProviders() {
-    const providers = this._data?.providers || [];
-    if (this._data?.category === 'fixed-pair') {
+    const providers = this.originalData?.providers || [];
+    if (this.isFixedPair) {
       setProviderList([providers[0]]);
     } else {
       setProviderList(providers);
     }
   }
 
-  private isEmptyObject(obj: any): boolean {
-    for (let prop in obj) {
-      if (!obj[prop] && prop !== 'dexId') {
-        return true;
-      }
-    }
-    return false;
+  // private isEmptyObject(obj: any): boolean {
+  //   for (let prop in obj) {
+  //     if (!obj[prop] && prop !== 'dexId') {
+  //       return true;
+  //     }
+  //   }
+  //   return false;
+  // }
+
+  // validate() {
+  //   const data = this.cardConfig.data?.providers || [];
+  //   if (!data || !data.length) return false;
+  //   for (let item of data) {
+  //     if (this.isEmptyObject(item)) {
+  //       return false;
+  //     }
+  //     const contractInfo = item.contractInfo || {};
+  //     const contractChainIds = Object.keys(contractInfo);
+  //     if (!contractChainIds.length) {
+  //       return false;
+  //     }
+  //     for (const chainId of contractChainIds) {
+  //       const hasTradeFee = !this.isEmptyObject(contractInfo[chainId].tradeFee);
+  //       if (!hasTradeFee || this.isEmptyObject(contractInfo[chainId])) {
+  //         return false;
+  //       }
+  //     }
+  //   }
+  //   return true;
+  // }
+
+  private get isFixedPair() {
+    return this._data?.category === 'fixed-pair';
   }
 
-  validate() {
-    const data = this.cardConfig.data?.providers || [];
-    if (!data || !data.length) return false;
-    for (let item of data) {
-      if (this.isEmptyObject(item)) {
-        return false;
-      }
-      const contractInfo = item.contractInfo || {};
-      const contractChainIds = Object.keys(contractInfo);
-      if (!contractChainIds.length) {
-        return false;
-      }
-      for (const chainId of contractChainIds) {
-        const hasTradeFee = !this.isEmptyObject(contractInfo[chainId].tradeFee);
-        if (!hasTradeFee || this.isEmptyObject(contractInfo[chainId])) {
-          return false;
+  private get originalData() {
+    if (!this._data) return undefined;
+    const { category, providers } = this._data;
+    if (!providers.length) return undefined;
+    let _providers: IProvider[] = [];
+    if (this.isFixedPair) {
+      const { key, caption, image, dexId } = providers[0];
+      let defaultProvider: IProvider = {
+        caption,
+        image,
+        key,
+        dexId,
+        contractInfo: {}
+      };
+      const arr = providers.filter(v => v.key === key);
+      arr.forEach(v => {
+        if (!defaultProvider.contractInfo[v.chainId]) {
+          const { factoryAddress, routerAddress, tradeFee, fromToken, toToken } = v;
+          defaultProvider.contractInfo[v.chainId] = {
+            factoryAddress,
+            routerAddress,
+            tradeFee,
+            fromToken,
+            toToken
+          }
         }
-      }
+      });
+      _providers.push(defaultProvider);
+    } else {
+      let providersByKeys: { [key: string]: IProviderUI[] } = {};
+      providers.forEach(v => {
+        if (!providersByKeys[v.key]) {
+          providersByKeys[v.key] = [];
+        }
+        providersByKeys[v.key].push(v);
+      });
+      Object.keys(providersByKeys).forEach(k => {
+        const arr = providersByKeys[k];
+        const { key, caption, image, dexId } = arr[0];
+        let defaultProvider: IProvider = {
+          caption,
+          image,
+          key,
+          dexId,
+          contractInfo: {}
+        }
+        arr.forEach(v => {
+          const { factoryAddress, routerAddress, tradeFee } = v;
+          if (!defaultProvider.contractInfo[v.chainId]) {
+            defaultProvider.contractInfo[v.chainId] = {
+              factoryAddress,
+              routerAddress,
+              tradeFee
+            }
+          }
+        });
+        _providers.push(defaultProvider);
+      })
     }
-    return true;
+    return { category, providers: _providers };
+  }
+
+  private async refreshUI() {
+    this.setProviders();
+    await this.initData();
+    this.onSetupPage(isWalletConnected());
   }
 
   constructor(parent?: Container, options?: any) {
@@ -320,7 +534,7 @@ export class SwapBlock extends Module implements PageBlock {
     this.$eventBus.register(this, EventId.chainChanged, this.onChainChange)
     this.$eventBus.register(this, EventId.SlippageToleranceChanged, () => { this.priceInfo.Items = this.getPriceInfo() })
     this.$eventBus.register(this, EventId.ExpertModeChanged, () => {
-      this.swapButtonText = this.getSwapButtonText()
+      this.setSwapButtonText();
     });
   }
 
@@ -328,7 +542,7 @@ export class SwapBlock extends Module implements PageBlock {
     if (connected && (this.chainId == null || this.chainId == undefined)) {
       this.onChainChange();
     } else {
-      if (this._data?.providers?.length) this.onSetupPage(connected);
+      if (this.originalData?.providers?.length) this.onSetupPage(connected);
     }
   }
 
@@ -345,14 +559,14 @@ export class SwapBlock extends Module implements PageBlock {
     if (this.chainId != null && this.chainId != undefined)
       this.swapBtn.classList.remove('hidden');
     // this.availableMarkets = getAvailableMarkets() || [];
-    if (this._data?.providers?.length) this.onSetupPage(true);
-    this.swapButtonText = this.getSwapButtonText()
+    if (this.originalData?.providers?.length) this.onSetupPage(true);
+    this.setSwapButtonText();
   }
 
   get supportedNetworks() {
     let providers: IProvider[] = [];
-    if (this._data?.providers) {
-      providers = this._data?.category === 'fixed-pair' ? [this._data.providers[0]] : this._data.providers;
+    if (this.originalData?.providers) {
+      providers = this.isFixedPair ? [this.originalData.providers[0]] : this.originalData.providers;
     }
     let supportedNetworks = [];
     for (const provider of providers) {
@@ -391,7 +605,9 @@ export class SwapBlock extends Module implements PageBlock {
   }
   set lastUpdated(value: number) {
     this._lastUpdated = value;
-    this.lastUpdatedText = `Last updated ${this._lastUpdated}(s) ago`;
+    if (this.lbLastUpdated) {
+      this.lbLastUpdated.caption = `Last updated ${this._lastUpdated}(s) ago`;
+    }
   }
   get isValidToken(): boolean {
     if (this.fromToken?.symbol && this.toToken?.symbol) {
@@ -425,6 +641,8 @@ export class SwapBlock extends Module implements PageBlock {
       });
     }
   }
+
+
 
   getAddressFromUrl = () => {
     const wHref = window.location.href;
@@ -491,7 +709,7 @@ export class SwapBlock extends Module implements PageBlock {
   }
 
   private setFixedPairData() {
-    const providers = this._data?.providers;
+    const providers = this.originalData?.providers;
     if (providers && providers.length) {
       const contractInfo = (providers[0].contractInfo || {})[this.chainId];
       if (contractInfo) {
@@ -554,15 +772,14 @@ export class SwapBlock extends Module implements PageBlock {
       this.resetUI();
       return;
     }
-    const isFixedPair = this._data?.category === 'fixed-pair';
-    if (isFixedPair) {
+    if (this.isFixedPair) {
       this.setFixedPairData();
     }
-    this.toggleReverseImage.enabled = !isFixedPair;
-    this.firstTokenSelection.disableSelect = isFixedPair;
-    this.secondTokenSelection.disableSelect = isFixedPair;
+    this.toggleReverseImage.enabled = !this.isFixedPair;
+    this.firstTokenSelection.disableSelect = this.isFixedPair;
+    this.secondTokenSelection.disableSelect = this.isFixedPair;
     // this.checkHasWallet = hasWallet();
-    this.swapButtonText = this.getSwapButtonText();
+    this.setSwapButtonText();
     await this.updateBalance();
     await this.onRenderChainList();
     const input = this.receiveCol.children[0] as Input;
@@ -581,7 +798,7 @@ export class SwapBlock extends Module implements PageBlock {
       if (input) {
         input.readOnly = false;
       }
-      if (!isFixedPair) {
+      if (!this.isFixedPair) {
         this.toggleReverseImage.classList.remove('cursor-default');
       }
     }
@@ -598,11 +815,11 @@ export class SwapBlock extends Module implements PageBlock {
         input.value = this.fixedNumber(this.toInputValue);
       }
     }
-    if (!isFixedPair) {
+    if (!this.isFixedPair) {
       this.setDefaultToken();
     }
     // TODO Only allow Oswap to be selected in Mainnet Oswap2Oswap Pilot launch, BSC <-> AVAX, should be changed when any2any is ready
-    if (!isFixedPair && (this.chainId === 56 && this.desChain?.chainId === 43114 || this.chainId === 43114 && this.desChain?.chainId === 56)) {
+    if (!this.isFixedPair && (this.chainId === 56 && this.desChain?.chainId === 43114 || this.chainId === 43114 && this.desChain?.chainId === 56)) {
       // Use hardcode map for Oswap2Oswap pilot launch
       const fromOswapTokenObj = getOpenSwapToken(this.chainId)!;
       this.firstTokenSelection.tokenDataListProp = [{
@@ -877,8 +1094,8 @@ export class SwapBlock extends Module implements PageBlock {
       this.payOrReceiveValue.caption = ' - ';
     }
     this.payOrReceiveToken.caption = this.isFrom ? this.fromTokenLabel.caption : this.toTokenLabel.caption;
-    this.estimateMsg = `${this.isFrom ? 'Input' : 'Output'} is estimated. If the price change by more than ${slippageTolerance}%, your transaction will revert`;
-    this.payOrReceiveText = this.isFrom ? 'You will pay at most' : 'You will receive at least';
+    this.lbEstimate.caption = `${this.isFrom ? 'Input' : 'Output'} is estimated. If the price change by more than ${slippageTolerance}%, your transaction will revert`;
+    this.lbPayOrReceive.caption = this.isFrom ? 'You will pay at most' : 'You will receive at least';
     this.priceInfo2.Items = this.getPriceInfo();
 
     this.swapModal.visible = true;
@@ -1095,7 +1312,7 @@ export class SwapBlock extends Module implements PageBlock {
         console.log('Cannot check the Approval status (Cross Chain)', e);
       }
     }
-    this.swapButtonText = this.getSwapButtonText();
+    this.setSwapButtonText();
     const enabled = !this.isSwapButtonDisabled();
     this.swapBtn.enabled = enabled;
     const isButtonLoading = this.isButtonLoading();
@@ -1771,6 +1988,13 @@ export class SwapBlock extends Module implements PageBlock {
       this.targetChainTokenMap = tokenBalanceObj.tokenMap ?? {};
     }
   }
+
+  private setSwapButtonText() {
+    if (this.swapBtn && this.swapBtn.hasChildNodes()) {
+      this.swapBtn.caption = this.getSwapButtonText();
+    }
+  }
+
   getSwapButtonText() {
     const isApproveButtonShown = this.isCrossChain ? this.crossChainApprovalStatus !== ApprovalStatus.NONE : this.isApproveButtonShown;
     if (!isWalletConnected()) {
@@ -1845,7 +2069,7 @@ export class SwapBlock extends Module implements PageBlock {
         ...mapStatus
       };
     }
-    this.swapButtonText = this.getSwapButtonText();
+    this.setSwapButtonText();
   }
   onSwapConfirming = (key: any) => {
     this.setMapStatus('swap', key, ApprovalStatus.APPROVING);
@@ -2002,7 +2226,7 @@ export class SwapBlock extends Module implements PageBlock {
         fromAmount: this.record.fromAmount,
         toAmount: this.record.toAmount,
         isFromEstimated: this.isFrom,
-        providerList: this._data.providers
+        providerList: this.originalData?.providers || []
       }
 
       const { error } = await executeSwap(swapData);
@@ -2097,13 +2321,14 @@ export class SwapBlock extends Module implements PageBlock {
     }
     this.priceInfoContainer.appendChild(this.priceInfo2);
   }
-  onRefresh = async (source: Control) => {
+
+  private onRefresh = async (source: Control) => {
     source.enabled = false;
     await this.handleAddRoute();
     source.enabled = true;
   }
 
-  onSetting = () => {
+  private onSetting = () => {
     this.transactionModal.showModal();
   }
 
@@ -2542,13 +2767,13 @@ export class SwapBlock extends Module implements PageBlock {
     }
   }
 
-  init = async () => {
+  async init() {
     this.chainId = getChainId();
     setDataFromSCConfig({ infuraId: InfuraId, networks: Networks });
     setTokenStore();
     // this.availableMarkets = getAvailableMarkets() || [];
-    this.swapButtonText = this.getSwapButtonText();
     super.init();
+    this.setSwapButtonText();
     this.openswapResult = new Result();
     this.swapComponent.appendChild(this.openswapResult);
     this.transactionModal = new TransactionSettings();
@@ -2569,7 +2794,7 @@ export class SwapBlock extends Module implements PageBlock {
                 <i-panel id="iconList" class="icon-list">
                 </i-panel>
                 <i-panel id="actionSetting" class="action-setting hidden">
-                  <i-label caption={this.lastUpdatedText}></i-label>
+                  <i-label id="lbLastUpdated"></i-label>
                   <i-icon width={26} height={26} class="rounded-icon" name="sync-alt" fill="white" onClick={this.onRefresh}></i-icon>
                   <i-icon width={26} height={26} class="rounded-icon" name="cog" fill="white" onClick={this.onSetting}></i-icon>
                 </i-panel>
@@ -2664,7 +2889,7 @@ export class SwapBlock extends Module implements PageBlock {
             </i-panel>
             <i-panel class="swap-btn-container" width="100%">
               <i-button
-                id="swapBtn" class="btn-swap btn-os hidden" height={67} caption={this.swapButtonText}
+                id="swapBtn" class="btn-swap btn-os hidden" height={67}
                 rightIcon={{ spin: true, visible: false }}
                 onClick={this.onClickSwapButton.bind(this)}
               ></i-button>
@@ -2737,10 +2962,10 @@ export class SwapBlock extends Module implements PageBlock {
               <i-label id="targetVaultBondBalanceLabel2" class="text--grey ml-auto" caption="Vault Bond Balance: 0"></i-label>
             </i-vstack>
             <i-panel class="mb-1">
-              <i-label caption={this.estimateMsg}></i-label>
+              <i-label id="lbEstimate"></i-label>
             </i-panel>
             <i-panel class="mb-1">
-              <i-label caption={this.payOrReceiveText}></i-label>
+              <i-label id="lbPayOrReceive"></i-label>
               <i-label id="payOrReceiveValue" class="text-primary bold" caption=""></i-label>
               <i-label id="payOrReceiveToken" caption=""></i-label>
             </i-panel>
@@ -2840,7 +3065,6 @@ export class SwapBlock extends Module implements PageBlock {
             </i-panel>
           </i-modal>
         </i-panel>
-        <swap-config id="cardConfig" visible={false}></swap-config>
       </i-panel>
     )
   }

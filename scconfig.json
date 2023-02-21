@@ -35,9 +35,6 @@
     "@swap/price-info": {
       "path": "price-info"
     },
-    "@swap/swap-config": {
-      "path": "swap-config"
-    },
     "@swap/transaction-settings": {
       "path": "transaction-settings"
     },
