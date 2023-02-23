@@ -1416,8 +1416,9 @@ export class SwapBlock extends Module implements PageBlock {
     this.disableSelectChain(true);
     this.disableSelectChain(true, true);
     let listRouting: any[] = [];
-    if (!this.isCrossChain) {
-      listRouting = await getAllRoutesData(this.fromToken, this.toToken, this.fromInputValue, this.toInputValue, this.isFrom);
+    if (!this.isCrossChain) {     
+      const useAPI = this._data.category === 'aggregator';
+      listRouting = await getAllRoutesData(this.fromToken, this.toToken, this.fromInputValue, this.toInputValue, this.isFrom, useAPI);
       listRouting = listRouting.map((v: any) => {
         // const config = ProviderConfigMap[v.provider];
         return {

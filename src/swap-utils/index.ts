@@ -1109,27 +1109,37 @@ async function getExtendedRouteObjData(wallet: any, bestRouteObj: any, tradeFeeM
 //   return null
 // }
 
-async function getAllRoutesData(firstTokenObject: ITokenObject, secondTokenObject: ITokenObject, firstInput: BigNumber, secondInput: BigNumber, isFromEstimated: boolean, targetChainId?: number) {
+async function getAllRoutesData(firstTokenObject: ITokenObject, secondTokenObject: ITokenObject, firstInput: BigNumber, secondInput: BigNumber, isFromEstimated: boolean, useAPI: boolean, targetChainId?: number) {
   let wallet: any = Wallet.getClientInstance();
   let resultArr: any[] = [];
   if (firstTokenObject && secondTokenObject && (firstInput.gt(0) || secondInput.gt(0))) {
     let routeDataArr = [];
+    if (useAPI) {
+      if (isFromEstimated) {
+        routeDataArr = await getBestAmountInRouteFromAPI(wallet, firstTokenObject, secondTokenObject, secondInput.toString(), targetChainId);
+      }
+      else {
+        routeDataArr = await getBestAmountOutRouteFromAPI(wallet, firstTokenObject, secondTokenObject, firstInput.toString(), targetChainId);
+      }
+    }
+
     if (isFromEstimated) {
-      routeDataArr = await getBestAmountInRouteFromAPI(wallet, firstTokenObject, secondTokenObject, secondInput.toString(), targetChainId);
       if (routeDataArr.length == 0) {
         const providerKey = getProviderList()[0]?.key;
-        let routeObj = await getBestAmountInRoute(providerKey ? [providerKey] : [], firstTokenObject, secondTokenObject, firstInput.toString(), []);
+        let routeObj = await getBestAmountInRoute(providerKey ? [providerKey] : [], firstTokenObject, secondTokenObject, secondInput.toString(), []);
         if (routeObj && routeObj.market.length == 1) {
-          let providerConfigByKey: any = {};
+          let providerConfigByMarketCode: any = {};
           let _chainId = getChainId();
-          getProviderList().filter(v => {!!v.contractInfo && Object.keys(v.contractInfo).includes((_chainId!).toString())}).forEach((v, i) => {
-            providerConfigByKey[v.key] = v;
+          getProviderList().filter(v => {
+            return !!v.contractInfo && Object.keys(v.contractInfo).includes((_chainId!).toString())
+          }).forEach((v, i) => {
+            providerConfigByMarketCode[v.key] = v;
           });
           let price = parseFloat(routeObj.price);
           let priceSwap = new BigNumber(1).div(routeObj.price).toNumber();
           let priceImpact = Number(routeObj.priceImpact) * 100;
           let tradeFee = parseFloat(routeObj.tradeFee);
-          let provider = providerConfigByKey[routeObj.market[0]].key
+          let provider = providerConfigByMarketCode[routeObj.market[0]]?.key
           let key = provider + '|0';
           routeDataArr.push({
             ...routeObj,
@@ -1144,7 +1154,6 @@ async function getAllRoutesData(firstTokenObject: ITokenObject, secondTokenObjec
       }
     }
     else {
-      routeDataArr = await getBestAmountOutRouteFromAPI(wallet, firstTokenObject, secondTokenObject, firstInput.toString(), targetChainId);
       if (routeDataArr.length == 0) {
         const providerKey = getProviderList()[0]?.key;
         let routeObj = await getBestAmountOutRoute(providerKey ? [providerKey] : [], firstTokenObject, secondTokenObject, firstInput.toString(), [], false);
