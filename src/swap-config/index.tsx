@@ -1,10 +1,10 @@
 import { customElements, Module, ControlElement, Input, VStack, Control, Upload, ComboBox, IComboItem, HStack } from '@ijstech/components';
 import { BigNumber } from '@ijstech/eth-wallet';
-import { Category, IContractInfo, IProvider, ISwapConfig, ITokenObject } from '@swap/global';
+import { Category, IContractInfo, IProvider, ISwapConfig, ITokenObject } from '../global/index';
 import { comboboxStyle, configStyle, pointerStyle, tokenSelectionStyle, uploadStyle } from './swap-config.css';
-import { TokenSelection } from '@swap/token-selection';
-import { getTargetChainTokenInfoObj } from '@swap/crosschain-utils';
-import { getNetworkInfo, isWalletConnected } from '@swap/store';
+import { TokenSelection } from '../token-selection';
+import { getTargetChainTokenInfoObj } from '../crosschain-utils';
+import { getNetworkInfo, isWalletConnected } from '../store/index';
 
 interface IContractInfoUI {
   chainId: string;

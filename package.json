@@ -1,15 +1,19 @@
 {
-    "name": "@scom/pageblock-swap",
-    "author": "",
-    "version": "0.1.1",
-    "description": "",
+    "name": "@scom/scom-swap",
+    "version": "0.1.2",
+    "main": "dist/index.js",
+    "plugin": "dist",
+    "pluginTypes": "pluginTypes/index.d.ts",
+    "types": "types/index.d.ts",
+    "engines": {
+        "node": ">=18.0.0"
+    },
     "scripts": {
+        "copy": "sh ./scripts/copy.sh",
         "build": "rm -rf dist && npx @ijstech/compiler",
         "serve": "npx @ijstech/cli serve 8080",
-        "test": "npm run build && npm run serve"
+        "test": "cd test && npm run test && cd .."
     },
-    "keywords": [],
-    "license": "AGPL-3.0",
     "devDependencies": {
         "@ijstech/cli": "^0.1.28",
         "@ijstech/compiler": "^0.1.22",

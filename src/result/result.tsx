@@ -1,9 +1,9 @@
 import { customElements, Module, ControlElement, Modal, Panel, Label, Image, Button, Container, VStack } from '@ijstech/components';
 import { Wallet } from '@ijstech/eth-wallet';
-// import { parseContractError } from '@swap/global';
-import { getNetworkExplorerName, viewOnExplorerByTxHash } from '@swap/store';
+// import { parseContractError } from '../global/index';
+import { getNetworkExplorerName, viewOnExplorerByTxHash } from '../store/index';
 import styleClass from './result.css';
-import Assets from '@swap/assets';
+import Assets from '../assets';
 
 declare global {
 	namespace JSX {

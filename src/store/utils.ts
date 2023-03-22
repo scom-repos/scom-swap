@@ -1,6 +1,6 @@
 import { application } from '@ijstech/components';
 import { Wallet, WalletPlugin } from '@ijstech/eth-wallet';
-import { EventId, INetwork, IProvider, ITokenObject, SITE_ENV, TokenMapType } from '@swap/global';
+import { EventId, INetwork, IProvider, ITokenObject, SITE_ENV, TokenMapType } from '../global/index';
 import { ChainNativeTokenByChainId, CoreContractAddressesByChainId } from './data/index';
 
 export {

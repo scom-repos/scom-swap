@@ -1,10 +1,10 @@
 import { application } from '@ijstech/components';
 import { Wallet, WalletPlugin } from '@ijstech/eth-wallet';
-import { EventId, ITokenObject } from '@swap/global';
-import Assets from '@swap/assets';
+import { EventId, ITokenObject } from '../global/index';
+import Assets from '../assets';
 import { DefaultTokens, getTokenIconPath, WETHByChainId } from './data/index';
 import { TokenStore } from './tokens';
-import { getAddresses, getChainId, getChainNativeToken, getCurrentChainId, getDefaultChainId, getNetworkInfo, getUserTokens, getWalletOptions, isWalletConnected, setCurrentChainId } from './utils';
+import { getAddresses, getChainId, getChainNativeToken, getCurrentChainId, getDefaultChainId, getNetworkInfo, getWalletOptions, isWalletConnected, setCurrentChainId } from './utils';
 
 export {
   //token

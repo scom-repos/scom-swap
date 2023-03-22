@@ -1,5 +1,5 @@
 import { BigNumber, Contracts, IWallet, Wallet } from '@ijstech/eth-wallet';
-import { ITokenObject, TokenMapType } from '@swap/global';
+import { ITokenObject, TokenMapType } from '../global/index';
 import { getChainId, getChainNativeToken, getDefaultChainId, getGovToken, getUserTokens } from './utils';
 
 export type DefaultTokensByChainType = Record<number, ITokenObject[]>;

@@ -1,18 +1,19 @@
 {
-    "extends": "./tsconfig.base.json",
-    "compilerOptions": {
-        "composite": true,
-        "experimentalDecorators": true,                
-        "module": "CommonJS",        
-        "moduleResolution": "node",
-        "outDir": "dist",
-        "baseUrl": ".",
-        "paths": {
-          "@swap/*": ["src/*"]
-        }
-    },        
-    "include": [
-        "src/**/*.tsx",
-        "src/**/*.ts"
-    ]
-  }
+  "compilerOptions": {
+    "target": "ES2017",
+    "moduleResolution": "Node",
+    "experimentalDecorators": true,
+    "jsx": "preserve",
+    "jsxFactory": "this.$render",
+    "jsxFragmentFactory": "this.$render",
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "declaration": false,
+    "baseUrl": ".",
+    "paths": {
+      "@pageblock-swap/*": ["src/*"]
+    }
+  },
+  "include": ["src/**/*.ts", "src/**/*.tsx"],
+  "exclude": ["node_modules"]
+}

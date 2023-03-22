@@ -9,10 +9,10 @@ import {
   hasUserToken,
   setUserTokens,
   tokenStore,
-} from '@swap/store';
-import { ITokenObject, formatNumber, EventId } from '@swap/global';
-import { Contracts } from '@scom/oswap-openswap-contract';
-import Assets from '@swap/assets';
+} from '../store/index';
+import { ITokenObject, formatNumber, EventId } from '../global/index';
+import { Contracts } from '../contracts/oswap-openswap-contract/index';
+import Assets from '../assets';
 import './tokenSelection.css';
 import { ImportToken } from './importToken';
 import { Wallet } from '@ijstech/eth-wallet';
