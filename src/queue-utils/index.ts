@@ -4,7 +4,7 @@ import {
   ABIKeys,
   numberToBytes32,
   ITokenObject,
-} from '@swap/global';
+} from '../global/index';
 import { BigNumber, Utils, Wallet } from '@ijstech/eth-wallet';
 import { 
   getChainNativeToken,
@@ -14,10 +14,10 @@ import {
   tokenPriceAMMReference,
   getChainId,
   tokenStore, 
-} from '@swap/store';
-import { Contracts } from "@scom/oswap-openswap-contract";
-import { Contracts as SolidityContracts } from "@scom/oswap-chainlink-contract"
-import { Contracts as AdaptorContracts } from "@scom/oswap-oracle-adaptor-contract"
+} from '../store/index';
+import { Contracts } from "../contracts/oswap-openswap-contract/index";
+import { Contracts as SolidityContracts } from "../contracts/oswap-chainlink-contract/index"
+import { Contracts as AdaptorContracts } from "../contracts/oswap-oracle-adaptor-contract/index"
 import { moment } from '@ijstech/components';
 
 const ConfigStore = ABIKeys.ConfigStore;

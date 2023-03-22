@@ -5,7 +5,7 @@ import {
   ERC20ApprovalModel,
   IERC20ApprovalEventOptions,
   IProvider
-} from "@swap/global";
+} from "../global/index";
 import {
   DefaultTokens,
   TokenBalancesType,
@@ -20,8 +20,8 @@ import {
   getMatchNetworks,
   getProviderList,
   tokenStore
-} from "@swap/store"
-import { Contracts as CrossChainContracts } from "@scom/oswap-cross-chain-bridge-contract"
+} from "../store/index"
+import { Contracts as CrossChainContracts } from "../contracts/oswap-cross-chain-bridge-contract/index"
 
 export interface IBridgeVaultBond {
   vaultTrollRegistry: string;

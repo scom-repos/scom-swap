@@ -1,7 +1,6 @@
 import { customElements, customModule, Module, Container, ControlElement, Modal, application, IEventBus } from '@ijstech/components';
-import { BigNumber } from '@ijstech/eth-wallet';
-import { EventId } from '@swap/global';
-import { toggleExpertMode } from '@swap/store'
+import { EventId } from '../global/index';
+import { toggleExpertMode } from '../store/index'
 import styleClass from './index.css';
 
 declare global {

@@ -16,9 +16,8 @@ import {
   Button,
   Control,
 } from '@ijstech/components';
-import { BigNumber } from '@ijstech/eth-wallet';
-import { EventId } from '@swap/global';
-import { getSlippageTolerance, getTransactionDeadline, isExpertMode, setSlippageTolerance, setTransactionDeadline, toggleExpertMode } from '@swap/store';
+import { EventId } from '../global/index';
+import { getSlippageTolerance, getTransactionDeadline, isExpertMode, setSlippageTolerance, setTransactionDeadline, toggleExpertMode } from '../store/index';
 import styleClass from './index.css';
 
 declare global {

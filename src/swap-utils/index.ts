@@ -1,5 +1,5 @@
 import { Wallet, BigNumber, Utils, Erc20, TransactionReceipt } from "@ijstech/eth-wallet";
-import { Contracts } from "@scom/oswap-openswap-contract";
+import { Contracts } from "../contracts/oswap-openswap-contract/index";
 // import { Contracts as BakeryContracts } from '@validapp/bakery-swap-sdk';
 // import { Contracts as TraderJoeContracts } from '@validapp/trader-joe-sdk';
 // import { Contracts as ImpossibleContracts } from '@scom/impossible-swap-sdk';
@@ -10,13 +10,13 @@ import {
   IERC20ApprovalEventOptions,
   ERC20ApprovalModel,
   QueueType,
-} from "@swap/global";
+} from "../global/index";
 
 import {
   GetAvailableRouteOptionsParams,
   getAvailableRouteOptions as getAvailableRouteOptionsForCrossChain,
   createBridgeVaultOrder as createBridgeVaultOrderForCrossChain
-} from "@swap/crosschain-utils"
+} from "../crosschain-utils/index"
 
 import {
   CoreContractAddressesByChainId,
@@ -28,9 +28,9 @@ import {
   getChainId,
   getNetworkInfo,
   getProviderList
-} from "@swap/store";
+} from "../store/index";
 
-import { getPair as getOraclePair, getRangeQueueData, getGroupQueueTraderDataObj } from "@swap/queue-utils";
+// import { getPair as getOraclePair, getRangeQueueData, getGroupQueueTraderDataObj } from "../queue-utils";
 
 interface TradeFee {
   fee: string

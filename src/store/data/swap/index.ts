@@ -1,4 +1,4 @@
-// import Assets from '@swap/assets';
+// import Assets from '../assets';
 // export interface ProviderConfig {
 //   caption: string;
 //   image: string;
