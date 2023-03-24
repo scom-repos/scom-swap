@@ -1,6 +1,6 @@
 import { customElements, Module, ControlElement, Modal, Panel, Label, Image, Button, Container, VStack } from '@ijstech/components';
 import { Wallet } from '@ijstech/eth-wallet';
-// import { parseContractError } from '../global/index';
+import { parseContractError } from '../global/index';
 import { getNetworkExplorerName, viewOnExplorerByTxHash } from '../store/index';
 import styleClass from './result.css';
 import Assets from '../assets';
@@ -216,7 +216,7 @@ export class Result extends Module {
       this.message.content.message = JSON.parse(this.message.content.message.replace('Internal JSON-RPC error.\n', '')).message;
     }
     
-    return '' // await parseContractError(this.message.content.message, this.message.obj);
+    return await parseContractError(this.message.content.message, this.message.obj);
   }
 
 	render() {
