@@ -170,7 +170,6 @@ export class Result extends Module {
         caption: 'Close'
       });
       button.classList.add('btn-os');
-      button.classList.add('btn-approve');
       button.classList.add('mt-1');
       button.onClick = () => this.closeModal();
       mainSection.appendChild(button);
@@ -202,7 +201,6 @@ export class Result extends Module {
         caption: 'Cancel'
       });
       button.classList.add('btn-os');
-      button.classList.add('btn-approve');
       button.classList.add('mt-1');
       button.onClick = () => this.closeModal();
       mainSection.appendChild(button);
