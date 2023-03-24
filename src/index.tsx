@@ -939,6 +939,7 @@ export default class ScomSwap extends Module implements PageBlock {
       this.resetUI();
       return;
     }
+    this.closeNetworkErrModal();
     if (this.isFixedPair) {
       this.setFixedPairData();
     }

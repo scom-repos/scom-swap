@@ -28768,6 +28768,13 @@ define("@scom/scom-swap/result/result.css.ts", ["require", "exports", "@ijstech/
                 padding: '.35rem 2.438rem',
                 borderRadius: 5,
                 background: '#2B304A 0% 0% no-repeat padding-box'
+            },
+            '.btn-os': {
+                background: 'transparent linear-gradient(90deg, #AC1D78 0%, #E04862 100%) 0% 0% no-repeat padding-box',
+                fontFamily: 'Raleway Bold',
+                fontSize: '1rem',
+                fontWeight: 'bold',
+                color: '#fff'
             }
         }
     });
@@ -28899,7 +28906,6 @@ define("@scom/scom-swap/result/result.tsx", ["require", "exports", "@ijstech/com
                     caption: 'Close'
                 });
                 button.classList.add('btn-os');
-                button.classList.add('btn-approve');
                 button.classList.add('mt-1');
                 button.onClick = () => this.closeModal();
                 mainSection.appendChild(button);
@@ -28929,7 +28935,6 @@ define("@scom/scom-swap/result/result.tsx", ["require", "exports", "@ijstech/com
                     caption: 'Cancel'
                 });
                 button.classList.add('btn-os');
-                button.classList.add('btn-approve');
                 button.classList.add('mt-1');
                 button.onClick = () => this.closeModal();
                 mainSection.appendChild(button);
@@ -29615,6 +29620,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                     this.resetUI();
                     return;
                 }
+                this.closeNetworkErrModal();
                 if (this.isFixedPair) {
                     this.setFixedPairData();
                 }
@@ -32153,7 +32159,6 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
             const category = this.getAttribute('category', true, "fixed-pair");
             const providers = this.getAttribute('providers', true, []);
             await this.setData({ category, providers });
-            console.log('init data');
         }
         render() {
             return (this.$render("i-panel", { id: "swapComponent", background: { color: '#0c1234' } },

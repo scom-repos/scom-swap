@@ -53,6 +53,13 @@ export default Styles.style({
       padding: '.35rem 2.438rem',
       borderRadius: 5,
       background: '#2B304A 0% 0% no-repeat padding-box'
+    },
+    '.btn-os': {
+      background: 'transparent linear-gradient(90deg, #AC1D78 0%, #E04862 100%) 0% 0% no-repeat padding-box',
+      fontFamily: 'Raleway Bold',
+      fontSize: '1rem',
+      fontWeight: 'bold',
+      color: '#fff'
     }
   }
 })
