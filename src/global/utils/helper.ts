@@ -334,3 +334,7 @@ export const downloadJsonFile = (name: string, obj: any) => {
   link.href = jsonContent;
   link.click();
 }
+
+export function isWalletAddress(address: string) {
+  return /^0x[a-fA-F0-9]{40}$/.test(address);
+}

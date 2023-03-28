@@ -816,6 +816,9 @@ Styles.cssRule('.pageblock-swap', {
           width: '16px !important',
           height: '16px !important',
         },
+        'i-icon.is-spin': {
+          background: '#fff'
+        }
       },
     },
     '.btn-os:not(.disabled):not(.is-spinning):hover, .btn-os:not(.disabled):not(.is-spinning):focus': {

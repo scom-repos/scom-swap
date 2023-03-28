@@ -3,6 +3,7 @@ import { Contracts } from "../contracts/oswap-openswap-contract/index";
 // import { Contracts as BakeryContracts } from '@validapp/bakery-swap-sdk';
 // import { Contracts as TraderJoeContracts } from '@validapp/trader-joe-sdk';
 // import { Contracts as ImpossibleContracts } from '@scom/impossible-swap-sdk';
+import { Contracts as ProxyContracts } from '../contracts/scom-commission-proxy-contract/index';
 
 import {
   getAPI,
@@ -10,6 +11,7 @@ import {
   IERC20ApprovalEventOptions,
   ERC20ApprovalModel,
   QueueType,
+  ICommissionInfo,
 } from "../global/index";
 
 import {
@@ -27,7 +29,8 @@ import {
   isWalletConnected,
   getChainId,
   getNetworkInfo,
-  getProviderList
+  getProviderList,
+  getProxyAddress
 } from "../store/index";
 
 // import { getPair as getOraclePair, getRangeQueueData, getGroupQueueTraderDataObj } from "../queue-utils";
@@ -158,9 +161,9 @@ function getRouterAddress(key: string): string {
   return contractInfo[getChainId()]?.routerAddress || '';
 }
 
-async function allowanceRouter(wallet: any, market: string, token: ITokenObject, owner: string, callback?: any) {
+async function allowanceRouter(wallet: any, market: string, token: ITokenObject, owner: string, contractAddress: string, callback?: any) {
   let erc20 = new Erc20(wallet, token.address, token.decimals);
-  let spender = getRouterAddress(market);
+  let spender = contractAddress ? contractAddress : getRouterAddress(market);
   // if (market == Market.HYBRID || market == Market.MIXED_QUEUE || market == Market.PEGGED_QUEUE || market == Market.GROUP_QUEUE) {
   //   spender = getHybridRouterAddress();
   // }
@@ -177,7 +180,7 @@ async function allowanceRouter(wallet: any, market: string, token: ITokenObject,
   return allowance;
 }
 
-async function checkIsApproveButtonShown(wallet: any, firstTokenObject: any, fromInput: BigNumber, market: string) {
+async function checkIsApproveButtonShown(wallet: any, firstTokenObject: any, fromInput: BigNumber, market: string, contractAddress?: string) {
   if (!isWalletConnected()) return false;
   let isApproveButtonShown = false;
   const owner = wallet.account.address;
@@ -189,13 +192,13 @@ async function checkIsApproveButtonShown(wallet: any, firstTokenObject: any, fro
     isApproveButtonShown = false;
   } else {
     isApproveButtonShown = false;
-    const allowance = await allowanceRouter(wallet, market, firstTokenObject, owner);
+    const allowance = await allowanceRouter(wallet, market, firstTokenObject, owner, contractAddress);
     isApproveButtonShown = fromInput.gt(allowance);
   }
   return isApproveButtonShown;
 }
 
-async function composeRouteObj(wallet: any, routeObj: any, market: string, firstTokenObject: any, firstInput: BigNumber, secondInput: BigNumber, isFromEstimated: boolean, needApproveButton: boolean) {
+async function composeRouteObj(wallet: any, routeObj: any, market: string, firstTokenObject: any, firstInput: BigNumber, secondInput: BigNumber, isFromEstimated: boolean, needApproveButton: boolean, commissionAmount: BigNumber, contractAddress?: string) {
   const slippageTolerance = getSlippageTolerance();
   if (!slippageTolerance) return null;
   let fromAmount = new BigNumber(0);
@@ -238,7 +241,8 @@ async function composeRouteObj(wallet: any, routeObj: any, market: string, first
       // else {
       //   isApproveButtonShown = await checkIsApproveButtonShown(wallet, firstTokenObject, fromAmount, market);
       // }
-      isApproveButtonShown = await checkIsApproveButtonShown(wallet, firstTokenObject, fromAmount, market);
+
+      isApproveButtonShown = await checkIsApproveButtonShown(wallet, firstTokenObject, fromAmount.plus(commissionAmount), market, contractAddress);
     }
   } catch (err) {
     console.log('err', err)
@@ -1109,7 +1113,7 @@ async function getExtendedRouteObjData(wallet: any, bestRouteObj: any, tradeFeeM
 //   return null
 // }
 
-async function getAllRoutesData(firstTokenObject: ITokenObject, secondTokenObject: ITokenObject, firstInput: BigNumber, secondInput: BigNumber, isFromEstimated: boolean, useAPI: boolean, targetChainId?: number) {
+async function getAllRoutesData(firstTokenObject: ITokenObject, secondTokenObject: ITokenObject, firstInput: BigNumber, secondInput: BigNumber, isFromEstimated: boolean, useAPI: boolean, commissionAmount: BigNumber, contractAddress: string, targetChainId?: number) {
   let wallet: any = Wallet.getClientInstance();
   let resultArr: any[] = [];
   if (firstTokenObject && secondTokenObject && (firstInput.gt(0) || secondInput.gt(0))) {
@@ -1188,7 +1192,7 @@ async function getAllRoutesData(firstTokenObject: ITokenObject, secondTokenObjec
       for (let i = 0; i < routeDataArr.length; i++) {
         let optionObj = routeDataArr[i];
         const provider = getProviderList().find(item => item.key === optionObj.provider)?.key || '';
-        let routeObj = await composeRouteObj(wallet, optionObj, provider, firstTokenObject, firstInput, secondInput, isFromEstimated, targetChainId == undefined);
+        let routeObj = await composeRouteObj(wallet, optionObj, provider, firstTokenObject, firstInput, secondInput, isFromEstimated, targetChainId == undefined, commissionAmount, contractAddress);
         if (!routeObj) continue;
         resultArr.push(routeObj);
       }
@@ -1493,7 +1497,22 @@ async function getAllRoutesData(firstTokenObject: ITokenObject, secondTokenObjec
 //   return receipt;
 // }
 
-const AmmTradeExactIn = async function (wallet: any, market: string, routeTokens: ITokenObject[], amountIn: string, amountOutMin: string, toAddress: string, deadline: number, feeOnTransfer: boolean, callback?: any, confirmationCallback?: any) {
+export const getCurrentCommissions = (commissions: ICommissionInfo[]) => {
+  return (commissions || []).filter(v => v.chainId == getChainId());
+}
+
+export const getCommissionAmount = (commissions: ICommissionInfo[], amount: BigNumber) => {
+  const _commissions = (commissions || []).filter(v => v.chainId == getChainId()).map(v => {
+    return {
+      to: v.walletAddress,
+      amount: amount.times(v.share)
+    }
+  });
+  const commissionsAmount = _commissions.length ? _commissions.map(v => v.amount).reduce((a, b) => a.plus(b)) : new BigNumber(0);
+  return commissionsAmount;
+}
+
+const AmmTradeExactIn = async function (wallet: any, market: string, routeTokens: ITokenObject[], amountIn: string, amountOutMin: string, toAddress: string, deadline: number, feeOnTransfer: boolean, commissions: ICommissionInfo[]) {
   if (routeTokens.length < 2) {
     return null;
   }
@@ -1568,57 +1587,113 @@ const AmmTradeExactIn = async function (wallet: any, market: string, routeTokens
   //     }
   //     break;
   // }
-  if (!tokenIn.address) {
-    let params = {
-      amountOutMin: Utils.toDecimals(amountOutMin, tokenOut.decimals).dp(0),
-      path: addresses,
-      to: toAddress,
-      deadline
-    };
-    let router = new Contracts.OSWAP_Router(wallet, routerAddress);
-    if (feeOnTransfer) {
-      receipt = await router.swapExactETHForTokensSupportingFeeOnTransferTokens(params, Utils.toDecimals(amountIn, tokenIn.decimals).dp(0));
-    }
-    else {
-      receipt = await router.swapExactETHForTokens(params, Utils.toDecimals(amountIn, tokenIn.decimals).dp(0));
-    }
-  } else if (!tokenOut.address) {
-    let params = {
-      amountIn: Utils.toDecimals(amountIn, tokenIn.decimals).dp(0),
-      amountOutMin: Utils.toDecimals(amountOutMin, tokenOut.decimals).dp(0),
-      path: addresses,
-      to: toAddress,
-      deadline
-    };
 
-    let router = new Contracts.OSWAP_Router(wallet, routerAddress);
-    if (feeOnTransfer) {
-      receipt = await router.swapExactTokensForETHSupportingFeeOnTransferTokens(params);
+  const router = new Contracts.OSWAP_Router(wallet, routerAddress)
+  const proxyAddress = getProxyAddress();
+  const proxy = new ProxyContracts.Proxy(wallet, proxyAddress);
+  const amount = tokenIn.address ? Utils.toDecimals(amountIn, tokenIn.decimals).dp(0) : Utils.toDecimals(amountIn).dp(0);
+  const _amountOutMin = Utils.toDecimals(amountOutMin, tokenOut.decimals).dp(0);
+  const _commissions = (commissions || []).filter(v => v.chainId == getChainId()).map(v => {
+    return {
+      to: v.walletAddress,
+      amount: amount.times(v.share)
     }
-    else {
-      receipt = await router.swapExactTokensForETH(params);
-    }
-  }
-  else {
-    let params = {
-      amountIn: Utils.toDecimals(amountIn, tokenIn.decimals).dp(0),
-      amountOutMin: Utils.toDecimals(amountOutMin, tokenOut.decimals).dp(0),
+  });
+  const commissionsAmount = _commissions.length ? _commissions.map(v => v.amount).reduce((a, b) => a.plus(b)) : new BigNumber(0);
+  if (!tokenIn.address) {
+    const params = {
+      amountOutMin: _amountOutMin,
       path: addresses,
       to: toAddress,
       deadline
     };
-    let router = new Contracts.OSWAP_Router(wallet, routerAddress);
-    if (feeOnTransfer) {
-      receipt = await router.swapExactTokensForTokensSupportingFeeOnTransferTokens(params);
+    if (_commissions.length) {
+      let txData: string;
+      if (feeOnTransfer) {
+        router.swapExactETHForTokensSupportingFeeOnTransferTokens.txData(params, amount)
+        txData = await router.swapExactETHForTokensSupportingFeeOnTransferTokens.txData(params, amount);
+      } else {
+        txData = await router.swapExactETHForTokens.txData(params, amount);
+      }
+      receipt = await proxy.proxyCall({
+        target: routerAddress,
+        tokensIn: [
+          {
+            token: Utils.nullAddress,
+            amount: amount.plus(commissionsAmount),
+            directTransfer: false,
+            commissions: _commissions
+          }
+        ],
+        data: txData,
+        to: wallet.address,
+        tokensOut: []
+      })
+    } else {
+      if (feeOnTransfer) {
+        receipt = await router.swapExactETHForTokensSupportingFeeOnTransferTokens(params, amount);
+      } else {
+        receipt = await router.swapExactETHForTokens(params, amount);
+      }
     }
-    else {
-      receipt = await router.swapExactTokensForTokens(params);
+  } else {
+    const tokensIn = {
+      token: tokenIn.address,
+      amount: amount.plus(commissionsAmount),
+      directTransfer: false,
+      commissions: _commissions
+    };
+    const params = {
+      amountIn: amount,
+      amountOutMin: _amountOutMin,
+      path: addresses,
+      to: toAddress,
+      deadline
+    };
+    if (_commissions.length) {
+      let txData: string;
+      if (!tokenOut.address) {
+        if (feeOnTransfer) {
+          txData = await router.swapExactTokensForETHSupportingFeeOnTransferTokens.txData(params);
+        } else {
+          txData = await router.swapExactTokensForETH.txData(params);
+        }
+      } else {
+        if (feeOnTransfer) {
+          txData = await router.swapExactTokensForTokensSupportingFeeOnTransferTokens.txData(params);
+        } else {
+          txData = await router.swapExactTokensForTokens.txData(params);
+        }
+      }
+      receipt = await proxy.proxyCall({
+        target: routerAddress,
+        tokensIn: [
+          tokensIn
+        ],
+        data: txData,
+        to: wallet.address,
+        tokensOut: []
+      });
+    } else {
+      if (!tokenOut.address) {
+        if (feeOnTransfer) {
+          receipt = await router.swapExactTokensForETHSupportingFeeOnTransferTokens(params);
+        } else {
+          receipt = await router.swapExactTokensForETH(params);
+        }
+      } else {
+        if (feeOnTransfer) {
+          receipt = await router.swapExactTokensForTokensSupportingFeeOnTransferTokens(params);
+        } else {
+          receipt = await router.swapExactTokensForTokens(params);
+        }
+      }
     }
   }
   return receipt;
 }
 
-const AmmTradeExactOut = async function (wallet: any, market: string, routeTokens: ITokenObject[], amountOut: string, amountInMax: string, toAddress: string, deadline: number, callback?: any, confirmationCallback?: any) {
+const AmmTradeExactOut = async function (wallet: any, market: string, routeTokens: ITokenObject[], amountOut: string, amountInMax: string, toAddress: string, deadline: number, commissions: ICommissionInfo[]) {
   if (routeTokens.length < 2) {
     return null;
   }
@@ -1675,32 +1750,82 @@ const AmmTradeExactOut = async function (wallet: any, market: string, routeToken
   //     }
   //     break;
   // }
+  const proxyAddress = getProxyAddress();
+  const proxy = new ProxyContracts.Proxy(wallet, proxyAddress);
+  const _amountInMax = Utils.toDecimals(amountInMax, tokenIn.decimals).dp(0);
+  const _amountOut = Utils.toDecimals(amountOut, tokenOut.decimals).dp(0);
+  const _commissions = (commissions || []).filter(v => v.chainId == getChainId()).map(v => {
+    return {
+      to: v.walletAddress,
+      amount: _amountInMax.times(v.share)
+    }
+  });
+  const commissionsAmount = _commissions.length ? _commissions.map(v => v.amount).reduce((a, b) => a.plus(b)) : new BigNumber(0);
   if (!tokenIn.address) {
-    let params = {
-      amountOut: Utils.toDecimals(amountOut, tokenOut.decimals).dp(0),
+    const params = {
+      amountOut: _amountOut,
       path: addresses,
       to: toAddress,
       deadline
     };
-    receipt = await router.swapETHForExactTokens(params, Utils.toDecimals(amountInMax, tokenIn.decimals).dp(0));
-  } else if (!tokenOut.address) {
-    let params = {
-      amountOut: Utils.toDecimals(amountOut, tokenOut.decimals).dp(0),
-      amountInMax: Utils.toDecimals(amountInMax, tokenIn.decimals).dp(0),
-      path: addresses,
-      to: toAddress,
-      deadline
-    };
-    receipt = await router.swapTokensForExactETH(params);
+    if (_commissions.length) {
+      const txData = await router.swapETHForExactTokens.txData(params, _amountInMax);;
+      receipt = await proxy.proxyCall({
+        target: routerAddress,
+        tokensIn: [
+          {
+            token: Utils.nullAddress,
+            amount: _amountInMax.plus(commissionsAmount),
+            directTransfer: false,
+            commissions: _commissions
+          }
+        ],
+        data: txData,
+        to: wallet.address,
+        tokensOut: []
+      })
+    } else {
+      receipt = await router.swapETHForExactTokens(params, _amountInMax);
+    }
   } else {
-    let params = {
-      amountOut: Utils.toDecimals(amountOut, tokenOut.decimals).dp(0),
-      amountInMax: Utils.toDecimals(amountInMax, tokenIn.decimals).dp(0),
+    const tokensIn = {
+      token: tokenIn.address,
+      amount: _amountInMax.plus(commissionsAmount),
+      directTransfer: false,
+      commissions: _commissions
+    };
+    const params = {
+      amountOut: _amountOut,
+      amountInMax: _amountInMax,
       path: addresses,
       to: toAddress,
       deadline
     };
-    receipt = await router.swapTokensForExactTokens(params);
+    if (_commissions.length) {
+      let txData: string;
+      if (!tokenOut.address) {
+        txData = await router.swapTokensForExactETH.txData(params);
+      } else {
+        txData = await router.swapTokensForExactTokens.txData(params);
+      }
+      receipt = await proxy.proxyCall({
+        target: routerAddress,
+        tokensIn: [
+          tokensIn
+        ],
+        data: txData,
+        to: wallet.address,
+        tokensOut: [
+          tokenOut.address
+        ]
+      });
+    } else {
+      if (!tokenOut.address) {
+        receipt = await router.swapTokensForExactETH(params);
+      } else {
+        receipt = await router.swapTokensForExactTokens(params);
+      }
+    }
   }
   return receipt;
 }
@@ -1863,6 +1988,7 @@ interface SwapData {
   toAmount: BigNumber;
   isFromEstimated: boolean;
   groupQueueOfferIndex?: number;
+  commissions?: ICommissionInfo[];
 }
 
 
@@ -1986,7 +2112,8 @@ const executeSwap: (swapData: SwapData) => Promise<{
         swapData.toAmount.toString(),
         amountInMax.toString(),
         toAddress,
-        transactionDeadline
+        transactionDeadline,
+        swapData.commissions
       );
     } else {
       const amountOutMin = swapData.toAmount.times(
@@ -2000,7 +2127,8 @@ const executeSwap: (swapData: SwapData) => Promise<{
         amountOutMin.toString(),
         toAddress,
         transactionDeadline,
-        false
+        false,
+        swapData.commissions
       );
     }
   } catch (error) {

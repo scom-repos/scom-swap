@@ -25,6 +25,7 @@ export const state = {
   proxyAddresses: {} as ProxyAddresses,
   ipfsGatewayUrl: "",
   apiGatewayUrls: {} as Record<string, string>,
+  embedderCommissionFee: "0"
 }
 
 export const setDataFromSCConfig = (options: any) => {
@@ -42,6 +43,9 @@ export const setDataFromSCConfig = (options: any) => {
   }
   if (options.apiGatewayUrls) {
     setAPIGatewayUrls(options.apiGatewayUrls);
+  }
+  if (options.embedderCommissionFee) {
+    setEmbedderCommissionFee(options.embedderCommissionFee);
   }
 }
 
@@ -68,6 +72,14 @@ export const getIPFSGatewayUrl = () => {
 
 export const setAPIGatewayUrls = (urls: Record<string, string>) => {
   state.apiGatewayUrls = urls;
+}
+
+const setEmbedderCommissionFee = (fee: string) => {
+  state.embedderCommissionFee = fee;
+}
+
+export const getEmbedderCommissionFee = () => {
+  return state.embedderCommissionFee;
 }
 
 export type APIGatewayKey = 'otcQueue';
