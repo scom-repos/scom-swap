@@ -41,7 +41,20 @@ export interface IProviderUI {
   }
 }
 
+export interface ICommissionInfo {
+  chainId: number;
+  walletAddress: string;
+  share: string;
+}
+
 export interface ISwapConfigUI {
   category: Category;
   providers: IProviderUI[];
+  commissions?: ICommissionInfo[];
+}
+
+export interface IEmbedData {
+  category?: Category;
+  providers?: IProviderUI[];
+  commissions?: ICommissionInfo[];
 }

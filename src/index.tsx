@@ -23,13 +23,13 @@ import {
   getDefaultChainId,
   setDataFromSCConfig,
   setCurrentChainId,
-  InfuraId,
-  Networks,
   setProviderList,
   getProviderByKey,
   tokenStore,
   setTokenStore,
   getNetworkInfo,
+  getEmbedderCommissionFee,
+  getProxyAddress,
 } from "./store/index";
 
 import {
@@ -42,7 +42,9 @@ import {
   registerPairsByAddress,
   debounce,
   getOraclePriceMap,
-  bridgeVaultConstantMap
+  bridgeVaultConstantMap,
+  getCommissionAmount,
+  getCurrentCommissions
 } from './swap-utils/index'
 
 import {
@@ -61,7 +63,8 @@ import {
   uniqWith,
   ISwapConfigUI,
   IProviderUI,
-  Category
+  Category,
+  ICommissionInfo
 } from './global/index';
 
 import {
@@ -76,6 +79,8 @@ import { TokenSelection } from './token-selection/index';
 import { Result } from './result/index';
 import { ExpertModeSettings } from './expert-mode-settings/index'
 import { TransactionSettings } from './transaction-settings/index'
+import Config from './config/index';
+import scconfig from './scconfig.json';
 
 const priceImpactTooHighMsg = 'Price Impact Too High. If you want to bypass this check, please turn on Expert Mode';
 const defaultInput = '1';
@@ -233,6 +238,8 @@ export default class ScomSwap extends Module implements PageBlock {
   private expertModal: ExpertModeSettings;
   private networkErrModal: Modal;
   private supportedNetworksElm: VStack;
+  private configDApp: Config;
+  private contractAddress: string;
 
   static async create(options?: ScomSwapElement, parent?: Container){
     let self = new this(parent, options);
@@ -252,6 +259,14 @@ export default class ScomSwap extends Module implements PageBlock {
   }
   set providers(value: IProviderUI[]) {
     this._data.providers = value;
+  }
+
+  get commissions() {
+    return this._data.commissions ?? [];
+  }
+
+  set commissions(value: ICommissionInfo[]) {
+    this._data.commissions = value;
   }
 
   getEmbedderActions() {
@@ -463,10 +478,12 @@ export default class ScomSwap extends Module implements PageBlock {
           return {
             execute: async () => {
               this._oldData = {...this._data};
+              this.configDApp.data = this._data;
               this.refreshUI();
             },
             undo: () => {
               this._data = {...this._oldData};
+              this.configDApp.data = this._data;
               this.refreshUI();
             },
             redo: () => { }
@@ -522,12 +539,52 @@ export default class ScomSwap extends Module implements PageBlock {
     return actions
   }
 
+  getConfigurators() {
+    let self = this;
+    return [
+      {
+        name: 'Commissions',
+        target: 'Embedders',
+        elementName: 'i-scom-swap-config',
+        getLinkParams: () => {
+          const commissions = this._data.commissions || [];
+          return {
+            data: window.btoa(JSON.stringify(commissions))
+          }
+        },
+        setLinkParams: async (params: any) => {
+          if (params.data) {
+            const decodedString = window.atob(params.data);
+            const commissions = JSON.parse(decodedString);
+            let resultingData = {
+              ...self._data,
+              commissions
+            };
+            await this.setData(resultingData);
+          }
+        },
+        bindOnChanged: (element: Config, callback: (data: any) => Promise<void>) => {
+          element.onCustomCommissionsChanged = async (data: any) => {
+            let resultingData = {
+              ...self._data,
+              ...data
+            };
+            await this.setData(resultingData);
+            await callback(data);
+          }
+        }
+      }
+    ]
+  }
+
   async getData() {
     return this._data;
   }
 
   async setData(value: ISwapConfigUI) {
     this._data = value;
+    this.configDApp.data = value;
+    this.updateContractAddress();
     await this.refreshUI();
   }
 
@@ -578,6 +635,17 @@ export default class ScomSwap extends Module implements PageBlock {
       setProviderList([providers[0]]);
     } else {
       setProviderList(providers);
+    }
+  }
+
+  updateContractAddress() {
+    if (this.approvalModelAction) {
+      if (getCurrentCommissions(this.commissions).length) {
+        this.contractAddress = getProxyAddress();
+      } else {
+        this.contractAddress = '';
+      }
+      this.setApprovalSpenderAddress();
     }
   }
 
@@ -686,6 +754,7 @@ export default class ScomSwap extends Module implements PageBlock {
 
   constructor(parent?: Container, options?: any) {
     super(parent, options);
+    setDataFromSCConfig(scconfig);
     this.fromInputValue = new BigNumber(0);
     this.toInputValue = new BigNumber(0);
     this.swapButtonStatusMap = {};
@@ -726,6 +795,7 @@ export default class ScomSwap extends Module implements PageBlock {
     if (this.chainId != null && this.chainId != undefined)
       this.swapBtn.classList.remove('hidden');
     // this.availableMarkets = getAvailableMarkets() || [];
+    this.updateContractAddress();
     if (this.originalData?.providers?.length) this.onSetupPage(true);
     this.setSwapButtonText();
   }
@@ -1190,6 +1260,11 @@ export default class ScomSwap extends Module implements PageBlock {
     return `${Number(value).toFixed()}%`;
   }
 
+  private totalAmount = () => {
+    const commissionAmount = getCommissionAmount(this.commissions, this.fromInputValue);
+    return this.fromInputValue.plus(commissionAmount);
+  }
+
   setupCrossChainPopup() {
     const arrows = this.swapModal.querySelectorAll('i-icon.arrow-down');
     if (!this.isCrossChain) {
@@ -1251,7 +1326,7 @@ export default class ScomSwap extends Module implements PageBlock {
     const slippageTolerance = getSlippageTolerance();
     this.fromTokenImage.url = Assets.fullPath(getTokenIconPath(this.fromToken, this.chainId));
     this.fromTokenLabel.caption = this.fromToken?.symbol ?? '';
-    this.fromTokenValue.caption = formatNumber(this.fromInputValue, 4);
+    this.fromTokenValue.caption = formatNumber(this.totalAmount(), 4);
     this.toTokenImage.url = Assets.fullPath(getTokenIconPath(this.toToken, this.isCrossChain ? this.desChain?.chainId : this.chainId));
     this.toTokenLabel.caption = this.toToken?.symbol ?? '';
     this.toTokenValue.caption = formatNumber(this.toInputValue, 4);
@@ -1277,7 +1352,8 @@ export default class ScomSwap extends Module implements PageBlock {
     if (this.isFrom) {
       const poolAmount = new BigNumber(this.record?.amountIn);
       if (poolAmount.isZero()) return null;
-      const minReceivedMaxSold = poolAmount.times(1 + slippageTolerance / 100).toNumber();
+      const commissionAmount = getCommissionAmount(this.commissions, poolAmount);
+      const minReceivedMaxSold = poolAmount.plus(commissionAmount).times(1 + slippageTolerance / 100).toNumber();
       return minReceivedMaxSold;
     } else {
       const poolAmount = new BigNumber(this.record?.amountOut);
@@ -1370,6 +1446,7 @@ export default class ScomSwap extends Module implements PageBlock {
 
   setApprovalSpenderAddress() {
     const item = this.record;
+    if (!item) return;
     // if (this.isCrossChain && item.contractAddress){
     //   setApprovalModalSpenderAddress(Market.HYBRID, item.contractAddress)
     // } else if (item?.provider && this.availableMarkets.includes(item.provider)) {
@@ -1378,8 +1455,15 @@ export default class ScomSwap extends Module implements PageBlock {
     // } else {
     //   setApprovalModalSpenderAddress(Market.HYBRID);
     // }
-    const market = getProviderByKey(item.provider)?.key || '';
-    setApprovalModalSpenderAddress(market);
+    const market =  getProviderByKey(item.provider)?.key || '';
+    if (this.approvalModelAction) {
+      if (getCurrentCommissions(this.commissions).length) {
+        this.contractAddress = getProxyAddress();
+        setApprovalModalSpenderAddress(market, this.contractAddress);
+      } else {
+        setApprovalModalSpenderAddress(market);
+      }
+    }
   }
 
   getInputValue(isFrom: boolean) {
@@ -1474,8 +1558,8 @@ export default class ScomSwap extends Module implements PageBlock {
     this.record = item;
     if (this.isCrossChain && this.fromToken && !this.fromToken.isNative) {
       try {
-        this.setApprovalSpenderAddress()
-        await this.approvalModelAction.checkAllowance(this.fromToken, this.fromInputValue.toFixed());
+        this.setApprovalSpenderAddress();
+        await this.approvalModelAction.checkAllowance(this.fromToken, this.totalAmount().toFixed());
       } catch (e) {
         console.log('Cannot check the Approval status (Cross Chain)', e);
       }
@@ -1489,7 +1573,7 @@ export default class ScomSwap extends Module implements PageBlock {
     }
     this.priceInfo.Items = this.getPriceInfo();
   }
-  onTokenInputChange(source: Control) {
+  onTokenInputChange(source: Control) { //TODO
     clearTimeout(this.timeout);
     this.timeout = setTimeout(async () => {
       const fromInput = this.payCol.getElementsByTagName('I-INPUT')?.[0] as Input;
@@ -1564,7 +1648,9 @@ export default class ScomSwap extends Module implements PageBlock {
     let listRouting: any[] = [];
     if (!this.isCrossChain) {     
       const useAPI = this._data.category === 'aggregator';
-      listRouting = await getAllRoutesData(this.fromToken, this.toToken, this.fromInputValue, this.toInputValue, this.isFrom, useAPI);
+      const commissionAmount = getCommissionAmount(this.commissions, this.fromInputValue);
+      this.updateContractAddress();
+      listRouting = await getAllRoutesData(this.fromToken, this.toToken, this.fromInputValue, this.toInputValue, this.isFrom, useAPI, commissionAmount, commissionAmount.gt(0) ? this.contractAddress : undefined);
       listRouting = listRouting.map((v: any) => {
         // const config = ProviderConfigMap[v.provider];
         return {
@@ -2061,6 +2147,8 @@ export default class ScomSwap extends Module implements PageBlock {
     const priceImpact = this.getPriceImpact();
     const minimumReceived = this.getMinimumReceived();
     const tradeFeeExactAmount = this.getTradeFeeExactAmount();
+    const commissionFee = getEmbedderCommissionFee();
+    const commissionAmount = this.record ? getCommissionAmount(this.commissions, new BigNumber(this.record.fromAmount || 0)) : new BigNumber(0);
 
     const fees = this.getFeeDetails();
     const countFees = fees.length;
@@ -2084,7 +2172,7 @@ export default class ScomSwap extends Module implements PageBlock {
         isHidden: this.isCrossChain,
       },
       {
-        title: "Minimum Received",
+        title: this.isFrom ? "Maximum Sold" : "Minimum Received",
         value: this.isValidToken ? minimumReceived : '-',
       },
       {
@@ -2098,6 +2186,11 @@ export default class ScomSwap extends Module implements PageBlock {
         value: this.isValidToken && this.record ? '30 seconds' : '-',
         isHidden: !this.isCrossChain,
       },
+      {
+        title: "Commission Fee",
+        value: this.isValidToken ? `${new BigNumber(commissionFee).times(100)}% (${formatNumber(commissionAmount)} ${this.fromToken?.symbol})` : '-',
+        isHidden: !getCurrentCommissions(this.commissions).length
+      }
     ];
     return info.filter((f: any) => !f.isHidden);
   }
@@ -2208,8 +2301,9 @@ export default class ScomSwap extends Module implements PageBlock {
     if (this.record.key === 'Oracle' && (this.record.fromAmount.isZero() || this.record.toAmount.isZero())) {
       return 'Circuit breaker triggered';
     }
+    const commissionAmount = getCommissionAmount(this.commissions, this.record.fromAmount);
     let balance = this.getBalance(this.fromToken)
-    if (this.record.fromAmount.gt(balance)) {
+    if (this.record.fromAmount.plus(commissionAmount).gt(balance)) {
       return `Insufficient ${this.fromToken?.symbol} balance`;
     }
     if (this.record.priceImpact > 15 && !isExpertMode()) {
@@ -2366,7 +2460,7 @@ export default class ScomSwap extends Module implements PageBlock {
   onSubmit = async () => {
     try {
       this.swapModal.visible = false;
-      this.showResultMessage(this.openswapResult, 'warning', `Swapping ${formatNumber(this.fromInputValue, 4)} ${this.fromToken?.symbol} to ${formatNumber(this.toInputValue, 4)} ${this.toToken?.symbol}`);
+      this.showResultMessage(this.openswapResult, 'warning', `Swapping ${formatNumber(this.totalAmount(), 4)} ${this.fromToken?.symbol} to ${formatNumber(this.toInputValue, 4)} ${this.toToken?.symbol}`);
       if (this.isCrossChain) {
         if (this.toToken && this.fromToken && this.desChain) {
           this.record.minReceivedMaxSold = this.getMinReceivedMaxSold()
@@ -2395,7 +2489,8 @@ export default class ScomSwap extends Module implements PageBlock {
         fromAmount: this.record.fromAmount,
         toAmount: this.record.toAmount,
         isFromEstimated: this.isFrom,
-        providerList: this.originalData?.providers || []
+        providerList: this.originalData?.providers || [],
+        commissions: this.commissions
       }
 
       const { error } = await executeSwap(swapData);
@@ -2407,10 +2502,9 @@ export default class ScomSwap extends Module implements PageBlock {
     }
   }
   onApproveRouterMax = () => {
-    const item = this.record;
     this.showResultMessage(this.openswapResult, 'warning', 'Approving');
     this.setApprovalSpenderAddress();
-    this.approvalModelAction.doApproveAction(this.fromToken as ITokenObject, this.fromInputValue.toString(), this.record);
+    this.approvalModelAction.doApproveAction(this.fromToken as ITokenObject, this.totalAmount().toString(), this.record);
   }
   onSetMaxBalance = async (value?: number) => {
     if (!this.fromToken?.symbol) return;
@@ -2938,7 +3032,6 @@ export default class ScomSwap extends Module implements PageBlock {
 
   async init() {
     this.chainId = getChainId();
-    setDataFromSCConfig({ infuraId: InfuraId, networks: Networks });
     setTokenStore();
     // this.availableMarkets = getAvailableMarkets() || [];
     super.init();
@@ -2950,7 +3043,9 @@ export default class ScomSwap extends Module implements PageBlock {
     this.initExpertModal();
     const category = this.getAttribute('category', true, "fixed-pair");
     const providers = this.getAttribute('providers', true, []);
-    await this.setData({category, providers});
+    const commissions = this.getAttribute('commissions', true, []);
+    this.updateContractAddress();
+    await this.setData({category, providers, commissions});
   }
 
   render() {
@@ -3237,6 +3332,7 @@ export default class ScomSwap extends Module implements PageBlock {
             </i-panel>
           </i-modal>
         </i-panel>
+        <i-scom-swap-config id="configDApp" visible={false} />
       </i-panel>
     )
   }

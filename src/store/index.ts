@@ -1,6 +1,6 @@
 import { application } from '@ijstech/components';
 import { Wallet, WalletPlugin } from '@ijstech/eth-wallet';
-import { EventId, ITokenObject } from '../global/index';
+import { EventId, INetwork, ITokenObject } from '../global/index';
 import Assets from '../assets';
 import { DefaultTokens, getTokenIconPath, WETHByChainId } from './data/index';
 import { TokenStore } from './tokens';
@@ -160,6 +160,23 @@ export const projectNativeTokenSymbol = () => {
   const token = projectNativeToken();
   return token ? token.symbol : ''
 };
+
+export const SupportedNetworks: INetwork[] = [
+  {
+    name: "BSC Testnet",
+    chainId: 97,
+    img: "bsc"
+  },
+  {
+    name: "Avalanche FUJI C-Chain",
+    chainId: 43113,
+    img: "avax"
+  }
+];
+
+export const getNetworkName = (chainId: number) => {
+  return SupportedNetworks.find(v => v.chainId === chainId)?.name || ""
+}
 
 export * from './utils';
 export * from './data/index';
