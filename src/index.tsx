@@ -1573,7 +1573,7 @@ export default class ScomSwap extends Module implements PageBlock {
     }
     this.priceInfo.Items = this.getPriceInfo();
   }
-  onTokenInputChange(source: Control) { //TODO
+  onTokenInputChange(source: Control) {
     clearTimeout(this.timeout);
     this.timeout = setTimeout(async () => {
       const fromInput = this.payCol.getElementsByTagName('I-INPUT')?.[0] as Input;
