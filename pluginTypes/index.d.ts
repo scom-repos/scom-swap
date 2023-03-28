@@ -10407,6 +10407,7 @@ declare module "@scom/scom-swap/store/utils.ts" {
         onto?: any;
         walletconnect?: any;
         bitkeepwallet?: any;
+        frontierwallet?: any;
     };
     export const getBridgeVaultVersion: (chainId: number) => string;
     export function getChainId(): number;
