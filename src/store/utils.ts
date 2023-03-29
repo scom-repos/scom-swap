@@ -1,11 +1,10 @@
 import { application } from '@ijstech/components';
 import { Wallet, WalletPlugin } from '@ijstech/eth-wallet';
 import { EventId, INetwork, IProvider, ITokenObject, SITE_ENV, TokenMapType } from '../global/index';
-import { ChainNativeTokenByChainId, CoreContractAddressesByChainId } from './data/index';
+import { ChainNativeTokenByChainId } from './data/index';
 
 export {
-  ChainNativeTokenByChainId,
-  CoreContractAddressesByChainId
+  ChainNativeTokenByChainId
 } from './data/index';
 
 const TOKENS = "oswap_user_tokens_";
@@ -449,21 +448,6 @@ export function getChainId() {
   // return Wallet.getInstance().chainId;
 }
 
-export function getAddresses(chainId: number) {
-  return CoreContractAddressesByChainId[chainId];
-};
-
 export const getChainNativeToken = (chainId: number): ITokenObject => {
   return ChainNativeTokenByChainId[chainId];
 };
-
-export const getGovToken = (chainId: number): ITokenObject => {
-  let govToken;
-  let Address = getAddresses(chainId);
-  if (chainId == 43113 || chainId == 43114) {
-    govToken = { address: Address["GOV_TOKEN"], decimals: 18, symbol: "veOSWAP", name: 'Vote-escrowed OSWAP' };
-  } else {
-    govToken = { address: Address["GOV_TOKEN"], decimals: 18, symbol: "OSWAP", name: 'OpenSwap' };
-  }
-  return govToken;
-}

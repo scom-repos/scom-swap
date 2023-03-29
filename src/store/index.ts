@@ -4,7 +4,7 @@ import { EventId, INetwork, ITokenObject } from '../global/index';
 import Assets from '../assets';
 import { DefaultTokens, getTokenIconPath, WETHByChainId } from './data/index';
 import { TokenStore } from './tokens';
-import { getAddresses, getChainId, getChainNativeToken, getCurrentChainId, getDefaultChainId, getNetworkInfo, getWalletOptions, isWalletConnected, setCurrentChainId } from './utils';
+import { getChainId, getChainNativeToken, getCurrentChainId, getDefaultChainId, getNetworkInfo, getWalletOptions, isWalletConnected, setCurrentChainId } from './utils';
 
 export {
   //token
@@ -15,11 +15,7 @@ export {
   ToUSDPriceFeedAddressesMap,
   tokenPriceAMMReference,
   getTokenIconPath,
-  getOpenSwapToken,
-
-  //core
-  CoreContractAddressesByChainId
-
+  getOpenSwapToken
 } from './data/index'
 
 export { TokenStore, TokenBalancesType, DefaultTokensByChainType } from './tokens';
@@ -39,9 +35,9 @@ export const getWETH = (chainId: number): ITokenObject => {
 
 export const getTokenDecimals = (address: string) => {
   let chainId = getChainId();
-  const Address = getAddresses(chainId);
+  const WETHAddress = getWETH(chainId).address;
   const ChainNativeToken = getChainNativeToken(chainId);
-  const tokenObject = (!address || address.toLowerCase() === Address['WETH9'].toLowerCase()) ? ChainNativeToken : tokenStore.tokenMap[address.toLowerCase()];
+  const tokenObject = (!address || address.toLowerCase() === WETHAddress.toLowerCase()) ? ChainNativeToken : tokenStore.tokenMap[address.toLowerCase()];
   return tokenObject ? tokenObject.decimals : 18;
 }
 

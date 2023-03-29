@@ -10184,24 +10184,15 @@ declare module "@scom/scom-swap/store/data/tokens/index.ts" {
     const getTokenIconPath: (tokenObj: any, chainId?: number) => string;
     export { DefaultERC20Tokens, ChainNativeTokenByChainId, WETHByChainId, DefaultTokens, ToUSDPriceFeedAddressesMap, tokenPriceAMMReference, getTokenIconPath, getOpenSwapToken, };
 }
-/// <amd-module name="@scom/scom-swap/store/data/core/index.ts" />
-declare module "@scom/scom-swap/store/data/core/index.ts" {
-    export const CoreContractAddressesByChainId: {
-        [chainId: number]: {
-            [contract: string]: string;
-        };
-    };
-}
 /// <amd-module name="@scom/scom-swap/store/data/index.ts" />
 declare module "@scom/scom-swap/store/data/index.ts" {
     export { DefaultERC20Tokens, ChainNativeTokenByChainId, WETHByChainId, DefaultTokens, ToUSDPriceFeedAddressesMap, tokenPriceAMMReference, getTokenIconPath, getOpenSwapToken, } from "@scom/scom-swap/store/data/tokens/index.ts";
-    export { CoreContractAddressesByChainId } from "@scom/scom-swap/store/data/core/index.ts";
 }
 /// <amd-module name="@scom/scom-swap/store/utils.ts" />
 declare module "@scom/scom-swap/store/utils.ts" {
     import { WalletPlugin } from '@ijstech/eth-wallet';
     import { INetwork, IProvider, ITokenObject, SITE_ENV, TokenMapType } from "@scom/scom-swap/global/index.ts";
-    export { ChainNativeTokenByChainId, CoreContractAddressesByChainId } from "@scom/scom-swap/store/data/index.ts";
+    export { ChainNativeTokenByChainId } from "@scom/scom-swap/store/data/index.ts";
     export type ProxyAddresses = {
         [key: number]: string;
     };
@@ -10288,11 +10279,7 @@ declare module "@scom/scom-swap/store/utils.ts" {
     };
     export const getBridgeVaultVersion: (chainId: number) => string;
     export function getChainId(): number;
-    export function getAddresses(chainId: number): {
-        [contract: string]: string;
-    };
     export const getChainNativeToken: (chainId: number) => ITokenObject;
-    export const getGovToken: (chainId: number) => ITokenObject;
 }
 /// <amd-module name="@scom/scom-swap/store/tokens.ts" />
 declare module "@scom/scom-swap/store/tokens.ts" {
@@ -10304,12 +10291,10 @@ declare module "@scom/scom-swap/store/tokens.ts" {
         private _tokenBalances;
         private _tokenMap;
         private _projectToken?;
-        private _govToken?;
         constructor(defaultTokensByChain: DefaultTokensByChainType);
         get tokenBalances(): TokenBalancesType;
         get tokenMap(): TokenMapType;
         get projectToken(): ITokenObject;
-        get govToken(): ITokenObject;
         getTokenList(chainId: number): ITokenObject[];
         private getERC20Balance;
         getTokenBalance(token: ITokenObject): string;
@@ -10326,7 +10311,7 @@ declare module "@scom/scom-swap/store/index.ts" {
     import { WalletPlugin } from '@ijstech/eth-wallet';
     import { INetwork, ITokenObject } from "@scom/scom-swap/global/index.ts";
     import { TokenStore } from "@scom/scom-swap/store/tokens.ts";
-    export { DefaultERC20Tokens, ChainNativeTokenByChainId, WETHByChainId, DefaultTokens, ToUSDPriceFeedAddressesMap, tokenPriceAMMReference, getTokenIconPath, getOpenSwapToken, CoreContractAddressesByChainId } from "@scom/scom-swap/store/data/index.ts";
+    export { DefaultERC20Tokens, ChainNativeTokenByChainId, WETHByChainId, DefaultTokens, ToUSDPriceFeedAddressesMap, tokenPriceAMMReference, getTokenIconPath, getOpenSwapToken } from "@scom/scom-swap/store/data/index.ts";
     export { TokenStore, TokenBalancesType, DefaultTokensByChainType } from "@scom/scom-swap/store/tokens.ts";
     export let tokenStore: TokenStore;
     export const setTokenStore: () => void;
@@ -10928,8 +10913,7 @@ declare module "@scom/scom-swap/swap-utils/index.ts" {
     const setERC20AllowanceToZero: (token: ITokenObject, spenderAddress: string) => Promise<import("@ijstech/eth-contract").TransactionReceipt>;
     const getApprovalModelAction: (options: IERC20ApprovalEventOptions) => Promise<import("@scom/scom-swap/global/index.ts").IERC20ApprovalAction>;
     const setApprovalModalSpenderAddress: (market: string, contractAddress?: string) => void;
-    const registerPairsByAddress: (market: string[], pairAddresses: string[]) => Promise<import("@ijstech/eth-contract").TransactionReceipt>;
-    export { getExtendedRouteObjData, getTradeFeeMap, getAllRoutesData, SwapData, executeSwap, getChainNativeToken, getRouterAddress, setERC20AllowanceToZero, getApprovalModelAction, setApprovalModalSpenderAddress, registerPairsByAddress, };
+    export { getExtendedRouteObjData, getTradeFeeMap, getAllRoutesData, SwapData, executeSwap, getChainNativeToken, getRouterAddress, setERC20AllowanceToZero, getApprovalModelAction, setApprovalModalSpenderAddress };
     export * from "@scom/scom-swap/swap-utils/helper.ts";
 }
 /// <amd-module name="@scom/scom-swap/price-info/priceInfo.css.ts" />
@@ -11336,9 +11320,6 @@ declare module "@scom/scom-swap/scconfig.json.ts" {
             "@pageblock-swap/swap-utils": {
                 path: string;
             };
-            "@pageblock-swap/queue-utils": {
-                path: string;
-            };
             "@pageblock-swap/price-info": {
                 path: string;
             };
@@ -11473,7 +11454,7 @@ declare module "@scom/scom-swap" {
     import { ITokenObject, ApprovalStatus, INetwork, PageBlock, IProvider, ISwapConfigUI, IProviderUI, Category, ICommissionInfo } from "@scom/scom-swap/global/index.ts";
     import { PriceInfo } from "@scom/scom-swap/price-info/index.tsx";
     import Config from "@scom/scom-swap/config/index.tsx";
-    type StatusMapType = 'register' | 'approve' | 'swap';
+    type StatusMapType = 'approve' | 'swap';
     interface ScomSwapElement extends ControlElement {
         category: Category;
         providers: IProviderUI[];
@@ -11541,7 +11522,6 @@ declare module "@scom/scom-swap" {
         private fallbackUrl;
         private swapButtonStatusMap;
         private approveButtonStatusMap;
-        private registerPairButtonStatusMap;
         private _lastUpdated;
         private lbLastUpdated;
         private timer;
@@ -11549,10 +11529,6 @@ declare module "@scom/scom-swap" {
         private lbEstimate;
         private lbPayOrReceive;
         private approvalModelAction;
-        private registerPairModal;
-        private registerPanel;
-        private registerBtn;
-        private registerPairsParams;
         private toggleReverseImage;
         private oldSupportedChainList;
         private supportedChainList;
@@ -11806,12 +11782,6 @@ declare module "@scom/scom-swap" {
         onSwapConfirmed: (data: any) => Promise<void>;
         isButtonLoading(): boolean;
         isSwapButtonDisabled(): boolean;
-        get bestSmartRoute(): any;
-        get hasRegisterPair(): any;
-        get pairs(): any;
-        get isRegisteringPair(): any;
-        registerPairButtonStatus: (pair: any) => any;
-        renderRegisterPairUI(): void;
         onClickSwapButton(): void;
         onSubmit: () => Promise<void>;
         onApproveRouterMax: () => void;
@@ -11836,7 +11806,6 @@ declare module "@scom/scom-swap" {
         onRenderChainList: () => Promise<void>;
         showModalFees: () => void;
         closeModalFees: () => void;
-        onRegister: () => void;
         private showResultMessage;
         private initExpertModal;
         private showNetworkErrModal;

@@ -8,5 +8,3 @@ export {
   getTokenIconPath,
   getOpenSwapToken,
 } from './tokens/index';
-
-export { CoreContractAddressesByChainId } from './core/index';

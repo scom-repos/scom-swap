@@ -28,9 +28,6 @@ export default {
     "@pageblock-swap/swap-utils": {
       "path": "swap-utils"
     },
-    "@pageblock-swap/queue-utils": {
-      "path": "queue-utils"
-    },
     "@pageblock-swap/price-info": {
       "path": "price-info"
     },

@@ -35,7 +35,6 @@ import {
   executeSwap,
   getApprovalModelAction,
   setApprovalModalSpenderAddress,
-  registerPairsByAddress,
   debounce,
   getCommissionAmount,
   getCurrentCommissions
@@ -71,7 +70,7 @@ import scconfig from './scconfig.json';
 
 const priceImpactTooHighMsg = 'Price Impact Too High. If you want to bypass this check, please turn on Expert Mode';
 const defaultInput = '1';
-type StatusMapType = 'register' | 'approve' | 'swap';
+type StatusMapType = 'approve' | 'swap';
 
 interface ScomSwapElement extends ControlElement {
   category: Category;
@@ -158,7 +157,6 @@ export default class ScomSwap extends Module implements PageBlock {
   private fallbackUrl: string = Assets.fullPath('img/tokens/Custom.png');
   private swapButtonStatusMap: any;
   private approveButtonStatusMap: any;
-  private registerPairButtonStatusMap: any;
   private _lastUpdated: number = 0;
   private lbLastUpdated: Label;
   private timer: any;
@@ -166,10 +164,6 @@ export default class ScomSwap extends Module implements PageBlock {
   private lbEstimate: Label;
   private lbPayOrReceive: Label;
   private approvalModelAction: IERC20ApprovalAction;
-  private registerPairModal: Modal;
-  private registerPanel: Panel;
-  private registerBtn: Button;
-  private registerPairsParams: any;
 
   // Cross Chain
   private toggleReverseImage: Image;
@@ -717,7 +711,6 @@ export default class ScomSwap extends Module implements PageBlock {
     this.toInputValue = new BigNumber(0);
     this.swapButtonStatusMap = {};
     this.approveButtonStatusMap = {};
-    this.registerPairButtonStatusMap = {};
     this.$eventBus = application.EventBus;
     this.registerEvent();
   }
@@ -1495,7 +1488,6 @@ export default class ScomSwap extends Module implements PageBlock {
     this.disableSelectChain(false, true);
     this.swapButtonStatusMap = {};
     this.approveButtonStatusMap = {};
-    this.registerPairButtonStatusMap = {};
     this.initRoutes();
     const pricePercent = this.getPricePercent(listRouting, false)
     this.listRouting.innerHTML = '';
@@ -1509,8 +1501,6 @@ export default class ScomSwap extends Module implements PageBlock {
     }
     this.listRouting.clearInnerHTML();
     this.listRouting.append(...nodeItems);
-    let unregisteredPairAddresses = (listRouting.filter(v => v.bestSmartRoute) as any).flatMap((v: any) => v.bestSmartRoute).filter((v: any) => !v.isRegistered).map((v: any) => v.pairAddress);
-    unregisteredPairAddresses.forEach((v: any) => this.registerPairButtonStatusMap[v] = ApprovalStatus.TO_BE_APPROVED);
     this.routeFound.caption = listRouting.length + ' Route(s) Found';
     if (listRouting.length > 1)
       this.toggleRoutes.classList.remove('hidden');
@@ -1869,9 +1859,6 @@ export default class ScomSwap extends Module implements PageBlock {
       if (this.isPriceImpactTooHigh) {
         return "Turn on Expert Mode"
       }
-      if (this.hasRegisterPair) {
-        return "Register Pair";
-      }
       return "Swap";
     }
   }
@@ -1898,13 +1885,7 @@ export default class ScomSwap extends Module implements PageBlock {
   }
   setMapStatus(type: StatusMapType, key: string, status: ApprovalStatus) {
     let mapStatus = {} as any;
-    if (type === 'register') {
-      mapStatus = this.registerPairButtonStatusMap;
-      mapStatus[key] = status;
-      this.registerPairButtonStatusMap = {
-        ...mapStatus
-      };
-    } else if (type === 'approve') {
+    if (type === 'approve') {
       mapStatus = this.approveButtonStatusMap;
       mapStatus[key] = status;
       this.approveButtonStatusMap = {
@@ -1942,81 +1923,6 @@ export default class ScomSwap extends Module implements PageBlock {
     return (isWalletConnected() && (warningMessageText != '' && !this.isPriceImpactTooHigh));
   }
 
-  get bestSmartRoute() {
-    if (this.record) {
-      const item = this.record;
-      if (item.isHybrid && item.bestSmartRoute) {
-        return item.bestSmartRoute;
-      }
-    }
-    return [];
-  };
-
-  get hasRegisterPair() {
-    const statusMap = this.registerPairButtonStatusMap;
-    return this.bestSmartRoute.some((pair: any) => {
-      return Object.keys(statusMap).includes(pair.pairAddress) && statusMap[pair.pairAddress] !== ApprovalStatus.NONE;
-    });
-  }
-
-  get pairs() {
-    return this.bestSmartRoute.filter((pair: any) => {
-      return [ApprovalStatus.TO_BE_APPROVED, ApprovalStatus.APPROVING].includes(this.registerPairButtonStatus(pair));
-    });
-  }
-
-  get isRegisteringPair() {
-    return this.pairs.some((pair: any) => this.registerPairButtonStatus(pair) === ApprovalStatus.APPROVING);
-  }
-
-  registerPairButtonStatus = (pair: any) => {
-    const statusMap = this.registerPairButtonStatusMap;
-    return Object.keys(statusMap).includes(pair.pairAddress) ? statusMap[pair.pairAddress] : ApprovalStatus.NONE;
-  };
-
-  renderRegisterPairUI() {
-    let listMarket = [] as any;
-    let listPairAddress = [] as any;
-    this.pairs.forEach((pair: any) => {
-      const market = getProviderByKey(pair.provider)?.key // ProviderConfigMap[pair.provider].marketCode;
-      listMarket.push(market);
-      listPairAddress.push(pair.pairAddress);
-    });
-    this.registerPairsParams = {
-      listMarket,
-      listPairAddress,
-    }
-    this.registerBtn.caption = this.isRegisteringPair ? 'Registering' : 'Register';
-    this.registerBtn.rightIcon.visible = this.isRegisteringPair;
-    this.registerBtn.enabled = !this.isRegisteringPair;
-    this.registerPanel.clearInnerHTML();
-    this.pairs.forEach((pair: any) => {
-      const { fromToken, toToken } = pair;
-      this.registerPanel.appendChild(
-        <i-hstack verticalAlignment="center" horizontalAlignment="space-between" margin={{ bottom: 20 }}>
-          <i-image
-            width={40}
-            height={40}
-            tooltip={{
-              content: `${fromToken.name} (${fromToken.symbol})`
-            }}
-            url={Assets.fullPath(getTokenIconPath(fromToken, this.chainId))}
-          />
-          <i-icon margin={{ left: 10, right: 10 }} name="arrow-right" fill='#fff' width={15} height={15} />
-          <i-image
-            width={40}
-            height={40}
-            tooltip={{
-              content: `${toToken.name} (${toToken.symbol})`
-            }}
-            url={Assets.fullPath(getTokenIconPath(toToken, this.chainId))}
-          />
-        </i-hstack>
-      )
-    });
-    this.registerPairModal.visible = true;
-  }
-
   onClickSwapButton() {
     if (!isWalletConnected()) {
       this.$eventBus.dispatch(EventId.ConnectWallet);
@@ -2031,10 +1937,6 @@ export default class ScomSwap extends Module implements PageBlock {
     }
     if (this.isPriceImpactTooHigh) {
       this.$eventBus.dispatch(EventId.ShowExpertModal);
-      return;
-    }
-    if (this.hasRegisterPair) {
-      this.renderRegisterPairUI();
       return;
     }
     this.handleSwapPopup();
@@ -2352,43 +2254,6 @@ export default class ScomSwap extends Module implements PageBlock {
     this.modalFees.visible = false;
   }
 
-  onRegister = () => {
-    const { listMarket, listPairAddress } = this.registerPairsParams;
-    this.showResultMessage(this.openswapResult, 'warning', 'Registering');
-    const callBack = (err: any, reply: any) => {
-      if (err) {
-        this.showResultMessage(this.openswapResult, 'error', err);
-      } else {
-        listPairAddress.forEach((pairAddress: string) => {
-          this.setMapStatus('register', pairAddress, ApprovalStatus.APPROVING);
-        });
-        this.showResultMessage(this.openswapResult, 'success', reply);
-        return reply;
-      }
-      this.registerBtn.rightIcon.visible = this.isRegisteringPair;
-      this.registerBtn.enabled = !this.isRegisteringPair;
-    };
-
-    const confirmationCallBack = () => {
-      listPairAddress.forEach((pairAddress: string) => {
-        this.setMapStatus('register', pairAddress, ApprovalStatus.NONE);
-      });
-      if (!this.hasRegisterPair && this.registerPairModal.visible && this.record) {
-        this.registerPairModal.visible = false;
-        this.registerBtn.rightIcon.visible = this.isRegisteringPair;
-        this.registerBtn.enabled = !this.isRegisteringPair;
-        this.onClickSwapButton();
-      }
-    };
-
-    registerSendTxEvents({
-      transactionHash: callBack,
-      confirmation: confirmationCallBack
-    });
-
-    registerPairsByAddress(listMarket, listPairAddress);
-  }
-
   private showResultMessage = (result: Result, status: 'warning' | 'success' | 'error', content?: string | Error) => {
     if (!result) return;
     let params: any = { status };
@@ -2634,23 +2499,6 @@ export default class ScomSwap extends Module implements PageBlock {
             <i-panel class="swap-btn-container" width="100%">
               <i-button id="swapModalConfirmBtn" class="btn-swap btn-os" height="auto" caption="Confirm Swap" onClick={this.doSwap}></i-button>
             </i-panel>
-          </i-modal>
-
-          <i-modal id="registerPairModal" title="Register Pair on your Hybrid Router!" closeIcon={{ name: 'times' }}>
-            <i-label caption="Congratulation on being the first one to use the below pairs on your hybrid router! Please click 'register' below to perform the swap. Approved to be distributed to our beloved community contributors!"></i-label>
-            <i-panel margin={{ top: 30, bottom: 10 }} width="100%">
-              <i-label font={{ color: "#ffffff8c", bold: false }} caption="Pair(s) to be register"></i-label>
-            </i-panel>
-            <i-hstack verticalAlignment="center" horizontalAlignment="space-between">
-              <i-panel id="registerPanel" class="register-panel" />
-              <i-panel>
-                <i-button
-                  id="registerBtn" width={150} class="btn-register btn-os" height="auto"
-                  rightIcon={{ spin: true, visible: false }}
-                  onClick={() => this.onRegister()} caption="Register"
-                />
-              </i-panel>
-            </i-hstack>
           </i-modal>
 
           <i-modal

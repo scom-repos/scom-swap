@@ -1,6 +1,6 @@
 import { BigNumber, Contracts, IWallet, Wallet } from '@ijstech/eth-wallet';
 import { ITokenObject, TokenMapType } from '../global/index';
-import { getChainId, getChainNativeToken, getDefaultChainId, getGovToken, getUserTokens } from './utils';
+import { getChainId, getChainNativeToken, getDefaultChainId, getUserTokens } from './utils';
 
 export type DefaultTokensByChainType = Record<number, ITokenObject[]>;
 
@@ -11,7 +11,6 @@ export class TokenStore {
   private _tokenBalances: TokenBalancesType;
   private _tokenMap: TokenMapType;
   private _projectToken?: ITokenObject;
-  private _govToken?: ITokenObject;
 
   constructor(defaultTokensByChain: DefaultTokensByChainType) {
     this._defaultTokensByChain = defaultTokensByChain;
@@ -29,10 +28,6 @@ export class TokenStore {
 
   public get projectToken() {
     return this._projectToken;
-  }
-
-  public get govToken() {
-    return this._govToken;
   }
 
   public getTokenList(chainId: number) {
@@ -138,12 +133,6 @@ export class TokenStore {
 
   private _updateTokenMapData(chainId: number): TokenMapType {
     let allTokensMap: TokenMapType = {};
-    let govToken = getGovToken(chainId);
-    let GovTokenObj;
-    if (govToken && govToken.address) {
-      GovTokenObj = {...govToken, address: govToken.address.toLowerCase()};
-      allTokensMap[GovTokenObj.address] = GovTokenObj;
-    }
     if (this._defaultTokensByChain[chainId]) {
       let defaultTokenList = this._defaultTokensByChain[chainId].sort((a, b) => {
         if (a.symbol.toLowerCase() < b.symbol.toLowerCase()) { return -1; }
@@ -163,9 +152,6 @@ export class TokenStore {
       }
       let stakeToken = defaultTokenList.find(v => v.symbol == 'OSWAP');
       this._projectToken = stakeToken ? { ...stakeToken, address: stakeToken.address!.toLowerCase() } : undefined;
-
-      if (GovTokenObj)
-        this._govToken = allTokensMap[GovTokenObj.address];
     }
     return allTokensMap;
   }
