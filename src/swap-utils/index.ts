@@ -1599,7 +1599,7 @@ const AmmTradeExactIn = async function (wallet: any, market: string, routeTokens
       amount: amount.times(v.share)
     }
   });
-  const commissionsAmount = _commissions.length ? _commissions.map(v => v.amount).reduce((a, b) => a.plus(b)) : new BigNumber(0);
+  const commissionsAmount = _commissions.length ? _commissions.map(v => v.amount).reduce((a, b) => a.plus(b)).dp(0) : new BigNumber(0);
   if (!tokenIn.address) {
     const params = {
       amountOutMin: _amountOutMin,
@@ -1610,7 +1610,6 @@ const AmmTradeExactIn = async function (wallet: any, market: string, routeTokens
     if (_commissions.length) {
       let txData: string;
       if (feeOnTransfer) {
-        router.swapExactETHForTokensSupportingFeeOnTransferTokens.txData(params, amount)
         txData = await router.swapExactETHForTokensSupportingFeeOnTransferTokens.txData(params, amount);
       } else {
         txData = await router.swapExactETHForTokens.txData(params, amount);
@@ -1760,7 +1759,7 @@ const AmmTradeExactOut = async function (wallet: any, market: string, routeToken
       amount: _amountInMax.times(v.share)
     }
   });
-  const commissionsAmount = _commissions.length ? _commissions.map(v => v.amount).reduce((a, b) => a.plus(b)) : new BigNumber(0);
+  const commissionsAmount = _commissions.length ? _commissions.map(v => v.amount).reduce((a, b) => a.plus(b)).dp(0) : new BigNumber(0);
   if (!tokenIn.address) {
     const params = {
       amountOut: _amountOut,

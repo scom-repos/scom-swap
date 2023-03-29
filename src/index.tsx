@@ -1001,12 +1001,13 @@ export default class ScomSwap extends Module implements PageBlock {
     this.onRenderPriceInfo();
   }
 
-  private onSetupPage = async (connected: boolean) => {
+  private onSetupPage = async (connected: boolean, _chainId?: number) => {
     // this.getAddressFromUrl();
-    this.chainId = getChainId();
+    this.chainId = _chainId ? _chainId : getChainId();
     if (this.supportedNetworks.every((v: string | number) => v != this.chainId)) {
       this.showNetworkErrModal();
       this.resetUI();
+      this.onRenderChainList();
       return;
     }
     this.closeNetworkErrModal();
@@ -2514,8 +2515,13 @@ export default class ScomSwap extends Module implements PageBlock {
     let inputVal = new BigNumber(balance);
     if (!address) {
       inputVal = new BigNumber(0);
+    } else {
+      const commissionAmount = getCommissionAmount(this.commissions, new BigNumber(balance));
+      if (commissionAmount.gt(0)) {
+        const totalFee = new BigNumber(balance).plus(commissionAmount).dividedBy(balance);
+        inputVal = inputVal.dividedBy(totalFee);
+      }
     }
-
     if (value == 0 || value) {
       inputVal = inputVal.multipliedBy(value).dividedBy(100);
     } else {
@@ -2524,7 +2530,7 @@ export default class ScomSwap extends Module implements PageBlock {
     if (inputVal.eq(this.fromInputValue)) return;
     this.fromInputValue = inputVal;
     const input = this.payCol.children[0] as Input;
-    input.value = this.fromInputValue.toString();
+    input.value = limitDecimals(this.fromInputValue.toFixed(), this.fromToken?.decimals || 18);
     await this.handleAddRoute();
   }
   isMaxDisabled = (): boolean => {
@@ -2790,7 +2796,8 @@ export default class ScomSwap extends Module implements PageBlock {
   onSelectSourceChain = async (obj: INetwork, img?: Image) => {
     if (this.isMetaMask || !isWalletConnected()) {
       await this.selectSourceChain(obj, img);
-      this.onSetupPage(true);
+      this.chainId = obj.chainId;
+      this.onSetupPage(true, this.chainId);
     }
   }
 
@@ -3002,15 +3009,18 @@ export default class ScomSwap extends Module implements PageBlock {
     this.supportedNetworksElm.clearInnerHTML();
     if (!this.supportedNetworks.length) {
       this.supportedNetworksElm.appendChild(<i-label caption={`No networks are supported. Please configure the swap!`} font={{ size: '16px' }} />)
-      return;
-    }
-    this.supportedNetworksElm.appendChild(<i-label caption={`We only support the following ${this.supportedNetworks.length > 1 ? 'networks' : 'network'}:`} font={{ size: '16px' }} />)
-    for (const chainId of this.supportedNetworks) {
-      const network = getNetworkInfo(chainId);
-      if (network) {
-        this.supportedNetworksElm.appendChild(
-          <i-label font={{ bold: true, size: '16px' }} caption={`${network.name} (${network.chainId})`} />
-        )
+    } else if (this.supportedChainList.some(v => v.chainId == this.chainId)) {
+      const network = getNetworkInfo(this.chainId);
+      this.supportedNetworksElm.appendChild(<i-label caption={`The ${network.name} (${network.chainId}) network has not been configured for the swap!`} font={{ size: '16px' }} />)
+    } else {
+      this.supportedNetworksElm.appendChild(<i-label caption={`We only support the following ${this.supportedNetworks.length > 1 ? 'networks' : 'network'}:`} font={{ size: '16px' }} />)
+      for (const chainId of this.supportedNetworks) {
+        const network = getNetworkInfo(chainId);
+        if (network) {
+          this.supportedNetworksElm.appendChild(
+            <i-label font={{ bold: true, size: '16px' }} caption={`${network.name} (${network.chainId})`} />
+          )
+        }
       }
     }
     this.networkErrModal.visible = true;
@@ -3071,7 +3081,7 @@ export default class ScomSwap extends Module implements PageBlock {
               <i-hstack class="my-2" verticalAlignment="center" horizontalAlignment="space-between">
                 <i-label class="custom-label" caption="You Pay"></i-label>
               </i-hstack>
-              <i-vstack id="srcChainBox" visible={false} class="my-2 w-100">
+              <i-vstack id="srcChainBox" class="my-2 w-100">
                 <i-hstack verticalAlignment="center" horizontalAlignment="space-between">
                   <i-label class="text--grey" caption="Selected Source Chain" />
                   <i-label id="srcChainLabel" caption="-" />
