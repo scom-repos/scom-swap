@@ -18,16 +18,7 @@ export {
   getOpenSwapToken,
 
   //core
-  CoreContractAddressesByChainId,
-
-  //cross-chain
-  baseRoute,
-  crossChainNativeTokenList,
-  BridgeVaultGroupList,
-  ChainTrollRegistryMap,
-  CrossChainAddressMap,
-  MockOracleMap,
-  BridgeVaultConstant,
+  CoreContractAddressesByChainId
 
 } from './data/index'
 

@@ -14,10 +14,7 @@ import {
   switchNetwork,
   getTokenIconPath,
   getWalletProvider,
-  BridgeVaultGroupList,
-  getSiteEnv,
   getMatchNetworks,
-  getOpenSwapToken,
   connectWallet,
   hasMetaMask,
   getDefaultChainId,
@@ -30,6 +27,7 @@ import {
   getNetworkInfo,
   getEmbedderCommissionFee,
   getProxyAddress,
+  getIPFSGatewayUrl,
 } from "./store/index";
 
 import {
@@ -174,15 +172,9 @@ export default class ScomSwap extends Module implements PageBlock {
   private registerPairsParams: any;
 
   // Cross Chain
-  private crossChainApprovalStatus: ApprovalStatus = ApprovalStatus.NONE;
   private toggleReverseImage: Image;
   private oldSupportedChainList: INetwork[] = [];
   private supportedChainList: INetwork[] = [];
-  private targetChainTokenBalances: any;
-  private targetChainTokenMap: any;
-  private minSwapHintLabel: Label;
-  private srcChainBox: Panel;
-  private desChainBox: Panel;
   private srcChainLabel: Label;
   private srcChainList: Panel;
   private desChainLabel: Label;
@@ -192,31 +184,8 @@ export default class ScomSwap extends Module implements PageBlock {
   private targetChainId: number | undefined;
   private srcChainFirstPanel: Panel;
   private targetChainFirstPanel: Panel;
-  private srcChainTokenImage: Image;
-  private srcChainTokenLabel: Label;
-  private targetChainTokenImage: Image;
-  private targetChainTokenLabel: Label;
   private srcChainSecondPanel: Panel;
-  private srcChainVaultImage: Image;
-  private srcChainVaultLabel: Label;
-  private srcVaultTokenImage: Image;
-  private srcVaultTokenLabel: Label;
-  private srcVaultTokenValue: Label;
-  private targetChainSecondPanel: Panel;
-  private targetChainVaultImage: Image;
-  private targetChainVaultLabel: Label;
-  private targetVaultTokenImage: Image;
-  private targetVaultTokenLabel: Label;
-  private targetVaultTokenValue: Label;
-  private targetVaultAssetBalanceLabel1: Label;
-  private targetVaultBondBalanceLabel1: Label;
-  private crossChainSoftCapLabel1: Label;
-  private targetVaultAssetBalanceLabel2: Label;
-  private targetVaultBondBalanceLabel2: Label;
-  private crossChainSoftCapLabel2: Label;
   private swapModalConfirmBtn: Button;
-  private crossChainVaultInfoVstack: VStack;
-  private modalViewOrder: Modal;
   private modalFees: Modal;
   private feesInfo: VStack;
   private lbReminderRejected: Label;
@@ -1079,7 +1048,6 @@ export default class ScomSwap extends Module implements PageBlock {
       },
       onApprovingError: async (token: ITokenObject, err: Error) => {
         this.showResultMessage(this.openswapResult, 'error', err);
-        this.crossChainApprovalStatus = ApprovalStatus.TO_BE_APPROVED;
         if (this.swapBtn.rightIcon.visible)
           this.swapBtn.rightIcon.visible = false;
       },
@@ -1187,8 +1155,6 @@ export default class ScomSwap extends Module implements PageBlock {
     this.srcChainFirstPanel.classList.add('hidden');
     this.targetChainFirstPanel.classList.add('hidden');
     this.srcChainSecondPanel.classList.add('hidden');
-    this.targetChainSecondPanel.classList.add('hidden');
-    this.crossChainVaultInfoVstack.classList.add('hidden');
   }
 
   handleSwapPopup() {
@@ -1571,7 +1537,13 @@ export default class ScomSwap extends Module implements PageBlock {
       providerObj = provider;
     }
     const tooltip = JSON.stringify({ content: providerObj.caption })
-    let tokenIcon = `<i-image tooltip='${tooltip}' url="${providerObj.image}" width="24" height="24"
+    let imageUrl = providerObj.image;
+    if (imageUrl?.startsWith('ipfs://')) {
+      const ipfsGatewayUrl = getIPFSGatewayUrl();
+      imageUrl = imageUrl.replace('ipfs://', ipfsGatewayUrl);
+    }
+
+    let tokenIcon = `<i-image tooltip='${tooltip}' url="${imageUrl}" width="24" height="24"
       class="inline-block" fallbackUrl="${this.fallbackUrl}"></i-image>`;
     return `${tokenIcon}`;
   }
@@ -2340,19 +2312,6 @@ export default class ScomSwap extends Module implements PageBlock {
     await this.setDefaultChain();
   };
 
-  showViewOrderModal = () => {
-    this.modalViewOrder.visible = true;
-  }
-
-  closeViewOrderModal = () => {
-    this.modalViewOrder.visible = false;
-  }
-
-  onViewOrder = () => {
-    this.modalViewOrder.visible = false;
-    window.open('#/cross-chain-bridge-record');
-  }
-
   showModalFees = () => {
     const fees = this.getFeeDetails();
     this.feesInfo.clearInnerHTML();
@@ -2531,7 +2490,7 @@ export default class ScomSwap extends Module implements PageBlock {
               </i-hstack>
               <i-vstack id="srcChainBox" class="my-2 w-100">
                 <i-hstack verticalAlignment="center" horizontalAlignment="space-between">
-                  <i-label class="text--grey" caption="Selected Source Chain" />
+                  <i-label class="text--grey" caption="Selected Chain" />
                   <i-label id="srcChainLabel" caption="-" />
                 </i-hstack>
                 <i-panel id="srcChainList" class="icon-list" maxWidth="100%" />
@@ -2649,26 +2608,6 @@ export default class ScomSwap extends Module implements PageBlock {
               </i-hstack>
               <i-icon name="arrow-down" class="arrow-down" fill="#fff" width={28} height={28} />
             </i-panel>
-            <i-panel id="targetChainSecondPanel">
-              <i-hstack verticalAlignment='center' horizontalAlignment='start'>
-                <i-panel class="row-chain">
-                  <i-image id="targetChainVaultImage" width="30px" height="30px" url="#" />
-                  <i-label id="targetChainVaultLabel" class="token-name" caption="" />
-                  <i-icon name="minus" fill='#fff' width={28} height={10} />
-                </i-panel>
-                <i-panel class="row-chain">
-                  <i-image id="targetVaultTokenImage" width="30px" height="30px" url="#" />
-                  <i-label id="targetVaultTokenLabel" class="token-name" caption="" />
-                </i-panel>
-                <i-label id="targetVaultTokenValue" class="token-value" caption="-" />
-              </i-hstack>
-              <i-vstack class="text-right">
-                <i-label id="crossChainSoftCapLabel1" class="text--grey ml-auto"></i-label>
-                <i-label id="targetVaultAssetBalanceLabel1" class="text--grey ml-auto" caption="Vault Asset Balance: 0"></i-label>
-                <i-label id="targetVaultBondBalanceLabel1" class="text--grey ml-auto" caption="Vault Bond Balance: 0"></i-label>
-              </i-vstack>
-              <i-icon name="arrow-down" class="arrow-down" fill="#fff" width={28} height={28} />
-            </i-panel>
             <i-hstack class="mb-1" verticalAlignment='center' horizontalAlignment='start'>
               <i-panel id="targetChainFirstPanel" class="row-chain">
                 <i-image id="targetChainTokenImage" width="30px" height="30px" url="#" />
@@ -2681,11 +2620,6 @@ export default class ScomSwap extends Module implements PageBlock {
               </i-panel>
               <i-label id="toTokenValue" class="token-value text-primary bold" caption=" - "></i-label>
             </i-hstack>
-            <i-vstack id="crossChainVaultInfoVstack" class="text-right">
-              <i-label id="crossChainSoftCapLabel2" class="text--grey ml-auto"></i-label>
-              <i-label id="targetVaultAssetBalanceLabel2" class="text--grey ml-auto" caption="Vault Asset Balance: 0"></i-label>
-              <i-label id="targetVaultBondBalanceLabel2" class="text--grey ml-auto" caption="Vault Bond Balance: 0"></i-label>
-            </i-vstack>
             <i-panel class="mb-1">
               <i-label id="lbEstimate"></i-label>
             </i-panel>
@@ -2717,37 +2651,6 @@ export default class ScomSwap extends Module implements PageBlock {
                 />
               </i-panel>
             </i-hstack>
-          </i-modal>
-
-          <i-modal
-            id="modalViewOrder"
-            class="bg-modal custom-modal"
-            title="Cross Chain"
-            closeIcon={{ name: 'times' }}
-          >
-            <i-panel class="i-modal_content">
-              <i-panel class="mt-1">
-                <i-hstack verticalAlignment='center' horizontalAlignment='center' class="mb-1">
-                  <i-image width={50} height={50} url={Assets.fullPath('img/success-icon.svg')} />
-                </i-hstack>
-                <i-hstack verticalAlignment='center' class="flex-col">
-                  <i-label caption="The order was created successfully!" />
-                  <i-label caption="Do you want to view the record?" />
-                </i-hstack>
-                <i-hstack verticalAlignment='center' horizontalAlignment='center' class="mt-1">
-                  <i-button
-                    caption="Cancel"
-                    class="btn-os btn-cancel"
-                    onClick={() => this.closeViewOrderModal()}
-                  />
-                  <i-button
-                    caption="View Order"
-                    class="btn-os btn-submit"
-                    onClick={() => this.onViewOrder()}
-                  />
-                </i-hstack>
-              </i-panel>
-            </i-panel>
           </i-modal>
 
           <i-modal

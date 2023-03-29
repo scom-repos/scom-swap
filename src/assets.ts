@@ -10,7 +10,6 @@ function fullPath(path: string): string {
 const TokenFolderName: { [key: number]: string } = {
   1: "ethereum",
   25: "cronos",
-  42: "kovan",
   56: "bsc",
   97: "bsc-testnet",
   137: "polygon",

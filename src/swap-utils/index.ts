@@ -2165,19 +2165,6 @@ const setApprovalModalSpenderAddress = (market: string, contractAddress?: string
   approvalModel.spenderAddress = contractAddress || getRouterAddress(market);
 }
 
-interface NewOrderParams{
-  vaultAddress: string,
-  targetChainId: number,
-  tokenIn: ITokenObject,
-  tokenOut: ITokenObject,
-  amountIn: string,
-  minAmountOut: string,
-  sourceRouteInfo?: {
-    amountOut: string,
-    pairs: string[]
-  }
-}
-
 const registerPairsByAddress = async (market: string[], pairAddresses: string[]) => {
   let wallet: any = Wallet.getClientInstance();
   let registryAddress = getAddresses()["OSWAP_HybridRouterRegistry"]
@@ -2198,7 +2185,6 @@ export {
   setERC20AllowanceToZero,
   getApprovalModelAction,
   setApprovalModalSpenderAddress,
-  NewOrderParams,
   registerPairsByAddress,
 }
 

@@ -1,11 +1,10 @@
 import { ITokenObject } from "../../../global/index";
 import { Tokens_Avalanche, Tokens_BSC, Tokens_Cronos, Tokens_Ethereuem, Tokens_Fantom, Tokens_Polygon } from "./mainnet/index";
-import { Tokens_Amino, Tokens_AminoXTestnet, Tokens_BSC_Testnet, Tokens_Cronos_Testnet, Tokens_Fantom_Testnet, Tokens_Fuji, Tokens_Kovan, Tokens_Mumbai } from "./testnet/index";
+import { Tokens_Amino, Tokens_AminoXTestnet, Tokens_BSC_Testnet, Tokens_Cronos_Testnet, Tokens_Fantom_Testnet, Tokens_Fuji, Tokens_Mumbai } from "./testnet/index";
 
 const DefaultERC20Tokens: { [chainId: number]: ITokenObject[] } = {
   1: Tokens_Ethereuem,
   25: Tokens_Cronos,
-  42: Tokens_Kovan,
   56: Tokens_BSC,
   97: Tokens_BSC_Testnet,
   137: Tokens_Polygon,
@@ -22,7 +21,6 @@ const DefaultERC20Tokens: { [chainId: number]: ITokenObject[] } = {
 const ChainNativeTokenByChainId: { [chainId: number]: ITokenObject } = {
   1: { address: undefined, decimals: 18, symbol: "ETH", name: 'ETH', isNative: true },
   25: { address: undefined, decimals: 18, symbol: "CRO", name: 'CRO', isNative: true }, //cronos
-  42: { address: undefined, decimals: 18, symbol: "ETH", name: 'ETH', isNative: true }, // Kovan,
   56: { address: undefined, decimals: 18, symbol: "BNB", name: 'BNB', isNative: true }, // Binance Mainnet
   97: { address: undefined, decimals: 18, symbol: "BNB", name: 'BNB', isNative: true }, // Binance Test Chain
   137: { address: undefined, decimals: 18, symbol: "MATIC", name: 'MATIC', isNative: true }, //Polygon
@@ -108,7 +106,6 @@ const tokenPriceAMMReference: { [chainId: number]: {[token:string]:string}} = { 
 const TokenFolderName: { [key: number]: string } = {
   1: "ethereum",
   25: "cronos",
-  42: "kovan",
   56: "bsc",
   97: "bsc-testnet",
   137: "polygon",

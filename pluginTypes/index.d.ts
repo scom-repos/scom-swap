@@ -9998,42 +9998,6 @@ declare module "@scom/scom-swap/store/data/tokens/mainnet/index.ts" {
     export { Tokens_Fantom } from "@scom/scom-swap/store/data/tokens/mainnet/fantom.ts";
     export { Tokens_Cronos } from "@scom/scom-swap/store/data/tokens/mainnet/cronos.ts";
 }
-/// <amd-module name="@scom/scom-swap/store/data/tokens/testnet/kovan.ts" />
-declare module "@scom/scom-swap/store/data/tokens/testnet/kovan.ts" {
-    export const Tokens_Kovan: ({
-        name: string;
-        address: string;
-        symbol: string;
-        decimals: number;
-        isCommon: boolean;
-        isWETH: boolean;
-        isVaultToken?: undefined;
-    } | {
-        name: string;
-        address: string;
-        symbol: string;
-        decimals: number;
-        isCommon: boolean;
-        isWETH?: undefined;
-        isVaultToken?: undefined;
-    } | {
-        name: string;
-        address: string;
-        symbol: string;
-        decimals: number;
-        isCommon: boolean;
-        isVaultToken: boolean;
-        isWETH?: undefined;
-    } | {
-        name: string;
-        address: string;
-        symbol: string;
-        decimals: number;
-        isCommon?: undefined;
-        isWETH?: undefined;
-        isVaultToken?: undefined;
-    })[];
-}
 /// <amd-module name="@scom/scom-swap/store/data/tokens/testnet/bsc-testnet.ts" />
 declare module "@scom/scom-swap/store/data/tokens/testnet/bsc-testnet.ts" {
     export const Tokens_BSC_Testnet: ({
@@ -10183,7 +10147,6 @@ declare module "@scom/scom-swap/store/data/tokens/testnet/cronos-testnet.ts" {
 }
 /// <amd-module name="@scom/scom-swap/store/data/tokens/testnet/index.ts" />
 declare module "@scom/scom-swap/store/data/tokens/testnet/index.ts" {
-    export { Tokens_Kovan } from "@scom/scom-swap/store/data/tokens/testnet/kovan.ts";
     export { Tokens_BSC_Testnet } from "@scom/scom-swap/store/data/tokens/testnet/bsc-testnet.ts";
     export { Tokens_Fuji } from "@scom/scom-swap/store/data/tokens/testnet/fuji.ts";
     export { Tokens_Mumbai } from "@scom/scom-swap/store/data/tokens/testnet/mumbai.ts";
@@ -10229,94 +10192,10 @@ declare module "@scom/scom-swap/store/data/core/index.ts" {
         };
     };
 }
-/// <amd-module name="@scom/scom-swap/store/data/cross-chain/index.ts" />
-declare module "@scom/scom-swap/store/data/cross-chain/index.ts" {
-    const baseRoute = "https://route.openswap.xyz";
-    const crossChainNativeTokenList: {
-        [chainId: number]: {
-            address: string;
-            decimals: number;
-            symbol: string;
-            name: string;
-            isNative: boolean;
-            wethAddress: string;
-        };
-    };
-    enum VaultType {
-        Project = "Project",
-        Exchange = "Exchange"
-    }
-    interface BridgeVaultConstant {
-        tokenAddress: string;
-        vaultRegistryAddress: string;
-        vaultAddress: string;
-        vaultDecimals?: number;
-        softCap?: number;
-        fixedStakingApr?: string;
-    }
-    interface BridgeVaultGroup {
-        name: string;
-        vaultType: VaultType;
-        vaults: {
-            [key: string]: BridgeVaultConstant;
-        };
-        deprecated?: boolean;
-    }
-    const BridgeVaultGroupList: BridgeVaultGroup[];
-    const ChainTrollRegistryMap: {
-        [chainId: number]: {
-            registryAddress: string;
-            isMainChain: boolean;
-        };
-    };
-    const CrossChainAddressMap: {
-        [chainId: number]: {
-            wrapperAddress: string;
-        };
-    };
-    const MockOracleMap: {
-        [chainId: number]: {
-            [token: string]: string;
-        };
-    };
-    enum VaultOrderStatus {
-        pending = 0,
-        executed = 1,
-        requestCancel = 2,
-        approvedCancel = 3,
-        cancelled = 4,
-        expired = 5
-    }
-    enum TrollType {
-        NotSpecified = 0,
-        SuperTroll = 1,
-        GeneralTroll = 2
-    }
-    const TrollTypeStringEnumMap: {
-        [index: string]: TrollType;
-    };
-    enum TrollStatus {
-        Active = 0,
-        Inactive = 1
-    }
-    enum VaultActionType {
-        Stake = 0,
-        RequestUnstake = 1,
-        Unstake = 2
-    }
-    enum TrollManagementActionType {
-        StakeNFT = 0,
-        UnstakeNFT = 1,
-        StakeBond = 2,
-        UnstakeBond = 3
-    }
-    export { baseRoute, crossChainNativeTokenList, BridgeVaultGroupList, ChainTrollRegistryMap, CrossChainAddressMap, MockOracleMap, VaultOrderStatus, VaultType, TrollType, TrollTypeStringEnumMap, TrollStatus, VaultActionType, TrollManagementActionType, BridgeVaultConstant, };
-}
 /// <amd-module name="@scom/scom-swap/store/data/index.ts" />
 declare module "@scom/scom-swap/store/data/index.ts" {
     export { DefaultERC20Tokens, ChainNativeTokenByChainId, WETHByChainId, DefaultTokens, ToUSDPriceFeedAddressesMap, tokenPriceAMMReference, getTokenIconPath, getOpenSwapToken, } from "@scom/scom-swap/store/data/tokens/index.ts";
     export { CoreContractAddressesByChainId } from "@scom/scom-swap/store/data/core/index.ts";
-    export * from "@scom/scom-swap/store/data/cross-chain/index.ts";
 }
 /// <amd-module name="@scom/scom-swap/store/utils.ts" />
 declare module "@scom/scom-swap/store/utils.ts" {
@@ -10447,7 +10326,7 @@ declare module "@scom/scom-swap/store/index.ts" {
     import { WalletPlugin } from '@ijstech/eth-wallet';
     import { INetwork, ITokenObject } from "@scom/scom-swap/global/index.ts";
     import { TokenStore } from "@scom/scom-swap/store/tokens.ts";
-    export { DefaultERC20Tokens, ChainNativeTokenByChainId, WETHByChainId, DefaultTokens, ToUSDPriceFeedAddressesMap, tokenPriceAMMReference, getTokenIconPath, getOpenSwapToken, CoreContractAddressesByChainId, baseRoute, crossChainNativeTokenList, BridgeVaultGroupList, ChainTrollRegistryMap, CrossChainAddressMap, MockOracleMap, BridgeVaultConstant, } from "@scom/scom-swap/store/data/index.ts";
+    export { DefaultERC20Tokens, ChainNativeTokenByChainId, WETHByChainId, DefaultTokens, ToUSDPriceFeedAddressesMap, tokenPriceAMMReference, getTokenIconPath, getOpenSwapToken, CoreContractAddressesByChainId } from "@scom/scom-swap/store/data/index.ts";
     export { TokenStore, TokenBalancesType, DefaultTokensByChainType } from "@scom/scom-swap/store/tokens.ts";
     export let tokenStore: TokenStore;
     export const setTokenStore: () => void;
@@ -11009,14 +10888,8 @@ declare module "@scom/scom-swap/contracts/scom-commission-proxy-contract/index.t
 }
 /// <amd-module name="@scom/scom-swap/swap-utils/helper.ts" />
 declare module "@scom/scom-swap/swap-utils/helper.ts" {
-    import { BridgeVaultConstant } from "@scom/scom-swap/store/index.ts";
     import { Control } from "@ijstech/components";
     export function debounce(func: any, timeout: number, target: Control): (...args: any) => void;
-    export const bridgeVaultConstantMap: {
-        [assetSymbol: string]: {
-            [chainId: string]: BridgeVaultConstant;
-        };
-    };
 }
 /// <amd-module name="@scom/scom-swap/swap-utils/index.ts" />
 declare module "@scom/scom-swap/swap-utils/index.ts" {
@@ -11055,20 +10928,8 @@ declare module "@scom/scom-swap/swap-utils/index.ts" {
     const setERC20AllowanceToZero: (token: ITokenObject, spenderAddress: string) => Promise<import("@ijstech/eth-contract").TransactionReceipt>;
     const getApprovalModelAction: (options: IERC20ApprovalEventOptions) => Promise<import("@scom/scom-swap/global/index.ts").IERC20ApprovalAction>;
     const setApprovalModalSpenderAddress: (market: string, contractAddress?: string) => void;
-    interface NewOrderParams {
-        vaultAddress: string;
-        targetChainId: number;
-        tokenIn: ITokenObject;
-        tokenOut: ITokenObject;
-        amountIn: string;
-        minAmountOut: string;
-        sourceRouteInfo?: {
-            amountOut: string;
-            pairs: string[];
-        };
-    }
     const registerPairsByAddress: (market: string[], pairAddresses: string[]) => Promise<import("@ijstech/eth-contract").TransactionReceipt>;
-    export { getExtendedRouteObjData, getTradeFeeMap, getAllRoutesData, SwapData, executeSwap, getChainNativeToken, getRouterAddress, setERC20AllowanceToZero, getApprovalModelAction, setApprovalModalSpenderAddress, NewOrderParams, registerPairsByAddress, };
+    export { getExtendedRouteObjData, getTradeFeeMap, getAllRoutesData, SwapData, executeSwap, getChainNativeToken, getRouterAddress, setERC20AllowanceToZero, getApprovalModelAction, setApprovalModalSpenderAddress, registerPairsByAddress, };
     export * from "@scom/scom-swap/swap-utils/helper.ts";
 }
 /// <amd-module name="@scom/scom-swap/price-info/priceInfo.css.ts" />
@@ -11492,7 +11353,6 @@ declare module "@scom/scom-swap/scconfig.json.ts" {
             "@ijstech/eth-contract": string;
             "@scom/oswap-openswap-contract": string;
             "@scom/oswap-chainlink-contract": string;
-            "@scom/oswap-cross-chain-bridge-contract": string;
             "@scom/oswap-oracle-adaptor-contract": string;
             "@scom/scom-commission-proxy-contract": string;
         };
@@ -11506,8 +11366,8 @@ declare module "@scom/scom-swap/scconfig.json.ts" {
             explorerTxUrl: string;
             explorerAddressUrl: string;
             isDisabled?: undefined;
-            isTestnet?: undefined;
             isMainChain?: undefined;
+            isTestnet?: undefined;
         } | {
             name: string;
             chainId: number;
@@ -11517,19 +11377,8 @@ declare module "@scom/scom-swap/scconfig.json.ts" {
             explorerName?: undefined;
             explorerTxUrl?: undefined;
             explorerAddressUrl?: undefined;
+            isMainChain?: undefined;
             isTestnet?: undefined;
-            isMainChain?: undefined;
-        } | {
-            name: string;
-            chainId: number;
-            img: string;
-            rpc: string;
-            explorerName: string;
-            explorerTxUrl: string;
-            explorerAddressUrl: string;
-            isTestnet: boolean;
-            isDisabled: boolean;
-            isMainChain?: undefined;
         } | {
             name: string;
             chainId: number;
@@ -11550,8 +11399,8 @@ declare module "@scom/scom-swap/scconfig.json.ts" {
             explorerAddressUrl: string;
             rpc?: undefined;
             isDisabled?: undefined;
-            isTestnet?: undefined;
             isMainChain?: undefined;
+            isTestnet?: undefined;
         } | {
             name: string;
             chainId: number;
@@ -11573,6 +11422,17 @@ declare module "@scom/scom-swap/scconfig.json.ts" {
             explorerName?: undefined;
             explorerTxUrl?: undefined;
             explorerAddressUrl?: undefined;
+            isMainChain?: undefined;
+        } | {
+            name: string;
+            chainId: number;
+            img: string;
+            rpc: string;
+            explorerName: string;
+            explorerTxUrl: string;
+            explorerAddressUrl: string;
+            isDisabled: boolean;
+            isTestnet: boolean;
             isMainChain?: undefined;
         } | {
             name: string;
@@ -11601,6 +11461,7 @@ declare module "@scom/scom-swap/scconfig.json.ts" {
             "97": string;
             "43113": string;
         };
+        ipfsGatewayUrl: string;
         embedderCommissionFee: string;
     };
     export default _default_56;
@@ -11692,15 +11553,9 @@ declare module "@scom/scom-swap" {
         private registerPanel;
         private registerBtn;
         private registerPairsParams;
-        private crossChainApprovalStatus;
         private toggleReverseImage;
         private oldSupportedChainList;
         private supportedChainList;
-        private targetChainTokenBalances;
-        private targetChainTokenMap;
-        private minSwapHintLabel;
-        private srcChainBox;
-        private desChainBox;
         private srcChainLabel;
         private srcChainList;
         private desChainLabel;
@@ -11710,31 +11565,8 @@ declare module "@scom/scom-swap" {
         private targetChainId;
         private srcChainFirstPanel;
         private targetChainFirstPanel;
-        private srcChainTokenImage;
-        private srcChainTokenLabel;
-        private targetChainTokenImage;
-        private targetChainTokenLabel;
         private srcChainSecondPanel;
-        private srcChainVaultImage;
-        private srcChainVaultLabel;
-        private srcVaultTokenImage;
-        private srcVaultTokenLabel;
-        private srcVaultTokenValue;
-        private targetChainSecondPanel;
-        private targetChainVaultImage;
-        private targetChainVaultLabel;
-        private targetVaultTokenImage;
-        private targetVaultTokenLabel;
-        private targetVaultTokenValue;
-        private targetVaultAssetBalanceLabel1;
-        private targetVaultBondBalanceLabel1;
-        private crossChainSoftCapLabel1;
-        private targetVaultAssetBalanceLabel2;
-        private targetVaultBondBalanceLabel2;
-        private crossChainSoftCapLabel2;
         private swapModalConfirmBtn;
-        private crossChainVaultInfoVstack;
-        private modalViewOrder;
         private modalFees;
         private feesInfo;
         private lbReminderRejected;
@@ -12002,9 +11834,6 @@ declare module "@scom/scom-swap" {
         initChainIcon: (network: INetwork) => void;
         updateSrcChainIconList: () => void;
         onRenderChainList: () => Promise<void>;
-        showViewOrderModal: () => void;
-        closeViewOrderModal: () => void;
-        onViewOrder: () => void;
         showModalFees: () => void;
         closeModalFees: () => void;
         onRegister: () => void;

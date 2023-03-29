@@ -10,5 +10,3 @@ export {
 } from './tokens/index';
 
 export { CoreContractAddressesByChainId } from './core/index';
-
-export * from './cross-chain/index';

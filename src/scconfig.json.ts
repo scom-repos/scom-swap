@@ -45,7 +45,6 @@ export default {
     "@ijstech/eth-contract": "*",
     "@scom/oswap-openswap-contract": "*",
     "@scom/oswap-chainlink-contract": "*",
-    "@scom/oswap-cross-chain-bridge-contract": "*",
     "@scom/oswap-oracle-adaptor-contract": "*",
     "@scom/scom-commission-proxy-contract": "*"
   },
@@ -64,17 +63,6 @@ export default {
       "name": "Cronos Mainnet",
       "chainId": 25,
       "img": "img/network/cronosMainnet.svg",
-      "isDisabled": true
-    },
-    {
-      "name": "Kovan Test Network",
-      "chainId": 42,
-      "img": "img/network/ethereumNetwork.svg",
-      "rpc": `https://kovan.infura.io/v3/${InfuraId}`,
-      "explorerName": "Etherscan",
-      "explorerTxUrl": "https://kovan.etherscan.io/tx/",
-      "explorerAddressUrl": "https://kovan.etherscan.io/address/",
-      "isTestnet": true,
       "isDisabled": true
     },
     {
@@ -184,5 +172,6 @@ export default {
     "97": "0x9602cB9A782babc72b1b6C96E050273F631a6870",
     "43113": "0x7f1EAB0db83c02263539E3bFf99b638E61916B96"
   },
+  "ipfsGatewayUrl": "https://ipfs.scom.dev/ipfs/",
   "embedderCommissionFee": "0.01"
 }
