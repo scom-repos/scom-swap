@@ -11450,6 +11450,7 @@ declare module "@scom/scom-swap/scconfig.json.ts" {
 /// <amd-module name="@scom/scom-swap" />
 declare module "@scom/scom-swap" {
     import { Module, Panel, Image, Container, Control, ControlElement, IDataSchema } from '@ijstech/components';
+    import { BigNumber } from '@ijstech/eth-wallet';
     import "@scom/scom-swap/index.css.ts";
     import { ITokenObject, ApprovalStatus, INetwork, PageBlock, IProvider, ISwapConfigUI, IProviderUI, Category, ICommissionInfo } from "@scom/scom-swap/global/index.ts";
     import { PriceInfo } from "@scom/scom-swap/price-info/index.tsx";
@@ -11690,6 +11691,7 @@ declare module "@scom/scom-swap" {
         get isApproveButtonShown(): boolean;
         get isPriceImpactTooHigh(): boolean;
         get isInsufficientBalance(): boolean;
+        get maxSold(): BigNumber;
         get isSwapping(): boolean;
         get approveButtonStatus(): any;
         get isApprovingRouter(): boolean;

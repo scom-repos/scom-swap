@@ -19163,7 +19163,7 @@ define("@scom/scom-swap/swap-utils/index.ts", ["require", "exports", "@ijstech/e
         const _commissions = (commissions || []).filter(v => v.chainId == index_17.getChainId()).map(v => {
             return {
                 to: v.walletAddress,
-                amount: _amountInMax.times(v.share)
+                amount: _amountInMax.times(v.share).dp(0)
             };
         });
         const commissionsAmount = _commissions.length ? _commissions.map(v => v.amount).reduce((a, b) => a.plus(b)).dp(0) : new eth_wallet_7.BigNumber(0);
@@ -22765,11 +22765,19 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
             return ((_a = this.record) === null || _a === void 0 ? void 0 : _a.priceImpact) > 15 && !index_29.isExpertMode() && warningMessageText === priceImpactTooHighMsg;
         }
         get isInsufficientBalance() {
-            var _a;
-            if (!this.fromToken && !this.record)
+            if (!this.fromToken || !this.record)
                 return false;
             const balance = this.getBalance(this.fromToken);
-            return ((_a = this.record) === null || _a === void 0 ? void 0 : _a.fromAmount) && this.record.fromAmount.gt(balance);
+            return this.maxSold.gt(balance);
+        }
+        get maxSold() {
+            if (!this.fromToken || !this.record)
+                return new eth_wallet_12.BigNumber(0);
+            const commissionAmount = index_30.getCommissionAmount(this.commissions, new eth_wallet_12.BigNumber(this.record.fromAmount));
+            const amountWithCommission = this.record.fromAmount.plus(commissionAmount);
+            if (!this.isFrom)
+                return new eth_wallet_12.BigNumber(amountWithCommission);
+            return new eth_wallet_12.BigNumber(this.getMinReceivedMaxSold() || amountWithCommission);
         }
         get isSwapping() {
             var _a;
@@ -23627,9 +23635,8 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
             if (this.record.key === 'Oracle' && (this.record.fromAmount.isZero() || this.record.toAmount.isZero())) {
                 return 'Circuit breaker triggered';
             }
-            const commissionAmount = index_30.getCommissionAmount(this.commissions, this.record.fromAmount);
-            let balance = this.getBalance(this.fromToken);
-            if (this.record.fromAmount.plus(commissionAmount).gt(balance)) {
+            const balance = this.getBalance(this.fromToken);
+            if (this.maxSold.gt(balance)) {
                 return `Insufficient ${(_c = this.fromToken) === null || _c === void 0 ? void 0 : _c.symbol} balance`;
             }
             if (this.record.priceImpact > 15 && !index_29.isExpertMode()) {

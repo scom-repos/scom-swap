@@ -772,9 +772,16 @@ export default class ScomSwap extends Module implements PageBlock {
     return this.record?.priceImpact > 15 && !isExpertMode() && warningMessageText === priceImpactTooHighMsg
   }
   get isInsufficientBalance(): boolean {
-    if (!this.fromToken && !this.record) return false;
+    if (!this.fromToken || !this.record) return false;
     const balance = this.getBalance(this.fromToken);
-    return this.record?.fromAmount && this.record.fromAmount.gt(balance)
+    return this.maxSold.gt(balance);
+  }
+  get maxSold() {
+    if (!this.fromToken || !this.record) return new BigNumber(0)
+    const commissionAmount = getCommissionAmount(this.commissions, new BigNumber(this.record.fromAmount));
+    const amountWithCommission = this.record.fromAmount.plus(commissionAmount);
+    if (!this.isFrom) return new BigNumber(amountWithCommission);
+    return new BigNumber(this.getMinReceivedMaxSold() || amountWithCommission);
   }
   get isSwapping(): boolean {
     const key = this.record?.key;
@@ -1873,9 +1880,8 @@ export default class ScomSwap extends Module implements PageBlock {
     if (this.record.key === 'Oracle' && (this.record.fromAmount.isZero() || this.record.toAmount.isZero())) {
       return 'Circuit breaker triggered';
     }
-    const commissionAmount = getCommissionAmount(this.commissions, this.record.fromAmount);
-    let balance = this.getBalance(this.fromToken)
-    if (this.record.fromAmount.plus(commissionAmount).gt(balance)) {
+    const balance = this.getBalance(this.fromToken);
+    if (this.maxSold.gt(balance)) {
       return `Insufficient ${this.fromToken?.symbol} balance`;
     }
     if (this.record.priceImpact > 15 && !isExpertMode()) {
