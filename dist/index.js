@@ -27896,7 +27896,7 @@ define("@scom/scom-swap/swap-utils/index.ts", ["require", "exports", "@ijstech/e
         const _commissions = (commissions || []).filter(v => v.chainId == index_26.getChainId()).map(v => {
             return {
                 to: v.walletAddress,
-                amount: amount.times(v.share)
+                amount: amount.times(v.share).dp(0)
             };
         });
         const commissionsAmount = _commissions.length ? _commissions.map(v => v.amount).reduce((a, b) => a.plus(b)).dp(0) : new eth_wallet_8.BigNumber(0);

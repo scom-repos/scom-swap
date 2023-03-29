@@ -1596,7 +1596,7 @@ const AmmTradeExactIn = async function (wallet: any, market: string, routeTokens
   const _commissions = (commissions || []).filter(v => v.chainId == getChainId()).map(v => {
     return {
       to: v.walletAddress,
-      amount: amount.times(v.share)
+      amount: amount.times(v.share).dp(0)
     }
   });
   const commissionsAmount = _commissions.length ? _commissions.map(v => v.amount).reduce((a, b) => a.plus(b)).dp(0) : new BigNumber(0);
