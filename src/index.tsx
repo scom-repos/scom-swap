@@ -2006,6 +2006,10 @@ export default class ScomSwap extends Module implements PageBlock {
     this.fromInputValue = inputVal;
     const input = this.payCol.children[0] as Input;
     input.value = limitDecimals(this.fromInputValue.toFixed(), this.fromToken?.decimals || 18);
+    if (this.receiveContainer && this.receiveContainer.childNodes[1]) {
+      this.receiveContainer.childNodes[1].appendChild(this.routingContainer);
+      this.redirectToken();
+    }
     await this.handleAddRoute();
   }
   isMaxDisabled = (): boolean => {

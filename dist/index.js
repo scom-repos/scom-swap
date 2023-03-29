@@ -22044,6 +22044,10 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                 this.fromInputValue = inputVal;
                 const input = this.payCol.children[0];
                 input.value = index_31.limitDecimals(this.fromInputValue.toFixed(), ((_d = this.fromToken) === null || _d === void 0 ? void 0 : _d.decimals) || 18);
+                if (this.receiveContainer && this.receiveContainer.childNodes[1]) {
+                    this.receiveContainer.childNodes[1].appendChild(this.routingContainer);
+                    this.redirectToken();
+                }
                 await this.handleAddRoute();
             };
             this.isMaxDisabled = () => {
