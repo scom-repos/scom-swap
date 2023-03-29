@@ -211,7 +211,6 @@ export const addUserTokens = (token: ITokenObject) => {
 interface NetworkConditions {
   isDisabled?: boolean,
   isTestnet?: boolean,
-  isCrossChainSupported?: boolean,
   isMainChain?: boolean
 }
 
@@ -432,7 +431,7 @@ export const getWalletOptions = (): { [key in WalletPlugin]?: any } => {
 
 export const getBridgeVaultVersion = (chainId: number): string => {
   let network = getNetworkInfo(chainId);
-  const isTestnet = !network.isDisabled && network.isCrossChainSupported && network.isTestnet;
+  const isTestnet = !network.isDisabled && network.isTestnet;
   // Testnet
   if (isTestnet) return '0.1.9';
   // Mainnet

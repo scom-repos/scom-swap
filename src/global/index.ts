@@ -5,7 +5,6 @@ export interface INetwork {
   rpc?: string;
   isDisabled?: boolean;
   isMainChain?: boolean;
-  isCrossChainSupported?: boolean;
   explorerName?: string;
   explorerTxUrl?: string;
   explorerAddressUrl?: string;

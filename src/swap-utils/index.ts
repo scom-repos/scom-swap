@@ -15,12 +15,6 @@ import {
 } from "../global/index";
 
 import {
-  GetAvailableRouteOptionsParams,
-  getAvailableRouteOptions as getAvailableRouteOptionsForCrossChain,
-  createBridgeVaultOrder as createBridgeVaultOrderForCrossChain
-} from "../crosschain-utils/index"
-
-import {
   CoreContractAddressesByChainId,
   ChainNativeTokenByChainId,
   WETHByChainId,
@@ -310,7 +304,6 @@ async function getTradeFeeMap() {
 }
 
 async function getBestAmountInRouteFromAPI(wallet: any, tokenIn: ITokenObject, tokenOut: ITokenObject, amountOut: string, chainId?: number) {
-  let isCrossChain = !!chainId ? 1 : 0;
   chainId = getChainId();
   let Address = getAddresses();
   let wrappedTokenAddress = Address['WETH9'];
@@ -322,8 +315,7 @@ async function getBestAmountInRouteFromAPI(wallet: any, tokenIn: ITokenObject, t
     tokenIn: tokenIn.address ? tokenIn.address : wrappedTokenAddress,
     tokenOut: tokenOut.address ? tokenOut.address : wrappedTokenAddress,
     amountOut: new BigNumber(amountOut).shiftedBy(tokenOut.decimals).toFixed(),
-    ignoreHybrid: Address['OSWAP_HybridRouterRegistry'] ? 0 : 1,
-    isCrossChain
+    ignoreHybrid: Address['OSWAP_HybridRouterRegistry'] ? 0 : 1
   })
   if (!routeObjArr) return [];
   let providerConfigByDexId: any = {};
@@ -375,7 +367,6 @@ async function getBestAmountInRouteFromAPI(wallet: any, tokenIn: ITokenObject, t
 }
 
 async function getBestAmountOutRouteFromAPI(wallet: any, tokenIn: ITokenObject, tokenOut: ITokenObject, amountIn: string, chainId?: number) {
-  let isCrossChain = !!chainId ? 1 : 0;
   chainId = getChainId();
   let Address = getAddresses();
   let wrappedTokenAddress = Address['WETH9'];
@@ -387,8 +378,7 @@ async function getBestAmountOutRouteFromAPI(wallet: any, tokenIn: ITokenObject, 
     tokenIn: tokenIn.address ? tokenIn.address : wrappedTokenAddress,
     tokenOut: tokenOut.address ? tokenOut.address : wrappedTokenAddress,
     amountIn: new BigNumber(amountIn).shiftedBy(tokenIn.decimals).toFixed(),
-    ignoreHybrid: Address['OSWAP_HybridRouterRegistry'] ? 0 : 1,
-    isCrossChain
+    ignoreHybrid: Address['OSWAP_HybridRouterRegistry'] ? 0 : 1
   })
   if (!routeObjArr) return [];
   let providerConfigByDexId: any = {};
@@ -2175,13 +2165,6 @@ const setApprovalModalSpenderAddress = (market: string, contractAddress?: string
   approvalModel.spenderAddress = contractAddress || getRouterAddress(market);
 }
 
-// CrossChain
-
-const getAvailableRouteOptions = async (params: GetAvailableRouteOptionsParams) => {
-  let slippageTolerance = getSlippageTolerance()
-  return await getAvailableRouteOptionsForCrossChain(params, getTradeFeeMap, getExtendedRouteObjData, slippageTolerance)
-}
-
 interface NewOrderParams{
   vaultAddress: string,
   targetChainId: number,
@@ -2194,19 +2177,6 @@ interface NewOrderParams{
     pairs: string[]
   }
 }
-
-const createBridgeVaultOrder: (newOrderParams: NewOrderParams) => Promise<{
-  receipt: TransactionReceipt | null;
-  error: Record<string, string> | null;
-}> = async (newOrderParams: NewOrderParams) => 
-  createBridgeVaultOrderForCrossChain({
-    ...newOrderParams,
-    transactionSetting: {
-      transactionDeadlineInMinutes: getTransactionDeadline(),
-      slippageTolerance: getSlippageTolerance()
-    }
-  });
-
 
 const registerPairsByAddress = async (market: string[], pairAddresses: string[]) => {
   let wallet: any = Wallet.getClientInstance();
@@ -2229,8 +2199,6 @@ export {
   getApprovalModelAction,
   setApprovalModalSpenderAddress,
   NewOrderParams,
-  createBridgeVaultOrder,
-  getAvailableRouteOptions,
   registerPairsByAddress,
 }
 

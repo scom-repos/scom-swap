@@ -3,7 +3,6 @@ import { BigNumber } from '@ijstech/eth-wallet';
 import { Category, IContractInfo, IProvider, ISwapConfig, ITokenObject } from '../global/index';
 import { comboboxStyle, configStyle, pointerStyle, tokenSelectionStyle, uploadStyle } from './swap-config.css';
 import { TokenSelection } from '../token-selection';
-import { getTargetChainTokenInfoObj } from '../crosschain-utils';
 import { getNetworkInfo, isWalletConnected } from '../store/index';
 
 interface IContractInfoUI {
@@ -258,13 +257,6 @@ export class SwapConfig extends Module {
     if (this.isFixedPair) comboBoxChain.enabled = false;
     fromTokenSelection.enabled = false;
     toTokenSelection.enabled = false;
-    if (fromTokenSelection.targetChainId != chainId) {
-      fromTokenSelection.targetChainId = chainId;
-      toTokenSelection.targetChainId = chainId;
-      const tokenBalanceObj = await getTargetChainTokenInfoObj(chainId);
-      this.chainTokenBalances[chainId] = isWalletConnected() ? tokenBalanceObj.balances : [];
-      this.chainTokenMaps[chainId] = tokenBalanceObj.tokenMap ?? {};
-    }
     fromTokenSelection.tokenDataListProp = this.getChainTokenDataList(chainId);
     toTokenSelection.tokenDataListProp = this.getChainTokenDataList(chainId);
     fromTokenSelection.enabled = true;

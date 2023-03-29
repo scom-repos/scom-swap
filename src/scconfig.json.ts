@@ -31,9 +31,6 @@ export default {
     "@pageblock-swap/queue-utils": {
       "path": "queue-utils"
     },
-    "@pageblock-swap/crosschain-utils": {
-      "path": "crosschain-utils"
-    },
     "@pageblock-swap/price-info": {
       "path": "price-info"
     },
@@ -74,7 +71,6 @@ export default {
       "chainId": 42,
       "img": "img/network/ethereumNetwork.svg",
       "rpc": `https://kovan.infura.io/v3/${InfuraId}`,
-      "isCrossChainSupported": true,
       "explorerName": "Etherscan",
       "explorerTxUrl": "https://kovan.etherscan.io/tx/",
       "explorerAddressUrl": "https://kovan.etherscan.io/address/",
@@ -87,7 +83,6 @@ export default {
       "img": "img/network/bscMainnet.svg",
       "rpc": "https://bsc-dataseed.binance.org/",
       "isMainChain": true,
-      "isCrossChainSupported": true,
       "explorerName": "BSCScan",
       "explorerTxUrl": "https://bscscan.com/tx/",
       "explorerAddressUrl": "https://bscscan.com/address/"
@@ -115,7 +110,6 @@ export default {
       "img": "img/network/bscMainnet.svg",
       "rpc": "https://rpc.ankr.com/bsc_testnet_chapel",
       "isMainChain": true,
-      "isCrossChainSupported": true,
       "explorerName": "BSCScan",
       "explorerTxUrl": "https://testnet.bscscan.com/tx/",
       "explorerAddressUrl": "https://testnet.bscscan.com/address/",
@@ -150,7 +144,6 @@ export default {
       "chainId": 43113,
       "img": "img/network/avax.svg",
       "rpc": "https://api.avax-test.network/ext/bc/C/rpc",
-      "isCrossChainSupported": true,
       "explorerName": "SnowTrace",
       "explorerTxUrl": "https://testnet.snowtrace.io/tx/",
       "explorerAddressUrl": "https://testnet.snowtrace.io/address/",
@@ -161,7 +154,6 @@ export default {
       "chainId": 43114,
       "img": "img/network/avax.svg",
       "rpc": "https://api.avax.network/ext/bc/C/rpc",
-      "isCrossChainSupported": true,
       "explorerName": "SnowTrace",
       "explorerTxUrl": "https://snowtrace.io/tx/",
       "explorerAddressUrl": "https://snowtrace.io/address/"

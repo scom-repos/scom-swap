@@ -37,12 +37,8 @@ import {
   executeSwap,
   getApprovalModelAction,
   setApprovalModalSpenderAddress,
-  createBridgeVaultOrder,
-  getAvailableRouteOptions,
   registerPairsByAddress,
   debounce,
-  getOraclePriceMap,
-  bridgeVaultConstantMap,
   getCommissionAmount,
   getCurrentCommissions
 } from './swap-utils/index'
@@ -66,13 +62,6 @@ import {
   Category,
   ICommissionInfo
 } from './global/index';
-
-import {
-  getTargetChainTokenInfoObj,
-  ICrossChainRouteResult,
-  getBridgeVault,
-  getBondsInBridgeVault,
-} from './crosschain-utils/index';
 
 import { PriceInfo } from './price-info/index';
 import { TokenSelection } from './token-selection/index';
@@ -817,7 +806,6 @@ export default class ScomSwap extends Module implements PageBlock {
     return warningMessageText === '' && this.approveButtonStatus !== ApprovalStatus.NONE
   }
   get isPriceImpactTooHigh(): boolean {
-    if (this.isCrossChain) return false;
     const warningMessageText = this.getWarningMessageText();
     return this.record?.priceImpact > 15 && !isExpertMode() && warningMessageText === priceImpactTooHighMsg
   }
@@ -853,7 +841,7 @@ export default class ScomSwap extends Module implements PageBlock {
     return false;
   }
   get targetTokenMap() {
-    return this.isCrossChain ? this.targetChainTokenMap : tokenStore.tokenMap;
+    return tokenStore.tokenMap;
   };
 
   private initWalletData = async () => {
@@ -891,25 +879,19 @@ export default class ScomSwap extends Module implements PageBlock {
     this.toTokenSymbol = urlParams.get('toToken') || '';
     const targetId = urlParams.get('toChainId');
     this.targetChainId = targetId ? new BigNumber(targetId).toNumber() : undefined;
-    if (!this.isCrossChain) {
-      this.chainId = getChainId();
-      const fromAmount = urlParams.get("fromAmount") ? (urlParams.get("fromAmount") || "") : this.targetChainId && this.chainId !== this.targetChainId ? "1" : "";
-      const toAmount = urlParams.get('toAmount') || '';
-      this.fromInputValue = new BigNumber(fromAmount).abs();
-      this.toInputValue = new BigNumber(toAmount).abs();
-    }
+    this.chainId = getChainId();
+    const fromAmount = urlParams.get("fromAmount") ? (urlParams.get("fromAmount") || "") : this.targetChainId && this.chainId !== this.targetChainId ? "1" : "";
+    const toAmount = urlParams.get('toAmount') || '';
+    this.fromInputValue = new BigNumber(fromAmount).abs();
+    this.toInputValue = new BigNumber(toAmount).abs();
   }
 
   private redirectToken = () => {
     let queryRouter: any = {
       chainId: this.chainId,
-      toChainId: this.desChain?.chainId || this.targetChainId,
       fromToken: this.fromToken?.symbol || this.fromTokenSymbol,
       toToken: this.toToken?.symbol || this.toTokenSymbol,
     };
-    if (this.isCrossChain) {
-      this.isFrom = false;
-    }
     if (this.isFrom) {
       queryRouter = {
         ...queryRouter,
@@ -924,13 +906,6 @@ export default class ScomSwap extends Module implements PageBlock {
     this.fromTokenSymbol = queryRouter.fromToken;
     this.toTokenSymbol = queryRouter.toToken;
     this.targetChainId = queryRouter.toChainId;
-    if (!this.isCrossChainEnabled) {
-      delete queryRouter['toChainId'];
-    }
-    // if (!window.location.hash.includes('#/swap')) return;
-    // const queryString = new URLSearchParams(queryRouter).toString();
-    // const newURL = window.location.protocol + "//" + window.location.host + '/' + location.hash.split("?")[0] + '?' + queryString;
-    // window.history.pushState({ path: newURL }, '', newURL);
   };
 
   private fixedNumber = (value: BigNumber | string | number) => {
@@ -1022,24 +997,11 @@ export default class ScomSwap extends Module implements PageBlock {
     await this.updateBalance();
     await this.onRenderChainList();
     const input = this.receiveCol.children[0] as Input;
-    if (this.isCrossChain) {
-      this.initRoutes();
-      this.toInputValue = new BigNumber(0);
-      if (input) {
-        input.value = '-';
-        input.readOnly = true;
-      }
-      this.toggleReverseImage.classList.add('cursor-default');
-      if (this.isEstimated('from')) {
-        this.onUpdateEstimatedPosition(false, true);
-      }
-    } else {
-      if (input) {
-        input.readOnly = false;
-      }
-      if (!this.isFixedPair) {
-        this.toggleReverseImage.classList.remove('cursor-default');
-      }
+    if (input) {
+      input.readOnly = false;
+    }
+    if (!this.isFixedPair) {
+      this.toggleReverseImage.classList.remove('cursor-default');
     }
     if (this.fromInputValue.isGreaterThanOrEqualTo(0)) {
       this.onUpdateEstimatedPosition(false, true);
@@ -1057,48 +1019,9 @@ export default class ScomSwap extends Module implements PageBlock {
     if (!this.isFixedPair) {
       this.setDefaultToken();
     }
-    // TODO Only allow Oswap to be selected in Mainnet Oswap2Oswap Pilot launch, BSC <-> AVAX, should be changed when any2any is ready
-    if (!this.isFixedPair && (this.chainId === 56 && this.desChain?.chainId === 43114 || this.chainId === 43114 && this.desChain?.chainId === 56)) {
-      // Use hardcode map for Oswap2Oswap pilot launch
-      const fromOswapTokenObj = getOpenSwapToken(this.chainId)!;
-      this.firstTokenSelection.tokenDataListProp = [{
-        ...fromOswapTokenObj,
-        status: false,
-        balance: fromOswapTokenObj.address ? this.allTokenBalancesMap[fromOswapTokenObj.address.toLowerCase()] ?? 0 : 0,
-      }];
-      this.onUpdateToken(fromOswapTokenObj, true);
-      this.firstTokenSelection.token = fromOswapTokenObj;
-      this.fromToken = fromOswapTokenObj;
-      // Update from Token description
-      const fromBalance = this.getBalance(this.fromToken);
-      this.payBalance.caption = `Balance: ${formatNumber(fromBalance, 4)} ${this.fromToken.symbol}`;
 
-      // Update Mainnet ToTokenSelection
-      await this.updateTargetChainBalances();
-      const toOswapTokenObj = getOpenSwapToken(this.desChain.chainId)!;
-      if (this.targetChainTokenBalances) {
-        this.secondTokenSelection.tokenDataListProp = [{
-          ...toOswapTokenObj,
-          status: false,
-          balance: this.targetChainTokenBalances[toOswapTokenObj.address!.toLowerCase()] ?? this.targetChainTokenBalances[toOswapTokenObj.symbol] ?? 0,
-        }];
-      } else {
-        this.secondTokenSelection.tokenDataListProp = [{
-          ...toOswapTokenObj,
-          status: null,
-        }];
-      }
-      this.onUpdateToken(toOswapTokenObj, false);
-      this.secondTokenSelection.token = toOswapTokenObj;
-      this.toToken = toOswapTokenObj;
-      // Update to token description
-      const toBalance = this.targetChainTokenBalances[toOswapTokenObj.address!.toLowerCase()] ?? 0;
-      this.receiveBalance.caption = `Balance: ${formatNumber(toBalance, 4)} ${this.toToken.symbol}`;
-    } else {
-      // Reset firstTokenSelection tokenDataListProp to empty array to allow bypass in TokenSelection get tokenDataList, and get show all token selection
-      this.firstTokenSelection.tokenDataListProp = [];
-      this.setTargetTokenList();
-    }
+    this.firstTokenSelection.tokenDataListProp = [];
+    this.setTargetTokenList();
 
     //if (connected) {
     this.actionSetting?.classList.remove("hidden");
@@ -1143,21 +1066,13 @@ export default class ScomSwap extends Module implements PageBlock {
       onToBePaid: async (token: ITokenObject) => {
       },
       onApproving: async (token: ITokenObject, receipt?: string, data?: any) => {
-        if (this.isCrossChain) {
-          this.crossChainApprovalStatus = ApprovalStatus.APPROVING;
-        } else {
-          this.setMapStatus('approve', data.key, ApprovalStatus.APPROVING);
-        }
+        this.setMapStatus('approve', data.key, ApprovalStatus.APPROVING);
         this.showResultMessage(this.openswapResult, 'success', receipt);
-        if ((this.isApprovingRouter || this.isCrossChain) && !this.swapBtn.rightIcon.visible)
+        if (this.isApprovingRouter && !this.swapBtn.rightIcon.visible)
           this.swapBtn.rightIcon.visible = true;
       },
       onApproved: async (token: ITokenObject, data?: any) => {
-        if (this.isCrossChain) {
-          this.crossChainApprovalStatus = ApprovalStatus.NONE;
-        } else {
-          this.setMapStatus('approve', data.key, ApprovalStatus.NONE);
-        }
+        this.setMapStatus('approve', data.key, ApprovalStatus.NONE);
         if (this.swapBtn.rightIcon.visible)
           this.swapBtn.rightIcon.visible = false;
         await this.handleAddRoute();
@@ -1174,7 +1089,7 @@ export default class ScomSwap extends Module implements PageBlock {
       },
       onPaid: async (data?: any) => {
         application.EventBus.dispatch(EventId.Paid);
-        this.onSwapConfirmed({ key: data.key, isCrossChain: this.isCrossChain });
+        this.onSwapConfirmed({ key: data.key });
         await this.updateBalance();
       },
       onPayingError: async (err: Error) => {
@@ -1192,7 +1107,7 @@ export default class ScomSwap extends Module implements PageBlock {
       [lstTargetTokenMap[0], lstTargetTokenMap[oswapIndex]] = [lstTargetTokenMap[oswapIndex], lstTargetTokenMap[0]];
     }
     if (this.fromTokenSymbol && this.toTokenSymbol) {
-      if (!this.isCrossChain && this.fromTokenSymbol === this.toTokenSymbol) {
+      if (this.fromTokenSymbol === this.toTokenSymbol) {
         this.toToken = undefined;
         this.toTokenSymbol = '';
       }
@@ -1200,17 +1115,15 @@ export default class ScomSwap extends Module implements PageBlock {
       const secondObj: any = lstTargetTokenMap.find((item: any) => this.toTokenSymbol === item.symbol || this.toTokenSymbol === item.address);
       if (firstObj) {
         this.fromToken = firstObj || ChainNativeTokenByChainId[this.chainId];
-      } else if (this.isCrossChain) {
-        this.fromToken = defaultCrossChainToken;
-      } else {
+      } 
+      else {
         const token = lstTokenMap.find((item: any) => item.symbol !== secondObj?.symbol);
         this.fromToken = secondObj?.symbol === ChainNativeTokenByChainId[this.chainId].symbol ? token : ChainNativeTokenByChainId[this.chainId];
       }
       if (secondObj) {
         this.toToken = secondObj;
-      } else if (this.isCrossChain) {
-        this.toToken = lstTargetTokenMap[0] as ITokenObject;
-      } else {
+      } 
+      else {
         const token = lstTargetTokenMap.find((item: any) => !(item.address === this.fromToken?.address || item.symbol === this.fromToken?.symbol)) as ITokenObject;
         this.toToken = this.fromToken?.symbol === ChainNativeTokenByChainId[this.chainId].symbol ? token : ChainNativeTokenByChainId[this.chainId];
       }
@@ -1238,7 +1151,6 @@ export default class ScomSwap extends Module implements PageBlock {
   }
 
   async onRevertSwap() {
-    if (this.isCrossChain) return;
     this.onUpdateEstimatedPosition(!this.isEstimated('from'), true);
     [this.fromToken, this.toToken] = [this.toToken, this.fromToken];
     [this.fromInputValue, this.toInputValue] = [this.toInputValue, this.fromInputValue];
@@ -1268,57 +1180,15 @@ export default class ScomSwap extends Module implements PageBlock {
 
   setupCrossChainPopup() {
     const arrows = this.swapModal.querySelectorAll('i-icon.arrow-down');
-    if (!this.isCrossChain) {
-      arrows.forEach((arrow: Element) => {
-        arrow.classList.remove('arrow-down--chain');
-      });
-    } else {
-      arrows.forEach((arrow: Element) => {
-        arrow.classList.add('arrow-down--chain');
-      });
-    }
+    arrows.forEach((arrow: Element) => {
+      arrow.classList.remove('arrow-down--chain');
+    });
     this.lbReminderRejected?.classList.add('hidden');
-    if (this.isCrossChain && this.srcChain && this.desChain) {
-      this.srcChainFirstPanel.classList.remove('hidden');
-      this.targetChainFirstPanel.classList.remove('hidden');
-      this.srcChainTokenImage.url = Assets.fullPath(this.srcChain.img);
-      this.srcChainTokenLabel.caption = this.srcChain.name;
-      this.targetChainTokenImage.url = Assets.fullPath(this.desChain.img);
-      this.targetChainTokenLabel.caption = this.desChain.name;
-      const { sourceVaultToken, targetVaultToken, sourceRouteObj, vaultTokenFromSourceChain, vaultTokenToTargetChain } = this.record;
-      if (sourceVaultToken && sourceRouteObj) {
-        this.srcChainSecondPanel.classList.remove('hidden');
-        this.srcChainVaultImage.url = Assets.fullPath(this.srcChain.img);
-        this.srcChainVaultLabel.caption = this.srcChain.name;
-        this.srcVaultTokenImage.url = Assets.fullPath(getTokenIconPath(sourceVaultToken, this.srcChain.chainId));
-        this.srcVaultTokenLabel.caption = sourceVaultToken.symbol;
-        this.srcVaultTokenValue.caption = formatNumber(vaultTokenFromSourceChain);
-        this.lbReminderRejected?.classList.remove('hidden');
-        this.lbReminderRejected.caption = `If the order is not executed in the target chain, the estimated withdrawalble amount is <b class="text-pink">${formatNumber(vaultTokenFromSourceChain)} ${sourceVaultToken?.symbol}</b>`;
-      } else {
-        this.srcChainSecondPanel.classList.add('hidden');
-      }
-      if (targetVaultToken && targetVaultToken.symbol !== this.toToken?.symbol) {
-        this.targetChainSecondPanel.classList.remove('hidden');
-        this.targetChainVaultImage.url = Assets.fullPath(this.desChain.img);
-        this.targetChainVaultLabel.caption = this.desChain.name;
-        this.targetVaultTokenImage.url = Assets.fullPath(getTokenIconPath(targetVaultToken, this.desChain.chainId));
-        this.targetVaultTokenLabel.caption = targetVaultToken.symbol;
-        this.targetVaultTokenValue.caption = formatNumber(vaultTokenToTargetChain);
-        // Hide vault info at toToken
-        this.crossChainVaultInfoVstack.classList.add('hidden');
-      } else {
-        this.targetChainSecondPanel.classList.add('hidden');
-        // Show vault info at the end if vaultTokenSymbol same as toToken
-        this.crossChainVaultInfoVstack.classList.remove('hidden');
-      }
-    } else {
-      this.srcChainFirstPanel.classList.add('hidden');
-      this.targetChainFirstPanel.classList.add('hidden');
-      this.srcChainSecondPanel.classList.add('hidden');
-      this.targetChainSecondPanel.classList.add('hidden');
-      this.crossChainVaultInfoVstack.classList.add('hidden');
-    }
+    this.srcChainFirstPanel.classList.add('hidden');
+    this.targetChainFirstPanel.classList.add('hidden');
+    this.srcChainSecondPanel.classList.add('hidden');
+    this.targetChainSecondPanel.classList.add('hidden');
+    this.crossChainVaultInfoVstack.classList.add('hidden');
   }
 
   handleSwapPopup() {
@@ -1328,7 +1198,7 @@ export default class ScomSwap extends Module implements PageBlock {
     this.fromTokenImage.url = Assets.fullPath(getTokenIconPath(this.fromToken, this.chainId));
     this.fromTokenLabel.caption = this.fromToken?.symbol ?? '';
     this.fromTokenValue.caption = formatNumber(this.totalAmount(), 4);
-    this.toTokenImage.url = Assets.fullPath(getTokenIconPath(this.toToken, this.isCrossChain ? this.desChain?.chainId : this.chainId));
+    this.toTokenImage.url = Assets.fullPath(getTokenIconPath(this.toToken, this.chainId));
     this.toTokenLabel.caption = this.toToken?.symbol ?? '';
     this.toTokenValue.caption = formatNumber(this.toInputValue, 4);
     const minimumReceived = this.getMinReceivedMaxSold();
@@ -1370,7 +1240,7 @@ export default class ScomSwap extends Module implements PageBlock {
 
   onUpdateToken(token: ITokenObject, isFrom: boolean) {
     if (!token) return;
-    const balance = this.getBalance(token, !isFrom && this.isCrossChain);
+    const balance = this.getBalance(token);
     if (isFrom) {
       this.fromToken = token;
       const enabled = !this.isMaxDisabled();
@@ -1557,14 +1427,6 @@ export default class ScomSwap extends Module implements PageBlock {
 
     this.swapBtn.classList.remove('hidden');
     this.record = item;
-    if (this.isCrossChain && this.fromToken && !this.fromToken.isNative) {
-      try {
-        this.setApprovalSpenderAddress();
-        await this.approvalModelAction.checkAllowance(this.fromToken, this.totalAmount().toFixed());
-      } catch (e) {
-        console.log('Cannot check the Approval status (Cross Chain)', e);
-      }
-    }
     this.setSwapButtonText();
     const enabled = !this.isSwapButtonDisabled();
     this.swapBtn.enabled = enabled;
@@ -1647,118 +1509,21 @@ export default class ScomSwap extends Module implements PageBlock {
     this.disableSelectChain(true);
     this.disableSelectChain(true, true);
     let listRouting: any[] = [];
-    if (!this.isCrossChain) {     
-      const useAPI = this._data.category === 'aggregator';
-      const commissionAmount = getCommissionAmount(this.commissions, this.fromInputValue);
-      this.updateContractAddress();
-      listRouting = await getAllRoutesData(this.fromToken, this.toToken, this.fromInputValue, this.toInputValue, this.isFrom, useAPI, commissionAmount, commissionAmount.gt(0) ? this.contractAddress : undefined);
-      listRouting = listRouting.map((v: any) => {
-        // const config = ProviderConfigMap[v.provider];
-        return {
-          ...v,
-          isHybrid: false // config.marketCode == Market.HYBRID,
-        }
-      });
-    } else if (this.srcChain && this.desChain) {
-      const tokenIn = Object.assign({}, this.fromToken) as any;
-      const tokenOut = Object.assign({}, this.toToken) as any;
-      listRouting = await getAvailableRouteOptions({
-        fromChainId: this.srcChain.chainId,
-        toChainId: this.desChain.chainId,
-        tokenIn: tokenIn,
-        tokenOut: tokenOut,
-        amountIn: this.fromInputValue
-      })
-      listRouting = listRouting.map((v: any) => {
-        let route: any = {};
-        if (v.sourceRouteObj) {
-          const amountOut = v.targetRouteObj ? v.targetRouteObj.amountOut : v.sourceRouteObj.amountOut;
-          route = {
-            ...v,
-            ...v.sourceRouteObj,
-            tradeFee: v.tradeFee,
-            price: v.price,
-            amountOut: new BigNumber(amountOut),
-          };
-          if (v.targetRouteObj) {
-            const config = getProviderByKey(v.targetRouteObj.provider);  // ProviderConfigMap[v.targetRouteObj.provider];
-            if (config) {
-              route.targetRouteObj = {
-                ...route.targetRouteObj,
-                caption: config.caption || '',
-                route: v.targetRouteObj.bestRoute,
-                isHybrid: false // config.marketCode == Market.HYBRID,
-              }
-            } else {
-              route.targetRouteObj = undefined;
-            }
-          }
-        } else {
-          route = {
-            ...v,
-            ...v.targetRouteObj,
-            tradeFee: v.tradeFee,
-            price: v.price,
-          };
-        }
-        return { ...route, fromAmount: new BigNumber(route.fromAmount) };
-      });
-      if (listRouting.length) {
-        this.minSwapHintLabel?.classList.add('hidden');
-      } else {
-        this.minSwapHintLabel?.classList.remove('hidden');
+    const useAPI = this._data.category === 'aggregator';
+    const commissionAmount = getCommissionAmount(this.commissions, this.fromInputValue);
+    this.updateContractAddress();
+    listRouting = await getAllRoutesData(this.fromToken, this.toToken, this.fromInputValue, this.toInputValue, this.isFrom, useAPI, commissionAmount, commissionAmount.gt(0) ? this.contractAddress : undefined);
+    listRouting = listRouting.map((v: any) => {
+      // const config = ProviderConfigMap[v.provider];
+      return {
+        ...v,
+        isHybrid: false // config.marketCode == Market.HYBRID,
       }
-    }
-
+    });
     this.swapModalConfirmBtn.caption = 'Confirm Swap';
     this.swapModalConfirmBtn.enabled = true;
     this.record = listRouting[0] || null;
 
-    if (listRouting[0] && this.isCrossChain) {
-      const assetSymbol = listRouting[0].targetVaultToken.symbol;
-      const { vaultAddress, vaultRegistryAddress, tokenAddress: vaultTokenAddress, softCap } = bridgeVaultConstantMap[assetSymbol === 'USDT.e' ? 'USDT' : assetSymbol][this.desChain!.chainId];
-      const [vault, bonds, oraclePriceMap] = await Promise.all([
-        getBridgeVault(this.desChain!.chainId, vaultAddress),
-        getBondsInBridgeVault(this.desChain!.chainId, vaultRegistryAddress),
-        getOraclePriceMap(this.desChain!.chainId)
-      ]);
-      const assetBalance = vault.lpAssetBalance ?? 0;
-      const assetDecimal = listRouting[0].targetVaultToken.decimals;
-      const targetVaultAssetBalance = (new BigNumber(assetBalance)).shiftedBy(-assetDecimal);
-      const targetVaultBondBalance = bonds.reduce((acc, cur) => {
-        if (cur.chainId !== this.desChain?.chainId) return acc;
-        acc = acc.plus((new BigNumber(cur.bond)).shiftedBy(-18));
-        return acc;
-      }, new BigNumber(0));
-      const vaultTokenToTargetChain: BigNumber = new BigNumber(listRouting[0].vaultTokenToTargetChain);
-      const vaultToUsdPrice = oraclePriceMap[vaultTokenAddress.toLowerCase()]; // This will be the vaultToken -> USD Price
-      const oswapToUsdPrice = oraclePriceMap[bridgeVaultConstantMap['OSWAP'][this.desChain!.chainId].tokenAddress.toLowerCase()];
-      const vaultToOswapPrice = vaultToUsdPrice.div(oswapToUsdPrice); // This will vaultToken -> oswap price;
-      this.targetVaultAssetBalanceLabel1.caption = `Vault Asset Balance: ${formatNumber(targetVaultAssetBalance.toNumber(), 4)} ${assetSymbol}`;
-      this.targetVaultAssetBalanceLabel2.caption = `Vault Asset Balance: ${formatNumber(targetVaultAssetBalance.toNumber(), 4)} ${assetSymbol}`;
-      if (!vault.vaultGroup) {
-        this.targetVaultBondBalanceLabel1.caption = `Vault Bond Balance: ${formatNumber(targetVaultBondBalance.toNumber(), 4)} ${assetSymbol}`;
-        this.targetVaultBondBalanceLabel2.caption = `Vault Bond Balance: ${formatNumber(targetVaultBondBalance.toNumber(), 4)} ${assetSymbol}`;
-      } else if (vault.vaultGroup === 'OSWAP') {
-        this.targetVaultBondBalanceLabel1.caption = `Vault Bond Balance: ${formatNumber(targetVaultBondBalance.toNumber(), 4)} OSWAP`;
-        this.targetVaultBondBalanceLabel2.caption = `Vault Bond Balance: ${formatNumber(targetVaultBondBalance.toNumber(), 4)} OSWAP`;
-      } else {
-        this.targetVaultBondBalanceLabel1.caption = `Vault Bond Balance: ${formatNumber(targetVaultBondBalance.toNumber(), 4)} OSWAP ≈ ${formatNumber(targetVaultBondBalance.div(vaultToOswapPrice).toNumber(), 4)} ${assetSymbol}`;
-        this.targetVaultBondBalanceLabel2.caption = `Vault Bond Balance: ${formatNumber(targetVaultBondBalance.toNumber(), 4)} OSWAP ≈ ${formatNumber(targetVaultBondBalance.div(vaultToOswapPrice).toNumber(), 4)} ${assetSymbol}`;
-      }
-      this.crossChainSoftCapLabel1.caption = softCap ? `Cap: ${softCap} ${assetSymbol}` : "-";
-      this.crossChainSoftCapLabel2.caption = softCap ? `Cap: ${softCap} ${assetSymbol}` : "-";
-      if (softCap && vaultTokenToTargetChain.toNumber() >= softCap) {
-        this.swapModalConfirmBtn.caption = 'Cap Reached';
-        this.swapModalConfirmBtn.enabled = false;
-      } else if (vaultTokenToTargetChain.gt(targetVaultAssetBalance) || vaultTokenToTargetChain.multipliedBy(vaultToOswapPrice).gt(targetVaultBondBalance)) {
-        this.swapModalConfirmBtn.caption = 'Exceed Vault Asset Balance or Bond Balance';
-        this.swapModalConfirmBtn.enabled = false;
-      } else {
-        this.swapModalConfirmBtn.enabled = true;
-      }
-
-    }
     this.lastUpdated = 0;
     this.disableSelectChain(false);
     this.disableSelectChain(false, true);
@@ -1780,7 +1545,6 @@ export default class ScomSwap extends Module implements PageBlock {
     this.listRouting.append(...nodeItems);
     let unregisteredPairAddresses = (listRouting.filter(v => v.bestSmartRoute) as any).flatMap((v: any) => v.bestSmartRoute).filter((v: any) => !v.isRegistered).map((v: any) => v.pairAddress);
     unregisteredPairAddresses.forEach((v: any) => this.registerPairButtonStatusMap[v] = ApprovalStatus.TO_BE_APPROVED);
-    if (this.isCrossChain && listRouting[0]) this.crossChainApprovalStatus = listRouting[0].isApproveButtonShown ? ApprovalStatus.TO_BE_APPROVED : ApprovalStatus.NONE
     this.routeFound.caption = listRouting.length + ' Route(s) Found';
     if (listRouting.length > 1)
       this.toggleRoutes.classList.remove('hidden');
@@ -1844,19 +1608,6 @@ export default class ScomSwap extends Module implements PageBlock {
     routingMainRow.horizontalAlignment = "start";
     routingMainRow.verticalAlignment = "center";
 
-    const hasTargetRouteObj = this.isCrossChain && item.sourceRouteObj && item.targetRouteObj;
-    if (this.isCrossChain && index) {
-      routingMainPanel.classList.add('routing-disabled');
-      routingMainPanel.tooltip.content = 'The optimised route will be automatically selected for cross-chain swapping';
-      routingMainPanel.setAttribute('data-placement', 'right');
-      routingMainPanel.onClick = () => { };
-    }
-    if (hasTargetRouteObj && this.srcChain) {
-      const srcLabel = await Label.create();
-      srcLabel.caption = `(${this.srcChain.name})`;
-      srcLabel.classList.add("routing-name");
-      marketRow.appendChild(srcLabel);
-    }
     for (let index = 0; index < providerConfig.length; index++) {
       const config = providerConfig[index];
       const label = await Label.create();
@@ -1909,81 +1660,6 @@ export default class ScomSwap extends Module implements PageBlock {
 
     routePanel.appendChild(routeRow);
     leftPanel.appendChild(routePanel);
-
-    if (hasTargetRouteObj && this.desChain) {
-      const routingTargetRow = new HStack();
-      routingTargetRow.width = "100%";
-      // routingTargetRow.justify = "space-between";
-      routingTargetRow.verticalAlignment = "center";
-
-      const routeTargetRow = new HStack();
-      routeTargetRow.width = "100%";
-      routeTargetRow.verticalAlignment = "center";
-
-      leftPanel.appendChild(routingTargetRow);
-      const targetLabel = await Label.create();
-      targetLabel.caption = `(${this.desChain.name})`;
-      targetLabel.classList.add("routing-name");
-      routingTargetRow.appendChild(targetLabel);
-
-      const isTargetHybrid = false; // ProviderConfigMap[item.targetRouteObj.provider].marketCode === Market.HYBRID;
-      const isTargetBestSmartRoute = isTargetHybrid && item.targetRouteObj && item.targetRouteObj.bestSmartRoute && item.targetRouteObj.bestSmartRoute.length;
-      if (isTargetBestSmartRoute) {
-        for (let idx = 0; idx < item.targetRouteObj.bestSmartRoute.length; idx++) {
-          const pair = item.targetRouteObj.bestSmartRoute[idx];
-          const label = await Label.create();
-          label.caption = this.getProviderCaption(pair?.provider || pair, pair.caption);
-          label.classList.add("routing-name");
-          routingTargetRow.appendChild(label);
-          if (idx !== item.targetRouteObj.bestSmartRoute.length - 1) {
-            const icon = new Icon(routingTargetRow, {
-              width: 14,
-              height: 14,
-              fill: "#ffffff8c",
-              name: "angle-right"
-            });
-            routingTargetRow.appendChild(icon);
-          }
-        };
-        leftPanel.appendChild(routingTargetRow);
-      } else {
-        targetLabel.caption = `(${this.desChain.name}) ${this.getProviderCaption(item.targetRouteObj.provider, item.targetRouteObj.caption)} ${item.targetRouteObj.provider}`;
-      }
-
-      const groupTokens = (pairs: any) => {
-        let list: any[] = [];
-        if (!pairs) return list;
-        pairs.forEach((pair: any, index: number) => {
-          if (index === 0) {
-            list.push(pair.fromToken);
-          }
-          list.push(pair.toToken);
-        });
-        return list;
-      };
-      const routes = isTargetBestSmartRoute ? groupTokens(item.targetRouteObj.bestSmartRoute) : item.targetRouteObj.route;
-      for (let idx = 0; idx < routes.length; idx++) {
-        const token = routes[idx];
-        const label = await Label.create();
-        label.caption = token.symbol;
-        label.classList.add("routing-caption");
-        routeTargetRow.appendChild(label);
-        if (idx !== routes.length - 1) {
-          const icon = new Icon(routeTargetRow, {
-            width: 14,
-            height: 14,
-            fill: "#ffffff8c",
-            name: "arrow-right"
-          });
-          icon.classList.add("route-icon");
-          routeTargetRow.appendChild(icon);
-        }
-      };
-      const routeTargetPanel = new Panel();
-      routeTargetPanel.classList.add("w-100");
-      routeTargetPanel.appendChild(routeTargetRow);
-      leftPanel.appendChild(routeTargetPanel);
-    }
 
     //Right Panel: balance, price percent
     const rightPanel = new Panel();
@@ -2053,16 +1729,6 @@ export default class ScomSwap extends Module implements PageBlock {
     const value = this.isPriceToggled ? this.record?.priceSwap : this.record?.price;
     let fromSymbol = this.fromToken?.symbol;
     let toSymbol = this.toToken?.symbol;
-    if (this.isCrossChain) {
-      const srcName = this.srcChain?.name;
-      const desName = this.desChain?.name;
-      if (srcName) {
-        fromSymbol = `${fromSymbol} (${srcName})`;
-      }
-      if (desName) {
-        toSymbol = `${toSymbol} (${desName})`;
-      }
-    }
     if (value || value == 0) {
       if (this.isPriceToggled) {
         return `1 ${fromSymbol} ≈ ${formatNumber(value)} ${toSymbol}`;
@@ -2089,51 +1755,14 @@ export default class ScomSwap extends Module implements PageBlock {
     return '-';
   }
   getTradeFeeExactAmount() {
-    const tradeFee = this.isCrossChain ? this.record?.tradeFee : this.record?.fromAmount.times(this.record?.tradeFee).toNumber();
+    const tradeFee = this.record?.fromAmount.times(this.record?.tradeFee).toNumber();
     if (tradeFee || tradeFee == 0) {
       return `${formatNumber(tradeFee)} ${this.fromToken?.symbol}`;
     }
     return '-';
   }
   getFeeDetails() {
-    if (this.isCrossChain && this.record) {
-      let record: ICrossChainRouteResult = this.record
-      let detail = [
-        {
-          title: "Source Chain Liquidity Fee",
-          description: "This fee is paid to the AMM Liquidity Providers on the Source Chain.",
-          value: record.fees.sourceRouteLiquidityFee,
-          isHidden: record.fees.sourceRouteLiquidityFee == 0
-        },
-        {
-          title: "Target Chain Liquidity Fee",
-          description: "This fee is paid to the AMM Liquidity Providers on the Target Chain.",
-          value: record.fees.targetRouteLiquidityFee,
-          isHidden: record.targetRouteObj.pairs.length == 0
-        },
-        {
-          title: "Base Fee",
-          description: "This fee is paid to the trolls to cover gas fee on the Target Chain",
-          value: record.fees.baseFee,
-        },
-        {
-          title: "Bridge Vault Liquidity Fee",
-          description: "This fee is paid to the Bridge Vault Liquidity Provider on Target Chain",
-          value: record.fees.transactionFee,
-        },
-        {
-          title: "Protocol Fee",
-          description: "This fee is paid to the troll owners on the Cross Chain Network",
-          value: record.fees.protocolFee,
-        },
-        {
-          title: "Imbalance Fee",
-          description: "This fee is acted as an incentive to balance the vault.",
-          value: record.fees.imbalanceFee,
-        }
-      ]
-      return detail.filter(v => !v.isHidden)
-    } else if (!this.isCrossChain && this.record) {
+    if (this.record) {
       return [{
         title: "Liquidity Provider Fee",
         description: "This fee is paid to the AMM Liquidity Provider.",
@@ -2170,7 +1799,7 @@ export default class ScomSwap extends Module implements PageBlock {
       {
         title: "Price Impact",
         value: this.isValidToken ? priceImpact : '-',
-        isHidden: this.isCrossChain,
+        isHidden: false,
       },
       {
         title: this.isFrom ? "Maximum Sold" : "Minimum Received",
@@ -2185,7 +1814,7 @@ export default class ScomSwap extends Module implements PageBlock {
       {
         title: "Estimated Time",
         value: this.isValidToken && this.record ? '30 seconds' : '-',
-        isHidden: !this.isCrossChain,
+        isHidden: true,
       },
       {
         title: "Commission Fee",
@@ -2214,21 +1843,15 @@ export default class ScomSwap extends Module implements PageBlock {
       return false;
     }
   };
-  getBalance(token?: ITokenObject, isCrossChain?: boolean) {
+  getBalance(token?: ITokenObject) {
     if (token && this.allTokenBalancesMap) {
       const address = token.address || '';
-      let balance: number = 0
-      if (isCrossChain) {
-        balance = token.isNative ? this.targetChainTokenBalances[token.symbol] : this.targetChainTokenBalances[address.toLowerCase()];
-      } else {
-        balance = address ? this.allTokenBalancesMap[address.toLowerCase()] ?? 0 : this.allTokenBalancesMap[token.symbol] || 0;
-      }
+      let balance = address ? this.allTokenBalancesMap[address.toLowerCase()] ?? 0 : this.allTokenBalancesMap[token.symbol] || 0;
       return balance
     }
     return 0;
   }
   async updateBalance() {
-    if (this.isCrossChain) await this.updateTargetChainBalances();
     if (isWalletConnected()) await tokenStore.updateAllTokenBalances();
     this.allTokenBalancesMap = isWalletConnected() ? tokenStore.tokenBalances : [];
     if (this.fromToken) {
@@ -2236,20 +1859,12 @@ export default class ScomSwap extends Module implements PageBlock {
       this.payBalance.caption = `Balance: ${formatNumber(balance, 4)} ${this.fromToken.symbol}`;
     }
     if (this.toToken) {
-      const balance = this.getBalance(this.toToken, this.isCrossChain);
+      const balance = this.getBalance(this.toToken);
       this.receiveBalance.caption = `Balance: ${formatNumber(balance, 4)} ${this.toToken.symbol}`;
     }
     const enabled = !this.isMaxDisabled();
     this.fromSlider.enabled = enabled;
     this.maxButton.enabled = enabled;
-  }
-  async updateTargetChainBalances() {
-    const targetChainId = this.desChain?.chainId || this.targetChainId;
-    if (targetChainId) {
-      const tokenBalanceObj = await getTargetChainTokenInfoObj(targetChainId);
-      this.targetChainTokenBalances = isWalletConnected() ? tokenBalanceObj.balances : [];
-      this.targetChainTokenMap = tokenBalanceObj.tokenMap ?? {};
-    }
   }
 
   private setSwapButtonText() {
@@ -2259,12 +1874,12 @@ export default class ScomSwap extends Module implements PageBlock {
   }
 
   getSwapButtonText() {
-    const isApproveButtonShown = this.isCrossChain ? this.crossChainApprovalStatus !== ApprovalStatus.NONE : this.isApproveButtonShown;
+    const isApproveButtonShown = this.isApproveButtonShown;
     if (!isWalletConnected()) {
       return "Connect Wallet";
     }
     if (isApproveButtonShown) {
-      const status = this.isCrossChain ? this.crossChainApprovalStatus : this.approveButtonStatus;
+      const status = this.approveButtonStatus;
       switch (status) {
         case ApprovalStatus.APPROVING:
           return "Approving";
@@ -2274,13 +1889,10 @@ export default class ScomSwap extends Module implements PageBlock {
       return '';
     } else {
       if (this.isSwapping) {
-        return this.isCrossChain ? "Creating Order" : "Swapping";
+        return "Swapping";
       }
       if (this.isInsufficientBalance) {
         return `Insufficient ${this.fromToken?.symbol} balance`;
-      }
-      if (this.isCrossChain) {
-        return "Create Order";
       }
       if (this.isPriceImpactTooHigh) {
         return "Turn on Expert Mode"
@@ -2341,17 +1953,14 @@ export default class ScomSwap extends Module implements PageBlock {
       this.swapBtn.rightIcon.visible = true;
   }
   onSwapConfirmed = async (data: any) => {
-    const { key, isCrossChain } = data;
+    const { key } = data;
     this.setMapStatus('swap', key, ApprovalStatus.TO_BE_APPROVED);
     if (this.swapBtn.rightIcon.visible)
       this.swapBtn.rightIcon.visible = false;
     await this.handleAddRoute();
-    if (isCrossChain) {
-      this.showViewOrderModal();
-    }
   }
   isButtonLoading() {
-    if (this.isApproveButtonShown || (this.isCrossChain && this.crossChainApprovalStatus === ApprovalStatus.APPROVING)) {
+    if (this.isApproveButtonShown) {
       return this.isApprovingRouter;
     }
     return this.isSwapping;
@@ -2443,7 +2052,7 @@ export default class ScomSwap extends Module implements PageBlock {
     }
     if (!this.record || this.isSwapButtonDisabled()) return;
 
-    const isApproveButtonShown = this.isCrossChain ? this.crossChainApprovalStatus !== ApprovalStatus.NONE : this.isApproveButtonShown;
+    const isApproveButtonShown = this.isApproveButtonShown;
     if (isApproveButtonShown) {
       this.onApproveRouterMax();
       return;
@@ -2462,24 +2071,6 @@ export default class ScomSwap extends Module implements PageBlock {
     try {
       this.swapModal.visible = false;
       this.showResultMessage(this.openswapResult, 'warning', `Swapping ${formatNumber(this.totalAmount(), 4)} ${this.fromToken?.symbol} to ${formatNumber(this.toInputValue, 4)} ${this.toToken?.symbol}`);
-      if (this.isCrossChain) {
-        if (this.toToken && this.fromToken && this.desChain) {
-          this.record.minReceivedMaxSold = this.getMinReceivedMaxSold()
-          const { error } = await createBridgeVaultOrder({
-            vaultAddress: this.record.vaultAddress,
-            targetChainId: this.desChain.chainId,
-            tokenIn: this.fromToken,
-            tokenOut: this.toToken,
-            amountIn: this.record.fromAmount,
-            minAmountOut: this.record.minReceivedMaxSold,
-            sourceRouteInfo: this.record.sourceRouteObj ? { amountOut: this.record.sourceRouteObj.amountOut, pairs: this.record.sourceRouteObj.pairs } : undefined
-          })
-          if (error) {
-            this.showResultMessage(this.openswapResult, 'error', error as any);
-          }
-        }
-        return;
-      }
       const route = this.record.bestRoute ? this.record.bestRoute : [this.fromToken, this.toToken];
       const swapData = {
         provider: this.record.provider,
@@ -2601,78 +2192,6 @@ export default class ScomSwap extends Module implements PageBlock {
     this.transactionModal.showModal();
   }
 
-  // Cross Chain
-  get isCrossChainEnabled() {
-    return false;
-
-    if (getSiteEnv() === SITE_ENV.MAINNET) {
-      this.srcChainBox?.classList.add('hidden');
-      this.desChainBox?.classList.add('hidden');
-      return false;
-    }
-
-    let chainId = getChainId();
-
-    if (!this.supportedChainList.some((v: any) => v.chainId == chainId)) {
-      this.srcChainBox?.classList.add('hidden');
-      this.desChainBox?.classList.add('hidden');
-      return false;
-    }
-    this.srcChainBox?.classList.remove('hidden');
-    if (this.srcChain?.isCrossChainSupported) {
-      this.desChainBox?.classList.remove('hidden');
-    } else {
-      this.desChainBox?.classList.add('hidden');
-    }
-    return true;
-  };
-
-  get isCrossChain() {
-    const srcChainId = this.srcChain?.chainId;
-    const desChainId = this.desChain?.chainId;
-    const isCrossChainSupported = this.srcChain?.isCrossChainSupported;
-    if (this.isCrossChainEnabled && isCrossChainSupported && srcChainId != desChainId) {
-      return true;
-    }
-    this.minSwapHintLabel?.classList.add('hidden');
-    return false;
-  };
-
-  get targetChainTokenDataList() {
-    let dataList: any[] = [];
-    if (this.targetChainTokenMap && this.isCrossChain) {
-      for (const key of Object.keys(this.targetChainTokenMap)) {
-        let tokenAddress = key;
-        let tokenObject = this.targetChainTokenMap[tokenAddress];
-        if (this.targetChainTokenBalances) {
-          dataList.push({
-            ...tokenObject,
-            status: false,
-            balance: this.targetChainTokenBalances[tokenAddress] ? this.targetChainTokenBalances[tokenAddress] : 0,
-          });
-        } else {
-          dataList.push({
-            ...tokenObject,
-            status: null,
-          });
-        }
-      }
-    }
-    return dataList;
-  };
-
-  get fromTokenToVaultMap() {
-    let map: { [key: string]: any } = {};
-    for (const vaultGroup of BridgeVaultGroupList) {
-      if (vaultGroup.deprecated) continue;
-      const vaults: { [key: string]: any } = vaultGroup.vaults;
-      if (!vaults[this.chainId] || Object.keys(vaults).length < 2) continue;
-      const currentChainTokenAddress = vaults[this.chainId].tokenAddress.toLowerCase();
-      map[currentChainTokenAddress] = vaults;
-    }
-    return map;
-  };
-
   get isMetaMask() {
     return getWalletProvider() === WalletPlugin.MetaMask;
   }
@@ -2702,9 +2221,6 @@ export default class ScomSwap extends Module implements PageBlock {
   selectSourceChain = async (obj: INetwork, img?: Image) => {
     if ((this.srcChain && this.srcChain.chainId != obj.chainId) || !this.srcChain) {
       await switchNetwork(obj.chainId);
-      if (!obj.isCrossChainSupported) {
-        this.selectDestinationChain(obj, img)
-      }
       this.srcChain = obj;
       this.srcChainLabel.caption = this.srcChain.name;
       const selected = this.srcChainList.querySelector('.icon-selected');
@@ -2719,61 +2235,12 @@ export default class ScomSwap extends Module implements PageBlock {
     }
   };
 
-  selectDestinationChain = async (obj: INetwork, img?: Image) => {
-    if (!this.isCrossChainEnabled) return;
-    this.disableSelectChain(true, true);
-    const selected = this.desChainList.querySelector('.icon-selected');
-    if (selected) {
-      selected.classList.remove('icon-selected');
-    }
-    const oldDestination = this.desChain;
-    try {
-      this.desChain = obj;
-      this.targetChainId = this.desChain.chainId;
-      await this.updateTargetChainBalances()
-      if (img) {
-        img.classList.add('icon-selected');
-      } else {
-        const currentNetwork = this.supportedChainList.find((f: INetwork) => f.chainId == obj.chainId);
-        const img = this.desChainList.querySelector(`[data-tooltip="${currentNetwork?.name}"]`);
-        if (img) {
-          img.classList.add('icon-selected');
-        }
-      }
-    } catch (err) {
-      console.log('err', err)
-      if (oldDestination) {
-        this.desChain = oldDestination;
-        if (selected) {
-          selected.classList.add('icon-selected');
-        }
-      } else {
-        this.desChain = this.supportedChainList[0];
-        this.desChainList.firstElementChild?.classList.add('icon-selected');
-      }
-    }
-    if (this.desChain) {
-      this.targetChainId = this.desChain.chainId;
-      this.desChainLabel.caption = this.desChain.name;
-    }
-    this.setTargetTokenList();
-    this.disableSelectChain(false, true);
-  };
-
   setTargetTokenList = (isDisabled?: boolean) => {
-    if (this.srcChain?.isCrossChainSupported && !isDisabled) {
-      const targetChainId = this.desChain?.chainId || this.chainId;
-      if (this.secondTokenSelection.targetChainId != targetChainId) {
-        this.secondTokenSelection.targetChainId = targetChainId;
-      }
-      this.secondTokenSelection.tokenDataListProp = this.targetChainTokenDataList;
-    } else {
-      const srcChainId = this.srcChain?.chainId || this.chainId;
-      if (this.secondTokenSelection.targetChainId != srcChainId) {
-        this.secondTokenSelection.targetChainId = srcChainId;
-      }
-      this.secondTokenSelection.tokenDataListProp = [];
+    const srcChainId = this.srcChain?.chainId || this.chainId;
+    if (this.secondTokenSelection.targetChainId != srcChainId) {
+      this.secondTokenSelection.targetChainId = srcChainId;
     }
+    this.secondTokenSelection.tokenDataListProp = [];
   }
 
   onSourceChainChanged = () => {
@@ -2801,12 +2268,6 @@ export default class ScomSwap extends Module implements PageBlock {
     }
   }
 
-  onSelectDestinationChain = async (obj: INetwork, img?: Image) => {
-    if (obj.chainId === this.desChain?.chainId) return;
-    await this.selectDestinationChain(obj, img);
-    this.onSetupPage(true);
-  }
-
   setDefaultChain = async () => {
     if (this.supportedChainList && this.supportedChainList.length) {
       let obj = this.supportedChainList.find((f: INetwork) => f.chainId == this.chainId);
@@ -2817,44 +2278,31 @@ export default class ScomSwap extends Module implements PageBlock {
       }
       this.onSourceChainChanged();
       const targetChain = this.supportedChainList.find((f: INetwork) => f.chainId == this.targetChainId);
-      const isSupported = targetChain && targetChain.isCrossChainSupported;
-      if (!this.desChain && isSupported) {
-        await this.selectDestinationChain(targetChain);
-      } else if (!isSupported && obj) {
-        await this.selectDestinationChain(obj);
-      } else {
-        if (this.isCrossChain) await this.updateTargetChainBalances();
-        if (this.toToken) {
-          const balance = this.getBalance(this.toToken, this.isCrossChain);
-          this.receiveBalance.caption = `Balance: ${formatNumber(balance, 4)} ${this.toToken.symbol}`;
-        }
-        this.setTargetTokenList();
+      if (this.toToken) {
+        const balance = this.getBalance(this.toToken);
+        this.receiveBalance.caption = `Balance: ${formatNumber(balance, 4)} ${this.toToken.symbol}`;
       }
+      this.setTargetTokenList();
       this.desChainLabel.caption = this.desChain?.name || '-';
     } else {
       this.setTargetTokenList(true);
     }
   };
 
-  initChainIcon = (network: INetwork, isDes?: boolean) => {
+  initChainIcon = (network: INetwork) => {
     const img = new Image();
     img.url = Assets.fullPath(network.img);
     img.tooltip.content = network.name;
     img.classList.add('chain-icon');
     img.setAttribute('data-tooltip', network.name); // for query
-    if (isDes) {
-      img.onClick = () => this.onSelectDestinationChain(network, img);
-      this.desChainList.appendChild(img);
-    } else {
-      if (!this.isMetaMask) {
-        img.tooltip.content = `Openswap supports this network ${network.name} (${network.chainId}), please switch network in the connected wallet.`;
-        img.classList.add('icon-disabled');
-      }
-      img.setAttribute('network-name', network.name);
-      img.setAttribute('chain-id', `${network.chainId}`);
-      img.onClick = () => this.onSelectSourceChain(network, img);
-      this.srcChainList.appendChild(img);
+    if (!this.isMetaMask) {
+      img.tooltip.content = `Openswap supports this network ${network.name} (${network.chainId}), please switch network in the connected wallet.`;
+      img.classList.add('icon-disabled');
     }
+    img.setAttribute('network-name', network.name);
+    img.setAttribute('chain-id', `${network.chainId}`);
+    img.onClick = () => this.onSelectSourceChain(network, img);
+    this.srcChainList.appendChild(img);
   };
 
   updateSrcChainIconList = () => {
@@ -2888,9 +2336,6 @@ export default class ScomSwap extends Module implements PageBlock {
     this.desChain = undefined;
     this.supportedChainList.forEach((network: INetwork) => {
       this.initChainIcon(network);
-      if (network.isCrossChainSupported) {
-        this.initChainIcon(network, true);
-      }
     });
     await this.setDefaultChain();
   };
@@ -3041,6 +2486,7 @@ export default class ScomSwap extends Module implements PageBlock {
   }
 
   async init() {
+    this.isReadyCallbackQueued = true;
     this.chainId = getChainId();
     setTokenStore();
     // this.availableMarkets = getAvailableMarkets() || [];
@@ -3056,6 +2502,8 @@ export default class ScomSwap extends Module implements PageBlock {
     const commissions = this.getAttribute('commissions', true, []);
     this.updateContractAddress();
     await this.setData({category, providers, commissions});
+    this.isReadyCallbackQueued = false;
+    this.executeReadyCallback();
   }
 
   render() {
