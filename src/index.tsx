@@ -178,7 +178,6 @@ export default class ScomSwap extends Module implements PageBlock {
   private targetChainId: number | undefined;
   private srcChainFirstPanel: Panel;
   private targetChainFirstPanel: Panel;
-  private srcChainSecondPanel: Panel;
   private swapModalConfirmBtn: Button;
   private modalFees: Modal;
   private feesInfo: VStack;
@@ -1154,7 +1153,6 @@ export default class ScomSwap extends Module implements PageBlock {
     this.lbReminderRejected?.classList.add('hidden');
     this.srcChainFirstPanel.classList.add('hidden');
     this.targetChainFirstPanel.classList.add('hidden');
-    this.srcChainSecondPanel.classList.add('hidden');
   }
 
   handleSwapPopup() {
@@ -1748,6 +1746,7 @@ export default class ScomSwap extends Module implements PageBlock {
     const tradeFeeExactAmount = this.getTradeFeeExactAmount();
     const commissionFee = getEmbedderCommissionFee();
     const commissionAmount = this.record ? getCommissionAmount(this.commissions, new BigNumber(this.record.fromAmount || 0)) : new BigNumber(0);
+    const total = this.record?.fromAmount ? new BigNumber(this.record.fromAmount).plus(commissionAmount) : new BigNumber(0);
 
     const fees = this.getFeeDetails();
     const countFees = fees.length;
@@ -1789,6 +1788,11 @@ export default class ScomSwap extends Module implements PageBlock {
         title: "Commission Fee",
         value: this.isValidToken ? `${new BigNumber(commissionFee).times(100)}% (${formatNumber(commissionAmount)} ${this.fromToken?.symbol})` : '-',
         isHidden: !getCurrentCommissions(this.commissions).length
+      },
+      {
+        title: "Total",
+        value: this.isValidToken ? `${formatNumber(total)} ${this.fromToken?.symbol}` : '-',
+        isHidden: false
       }
     ];
     return info.filter((f: any) => !f.isHidden);
@@ -2356,9 +2360,6 @@ export default class ScomSwap extends Module implements PageBlock {
               </i-hstack>
             </i-panel>
             <i-panel class="content-swap">
-              <i-hstack class="my-2" verticalAlignment="center" horizontalAlignment="space-between">
-                <i-label class="custom-label" caption="You Pay"></i-label>
-              </i-hstack>
               <i-vstack id="srcChainBox" class="my-2 w-100">
                 <i-hstack verticalAlignment="center" horizontalAlignment="space-between">
                   <i-label class="text--grey" caption="Selected Chain" />
@@ -2377,6 +2378,9 @@ export default class ScomSwap extends Module implements PageBlock {
                 stepDots={5}
                 onChanged={debounce(this.onSliderChange.bind(this), 500, this)}
               />
+              <i-hstack class="my-2" verticalAlignment="center" horizontalAlignment="space-between">
+                <i-label caption="You Pay" font={{ size: '1.125rem', color: '#fff' }}></i-label>
+              </i-hstack>             
               <i-panel class="token-box">
                 <i-vstack id="payContainer" class="input--token-container" >
                   <i-hstack class="balance-info" horizontalAlignment="space-between" verticalAlignment="center" width="100%">
@@ -2395,10 +2399,6 @@ export default class ScomSwap extends Module implements PageBlock {
                   </i-panel>
                 </i-vstack>
               </i-panel>
-              <i-panel id="minSwapHintLabel" visible={false} class="hints">
-                <i-icon name="star" fill="#f7d063" width={13} height={13} />
-                <i-label caption="No crosschain routes are found. You may try updating the input amount or selecting another token." />
-              </i-panel>
               <i-panel class="toggle-reverse">
                 <i-image id="toggleReverseImage" width={32} height={32} class="icon-swap rounded-icon" url={Assets.fullPath("img/swap/icon-swap.png")} onClick={this.onRevertSwap.bind(this)} />
               </i-panel>
@@ -2406,7 +2406,7 @@ export default class ScomSwap extends Module implements PageBlock {
                 <i-vstack id="receiveContainer" class="input--token-container" >
                   <i-vstack class="balance-info" width="100%">
                     <i-vstack width="100%">
-                      <i-label class="custom-label" caption="You Receive"></i-label>
+                      <i-label caption="You Receive" font={{ size: '1.125rem', color: '#fff' }}></i-label>
                     </i-vstack>
                     <i-vstack id="desChainBox" visible={false} class="my-2 w-100">
                       <i-hstack verticalAlignment="center" horizontalAlignment="space-between">
@@ -2464,21 +2464,6 @@ export default class ScomSwap extends Module implements PageBlock {
               <i-label id="fromTokenValue" class="token-value" caption=" - "></i-label>
             </i-hstack>
             <i-icon name="arrow-down" class="arrow-down" fill="#fff" width={28} height={28} />
-            <i-panel id="srcChainSecondPanel">
-              <i-hstack verticalAlignment='center' horizontalAlignment='start'>
-                <i-panel class="row-chain">
-                  <i-image id="srcChainVaultImage" width="30px" height="30px" url="#" />
-                  <i-label id="srcChainVaultLabel" class="token-name" caption="" />
-                  <i-icon name="minus" fill='#fff' width={28} height={10} />
-                </i-panel>
-                <i-panel class="row-chain">
-                  <i-image id="srcVaultTokenImage" width="30px" height="30px" url="#" />
-                  <i-label id="srcVaultTokenLabel" class="token-name" caption="" />
-                </i-panel>
-                <i-label id="srcVaultTokenValue" class="token-value" caption="-" />
-              </i-hstack>
-              <i-icon name="arrow-down" class="arrow-down" fill="#fff" width={28} height={28} />
-            </i-panel>
             <i-hstack class="mb-1" verticalAlignment='center' horizontalAlignment='start'>
               <i-panel id="targetChainFirstPanel" class="row-chain">
                 <i-image id="targetChainTokenImage" width="30px" height="30px" url="#" />

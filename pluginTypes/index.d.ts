@@ -11542,7 +11542,6 @@ declare module "@scom/scom-swap" {
         private targetChainId;
         private srcChainFirstPanel;
         private targetChainFirstPanel;
-        private srcChainSecondPanel;
         private swapModalConfirmBtn;
         private modalFees;
         private feesInfo;

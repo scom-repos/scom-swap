@@ -18362,7 +18362,7 @@ define("@scom/scom-swap/swap-utils/index.ts", ["require", "exports", "@ijstech/e
     }
     exports.getRouterAddress = getRouterAddress;
     async function allowanceRouter(wallet, market, token, owner, contractAddress, callback) {
-        let erc20 = new eth_wallet_7.Erc20(wallet, token.address, token.decimals);
+        let erc20 = new index_14.Contracts.ERC20(wallet, token.address);
         let spender = contractAddress ? contractAddress : getRouterAddress(market);
         let allowance = await erc20.allowance({
             owner,
@@ -22946,7 +22946,6 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
             (_a = this.lbReminderRejected) === null || _a === void 0 ? void 0 : _a.classList.add('hidden');
             this.srcChainFirstPanel.classList.add('hidden');
             this.targetChainFirstPanel.classList.add('hidden');
-            this.srcChainSecondPanel.classList.add('hidden');
         }
         handleSwapPopup() {
             var _a, _b, _c, _d;
@@ -23513,13 +23512,14 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
             }
         }
         getPriceInfo() {
-            var _a;
+            var _a, _b, _c;
             const rate = this.getRate();
             const priceImpact = this.getPriceImpact();
             const minimumReceived = this.getMinimumReceived();
             const tradeFeeExactAmount = this.getTradeFeeExactAmount();
             const commissionFee = index_29.getEmbedderCommissionFee();
             const commissionAmount = this.record ? index_30.getCommissionAmount(this.commissions, new eth_wallet_12.BigNumber(this.record.fromAmount || 0)) : new eth_wallet_12.BigNumber(0);
+            const total = ((_a = this.record) === null || _a === void 0 ? void 0 : _a.fromAmount) ? new eth_wallet_12.BigNumber(this.record.fromAmount).plus(commissionAmount) : new eth_wallet_12.BigNumber(0);
             const fees = this.getFeeDetails();
             const countFees = fees.length;
             let feeTooltip;
@@ -23558,8 +23558,13 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                 },
                 {
                     title: "Commission Fee",
-                    value: this.isValidToken ? `${new eth_wallet_12.BigNumber(commissionFee).times(100)}% (${index_31.formatNumber(commissionAmount)} ${(_a = this.fromToken) === null || _a === void 0 ? void 0 : _a.symbol})` : '-',
+                    value: this.isValidToken ? `${new eth_wallet_12.BigNumber(commissionFee).times(100)}% (${index_31.formatNumber(commissionAmount)} ${(_b = this.fromToken) === null || _b === void 0 ? void 0 : _b.symbol})` : '-',
                     isHidden: !index_30.getCurrentCommissions(this.commissions).length
+                },
+                {
+                    title: "Total",
+                    value: this.isValidToken ? `${index_31.formatNumber(total)} ${(_c = this.fromToken) === null || _c === void 0 ? void 0 : _c.symbol}` : '-',
+                    isHidden: false
                 }
             ];
             return info.filter((f) => !f.isHidden);
@@ -23814,14 +23819,14 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                                     this.$render("i-icon", { width: 26, height: 26, class: "rounded-icon", name: "sync-alt", fill: "white", onClick: this.onRefresh }),
                                     this.$render("i-icon", { width: 26, height: 26, class: "rounded-icon", name: "cog", fill: "white", onClick: this.onSetting })))),
                         this.$render("i-panel", { class: "content-swap" },
-                            this.$render("i-hstack", { class: "my-2", verticalAlignment: "center", horizontalAlignment: "space-between" },
-                                this.$render("i-label", { class: "custom-label", caption: "You Pay" })),
                             this.$render("i-vstack", { id: "srcChainBox", class: "my-2 w-100" },
                                 this.$render("i-hstack", { verticalAlignment: "center", horizontalAlignment: "space-between" },
                                     this.$render("i-label", { class: "text--grey", caption: "Selected Chain" }),
                                     this.$render("i-label", { id: "srcChainLabel", caption: "-" })),
                                 this.$render("i-panel", { id: "srcChainList", class: "icon-list", maxWidth: "100%" })),
                             this.$render("i-range", { id: "fromSlider", class: "custom--slider", width: '100%', min: 0, max: 100, tooltipFormatter: this.tipFormatter, tooltipVisible: true, stepDots: 5, onChanged: index_30.debounce(this.onSliderChange.bind(this), 500, this) }),
+                            this.$render("i-hstack", { class: "my-2", verticalAlignment: "center", horizontalAlignment: "space-between" },
+                                this.$render("i-label", { caption: "You Pay", font: { size: '1.125rem', color: '#fff' } })),
                             this.$render("i-panel", { class: "token-box" },
                                 this.$render("i-vstack", { id: "payContainer", class: "input--token-container" },
                                     this.$render("i-hstack", { class: "balance-info", horizontalAlignment: "space-between", verticalAlignment: "center", width: "100%" },
@@ -23833,16 +23838,13 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                                                 this.$render("swap-token-selection", { disableSelect: true, id: "firstTokenSelection" })),
                                             this.$render("i-vstack", { id: "payCol" },
                                                 this.$render("i-label", { class: "text-value text-right", caption: " - " })))))),
-                            this.$render("i-panel", { id: "minSwapHintLabel", visible: false, class: "hints" },
-                                this.$render("i-icon", { name: "star", fill: "#f7d063", width: 13, height: 13 }),
-                                this.$render("i-label", { caption: "No crosschain routes are found. You may try updating the input amount or selecting another token." })),
                             this.$render("i-panel", { class: "toggle-reverse" },
                                 this.$render("i-image", { id: "toggleReverseImage", width: 32, height: 32, class: "icon-swap rounded-icon", url: assets_7.default.fullPath("img/swap/icon-swap.png"), onClick: this.onRevertSwap.bind(this) })),
                             this.$render("i-panel", { class: "token-box" },
                                 this.$render("i-vstack", { id: "receiveContainer", class: "input--token-container" },
                                     this.$render("i-vstack", { class: "balance-info", width: "100%" },
                                         this.$render("i-vstack", { width: "100%" },
-                                            this.$render("i-label", { class: "custom-label", caption: "You Receive" })),
+                                            this.$render("i-label", { caption: "You Receive", font: { size: '1.125rem', color: '#fff' } })),
                                         this.$render("i-vstack", { id: "desChainBox", visible: false, class: "my-2 w-100" },
                                             this.$render("i-hstack", { verticalAlignment: "center", horizontalAlignment: "space-between" },
                                                 this.$render("i-label", { class: "text--grey", caption: "Selected Destination Chain" }),
@@ -23876,17 +23878,6 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                                 this.$render("i-label", { id: "fromTokenLabel", class: "token-name", caption: "" })),
                             this.$render("i-label", { id: "fromTokenValue", class: "token-value", caption: " - " })),
                         this.$render("i-icon", { name: "arrow-down", class: "arrow-down", fill: "#fff", width: 28, height: 28 }),
-                        this.$render("i-panel", { id: "srcChainSecondPanel" },
-                            this.$render("i-hstack", { verticalAlignment: 'center', horizontalAlignment: 'start' },
-                                this.$render("i-panel", { class: "row-chain" },
-                                    this.$render("i-image", { id: "srcChainVaultImage", width: "30px", height: "30px", url: "#" }),
-                                    this.$render("i-label", { id: "srcChainVaultLabel", class: "token-name", caption: "" }),
-                                    this.$render("i-icon", { name: "minus", fill: '#fff', width: 28, height: 10 })),
-                                this.$render("i-panel", { class: "row-chain" },
-                                    this.$render("i-image", { id: "srcVaultTokenImage", width: "30px", height: "30px", url: "#" }),
-                                    this.$render("i-label", { id: "srcVaultTokenLabel", class: "token-name", caption: "" })),
-                                this.$render("i-label", { id: "srcVaultTokenValue", class: "token-value", caption: "-" })),
-                            this.$render("i-icon", { name: "arrow-down", class: "arrow-down", fill: "#fff", width: 28, height: 28 })),
                         this.$render("i-hstack", { class: "mb-1", verticalAlignment: 'center', horizontalAlignment: 'start' },
                             this.$render("i-panel", { id: "targetChainFirstPanel", class: "row-chain" },
                                 this.$render("i-image", { id: "targetChainTokenImage", width: "30px", height: "30px", url: "#" }),

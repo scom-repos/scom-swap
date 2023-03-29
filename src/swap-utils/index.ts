@@ -64,7 +64,7 @@ function getRouterAddress(key: string): string {
 }
 
 async function allowanceRouter(wallet: any, market: string, token: ITokenObject, owner: string, contractAddress: string, callback?: any) {
-  let erc20 = new Erc20(wallet, token.address, token.decimals);
+  let erc20 = new Contracts.ERC20(wallet, token.address);
   let spender = contractAddress ? contractAddress : getRouterAddress(market);
   let allowance = await erc20.allowance({
     owner,
