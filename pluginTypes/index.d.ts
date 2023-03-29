@@ -16996,8 +16996,8 @@ declare module "@scom/scom-swap/scconfig.json.ts" {
             explorerName: string;
             explorerTxUrl: string;
             explorerAddressUrl: string;
+            isDisabled: boolean;
             isTestnet: boolean;
-            isDisabled?: undefined;
             isCrossChainSupported?: undefined;
             isMainChain?: undefined;
         } | {
@@ -17023,18 +17023,6 @@ declare module "@scom/scom-swap/scconfig.json.ts" {
             explorerAddressUrl: string;
             isDisabled?: undefined;
             isTestnet?: undefined;
-            isMainChain?: undefined;
-        } | {
-            name: string;
-            chainId: number;
-            img: string;
-            rpc: string;
-            explorerName: string;
-            explorerTxUrl: string;
-            explorerAddressUrl: string;
-            isDisabled: boolean;
-            isTestnet: boolean;
-            isCrossChainSupported?: undefined;
             isMainChain?: undefined;
         } | {
             name: string;

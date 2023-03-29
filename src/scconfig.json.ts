@@ -142,6 +142,7 @@ export default {
       "explorerName": "PolygonScan",
       "explorerTxUrl": "https://mumbai.polygonscan.com/tx/",
       "explorerAddressUrl": "https://mumbai.polygonscan.com/address/",
+      "isDisabled": true,
       "isTestnet": true
     },
     {

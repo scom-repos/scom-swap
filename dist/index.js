@@ -27899,7 +27899,7 @@ define("@scom/scom-swap/swap-utils/index.ts", ["require", "exports", "@ijstech/e
                 amount: amount.times(v.share)
             };
         });
-        const commissionsAmount = _commissions.length ? _commissions.map(v => v.amount).reduce((a, b) => a.plus(b)) : new eth_wallet_8.BigNumber(0);
+        const commissionsAmount = _commissions.length ? _commissions.map(v => v.amount).reduce((a, b) => a.plus(b)).dp(0) : new eth_wallet_8.BigNumber(0);
         if (!tokenIn.address) {
             const params = {
                 amountOutMin: _amountOutMin,
@@ -27910,7 +27910,6 @@ define("@scom/scom-swap/swap-utils/index.ts", ["require", "exports", "@ijstech/e
             if (_commissions.length) {
                 let txData;
                 if (feeOnTransfer) {
-                    router.swapExactETHForTokensSupportingFeeOnTransferTokens.txData(params, amount);
                     txData = await router.swapExactETHForTokensSupportingFeeOnTransferTokens.txData(params, amount);
                 }
                 else {
@@ -28068,7 +28067,7 @@ define("@scom/scom-swap/swap-utils/index.ts", ["require", "exports", "@ijstech/e
                 amount: _amountInMax.times(v.share)
             };
         });
-        const commissionsAmount = _commissions.length ? _commissions.map(v => v.amount).reduce((a, b) => a.plus(b)) : new eth_wallet_8.BigNumber(0);
+        const commissionsAmount = _commissions.length ? _commissions.map(v => v.amount).reduce((a, b) => a.plus(b)).dp(0) : new eth_wallet_8.BigNumber(0);
         if (!tokenIn.address) {
             const params = {
                 amountOut: _amountOut,
@@ -30680,6 +30679,7 @@ define("@scom/scom-swap/scconfig.json.ts", ["require", "exports"], function (req
                 "explorerName": "PolygonScan",
                 "explorerTxUrl": "https://mumbai.polygonscan.com/tx/",
                 "explorerAddressUrl": "https://mumbai.polygonscan.com/address/",
+                "isDisabled": true,
                 "isTestnet": true
             },
             {
@@ -30867,13 +30867,14 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                 }
                 return formatted.replace(/,/g, '');
             };
-            this.onSetupPage = async (connected) => {
+            this.onSetupPage = async (connected, _chainId) => {
                 var _a, _b, _c, _d, _e, _f, _g;
                 // this.getAddressFromUrl();
-                this.chainId = index_38.getChainId();
+                this.chainId = _chainId ? _chainId : index_38.getChainId();
                 if (this.supportedNetworks.every((v) => v != this.chainId)) {
                     this.showNetworkErrModal();
                     this.resetUI();
+                    this.onRenderChainList();
                     return;
                 }
                 this.closeNetworkErrModal();
@@ -31155,7 +31156,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                 this.approvalModelAction.doApproveAction(this.fromToken, this.totalAmount().toString(), this.record);
             };
             this.onSetMaxBalance = async (value) => {
-                var _a, _b, _c;
+                var _a, _b, _c, _d;
                 if (!((_a = this.fromToken) === null || _a === void 0 ? void 0 : _a.symbol))
                     return;
                 this.isFrom = false;
@@ -31164,6 +31165,13 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                 let inputVal = new eth_wallet_13.BigNumber(balance);
                 if (!address) {
                     inputVal = new eth_wallet_13.BigNumber(0);
+                }
+                else {
+                    const commissionAmount = index_39.getCommissionAmount(this.commissions, new eth_wallet_13.BigNumber(balance));
+                    if (commissionAmount.gt(0)) {
+                        const totalFee = new eth_wallet_13.BigNumber(balance).plus(commissionAmount).dividedBy(balance);
+                        inputVal = inputVal.dividedBy(totalFee);
+                    }
                 }
                 if (value == 0 || value) {
                     inputVal = inputVal.multipliedBy(value).dividedBy(100);
@@ -31175,7 +31183,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                     return;
                 this.fromInputValue = inputVal;
                 const input = this.payCol.children[0];
-                input.value = this.fromInputValue.toString();
+                input.value = index_40.limitDecimals(this.fromInputValue.toFixed(), ((_d = this.fromToken) === null || _d === void 0 ? void 0 : _d.decimals) || 18);
                 await this.handleAddRoute();
             };
             this.isMaxDisabled = () => {
@@ -31316,7 +31324,8 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
             this.onSelectSourceChain = async (obj, img) => {
                 if (this.isMetaMask || !index_38.isWalletConnected()) {
                     await this.selectSourceChain(obj, img);
-                    this.onSetupPage(true);
+                    this.chainId = obj.chainId;
+                    this.onSetupPage(true, this.chainId);
                 }
             };
             this.onSelectDestinationChain = async (obj, img) => {
@@ -33457,13 +33466,18 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
             this.supportedNetworksElm.clearInnerHTML();
             if (!this.supportedNetworks.length) {
                 this.supportedNetworksElm.appendChild(this.$render("i-label", { caption: `No networks are supported. Please configure the swap!`, font: { size: '16px' } }));
-                return;
             }
-            this.supportedNetworksElm.appendChild(this.$render("i-label", { caption: `We only support the following ${this.supportedNetworks.length > 1 ? 'networks' : 'network'}:`, font: { size: '16px' } }));
-            for (const chainId of this.supportedNetworks) {
-                const network = index_38.getNetworkInfo(chainId);
-                if (network) {
-                    this.supportedNetworksElm.appendChild(this.$render("i-label", { font: { bold: true, size: '16px' }, caption: `${network.name} (${network.chainId})` }));
+            else if (this.supportedChainList.some(v => v.chainId == this.chainId)) {
+                const network = index_38.getNetworkInfo(this.chainId);
+                this.supportedNetworksElm.appendChild(this.$render("i-label", { caption: `The ${network.name} (${network.chainId}) network has not been configured for the swap!`, font: { size: '16px' } }));
+            }
+            else {
+                this.supportedNetworksElm.appendChild(this.$render("i-label", { caption: `We only support the following ${this.supportedNetworks.length > 1 ? 'networks' : 'network'}:`, font: { size: '16px' } }));
+                for (const chainId of this.supportedNetworks) {
+                    const network = index_38.getNetworkInfo(chainId);
+                    if (network) {
+                        this.supportedNetworksElm.appendChild(this.$render("i-label", { font: { bold: true, size: '16px' }, caption: `${network.name} (${network.chainId})` }));
+                    }
                 }
             }
             this.networkErrModal.visible = true;
@@ -33513,7 +33527,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                         this.$render("i-panel", { class: "content-swap" },
                             this.$render("i-hstack", { class: "my-2", verticalAlignment: "center", horizontalAlignment: "space-between" },
                                 this.$render("i-label", { class: "custom-label", caption: "You Pay" })),
-                            this.$render("i-vstack", { id: "srcChainBox", visible: false, class: "my-2 w-100" },
+                            this.$render("i-vstack", { id: "srcChainBox", class: "my-2 w-100" },
                                 this.$render("i-hstack", { verticalAlignment: "center", horizontalAlignment: "space-between" },
                                     this.$render("i-label", { class: "text--grey", caption: "Selected Source Chain" }),
                                     this.$render("i-label", { id: "srcChainLabel", caption: "-" })),
