@@ -21360,6 +21360,9 @@ define("@scom/scom-swap/config/index.tsx", ["require", "exports", "@ijstech/comp
                         icon.classList.add('pointer');
                         icon.onClick = async (source) => {
                             this.networkPicker.setNetworkByChainId(rowData.chainId);
+                            let key = `${rowData.chainId}_${rowData.walletAddress}`;
+                            delete this.commissionInfoMap[key];
+                            this.commissionInfoList = Object.values(this.commissionInfoMap);
                             this.inputWalletAddress.value = rowData.walletAddress;
                             this.modalAddCommission.visible = true;
                         };
@@ -21380,15 +21383,14 @@ define("@scom/scom-swap/config/index.tsx", ["require", "exports", "@ijstech/comp
                         });
                         icon.classList.add('pointer');
                         icon.onClick = async (source) => {
-                            const index = this.commissionInfoList.findIndex(v => v.walletAddress == rowData.walletAddress && v.chainId == rowData.chainId);
-                            if (index >= 0) {
-                                this.commissionInfoList.splice(index, 1);
-                                this.tableCommissions.data = this.commissionInfoList;
-                                if (this._onCustomCommissionsChanged) {
-                                    await this._onCustomCommissionsChanged({
-                                        commissions: this.commissionInfoList
-                                    });
-                                }
+                            let key = `${rowData.chainId}_${rowData.walletAddress}`;
+                            delete this.commissionInfoMap[key];
+                            this.commissionInfoList = Object.values(this.commissionInfoMap);
+                            this.tableCommissions.data = this.commissionInfoList;
+                            if (this._onCustomCommissionsChanged) {
+                                await this._onCustomCommissionsChanged({
+                                    commissions: this.commissionInfoList
+                                });
                             }
                         };
                         return icon;
@@ -21399,6 +21401,7 @@ define("@scom/scom-swap/config/index.tsx", ["require", "exports", "@ijstech/comp
         async init() {
             super.init();
             this.commissionInfoList = [];
+            this.commissionInfoMap = {};
             const embedderFee = index_27.getEmbedderCommissionFee();
             this.lbCommissionShare.caption = `${index_28.formatNumber(new eth_wallet_11.BigNumber(embedderFee).times(100).toFixed(), 4)} %`;
         }
@@ -21425,13 +21428,16 @@ define("@scom/scom-swap/config/index.tsx", ["require", "exports", "@ijstech/comp
             this.modalAddCommission.visible = true;
         }
         async onConfirmCommissionClicked() {
-            var _a;
+            var _a, _b;
             const embedderFee = index_27.getEmbedderCommissionFee();
-            this.commissionInfoList.push({
-                chainId: (_a = this.networkPicker.selectedNetwork) === null || _a === void 0 ? void 0 : _a.chainId,
+            let key = `${(_a = this.networkPicker.selectedNetwork) === null || _a === void 0 ? void 0 : _a.chainId}_${this.inputWalletAddress.value}`;
+            let record = {
+                chainId: (_b = this.networkPicker.selectedNetwork) === null || _b === void 0 ? void 0 : _b.chainId,
                 walletAddress: this.inputWalletAddress.value,
                 share: embedderFee
-            });
+            };
+            this.commissionInfoList.push(record);
+            this.commissionInfoMap[key] = record;
             this.tableCommissions.data = this.commissionInfoList;
             this.modalAddCommission.visible = false;
             if (this._onCustomCommissionsChanged) {
@@ -21444,14 +21450,14 @@ define("@scom/scom-swap/config/index.tsx", ["require", "exports", "@ijstech/comp
             if (!this.networkPicker.selectedNetwork) {
                 this.lbErrMsg.caption = 'Please select network';
             }
-            else if (this.commissionInfoList.find(v => v.chainId == this.networkPicker.selectedNetwork.chainId)) {
-                this.lbErrMsg.caption = 'This network already exists';
-            }
             else if (!this.inputWalletAddress.value) {
                 this.lbErrMsg.caption = 'Please enter wallet address';
             }
             else if (!index_28.isWalletAddress(this.inputWalletAddress.value)) {
                 this.lbErrMsg.caption = 'Please enter valid wallet address';
+            }
+            else if (this.commissionInfoList.find(x => { var _a; return x.chainId === ((_a = this.networkPicker.selectedNetwork) === null || _a === void 0 ? void 0 : _a.chainId); })) {
+                this.lbErrMsg.caption = 'This network already exists';
             }
             else {
                 this.lbErrMsg.caption = '';

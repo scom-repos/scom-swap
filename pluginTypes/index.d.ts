@@ -11272,6 +11272,7 @@ declare module "@scom/scom-swap/config/index.tsx" {
         private inputWalletAddress;
         private lbCommissionShare;
         private commissionInfoList;
+        private commissionInfoMap;
         private commissionsTableColumns;
         private btnConfirm;
         private lbErrMsg;

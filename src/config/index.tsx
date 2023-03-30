@@ -34,6 +34,7 @@ export default class Config extends Module {
   private inputWalletAddress: Input;
   private lbCommissionShare: Label;
   private commissionInfoList: ICommissionInfo[];
+  private commissionInfoMap: Record<string, ICommissionInfo>;
   private commissionsTableColumns = [
     {
       title: 'Network',
@@ -63,6 +64,9 @@ export default class Config extends Module {
         icon.classList.add('pointer');
         icon.onClick = async (source: Control) => {
           this.networkPicker.setNetworkByChainId(rowData.chainId);
+          let key = `${rowData.chainId}_${rowData.walletAddress}`;
+          delete this.commissionInfoMap[key];
+          this.commissionInfoList = Object.values(this.commissionInfoMap);
           this.inputWalletAddress.value = rowData.walletAddress;
           this.modalAddCommission.visible = true;
         }
@@ -83,15 +87,14 @@ export default class Config extends Module {
         });
         icon.classList.add('pointer');
         icon.onClick = async (source: Control) => {
-          const index = this.commissionInfoList.findIndex(v => v.walletAddress == rowData.walletAddress && v.chainId == rowData.chainId);
-          if (index >= 0) {
-            this.commissionInfoList.splice(index, 1);
-            this.tableCommissions.data = this.commissionInfoList;
-            if (this._onCustomCommissionsChanged) {
-              await this._onCustomCommissionsChanged({
-                commissions: this.commissionInfoList
-              });
-            }
+          let key = `${rowData.chainId}_${rowData.walletAddress}`;
+          delete this.commissionInfoMap[key];
+          this.commissionInfoList = Object.values(this.commissionInfoMap);
+          this.tableCommissions.data = this.commissionInfoList;
+          if (this._onCustomCommissionsChanged) {
+            await this._onCustomCommissionsChanged({
+              commissions: this.commissionInfoList
+            });
           }
         }
         return icon;
@@ -105,6 +108,7 @@ export default class Config extends Module {
   async init() {
     super.init();
     this.commissionInfoList = [];
+    this.commissionInfoMap = {};
     const embedderFee = getEmbedderCommissionFee();
     this.lbCommissionShare.caption = `${formatNumber(new BigNumber(embedderFee).times(100).toFixed(), 4)} %`;
   }
@@ -140,11 +144,16 @@ export default class Config extends Module {
 
   async onConfirmCommissionClicked() {
     const embedderFee = getEmbedderCommissionFee();
-    this.commissionInfoList.push({
+
+    let key = `${this.networkPicker.selectedNetwork?.chainId}_${this.inputWalletAddress.value}`;
+    let record = {
       chainId: this.networkPicker.selectedNetwork?.chainId,
       walletAddress: this.inputWalletAddress.value,
       share: embedderFee
-    })
+    }
+    this.commissionInfoList.push(record);
+    this.commissionInfoMap[key] = record;
+
     this.tableCommissions.data = this.commissionInfoList;
     this.modalAddCommission.visible = false;
 
@@ -159,14 +168,14 @@ export default class Config extends Module {
     if (!this.networkPicker.selectedNetwork) {
       this.lbErrMsg.caption = 'Please select network';
     }
-    else if (this.commissionInfoList.find(v => v.chainId == this.networkPicker.selectedNetwork.chainId)) {
-      this.lbErrMsg.caption = 'This network already exists';
-    }
     else if (!this.inputWalletAddress.value) {
       this.lbErrMsg.caption = 'Please enter wallet address';
     }
     else if (!isWalletAddress(this.inputWalletAddress.value)) {
       this.lbErrMsg.caption = 'Please enter valid wallet address';
+    }
+    else if (this.commissionInfoList.find(x => x.chainId === this.networkPicker.selectedNetwork?.chainId)) {
+      this.lbErrMsg.caption = 'This network already exists';
     }
     else {
       this.lbErrMsg.caption = '';
