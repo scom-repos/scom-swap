@@ -18392,7 +18392,7 @@ define("@scom/scom-swap/swap-utils/index.ts", ["require", "exports", "@ijstech/e
         }
         return isApproveButtonShown;
     }
-    async function composeRouteObj(wallet, routeObj, market, firstTokenObject, firstInput, secondInput, isFromEstimated, needApproveButton, commissionAmount, contractAddress) {
+    async function composeRouteObj(wallet, routeObj, market, firstTokenObject, firstInput, secondInput, isFromEstimated, commissions) {
         const slippageTolerance = index_17.getSlippageTolerance();
         if (!slippageTolerance)
             return null;
@@ -18428,9 +18428,9 @@ define("@scom/scom-swap/swap-utils/index.ts", ["require", "exports", "@ijstech/e
             priceSwap = new eth_wallet_7.BigNumber(1).div(routeObj.price).toNumber();
             priceImpact = Number(routeObj.priceImpact) * 100;
             tradeFee = parseFloat(routeObj.tradeFee);
-            if (needApproveButton) {
-                isApproveButtonShown = await checkIsApproveButtonShown(wallet, firstTokenObject, fromAmount.plus(commissionAmount), market, contractAddress);
-            }
+            const commissionAmount = exports.getCommissionAmount(commissions, fromAmount);
+            const contractAddress = commissionAmount.gt(0) ? index_17.getProxyAddress() : '';
+            isApproveButtonShown = await checkIsApproveButtonShown(wallet, firstTokenObject, fromAmount.plus(commissionAmount), market, contractAddress);
         }
         catch (err) {
             console.log('err', err);
@@ -18918,7 +18918,7 @@ define("@scom/scom-swap/swap-utils/index.ts", ["require", "exports", "@ijstech/e
         return extendedRouteObj;
     }
     exports.getExtendedRouteObjData = getExtendedRouteObjData;
-    async function getAllRoutesData(firstTokenObject, secondTokenObject, firstInput, secondInput, isFromEstimated, useAPI, commissionAmount, contractAddress, targetChainId) {
+    async function getAllRoutesData(firstTokenObject, secondTokenObject, firstInput, secondInput, isFromEstimated, useAPI, commissions) {
         var _a, _b, _c, _d, _e;
         let wallet = eth_wallet_7.Wallet.getClientInstance();
         let resultArr = [];
@@ -18926,10 +18926,10 @@ define("@scom/scom-swap/swap-utils/index.ts", ["require", "exports", "@ijstech/e
             let routeDataArr = [];
             if (useAPI) {
                 if (isFromEstimated) {
-                    routeDataArr = await getBestAmountInRouteFromAPI(wallet, firstTokenObject, secondTokenObject, secondInput.toString(), targetChainId);
+                    routeDataArr = await getBestAmountInRouteFromAPI(wallet, firstTokenObject, secondTokenObject, secondInput.toString());
                 }
                 else {
-                    routeDataArr = await getBestAmountOutRouteFromAPI(wallet, firstTokenObject, secondTokenObject, firstInput.toString(), targetChainId);
+                    routeDataArr = await getBestAmountOutRouteFromAPI(wallet, firstTokenObject, secondTokenObject, firstInput.toString());
                 }
             }
             if (isFromEstimated) {
@@ -18990,7 +18990,7 @@ define("@scom/scom-swap/swap-utils/index.ts", ["require", "exports", "@ijstech/e
                 for (let i = 0; i < routeDataArr.length; i++) {
                     let optionObj = routeDataArr[i];
                     const provider = ((_e = index_17.getProviderList().find(item => item.key === optionObj.provider)) === null || _e === void 0 ? void 0 : _e.key) || '';
-                    let routeObj = await composeRouteObj(wallet, optionObj, provider, firstTokenObject, firstInput, secondInput, isFromEstimated, targetChainId == undefined, commissionAmount, contractAddress);
+                    let routeObj = await composeRouteObj(wallet, optionObj, provider, firstTokenObject, firstInput, secondInput, isFromEstimated, commissions);
                     if (!routeObj)
                         continue;
                     resultArr.push(routeObj);
@@ -23257,6 +23257,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
             this.swapBtn.classList.add('hidden');
         }
         async handleAddRoute() {
+            var _a, _b;
             if (!this.fromToken || !this.toToken || !(this.fromInputValue.gt(0) || this.toInputValue.gt(0)))
                 return;
             this.initRoutes();
@@ -23264,9 +23265,8 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
             this.disableSelectChain(true, true);
             let listRouting = [];
             const useAPI = this._data.category === 'aggregator';
-            const commissionAmount = index_30.getCommissionAmount(this.commissions, this.fromInputValue);
             this.updateContractAddress();
-            listRouting = await index_30.getAllRoutesData(this.fromToken, this.toToken, this.fromInputValue, this.toInputValue, this.isFrom, useAPI, commissionAmount, commissionAmount.gt(0) ? this.contractAddress : undefined);
+            listRouting = await index_30.getAllRoutesData(this.fromToken, this.toToken, this.fromInputValue, this.toInputValue, this.isFrom, useAPI, this.commissions);
             listRouting = listRouting.map((v) => {
                 // const config = ProviderConfigMap[v.provider];
                 return Object.assign(Object.assign({}, v), { isHybrid: false // config.marketCode == Market.HYBRID,
@@ -23309,8 +23309,14 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                     input.value = '-';
                 }
             }
-            if (this.record)
+            if (this.record) {
                 this.setApprovalSpenderAddress();
+                const commissionFee = index_29.getEmbedderCommissionFee();
+                const commissionAmount = index_30.getCommissionAmount(this.commissions, this.record.fromAmount);
+                const total = ((_a = this.record) === null || _a === void 0 ? void 0 : _a.fromAmount) ? new eth_wallet_12.BigNumber(this.record.fromAmount).plus(commissionAmount) : new eth_wallet_12.BigNumber(0);
+                this.lbYouPayTitle.caption = commissionAmount.gt(0) ? `You Pay (incl. ${new eth_wallet_12.BigNumber(commissionFee).times(100)}% fee)` : `You Pay`;
+                this.lbYouPayValue.caption = `${index_31.formatNumber(total)} ${(_b = this.fromToken) === null || _b === void 0 ? void 0 : _b.symbol}`;
+            }
         }
         getProviderCaption(provider, caption) {
             let providerObj;
@@ -23516,14 +23522,13 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
             }
         }
         getPriceInfo() {
-            var _a, _b, _c;
+            var _a;
             const rate = this.getRate();
             const priceImpact = this.getPriceImpact();
             const minimumReceived = this.getMinimumReceived();
             const tradeFeeExactAmount = this.getTradeFeeExactAmount();
             const commissionFee = index_29.getEmbedderCommissionFee();
             const commissionAmount = this.record ? index_30.getCommissionAmount(this.commissions, new eth_wallet_12.BigNumber(this.record.fromAmount || 0)) : new eth_wallet_12.BigNumber(0);
-            const total = ((_a = this.record) === null || _a === void 0 ? void 0 : _a.fromAmount) ? new eth_wallet_12.BigNumber(this.record.fromAmount).plus(commissionAmount) : new eth_wallet_12.BigNumber(0);
             const fees = this.getFeeDetails();
             const countFees = fees.length;
             let feeTooltip;
@@ -23562,13 +23567,8 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                 },
                 {
                     title: "Commission Fee",
-                    value: this.isValidToken ? `${new eth_wallet_12.BigNumber(commissionFee).times(100)}% (${index_31.formatNumber(commissionAmount)} ${(_b = this.fromToken) === null || _b === void 0 ? void 0 : _b.symbol})` : '-',
+                    value: this.isValidToken ? `${new eth_wallet_12.BigNumber(commissionFee).times(100)}% (${index_31.formatNumber(commissionAmount)} ${(_a = this.fromToken) === null || _a === void 0 ? void 0 : _a.symbol})` : '-',
                     isHidden: !index_30.getCurrentCommissions(this.commissions).length
-                },
-                {
-                    title: "Total",
-                    value: this.isValidToken ? `${index_31.formatNumber(total)} ${(_c = this.fromToken) === null || _c === void 0 ? void 0 : _c.symbol}` : '-',
-                    isHidden: false
                 }
             ];
             return info.filter((f) => !f.isHidden);
@@ -23830,7 +23830,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                                 this.$render("i-panel", { id: "srcChainList", class: "icon-list", maxWidth: "100%" })),
                             this.$render("i-range", { id: "fromSlider", class: "custom--slider", width: '100%', min: 0, max: 100, tooltipFormatter: this.tipFormatter, tooltipVisible: true, stepDots: 5, onChanged: index_30.debounce(this.onSliderChange.bind(this), 500, this) }),
                             this.$render("i-hstack", { class: "my-2", verticalAlignment: "center", horizontalAlignment: "space-between" },
-                                this.$render("i-label", { caption: "You Pay", font: { size: '1.125rem', color: '#fff' } })),
+                                this.$render("i-label", { caption: "You Buy", font: { size: '1.125rem', color: '#fff' } })),
                             this.$render("i-panel", { class: "token-box" },
                                 this.$render("i-vstack", { id: "payContainer", class: "input--token-container" },
                                     this.$render("i-hstack", { class: "balance-info", horizontalAlignment: "space-between", verticalAlignment: "center", width: "100%" },
@@ -23842,6 +23842,9 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                                                 this.$render("i-scom-swap-token-selection", { disableSelect: true, id: "firstTokenSelection" })),
                                             this.$render("i-vstack", { id: "payCol" },
                                                 this.$render("i-label", { class: "text-value text-right", caption: " - " })))))),
+                            this.$render("i-hstack", { horizontalAlignment: "space-between" },
+                                this.$render("i-label", { id: 'lbYouPayTitle', caption: "You Pay", font: { size: '1.125rem', color: '#fff' } }),
+                                this.$render("i-label", { id: 'lbYouPayValue', caption: '0', font: { size: '1.125rem', color: '#fff' } })),
                             this.$render("i-panel", { class: "toggle-reverse" },
                                 this.$render("i-image", { id: "toggleReverseImage", width: 32, height: 32, class: "icon-swap rounded-icon", url: assets_7.default.fullPath("img/swap/icon-swap.png"), onClick: this.onRevertSwap.bind(this) })),
                             this.$render("i-panel", { class: "token-box" },

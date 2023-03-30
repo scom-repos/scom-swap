@@ -94,7 +94,7 @@ async function checkIsApproveButtonShown(wallet: any, firstTokenObject: any, fro
   return isApproveButtonShown;
 }
 
-async function composeRouteObj(wallet: any, routeObj: any, market: string, firstTokenObject: any, firstInput: BigNumber, secondInput: BigNumber, isFromEstimated: boolean, needApproveButton: boolean, commissionAmount: BigNumber, contractAddress?: string) {
+async function composeRouteObj(wallet: any, routeObj: any, market: string, firstTokenObject: any, firstInput: BigNumber, secondInput: BigNumber, isFromEstimated: boolean, commissions: ICommissionInfo[]) {
   const slippageTolerance = getSlippageTolerance();
   if (!slippageTolerance) return null;
   let fromAmount = new BigNumber(0);
@@ -129,9 +129,9 @@ async function composeRouteObj(wallet: any, routeObj: any, market: string, first
     priceImpact = Number(routeObj.priceImpact) * 100;
     tradeFee = parseFloat(routeObj.tradeFee);
 
-    if (needApproveButton) {
-      isApproveButtonShown = await checkIsApproveButtonShown(wallet, firstTokenObject, fromAmount.plus(commissionAmount), market, contractAddress);
-    }
+    const commissionAmount = getCommissionAmount(commissions, fromAmount);
+    const contractAddress = commissionAmount.gt(0) ? getProxyAddress() : '';
+    isApproveButtonShown = await checkIsApproveButtonShown(wallet, firstTokenObject, fromAmount.plus(commissionAmount), market, contractAddress);
   } catch (err) {
     console.log('err', err)
     return null;
@@ -655,17 +655,17 @@ async function getExtendedRouteObjData(wallet: any, bestRouteObj: any, tradeFeeM
   return extendedRouteObj;
 }
 
-async function getAllRoutesData(firstTokenObject: ITokenObject, secondTokenObject: ITokenObject, firstInput: BigNumber, secondInput: BigNumber, isFromEstimated: boolean, useAPI: boolean, commissionAmount: BigNumber, contractAddress: string, targetChainId?: number) {
+async function getAllRoutesData(firstTokenObject: ITokenObject, secondTokenObject: ITokenObject, firstInput: BigNumber, secondInput: BigNumber, isFromEstimated: boolean, useAPI: boolean, commissions: ICommissionInfo[]) {
   let wallet: any = Wallet.getClientInstance();
   let resultArr: any[] = [];
   if (firstTokenObject && secondTokenObject && (firstInput.gt(0) || secondInput.gt(0))) {
     let routeDataArr = [];
     if (useAPI) {
       if (isFromEstimated) {
-        routeDataArr = await getBestAmountInRouteFromAPI(wallet, firstTokenObject, secondTokenObject, secondInput.toString(), targetChainId);
+        routeDataArr = await getBestAmountInRouteFromAPI(wallet, firstTokenObject, secondTokenObject, secondInput.toString());
       }
       else {
-        routeDataArr = await getBestAmountOutRouteFromAPI(wallet, firstTokenObject, secondTokenObject, firstInput.toString(), targetChainId);
+        routeDataArr = await getBestAmountOutRouteFromAPI(wallet, firstTokenObject, secondTokenObject, firstInput.toString());
       }
     }
 
@@ -734,7 +734,7 @@ async function getAllRoutesData(firstTokenObject: ITokenObject, secondTokenObjec
       for (let i = 0; i < routeDataArr.length; i++) {
         let optionObj = routeDataArr[i];
         const provider = getProviderList().find(item => item.key === optionObj.provider)?.key || '';
-        let routeObj = await composeRouteObj(wallet, optionObj, provider, firstTokenObject, firstInput, secondInput, isFromEstimated, targetChainId == undefined, commissionAmount, contractAddress);
+        let routeObj = await composeRouteObj(wallet, optionObj, provider, firstTokenObject, firstInput, secondInput, isFromEstimated, commissions);
         if (!routeObj) continue;
         resultArr.push(routeObj);
       }

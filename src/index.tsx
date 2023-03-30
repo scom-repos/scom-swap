@@ -139,6 +139,8 @@ export default class ScomSwap extends Module implements PageBlock {
   private swapBtn: Button;
   // private iconList: Panel;
   private actionSetting: Panel;
+  private lbYouPayTitle: Label;
+  private lbYouPayValue: Label;
 
   private isFrom: boolean;
   private fromToken?: ITokenObject;
@@ -1474,9 +1476,8 @@ export default class ScomSwap extends Module implements PageBlock {
     this.disableSelectChain(true, true);
     let listRouting: any[] = [];
     const useAPI = this._data.category === 'aggregator';
-    const commissionAmount = getCommissionAmount(this.commissions, this.fromInputValue);
     this.updateContractAddress();
-    listRouting = await getAllRoutesData(this.fromToken, this.toToken, this.fromInputValue, this.toInputValue, this.isFrom, useAPI, commissionAmount, commissionAmount.gt(0) ? this.contractAddress : undefined);
+    listRouting = await getAllRoutesData(this.fromToken, this.toToken, this.fromInputValue, this.toInputValue, this.isFrom, useAPI, this.commissions);
     listRouting = listRouting.map((v: any) => {
       // const config = ProviderConfigMap[v.provider];
       return {
@@ -1521,7 +1522,14 @@ export default class ScomSwap extends Module implements PageBlock {
         input.value = '-';
       }
     }
-    if (this.record) this.setApprovalSpenderAddress()
+    if (this.record) {
+      this.setApprovalSpenderAddress();    
+      const commissionFee = getEmbedderCommissionFee();
+      const commissionAmount = getCommissionAmount(this.commissions, this.record.fromAmount);
+      const total = this.record?.fromAmount ? new BigNumber(this.record.fromAmount).plus(commissionAmount) : new BigNumber(0);
+      this.lbYouPayTitle.caption = commissionAmount.gt(0) ? `You Pay (incl. ${new BigNumber(commissionFee).times(100)}% fee)` : `You Pay`;
+      this.lbYouPayValue.caption = `${formatNumber(total)} ${this.fromToken?.symbol}`;
+    }
   }
   getProviderCaption(provider: string | IProvider, caption: string) {
     let providerObj: any;
@@ -1746,7 +1754,6 @@ export default class ScomSwap extends Module implements PageBlock {
     const tradeFeeExactAmount = this.getTradeFeeExactAmount();
     const commissionFee = getEmbedderCommissionFee();
     const commissionAmount = this.record ? getCommissionAmount(this.commissions, new BigNumber(this.record.fromAmount || 0)) : new BigNumber(0);
-    const total = this.record?.fromAmount ? new BigNumber(this.record.fromAmount).plus(commissionAmount) : new BigNumber(0);
 
     const fees = this.getFeeDetails();
     const countFees = fees.length;
@@ -1788,11 +1795,6 @@ export default class ScomSwap extends Module implements PageBlock {
         title: "Commission Fee",
         value: this.isValidToken ? `${new BigNumber(commissionFee).times(100)}% (${formatNumber(commissionAmount)} ${this.fromToken?.symbol})` : '-',
         isHidden: !getCurrentCommissions(this.commissions).length
-      },
-      {
-        title: "Total",
-        value: this.isValidToken ? `${formatNumber(total)} ${this.fromToken?.symbol}` : '-',
-        isHidden: false
       }
     ];
     return info.filter((f: any) => !f.isHidden);
@@ -2383,7 +2385,7 @@ export default class ScomSwap extends Module implements PageBlock {
                 onChanged={debounce(this.onSliderChange.bind(this), 500, this)}
               />
               <i-hstack class="my-2" verticalAlignment="center" horizontalAlignment="space-between">
-                <i-label caption="You Pay" font={{ size: '1.125rem', color: '#fff' }}></i-label>
+                <i-label caption="You Buy" font={{ size: '1.125rem', color: '#fff' }}></i-label>
               </i-hstack>             
               <i-panel class="token-box">
                 <i-vstack id="payContainer" class="input--token-container" >
@@ -2403,6 +2405,10 @@ export default class ScomSwap extends Module implements PageBlock {
                   </i-panel>
                 </i-vstack>
               </i-panel>
+              <i-hstack horizontalAlignment="space-between">
+                <i-label id='lbYouPayTitle' caption="You Pay" font={{ size: '1.125rem', color: '#fff' }}></i-label>
+                <i-label id='lbYouPayValue' caption='0' font={{ size: '1.125rem', color: '#fff' }}></i-label>
+              </i-hstack>
               <i-panel class="toggle-reverse">
                 <i-image id="toggleReverseImage" width={32} height={32} class="icon-swap rounded-icon" url={Assets.fullPath("img/swap/icon-swap.png")} onClick={this.onRevertSwap.bind(this)} />
               </i-panel>

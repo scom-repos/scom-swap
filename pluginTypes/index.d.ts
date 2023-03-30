@@ -10891,7 +10891,7 @@ declare module "@scom/scom-swap/swap-utils/index.ts" {
     function getRouterAddress(key: string): string;
     function getTradeFeeMap(): Promise<TradeFeeMap>;
     function getExtendedRouteObjData(wallet: any, bestRouteObj: any, tradeFeeMap: TradeFeeMap, swapPrice: BigNumber, isHybridOrQueue: boolean): Promise<any>;
-    function getAllRoutesData(firstTokenObject: ITokenObject, secondTokenObject: ITokenObject, firstInput: BigNumber, secondInput: BigNumber, isFromEstimated: boolean, useAPI: boolean, commissionAmount: BigNumber, contractAddress: string, targetChainId?: number): Promise<any[]>;
+    function getAllRoutesData(firstTokenObject: ITokenObject, secondTokenObject: ITokenObject, firstInput: BigNumber, secondInput: BigNumber, isFromEstimated: boolean, useAPI: boolean, commissions: ICommissionInfo[]): Promise<any[]>;
     export const getCurrentCommissions: (commissions: ICommissionInfo[]) => ICommissionInfo[];
     export const getCommissionAmount: (commissions: ICommissionInfo[], amount: BigNumber) => BigNumber;
     interface SwapData {
@@ -11508,6 +11508,8 @@ declare module "@scom/scom-swap" {
         private maxButton;
         private swapBtn;
         private actionSetting;
+        private lbYouPayTitle;
+        private lbYouPayValue;
         private isFrom;
         private fromToken?;
         private toToken?;
