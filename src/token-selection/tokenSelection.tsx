@@ -27,12 +27,12 @@ declare const window: any;
 declare global {
   namespace JSX {
     interface IntrinsicElements {
-      ['swap-token-selection']: TokenSelectionElement;
+      ['i-scom-swap-token-selection']: TokenSelectionElement;
     }
   }
 };
 
-@customElements('swap-token-selection')
+@customElements('i-scom-swap-token-selection')
 export class TokenSelection extends Module {
   private _token?: ITokenObject;
   private _targetChainId: number;
@@ -586,7 +586,7 @@ export class TokenSelection extends Module {
           </i-panel>
           <i-grid-layout id="tokenList" class="token-list" columnsPerRow={1}></i-grid-layout>
         </i-modal>
-        <swap-import-token id="importTokenModal" />
+        <i-scom-swap-import-token id="importTokenModal" />
       </i-panel>
     )
   }

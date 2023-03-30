@@ -387,8 +387,8 @@ export class SwapConfig extends Module {
   private async addContractInfo(parentElm: VStack, providerIndex: number, index: number, item?: IContractInfoUI) {
     const chainId = item?.chainId;
     const hasChainId = !!chainId;
-    const fromTokenSelection: TokenSelection = (<swap-token-selection class={tokenSelectionStyle} width="100%" />);
-    const toTokenSelection: TokenSelection = (<swap-token-selection class={tokenSelectionStyle} width="100%" />);
+    const fromTokenSelection: TokenSelection = (<i-scom-swap-token-selection class={tokenSelectionStyle} width="100%" />);
+    const toTokenSelection: TokenSelection = (<i-scom-swap-token-selection class={tokenSelectionStyle} width="100%" />);
     fromTokenSelection.enabled = hasChainId;
     fromTokenSelection.isBtnMaxShown = false;
     fromTokenSelection.onSelectToken = (token: ITokenObject) => this.updateContractInfo(fromTokenSelection, providerIndex, index, 'fromToken', token);

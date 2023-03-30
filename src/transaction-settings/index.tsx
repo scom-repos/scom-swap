@@ -23,7 +23,7 @@ import styleClass from './index.css';
 declare global {
   namespace JSX {
     interface IntrinsicElements {
-      ['transaction-settings']: ControlElement;
+      ['i-scom-swap-transaction-settings']: ControlElement;
     }
   }
 };
@@ -31,7 +31,7 @@ declare global {
 const listSlippage = [0.1, 0.5, 1];
 
 @customModule
-@customElements('transaction-settings')
+@customElements('i-scom-swap-transaction-settings')
 export class TransactionSettings extends Module {
   private transactionModal: Modal;
   private slippageGroup: Panel;

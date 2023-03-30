@@ -2394,7 +2394,7 @@ export default class ScomSwap extends Module implements PageBlock {
                   <i-panel class="bg-box" width="100%">
                     <i-hstack class="input--token-box" verticalAlignment="center" horizontalAlignment="space-between" width="100%">
                       <i-vstack>
-                        <swap-token-selection disableSelect={true} id="firstTokenSelection"></swap-token-selection>
+                        <i-scom-swap-token-selection disableSelect={true} id="firstTokenSelection"></i-scom-swap-token-selection>
                       </i-vstack>
                       <i-vstack id="payCol">
                         <i-label class="text-value text-right" caption=" - "></i-label>
@@ -2426,7 +2426,7 @@ export default class ScomSwap extends Module implements PageBlock {
                   <i-panel class="bg-box" width="100%">
                     <i-hstack class="input--token-box" verticalAlignment="center" horizontalAlignment="space-between" width="100%">
                       <i-vstack>
-                        <swap-token-selection disableSelect={true} id="secondTokenSelection"></swap-token-selection>
+                        <i-scom-swap-token-selection disableSelect={true} id="secondTokenSelection"></i-scom-swap-token-selection>
                       </i-vstack>
                       <i-vstack id="receiveCol">
                         <i-label class="text-value text-right" caption=" - "></i-label>

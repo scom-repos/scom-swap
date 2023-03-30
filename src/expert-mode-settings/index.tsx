@@ -6,13 +6,13 @@ import styleClass from './index.css';
 declare global {
 	namespace JSX {
 		interface IntrinsicElements {
-			['expert-mode-settings']: ControlElement;
+			['i-scom-swap-expert-mode-settings']: ControlElement;
 		}
 	}
 };
 
 @customModule
-@customElements('expert-mode-settings')
+@customElements('i-scom-swap-expert-mode-settings')
 export class ExpertModeSettings extends Module {
   private expertModal: Modal;
   private $eventBus: IEventBus;

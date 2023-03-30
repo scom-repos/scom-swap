@@ -5,12 +5,12 @@ import Assets from '../assets';
 declare global {
   namespace JSX {
     interface IntrinsicElements {
-      ['price-info']: ControlElement;
+      ['i-scom-swap-price-info']: ControlElement;
     }
   }
 };
 
-@customElements('price-info')
+@customElements('i-scom-swap-price-info')
 export class PriceInfo extends Module {
   private priceContent: Panel;
 

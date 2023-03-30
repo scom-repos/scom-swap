@@ -18,12 +18,12 @@ import { addUserTokens, tokenStore, viewOnExplorerByAddress } from '../store/ind
 declare global {
 	namespace JSX {
 		interface IntrinsicElements {
-			['swap-import-token']: ControlElement;
+			['i-scom-swap-import-token']: ControlElement;
 		}
 	}
 };
 
-@customElements('swap-import-token')
+@customElements('i-scom-swap-import-token')
 export class ImportToken extends Module {
   private importModal: Modal;
   private importBtn: Button;

@@ -10925,7 +10925,7 @@ declare module "@scom/scom-swap/price-info/index.tsx" {
     global {
         namespace JSX {
             interface IntrinsicElements {
-                ['price-info']: ControlElement;
+                ['i-scom-swap-price-info']: ControlElement;
             }
         }
     }
@@ -10954,7 +10954,7 @@ declare module "@scom/scom-swap/token-selection/importToken.tsx" {
     global {
         namespace JSX {
             interface IntrinsicElements {
-                ['swap-import-token']: ControlElement;
+                ['i-scom-swap-import-token']: ControlElement;
             }
         }
     }
@@ -10991,7 +10991,7 @@ declare module "@scom/scom-swap/token-selection/tokenSelection.tsx" {
     global {
         namespace JSX {
             interface IntrinsicElements {
-                ['swap-token-selection']: TokenSelectionElement;
+                ['i-scom-swap-token-selection']: TokenSelectionElement;
             }
         }
     }
@@ -11092,7 +11092,7 @@ declare module "@scom/scom-swap/result/result.tsx" {
     global {
         namespace JSX {
             interface IntrinsicElements {
-                ['swap-result']: ControlElement;
+                ['i-scom-swap-result']: ControlElement;
             }
         }
     }
@@ -11136,7 +11136,7 @@ declare module "@scom/scom-swap/expert-mode-settings/index.tsx" {
     global {
         namespace JSX {
             interface IntrinsicElements {
-                ['expert-mode-settings']: ControlElement;
+                ['i-scom-swap-expert-mode-settings']: ControlElement;
             }
         }
     }
@@ -11162,7 +11162,7 @@ declare module "@scom/scom-swap/transaction-settings/index.tsx" {
     global {
         namespace JSX {
             interface IntrinsicElements {
-                ['transaction-settings']: ControlElement;
+                ['i-scom-swap-transaction-settings']: ControlElement;
             }
         }
     }

@@ -8,7 +8,7 @@ import Assets from '../assets';
 declare global {
 	namespace JSX {
 		interface IntrinsicElements {
-			['swap-result']: ControlElement;
+			['i-scom-swap-result']: ControlElement;
 		}
 	}
 };
@@ -21,7 +21,7 @@ export interface IMessage {
   customRedirect?: any,
 }
 
-@customElements('swap-result')
+@customElements('i-scom-swap-result')
 export class Result extends Module {
   private confirmModal: Modal;
   private mainContent: Panel;

@@ -19442,7 +19442,7 @@ define("@scom/scom-swap/price-info/index.tsx", ["require", "exports", "@ijstech/
         components_7.observable()
     ], PriceInfo.prototype, "headerTitle", void 0);
     PriceInfo = __decorate([
-        components_7.customElements('price-info')
+        components_7.customElements('i-scom-swap-price-info')
     ], PriceInfo);
     exports.PriceInfo = PriceInfo;
 });
@@ -19834,7 +19834,7 @@ define("@scom/scom-swap/token-selection/importToken.tsx", ["require", "exports",
         components_9.observable()
     ], ImportToken.prototype, "_state", void 0);
     ImportToken = __decorate([
-        components_9.customElements('swap-import-token')
+        components_9.customElements('i-scom-swap-import-token')
     ], ImportToken);
     exports.ImportToken = ImportToken;
 });
@@ -20279,7 +20279,7 @@ define("@scom/scom-swap/token-selection/tokenSelection.tsx", ["require", "export
                             this.$render("i-icon", { id: "iconSortUp", class: "icon-sort-up", name: "sort-up" }),
                             this.$render("i-icon", { id: "iconSortDown", class: "icon-sort-down", name: "sort-down" }))),
                     this.$render("i-grid-layout", { id: "tokenList", class: "token-list", columnsPerRow: 1 })),
-                this.$render("swap-import-token", { id: "importTokenModal" })));
+                this.$render("i-scom-swap-import-token", { id: "importTokenModal" })));
         }
     };
     __decorate([
@@ -20289,7 +20289,7 @@ define("@scom/scom-swap/token-selection/tokenSelection.tsx", ["require", "export
         components_10.observable()
     ], TokenSelection.prototype, "filterValue", void 0);
     TokenSelection = __decorate([
-        components_10.customElements('swap-token-selection')
+        components_10.customElements('i-scom-swap-token-selection')
     ], TokenSelection);
     exports.TokenSelection = TokenSelection;
     ;
@@ -20545,7 +20545,7 @@ define("@scom/scom-swap/result/result.tsx", ["require", "exports", "@ijstech/com
         }
     };
     Result = __decorate([
-        components_12.customElements('swap-result')
+        components_12.customElements('i-scom-swap-result')
     ], Result);
     exports.Result = Result;
     ;
@@ -20654,7 +20654,7 @@ define("@scom/scom-swap/expert-mode-settings/index.tsx", ["require", "exports", 
     };
     ExpertModeSettings = __decorate([
         components_14.customModule,
-        components_14.customElements('expert-mode-settings')
+        components_14.customElements('i-scom-swap-expert-mode-settings')
     ], ExpertModeSettings);
     exports.ExpertModeSettings = ExpertModeSettings;
     ;
@@ -21061,7 +21061,7 @@ define("@scom/scom-swap/transaction-settings/index.tsx", ["require", "exports", 
     ], TransactionSettings.prototype, "slippageToleranceMessage", void 0);
     TransactionSettings = __decorate([
         components_16.customModule,
-        components_16.customElements('transaction-settings')
+        components_16.customElements('i-scom-swap-transaction-settings')
     ], TransactionSettings);
     exports.TransactionSettings = TransactionSettings;
     ;
@@ -23839,7 +23839,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                                     this.$render("i-panel", { class: "bg-box", width: "100%" },
                                         this.$render("i-hstack", { class: "input--token-box", verticalAlignment: "center", horizontalAlignment: "space-between", width: "100%" },
                                             this.$render("i-vstack", null,
-                                                this.$render("swap-token-selection", { disableSelect: true, id: "firstTokenSelection" })),
+                                                this.$render("i-scom-swap-token-selection", { disableSelect: true, id: "firstTokenSelection" })),
                                             this.$render("i-vstack", { id: "payCol" },
                                                 this.$render("i-label", { class: "text-value text-right", caption: " - " })))))),
                             this.$render("i-panel", { class: "toggle-reverse" },
@@ -23859,7 +23859,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                                     this.$render("i-panel", { class: "bg-box", width: "100%" },
                                         this.$render("i-hstack", { class: "input--token-box", verticalAlignment: "center", horizontalAlignment: "space-between", width: "100%" },
                                             this.$render("i-vstack", null,
-                                                this.$render("swap-token-selection", { disableSelect: true, id: "secondTokenSelection" })),
+                                                this.$render("i-scom-swap-token-selection", { disableSelect: true, id: "secondTokenSelection" })),
                                             this.$render("i-vstack", { id: "receiveCol" },
                                                 this.$render("i-label", { class: "text-value text-right", caption: " - " }))),
                                         this.$render("i-panel", { id: "routingContainer", class: "routing-container" },
