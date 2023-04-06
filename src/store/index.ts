@@ -1,13 +1,12 @@
 import { application } from '@ijstech/components';
-import { Wallet, WalletPlugin } from '@ijstech/eth-wallet';
+import { Wallet } from '@ijstech/eth-wallet';
 import { EventId, INetwork, ITokenObject } from '../global/index';
 import Assets from '../assets';
 import { DefaultTokens, getTokenIconPath, WETHByChainId } from './data/index';
 import { TokenStore } from './tokens';
-import { getChainId, getChainNativeToken, getCurrentChainId, getDefaultChainId, getNetworkInfo, getWalletOptions, isWalletConnected, setCurrentChainId } from './utils';
+import { getChainId, getChainNativeToken, getCurrentChainId, getDefaultChainId, getNetworkInfo, isWalletConnected, setCurrentChainId } from './utils';
 
 export {
-  //token
   DefaultERC20Tokens,
   ChainNativeTokenByChainId,
   WETHByChainId,
@@ -69,71 +68,6 @@ export const tokenName = (address: string) => {
   let tokenObject = tokenMap[address.toLowerCase()];
   if (!tokenObject) tokenObject = tokenMap[address];
   return tokenObject?.name || '';
-}
-
-export async function logoutWallet() {
-  const wallet = Wallet.getClientInstance();
-  await wallet.disconnect();
-  localStorage.setItem('walletProvider', '');
-  application.EventBus.dispatch(EventId.IsWalletDisconnected, false);
-}
-
-export async function connectWallet(walletPlugin: WalletPlugin, eventHandlers?: { [key: string]: Function }) {
-  // let walletProvider = localStorage.getItem('walletProvider') || '';
-  let wallet: any = Wallet.getClientInstance();
-  let walletOptions = getWalletOptions();
-  if (!wallet.chainId) {
-    wallet.chainId = getDefaultChainId();
-  }
-  let providerOptions = walletOptions[walletPlugin];
-  await wallet.connect(walletPlugin, {
-    onAccountChanged: async (account: string) => {
-      if (eventHandlers && eventHandlers.accountsChanged) {
-        eventHandlers.accountsChanged(account);
-      }
-      const connected = !!account;
-      if (connected) {
-        localStorage.setItem('walletProvider', Wallet.getClientInstance().clientSideProvider?.walletPlugin || '');
-        if (wallet.chainId !== getCurrentChainId()) {
-          setCurrentChainId(wallet.chainId);
-          application.EventBus.dispatch(EventId.chainChanged, wallet.chainId);
-        }
-        tokenStore.updateTokenMapData();
-        await tokenStore.updateAllTokenBalances();
-      }
-      application.EventBus.dispatch(EventId.IsWalletConnected, connected);
-    },
-    onChainChanged: async (chainIdHex: string) => {
-      const chainId = Number(chainIdHex);
-
-      if (eventHandlers && eventHandlers.chainChanged) {
-        eventHandlers.chainChanged(chainId);
-      }
-
-      setCurrentChainId(chainId);
-      tokenStore.updateTokenMapData();
-      await tokenStore.updateAllTokenBalances();
-      application.EventBus.dispatch(EventId.chainChanged, chainId);
-    }
-  }, providerOptions)
-  return wallet;
-}
-
-export const getNetworkImg = (chainId: number) => {
-  try {
-    const network = getNetworkInfo(chainId);
-    if (network) {
-      return Assets.fullPath(network.img);
-    }
-  } catch { }
-  return Assets.fullPath('img/tokens/token-placeholder.svg');
-}
-
-const EMBED_URL = "https://embed.scom.page/#/";
-export const getEmbedLink = (dataUri: string, params?: { [key: string]: string }) => {
-  let queries = new URLSearchParams(params).toString();
-  let url = `${EMBED_URL}${dataUri}${queries ? "?" + queries : ""}`;
-  return url;
 }
 
 export const projectNativeToken = (): ITokenObject & { address: string } | null => {

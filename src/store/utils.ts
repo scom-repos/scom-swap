@@ -1,11 +1,16 @@
 import { application } from '@ijstech/components';
-import { Wallet, WalletPlugin } from '@ijstech/eth-wallet';
+import { Wallet } from '@ijstech/eth-wallet';
 import { EventId, INetwork, IProvider, ITokenObject, SITE_ENV, TokenMapType } from '../global/index';
 import { ChainNativeTokenByChainId } from './data/index';
 
 export {
   ChainNativeTokenByChainId
 } from './data/index';
+
+export enum WalletPlugin {
+  MetaMask = 'metamask',
+  WalletConnect = 'walletconnect',
+}
 
 const TOKENS = "oswap_user_tokens_";
 
@@ -339,93 +344,19 @@ export async function switchNetwork(chainId: number) {
     return;
   }
   const wallet = Wallet.getClientInstance();
-  if (wallet?.clientSideProvider?.walletPlugin === WalletPlugin.MetaMask) {
+  if (wallet?.clientSideProvider?.name === WalletPlugin.MetaMask) {
     await wallet.switchNetwork(chainId);
   }
 }
 
-export const hasWallet = function () {
-  let hasWallet = false;
-  for (let wallet of walletList) {
-    if (Wallet.isInstalled(wallet.name)) {
-      hasWallet = true;
-      break;
-    }
-  }
-  return hasWallet;
-}
-
 export const hasMetaMask = function () {
-  return Wallet.isInstalled(WalletPlugin.MetaMask);
+  const wallet = Wallet.getClientInstance();
+  return wallet?.clientSideProvider?.name === WalletPlugin.MetaMask;
 }
 
 export const truncateAddress = (address: string) => {
   if (address === undefined || address === null) return '';
   return address.substr(0, 6) + '...' + address.substr(-4);
-}
-
-export const walletList = [
-  {
-    name: WalletPlugin.MetaMask,
-    displayName: 'MetaMask',
-    iconFile: 'metamask.png'
-  },
-  {
-    name: WalletPlugin.BitKeepWallet,
-    displayName: 'BitKeep Wallet',
-    iconFile: 'BitKeep.png'
-  },
-  {
-    name: WalletPlugin.ONTOWallet,
-    displayName: 'ONTO Wallet',
-    iconFile: 'ONTOWallet.jpg'
-  },
-  {
-    name: WalletPlugin.Coin98,
-    displayName: 'Coin98 Wallet',
-    iconFile: 'Coin98.svg'
-  },
-  {
-    name: WalletPlugin.TrustWallet,
-    displayName: 'Trust Wallet',
-    iconFile: 'trustwallet.svg'
-  },
-  {
-    name: WalletPlugin.BinanceChainWallet,
-    displayName: 'Binance Chain Wallet',
-    iconFile: 'binance-chain-wallet.svg'
-  },
-  {
-    name: WalletPlugin.WalletConnect,
-    displayName: 'WalletConnect',
-    iconFile: 'walletconnect.svg'
-  }
-]
-
-export const getWalletOptions = (): { [key in WalletPlugin]?: any } => {
-  let networkList = getSiteSupportedNetworks();
-  const rpcs: { [chainId: number]: string } = {}
-  for (const network of networkList) {
-    let rpc = network.rpc
-    if (rpc) rpcs[network.chainId] = rpc;
-  }
-  let walletOptionsMap: any = {};
-  for (let walletItem of walletList) {
-    if (walletItem.name == WalletPlugin.WalletConnect) {
-      walletOptionsMap[walletItem.name] = {
-        infuraId: getInfuraId(),
-        bridge: "https://bridge.walletconnect.org",
-        rpc: rpcs,
-        callWithDefaultProvider: true
-      }
-    }
-    walletOptionsMap[walletItem.name] = {
-      infuraId: getInfuraId(),
-      rpc: rpcs,
-      callWithDefaultProvider: true
-    }
-  }
-  return walletOptionsMap;
 }
 
 export const getBridgeVaultVersion = (chainId: number): string => {
@@ -436,12 +367,6 @@ export const getBridgeVaultVersion = (chainId: number): string => {
   // Mainnet
   return '1.1.1';
 }
-
-// export function getAvailableMarkets() {
-//   let chainId = getChainId();
-//   let markets = availableMarketsByChainId[chainId];
-//   return markets;
-// }
 
 export function getChainId() {
   return isWalletConnected() ? Wallet.getInstance().chainId : getDefaultChainId();

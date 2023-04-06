@@ -10190,9 +10190,12 @@ declare module "@scom/scom-swap/store/data/index.ts" {
 }
 /// <amd-module name="@scom/scom-swap/store/utils.ts" />
 declare module "@scom/scom-swap/store/utils.ts" {
-    import { WalletPlugin } from '@ijstech/eth-wallet';
     import { INetwork, IProvider, ITokenObject, SITE_ENV, TokenMapType } from "@scom/scom-swap/global/index.ts";
     export { ChainNativeTokenByChainId } from "@scom/scom-swap/store/data/index.ts";
+    export enum WalletPlugin {
+        MetaMask = "metamask",
+        WalletConnect = "walletconnect"
+    }
     export type ProxyAddresses = {
         [key: number]: string;
     };
@@ -10259,24 +10262,8 @@ declare module "@scom/scom-swap/store/utils.ts" {
     export function getWalletProvider(): string;
     export function isWalletConnected(): boolean;
     export function switchNetwork(chainId: number): Promise<void>;
-    export const hasWallet: () => boolean;
     export const hasMetaMask: () => boolean;
     export const truncateAddress: (address: string) => string;
-    export const walletList: {
-        name: WalletPlugin;
-        displayName: string;
-        iconFile: string;
-    }[];
-    export const getWalletOptions: () => {
-        metamask?: any;
-        coin98?: any;
-        trustwallet?: any;
-        binancechainwallet?: any;
-        onto?: any;
-        walletconnect?: any;
-        bitkeepwallet?: any;
-        frontierwallet?: any;
-    };
     export const getBridgeVaultVersion: (chainId: number) => string;
     export function getChainId(): number;
     export const getChainNativeToken: (chainId: number) => ITokenObject;
@@ -10308,7 +10295,6 @@ declare module "@scom/scom-swap/store/tokens.ts" {
 }
 /// <amd-module name="@scom/scom-swap/store/index.ts" />
 declare module "@scom/scom-swap/store/index.ts" {
-    import { WalletPlugin } from '@ijstech/eth-wallet';
     import { INetwork, ITokenObject } from "@scom/scom-swap/global/index.ts";
     import { TokenStore } from "@scom/scom-swap/store/tokens.ts";
     export { DefaultERC20Tokens, ChainNativeTokenByChainId, WETHByChainId, DefaultTokens, ToUSDPriceFeedAddressesMap, tokenPriceAMMReference, getTokenIconPath, getOpenSwapToken } from "@scom/scom-swap/store/data/index.ts";
@@ -10321,14 +10307,6 @@ declare module "@scom/scom-swap/store/index.ts" {
     export const getTokenIcon: (address: string) => string;
     export const tokenSymbol: (address: string) => string;
     export const tokenName: (address: string) => string;
-    export function logoutWallet(): Promise<void>;
-    export function connectWallet(walletPlugin: WalletPlugin, eventHandlers?: {
-        [key: string]: Function;
-    }): Promise<any>;
-    export const getNetworkImg: (chainId: number) => string;
-    export const getEmbedLink: (dataUri: string, params?: {
-        [key: string]: string;
-    }) => string;
     export const projectNativeToken: () => (ITokenObject & {
         address: string;
     }) | null;
@@ -11688,7 +11666,7 @@ declare module "@scom/scom-swap" {
         private registerEvent;
         onWalletConnect: (connected: boolean) => Promise<void>;
         onWalletDisconnect: (connected: boolean) => Promise<void>;
-        onChainChange: () => void;
+        onChainChange: () => Promise<void>;
         get supportedNetworks(): any;
         get isApproveButtonShown(): boolean;
         get isPriceImpactTooHigh(): boolean;
@@ -11701,7 +11679,6 @@ declare module "@scom/scom-swap" {
         set lastUpdated(value: number);
         get isValidToken(): boolean;
         get targetTokenMap(): import("@scom/scom-swap/global/index.ts").TokenMapType;
-        private initWalletData;
         getAddressFromUrl: () => void;
         private redirectToken;
         private fixedNumber;

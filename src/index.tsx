@@ -1,5 +1,5 @@
 import { Module, Panel, Icon, Button, Label, VStack, Image, Container, Range, IEventBus, application, customModule, Modal, Input, observable, HStack, Control, customElements, ControlElement, IDataSchema } from '@ijstech/components';
-import { BigNumber, Wallet, WalletPlugin } from '@ijstech/eth-wallet';
+import { BigNumber, Wallet } from '@ijstech/eth-wallet';
 import {} from '@ijstech/eth-contract';
 import Assets from './assets';
 import './index.css';
@@ -10,13 +10,10 @@ import {
   projectNativeTokenSymbol,
   getSlippageTolerance,
   isWalletConnected,
-  hasWallet,
   switchNetwork,
   getTokenIconPath,
   getWalletProvider,
   getMatchNetworks,
-  connectWallet,
-  hasMetaMask,
   getDefaultChainId,
   setDataFromSCConfig,
   setCurrentChainId,
@@ -28,6 +25,7 @@ import {
   getEmbedderCommissionFee,
   getProxyAddress,
   getIPFSGatewayUrl,
+  WalletPlugin,
 } from "./store/index";
 
 import {
@@ -568,7 +566,7 @@ export default class ScomSwap extends Module implements PageBlock {
     this.setProviders();
     if (this._data?.providers?.length) {
       await this.initData();
-      this.onSetupPage(isWalletConnected());
+      await this.onSetupPage(isWalletConnected());
     }
   }
 
@@ -702,7 +700,7 @@ export default class ScomSwap extends Module implements PageBlock {
   private async refreshUI() {
     this.setProviders();
     await this.initData();
-    this.onSetupPage(isWalletConnected());
+    await this.onSetupPage(isWalletConnected());
   }
 
   constructor(parent?: Container, options?: any) {
@@ -730,7 +728,7 @@ export default class ScomSwap extends Module implements PageBlock {
     if (connected && (this.chainId == null || this.chainId == undefined)) {
       this.onChainChange();
     } else {
-      if (this.originalData?.providers?.length) this.onSetupPage(connected);
+      if (this.originalData?.providers?.length) await this.onSetupPage(connected);
     }
   }
 
@@ -742,13 +740,13 @@ export default class ScomSwap extends Module implements PageBlock {
     }
   }
 
-  onChainChange = () => {
+  onChainChange = async () => {
     this.chainId = getChainId();
     if (this.chainId != null && this.chainId != undefined)
       this.swapBtn.classList.remove('hidden');
     // this.availableMarkets = getAvailableMarkets() || [];
     this.updateContractAddress();
-    if (this.originalData?.providers?.length) this.onSetupPage(true);
+    if (this.originalData?.providers?.length) await this.onSetupPage(true);
     this.setSwapButtonText();
   }
 
@@ -813,31 +811,6 @@ export default class ScomSwap extends Module implements PageBlock {
   get targetTokenMap() {
     return tokenStore.tokenMap;
   };
-
-  private initWalletData = async () => {
-    let accountsChangedEventHandler = async (account: string) => {
-      tokenStore.updateTokenMapData();
-    }
-    let chainChangedEventHandler = async (hexChainId: number) => {
-      tokenStore.updateTokenMapData();
-    }
-    let selectedProvider = localStorage.getItem('walletProvider') as WalletPlugin;
-    if (!selectedProvider && hasMetaMask()) {
-      selectedProvider = WalletPlugin.MetaMask;
-    }
-    const isValidProvider = Object.values(WalletPlugin).includes(selectedProvider);
-    if (!Wallet.getClientInstance().chainId) {
-      Wallet.getClientInstance().chainId = getDefaultChainId();
-    }
-    if (hasWallet() && isValidProvider) {
-      await connectWallet(selectedProvider, {
-        'accountsChanged': accountsChangedEventHandler,
-        'chainChanged': chainChangedEventHandler
-      });
-    }
-  }
-
-
 
   getAddressFromUrl = () => {
     const wHref = window.location.href;
@@ -949,6 +922,8 @@ export default class ScomSwap extends Module implements PageBlock {
   private onSetupPage = async (connected: boolean, _chainId?: number) => {
     // this.getAddressFromUrl();
     this.chainId = _chainId ? _chainId : getChainId();
+    tokenStore.updateTokenMapData();
+    await tokenStore.updateAllTokenBalances();
     if (this.supportedNetworks.every((v: string | number) => v != this.chainId)) {
       this.showNetworkErrModal();
       this.resetUI();
@@ -1016,7 +991,9 @@ export default class ScomSwap extends Module implements PageBlock {
   */
   }
 
-  private initTokenSelection() {
+  private async initTokenSelection() {
+    await this.firstTokenSelection.ready();
+    await this.secondTokenSelection.ready();
     this.firstTokenSelection.disableSelect = false;
     this.firstTokenSelection.onSelectToken = (token: ITokenObject) => this.onSelectToken(token, true);
     this.firstTokenSelection.isBtnMaxShown = false;
@@ -2154,7 +2131,7 @@ export default class ScomSwap extends Module implements PageBlock {
     if (this.isMetaMask || !isWalletConnected()) {
       await this.selectSourceChain(obj, img);
       this.chainId = obj.chainId;
-      this.onSetupPage(true, this.chainId);
+      await this.onSetupPage(true, this.chainId);
     }
   }
 
@@ -2317,9 +2294,9 @@ export default class ScomSwap extends Module implements PageBlock {
 
   private async initData() {
     if (!this.isInited) {
-      await this.initWalletData();
+      // await this.initWalletData();
       setCurrentChainId(getDefaultChainId());
-      this.initTokenSelection();
+      await this.initTokenSelection();
       await this.initApprovalModelAction();
       this.isInited = true;
     }
