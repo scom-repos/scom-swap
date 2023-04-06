@@ -14,9 +14,7 @@ import {
   getTokenIconPath,
   getWalletProvider,
   getMatchNetworks,
-  getDefaultChainId,
   setDataFromSCConfig,
-  setCurrentChainId,
   setProviderList,
   getProviderByKey,
   tokenStore,
@@ -2294,8 +2292,6 @@ export default class ScomSwap extends Module implements PageBlock {
 
   private async initData() {
     if (!this.isInited) {
-      // await this.initWalletData();
-      setCurrentChainId(getDefaultChainId());
       await this.initTokenSelection();
       await this.initApprovalModelAction();
       this.isInited = true;

@@ -1,6 +1,6 @@
 import { BigNumber, Contracts, IWallet, Wallet } from '@ijstech/eth-wallet';
 import { ITokenObject, TokenMapType } from '../global/index';
-import { getChainId, getChainNativeToken, getDefaultChainId, getUserTokens } from './utils';
+import { getChainId, getChainNativeToken, getUserTokens } from './utils';
 
 export type DefaultTokensByChainType = Record<number, ITokenObject[]>;
 
@@ -14,8 +14,7 @@ export class TokenStore {
 
   constructor(defaultTokensByChain: DefaultTokensByChainType) {
     this._defaultTokensByChain = defaultTokensByChain;
-    const defaultChainId = getDefaultChainId();
-    this._tokenMap = this._updateTokenMapData(defaultChainId);
+    this._tokenMap = this._updateTokenMapData(Wallet.getInstance().chainId);
   }
 
   public get tokenBalances() {

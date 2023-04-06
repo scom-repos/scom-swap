@@ -135,17 +135,6 @@ export const setTransactionDeadline = (value: any) => {
   state.transactionDeadline = value
 }
 
-export const getDefaultChainId = () => {
-  switch (getSiteEnv()) {
-    case SITE_ENV.TESTNET:
-      return 97
-    case SITE_ENV.DEV:
-    case SITE_ENV.MAINNET:
-    default:
-      return 56
-  }
-}
-
 const setInfuraId = (infuraId: string) => {
   state.infuraId = infuraId;
 }
@@ -359,18 +348,8 @@ export const truncateAddress = (address: string) => {
   return address.substr(0, 6) + '...' + address.substr(-4);
 }
 
-export const getBridgeVaultVersion = (chainId: number): string => {
-  let network = getNetworkInfo(chainId);
-  const isTestnet = !network.isDisabled && network.isTestnet;
-  // Testnet
-  if (isTestnet) return '0.1.9';
-  // Mainnet
-  return '1.1.1';
-}
-
 export function getChainId() {
-  return isWalletConnected() ? Wallet.getInstance().chainId : getDefaultChainId();
-  // return Wallet.getInstance().chainId;
+  return Wallet.getInstance().chainId;
 }
 
 export const getChainNativeToken = (chainId: number): ITokenObject => {

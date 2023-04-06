@@ -17011,7 +17011,7 @@ define("@scom/scom-swap/store/data/index.ts", ["require", "exports", "@scom/scom
 define("@scom/scom-swap/store/utils.ts", ["require", "exports", "@ijstech/components", "@ijstech/eth-wallet", "@scom/scom-swap/global/index.ts", "@scom/scom-swap/store/data/index.ts", "@scom/scom-swap/store/data/index.ts"], function (require, exports, components_4, eth_wallet_4, index_8, index_9, index_10) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.getChainNativeToken = exports.getChainId = exports.getBridgeVaultVersion = exports.truncateAddress = exports.hasMetaMask = exports.switchNetwork = exports.isWalletConnected = exports.getWalletProvider = exports.viewOnExplorerByAddress = exports.viewOnExplorerByTxHash = exports.getProviderByKey = exports.getProviderList = exports.setProviderList = exports.hasUserToken = exports.setUserTokens = exports.getTokensDataList = exports.getNetworkExplorerName = exports.getSiteSupportedNetworks = exports.getMatchNetworks = exports.addUserTokens = exports.getUserTokens = exports.getFilteredNetworks = exports.getNetworkInfo = exports.getInfuraId = exports.getDefaultChainId = exports.setTransactionDeadline = exports.getTransactionDeadline = exports.setSlippageTolerance = exports.getSlippageTolerance = exports.toggleExpertMode = exports.isExpertMode = exports.getCurrentChainId = exports.setCurrentChainId = exports.getSiteEnv = exports.setSiteEnv = exports.getAPIGatewayUrl = exports.getEmbedderCommissionFee = exports.setAPIGatewayUrls = exports.getIPFSGatewayUrl = exports.setIPFSGatewayUrl = exports.getProxyAddress = exports.setProxyAddresses = exports.setDataFromSCConfig = exports.state = exports.WalletPlugin = exports.ChainNativeTokenByChainId = void 0;
+    exports.getChainNativeToken = exports.getChainId = exports.truncateAddress = exports.hasMetaMask = exports.switchNetwork = exports.isWalletConnected = exports.getWalletProvider = exports.viewOnExplorerByAddress = exports.viewOnExplorerByTxHash = exports.getProviderByKey = exports.getProviderList = exports.setProviderList = exports.hasUserToken = exports.setUserTokens = exports.getTokensDataList = exports.getNetworkExplorerName = exports.getSiteSupportedNetworks = exports.getMatchNetworks = exports.addUserTokens = exports.getUserTokens = exports.getFilteredNetworks = exports.getNetworkInfo = exports.getInfuraId = exports.setTransactionDeadline = exports.getTransactionDeadline = exports.setSlippageTolerance = exports.getSlippageTolerance = exports.toggleExpertMode = exports.isExpertMode = exports.getCurrentChainId = exports.setCurrentChainId = exports.getSiteEnv = exports.setSiteEnv = exports.getAPIGatewayUrl = exports.getEmbedderCommissionFee = exports.setAPIGatewayUrls = exports.getIPFSGatewayUrl = exports.setIPFSGatewayUrl = exports.getProxyAddress = exports.setProxyAddresses = exports.setDataFromSCConfig = exports.state = exports.WalletPlugin = exports.ChainNativeTokenByChainId = void 0;
     Object.defineProperty(exports, "ChainNativeTokenByChainId", { enumerable: true, get: function () { return index_10.ChainNativeTokenByChainId; } });
     var WalletPlugin;
     (function (WalletPlugin) {
@@ -17136,17 +17136,6 @@ define("@scom/scom-swap/store/utils.ts", ["require", "exports", "@ijstech/compon
         exports.state.transactionDeadline = value;
     };
     exports.setTransactionDeadline = setTransactionDeadline;
-    const getDefaultChainId = () => {
-        switch (exports.getSiteEnv()) {
-            case index_8.SITE_ENV.TESTNET:
-                return 97;
-            case index_8.SITE_ENV.DEV:
-            case index_8.SITE_ENV.MAINNET:
-            default:
-                return 56;
-        }
-    };
-    exports.getDefaultChainId = getDefaultChainId;
     const setInfuraId = (infuraId) => {
         exports.state.infuraId = infuraId;
     };
@@ -17336,16 +17325,6 @@ define("@scom/scom-swap/store/utils.ts", ["require", "exports", "@ijstech/compon
         }
     }
     exports.switchNetwork = switchNetwork;
-    // export const hasWallet = function () {
-    //   let hasWallet = false;
-    //   for (let wallet of walletList) {
-    //     if (Wallet.isInstalled(wallet.name)) {
-    //       hasWallet = true;
-    //       break;
-    //     }
-    //   }
-    //   return hasWallet;
-    // }
     const hasMetaMask = function () {
         var _a;
         const wallet = eth_wallet_4.Wallet.getClientInstance();
@@ -17358,49 +17337,8 @@ define("@scom/scom-swap/store/utils.ts", ["require", "exports", "@ijstech/compon
         return address.substr(0, 6) + '...' + address.substr(-4);
     };
     exports.truncateAddress = truncateAddress;
-    // export const getWalletOptions = (): { [key in WalletPlugin]?: any } => {
-    //   let networkList = getSiteSupportedNetworks();
-    //   const rpcs: { [chainId: number]: string } = {}
-    //   for (const network of networkList) {
-    //     let rpc = network.rpc
-    //     if (rpc) rpcs[network.chainId] = rpc;
-    //   }
-    //   let walletOptionsMap: any = {};
-    //   for (let walletItem of walletList) {
-    //     if (walletItem.name == WalletPlugin.WalletConnect) {
-    //       walletOptionsMap[walletItem.name] = {
-    //         infuraId: getInfuraId(),
-    //         bridge: "https://bridge.walletconnect.org",
-    //         rpc: rpcs,
-    //         callWithDefaultProvider: true
-    //       }
-    //     }
-    //     walletOptionsMap[walletItem.name] = {
-    //       infuraId: getInfuraId(),
-    //       rpc: rpcs,
-    //       callWithDefaultProvider: true
-    //     }
-    //   }
-    //   return walletOptionsMap;
-    // }
-    const getBridgeVaultVersion = (chainId) => {
-        let network = exports.getNetworkInfo(chainId);
-        const isTestnet = !network.isDisabled && network.isTestnet;
-        // Testnet
-        if (isTestnet)
-            return '0.1.9';
-        // Mainnet
-        return '1.1.1';
-    };
-    exports.getBridgeVaultVersion = getBridgeVaultVersion;
-    // export function getAvailableMarkets() {
-    //   let chainId = getChainId();
-    //   let markets = availableMarketsByChainId[chainId];
-    //   return markets;
-    // }
     function getChainId() {
-        return isWalletConnected() ? eth_wallet_4.Wallet.getInstance().chainId : exports.getDefaultChainId();
-        // return Wallet.getInstance().chainId;
+        return eth_wallet_4.Wallet.getInstance().chainId;
     }
     exports.getChainId = getChainId;
     const getChainNativeToken = (chainId) => {
@@ -17415,8 +17353,7 @@ define("@scom/scom-swap/store/tokens.ts", ["require", "exports", "@ijstech/eth-w
     class TokenStore {
         constructor(defaultTokensByChain) {
             this._defaultTokensByChain = defaultTokensByChain;
-            const defaultChainId = utils_1.getDefaultChainId();
-            this._tokenMap = this._updateTokenMapData(defaultChainId);
+            this._tokenMap = this._updateTokenMapData(eth_wallet_5.Wallet.getInstance().chainId);
         }
         get tokenBalances() {
             return this._tokenBalances;
@@ -17570,7 +17507,6 @@ define("@scom/scom-swap/store/index.ts", ["require", "exports", "@scom/scom-swap
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.getNetworkName = exports.SupportedNetworks = exports.projectNativeTokenSymbol = exports.projectNativeToken = exports.tokenName = exports.tokenSymbol = exports.getTokenIcon = exports.getTokenDecimals = exports.getWETH = exports.nullAddress = exports.setTokenStore = exports.tokenStore = exports.TokenStore = exports.getOpenSwapToken = exports.getTokenIconPath = exports.tokenPriceAMMReference = exports.ToUSDPriceFeedAddressesMap = exports.DefaultTokens = exports.WETHByChainId = exports.ChainNativeTokenByChainId = exports.DefaultERC20Tokens = void 0;
-    //token
     Object.defineProperty(exports, "DefaultERC20Tokens", { enumerable: true, get: function () { return index_12.DefaultERC20Tokens; } });
     Object.defineProperty(exports, "ChainNativeTokenByChainId", { enumerable: true, get: function () { return index_12.ChainNativeTokenByChainId; } });
     Object.defineProperty(exports, "WETHByChainId", { enumerable: true, get: function () { return index_12.WETHByChainId; } });
@@ -17634,44 +17570,6 @@ define("@scom/scom-swap/store/index.ts", ["require", "exports", "@scom/scom-swap
         return (tokenObject === null || tokenObject === void 0 ? void 0 : tokenObject.name) || '';
     };
     exports.tokenName = tokenName;
-    // export async function connectWallet(walletPlugin: WalletPlugin, eventHandlers?: { [key: string]: Function }) {
-    //   // let walletProvider = localStorage.getItem('walletProvider') || '';
-    //   let wallet: any = Wallet.getClientInstance();
-    //   let walletOptions = getWalletOptions();
-    //   if (!wallet.chainId) {
-    //     wallet.chainId = getDefaultChainId();
-    //   }
-    //   let providerOptions = walletOptions[walletPlugin];
-    //   await wallet.connect(walletPlugin, {
-    //     onAccountChanged: async (account: string) => {
-    //       if (eventHandlers && eventHandlers.accountsChanged) {
-    //         eventHandlers.accountsChanged(account);
-    //       }
-    //       const connected = !!account;
-    //       if (connected) {
-    //         localStorage.setItem('walletProvider', Wallet.getClientInstance().clientSideProvider?.walletPlugin || '');
-    //         if (wallet.chainId !== getCurrentChainId()) {
-    //           setCurrentChainId(wallet.chainId);
-    //           application.EventBus.dispatch(EventId.chainChanged, wallet.chainId);
-    //         }
-    //         tokenStore.updateTokenMapData();
-    //         await tokenStore.updateAllTokenBalances();
-    //       }
-    //       application.EventBus.dispatch(EventId.IsWalletConnected, connected);
-    //     },
-    //     onChainChanged: async (chainIdHex: string) => {
-    //       const chainId = Number(chainIdHex);
-    //       if (eventHandlers && eventHandlers.chainChanged) {
-    //         eventHandlers.chainChanged(chainId);
-    //       }
-    //       setCurrentChainId(chainId);
-    //       tokenStore.updateTokenMapData();
-    //       await tokenStore.updateAllTokenBalances();
-    //       application.EventBus.dispatch(EventId.chainChanged, chainId);
-    //     }
-    //   }, providerOptions)
-    //   return wallet;
-    // }
     const projectNativeToken = () => {
         let chainId = utils_2.getChainId();
         if (chainId == null || chainId == undefined)
@@ -19899,7 +19797,6 @@ define("@scom/scom-swap/token-selection/tokenSelection.tsx", ["require", "export
         }
         set disableSelect(value) {
             this._disableSelect = value;
-            // if (!this.btnToken) return;
             this.btnToken.enabled = !value;
             // this.btnToken.rightIcon.name = value ? '' : 'caret-down';
             this.btnToken.rightIcon.visible = !value;
@@ -21681,28 +21578,6 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                     await this.onSetupPage(true);
                 this.setSwapButtonText();
             };
-            // private initWalletData = async () => {
-            //   let accountsChangedEventHandler = async (account: string) => {
-            //     tokenStore.updateTokenMapData();
-            //   }
-            //   let chainChangedEventHandler = async (hexChainId: number) => {
-            //     tokenStore.updateTokenMapData();
-            //   }
-            //   let selectedProvider = localStorage.getItem('walletProvider') as WalletPlugin;
-            //   if (!selectedProvider && hasMetaMask()) {
-            //     selectedProvider = WalletPlugin.MetaMask;
-            //   }
-            //   const isValidProvider = Object.values(WalletPlugin).includes(selectedProvider);
-            //   if (!Wallet.getClientInstance().chainId) {
-            //     Wallet.getClientInstance().chainId = getDefaultChainId();
-            //   }
-            //   if (hasWallet() && isValidProvider) {
-            //     await connectWallet(selectedProvider, {
-            //       'accountsChanged': accountsChangedEventHandler,
-            //       'chainChanged': chainChangedEventHandler
-            //     });
-            //   }
-            // }
             this.getAddressFromUrl = () => {
                 const wHref = window.location.href;
                 const startIdx = wHref.indexOf('?');
@@ -23734,7 +23609,6 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
         async initData() {
             if (!this.isInited) {
                 // await this.initWalletData();
-                index_29.setCurrentChainId(index_29.getDefaultChainId());
                 await this.initTokenSelection();
                 await this.initApprovalModelAction();
                 this.isInited = true;

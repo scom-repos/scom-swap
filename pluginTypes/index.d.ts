@@ -10237,7 +10237,6 @@ declare module "@scom/scom-swap/store/utils.ts" {
     export const setSlippageTolerance: (value: any) => void;
     export const getTransactionDeadline: () => any;
     export const setTransactionDeadline: (value: any) => void;
-    export const getDefaultChainId: () => 97 | 56;
     export const getInfuraId: () => string;
     export const getNetworkInfo: (chainId: number) => INetwork;
     export const getFilteredNetworks: (filter: (value: INetwork, index: number, array: INetwork[]) => boolean) => INetwork[];
@@ -10264,7 +10263,6 @@ declare module "@scom/scom-swap/store/utils.ts" {
     export function switchNetwork(chainId: number): Promise<void>;
     export const hasMetaMask: () => boolean;
     export const truncateAddress: (address: string) => string;
-    export const getBridgeVaultVersion: (chainId: number) => string;
     export function getChainId(): number;
     export const getChainNativeToken: (chainId: number) => ITokenObject;
 }

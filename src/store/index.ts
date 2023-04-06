@@ -4,7 +4,7 @@ import { EventId, INetwork, ITokenObject } from '../global/index';
 import Assets from '../assets';
 import { DefaultTokens, getTokenIconPath, WETHByChainId } from './data/index';
 import { TokenStore } from './tokens';
-import { getChainId, getChainNativeToken, getCurrentChainId, getDefaultChainId, getNetworkInfo, isWalletConnected, setCurrentChainId } from './utils';
+import { getChainId, getChainNativeToken, isWalletConnected, setCurrentChainId } from './utils';
 
 export {
   DefaultERC20Tokens,
