@@ -1,14 +1,16 @@
-export interface INetwork {
-  chainId: number;
-  name: string;
-  img: string;
-  rpc?: string;
+import { INetwork } from '@ijstech/eth-wallet';
+
+export interface IExtendedNetwork extends INetwork {
+  shortName?: string;
   isDisabled?: boolean;
   isMainChain?: boolean;
+  isCrossChainSupported?: boolean;
   explorerName?: string;
   explorerTxUrl?: string;
   explorerAddressUrl?: string;
   isTestnet?: boolean;
+  symbol?: string;
+	env?: string;
 };
 
 export const ABIKeys = {

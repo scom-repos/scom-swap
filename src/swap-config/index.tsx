@@ -220,7 +220,7 @@ export class SwapConfig extends Module {
       const network = getNetworkInfo(item);
       if (network && !network.isDisabled) {
         supportedNetworks.push({
-          label: `${network.name} (${network.chainId})`,
+          label: `${network.chainName} (${network.chainId})`,
           value: `${item}`
         })
       }

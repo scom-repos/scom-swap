@@ -16,9 +16,8 @@ import {
 } from '@ijstech/components';
 import { BigNumber } from '@ijstech/eth-wallet';
 import ScomNetworkPicker from '../scom-network-picker/index';
-import { getEmbedderCommissionFee, SupportedNetworks } from '../store/index';
-import { INetwork, formatNumber, isWalletAddress, ICommissionInfo, IEmbedData } from '../global/index';
-import assets from '../assets';
+import { getEmbedderCommissionFee, getNetworkInfo, SupportedNetworks } from '../store/index';
+import { IExtendedNetwork, formatNumber, isWalletAddress, ICommissionInfo, IEmbedData } from '../global/index';
 import { customStyle, tableStyle } from './index.css'
 const Theme = Styles.Theme.ThemeVars;
 
@@ -50,7 +49,8 @@ export default class Config extends Module {
       onRenderCell: function (source: Control, columnData: number, rowData: any) {
         const network = SupportedNetworks.find(net => net.chainId === columnData)
         if (!network) return <i-panel></i-panel>
-        const imgUrl = assets.img.network[network.img] || ''
+        const networkInfo = getNetworkInfo(network.chainId)
+        const imgUrl = networkInfo.image || ''
         const hstack = new HStack(undefined, {
           verticalAlignment: 'center',
           gap: 5
@@ -59,7 +59,7 @@ export default class Config extends Module {
           image: {url: imgUrl, width: 16, height: 16}
         })
         const lbName = new Label(hstack, {
-          caption: network.name || '',
+          caption: networkInfo.chainName || '',
           font: {size: '0.875rem'}
         })
         hstack.append(imgEl, lbName);
@@ -219,7 +219,7 @@ export default class Config extends Module {
     }
   }
 
-  onNetworkSelected(network: INetwork) {
+  onNetworkSelected(network: IExtendedNetwork) {
     this.validateModalFields();
   }
 

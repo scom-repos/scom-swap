@@ -1,3 +1,5 @@
+import { ITokenObject } from "./common";
+
 export type Category = 'fixed-pair' | 'aggregator';
 
 export interface ISwapConfig {
@@ -51,6 +53,7 @@ export interface ISwapConfigUI {
   category: Category;
   providers: IProviderUI[];
   commissions?: ICommissionInfo[];
+  tokens?: ITokenObject[];
 }
 
 export interface IEmbedData {
