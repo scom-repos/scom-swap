@@ -31,7 +31,7 @@ export class TokenStore {
 
   public getTokenList(chainId: number) {
     if (!chainId) return [];
-    const tokenList = [...this._defaultTokensByChain[chainId]];
+    const tokenList = [...(this._defaultTokensByChain[chainId] || [])];
     const userCustomTokens = getUserTokens(chainId);
     if (userCustomTokens) {
       userCustomTokens.forEach(v => tokenList.push({...v, isNew: false, isCustom: true}));

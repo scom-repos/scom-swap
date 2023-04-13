@@ -24,7 +24,7 @@ import {
   getProxyAddress,
   getIPFSGatewayUrl,
   WalletPlugin,
-  getSupportedTokens,
+  getSupportedTokens
 } from "./store/index";
 
 import {
@@ -43,7 +43,7 @@ import {
   ApprovalStatus,
   EventId,
   IERC20ApprovalAction,
-  INetwork,
+  IExtendedNetwork,
   limitDecimals,
   isInvalidInput,
   SITE_ENV,
@@ -72,6 +72,7 @@ type StatusMapType = 'approve' | 'swap';
 interface ScomSwapElement extends ControlElement {
   category: Category;
   providers: IProviderUI[];
+  tokens?: ITokenObject[];
 }
 
 declare global {
@@ -88,11 +89,13 @@ declare const window: any;
 export default class ScomSwap extends Module implements PageBlock {
   private _oldData: ISwapConfigUI = {
     category: 'fixed-pair',
-    providers: []
+    providers: [],
+    tokens: []
   };
   private _data: ISwapConfigUI = {
     category: 'fixed-pair',
-    providers: []
+    providers: [],
+    tokens: []
   };
   private oldTag: any = {};
   tag: any = {};
@@ -166,14 +169,14 @@ export default class ScomSwap extends Module implements PageBlock {
 
   // Cross Chain
   private toggleReverseImage: Image;
-  private oldSupportedChainList: INetwork[] = [];
-  private supportedChainList: INetwork[] = [];
+  private oldSupportedChainList: IExtendedNetwork[] = [];
+  private supportedChainList: IExtendedNetwork[] = [];
   private srcChainLabel: Label;
   private srcChainList: Panel;
   private desChainLabel: Label;
   private desChainList: Panel;
-  private srcChain: INetwork | undefined;
-  private desChain: INetwork | undefined;
+  private srcChain: IExtendedNetwork | undefined;
+  private desChain: IExtendedNetwork | undefined;
   private targetChainId: number | undefined;
   private srcChainFirstPanel: Panel;
   private targetChainFirstPanel: Panel;
@@ -217,6 +220,13 @@ export default class ScomSwap extends Module implements PageBlock {
 
   set commissions(value: ICommissionInfo[]) {
     this._data.commissions = value;
+  }
+
+  get tokens() {
+    return this._data.tokens;
+  }
+  set tokens(value: ITokenObject[]) {
+    this._data.tokens = value;
   }
 
   getEmbedderActions() {
@@ -963,8 +973,7 @@ export default class ScomSwap extends Module implements PageBlock {
     if (!this.isFixedPair) {
       this.setDefaultToken();
     }
-
-    this.firstTokenSelection.tokenDataListProp = getSupportedTokens() // [];
+    this.firstTokenSelection.tokenDataListProp = getSupportedTokens(this._data.tokens || [], this.chainId);
     this.setTargetTokenList();
 
     //if (connected) {
@@ -2084,11 +2093,11 @@ export default class ScomSwap extends Module implements PageBlock {
     });
   }
 
-  selectSourceChain = async (obj: INetwork, img?: Image) => {
+  selectSourceChain = async (obj: IExtendedNetwork, img?: Image) => {
     if ((this.srcChain && this.srcChain.chainId != obj.chainId) || !this.srcChain) {
       await switchNetwork(obj.chainId);
       this.srcChain = obj;
-      this.srcChainLabel.caption = this.srcChain.name;
+      this.srcChainLabel.caption = this.srcChain.chainName;
       const selected = this.srcChainList.querySelector('.icon-selected');
       if (selected) {
         selected.classList.remove('icon-selected');
@@ -2106,7 +2115,7 @@ export default class ScomSwap extends Module implements PageBlock {
     if (this.secondTokenSelection.targetChainId != srcChainId) {
       this.secondTokenSelection.targetChainId = srcChainId;
     }
-    this.secondTokenSelection.tokenDataListProp = getSupportedTokens()// [];
+    this.secondTokenSelection.tokenDataListProp = getSupportedTokens(this._data.tokens || [], srcChainId);
   }
 
   onSourceChainChanged = () => {
@@ -2117,16 +2126,16 @@ export default class ScomSwap extends Module implements PageBlock {
     this.getSupportedChainList();
     if (!this.chainId)
       this.chainId = this.supportedChainList[0].chainId;
-    const currentNetwork = this.supportedChainList.find((f: INetwork) => f.chainId == this.chainId);
+    const currentNetwork = this.supportedChainList.find((f: IExtendedNetwork) => f.chainId == this.chainId);
     this.srcChain = currentNetwork;
-    this.srcChainLabel.caption = this.srcChain?.name || '-';
-    const img = this.srcChainList.querySelector(`[network-name="${currentNetwork?.name}"]`);
+    this.srcChainLabel.caption = this.srcChain?.chainName || '-';
+    const img = this.srcChainList.querySelector(`[network-name="${currentNetwork?.chainName}"]`);
     if (img) {
       img.classList.add('icon-selected');
     }
   }
 
-  onSelectSourceChain = async (obj: INetwork, img?: Image) => {
+  onSelectSourceChain = async (obj: IExtendedNetwork, img?: Image) => {
     if (this.isMetaMask || !isWalletConnected()) {
       await this.selectSourceChain(obj, img);
       this.chainId = obj.chainId;
@@ -2136,36 +2145,36 @@ export default class ScomSwap extends Module implements PageBlock {
 
   setDefaultChain = async () => {
     if (this.supportedChainList && this.supportedChainList.length) {
-      let obj = this.supportedChainList.find((f: INetwork) => f.chainId == this.chainId);
+      let obj = this.supportedChainList.find((f: IExtendedNetwork) => f.chainId == this.chainId);
       if (!obj)
         obj = this.supportedChainList[0];
       if (!this.srcChain && obj) {
         await this.selectSourceChain(obj);
       }
       this.onSourceChainChanged();
-      const targetChain = this.supportedChainList.find((f: INetwork) => f.chainId == this.targetChainId);
+      const targetChain = this.supportedChainList.find((f: IExtendedNetwork) => f.chainId == this.targetChainId);
       if (this.toToken) {
         const balance = this.getBalance(this.toToken);
         this.receiveBalance.caption = `Balance: ${formatNumber(balance, 4)} ${this.toToken.symbol}`;
       }
       this.setTargetTokenList();
-      this.desChainLabel.caption = this.desChain?.name || '-';
+      this.desChainLabel.caption = this.desChain?.chainName || '-';
     } else {
       this.setTargetTokenList(true);
     }
   };
 
-  initChainIcon = (network: INetwork) => {
+  initChainIcon = (network: IExtendedNetwork) => {
     const img = new Image();
-    img.url = Assets.fullPath(network.img);
-    img.tooltip.content = network.name;
+    img.url = network.image;
+    img.tooltip.content = network.chainName;
     img.classList.add('chain-icon');
-    img.setAttribute('data-tooltip', network.name); // for query
+    img.setAttribute('data-tooltip', network.chainName); // for query
     if (!this.isMetaMask) {
-      img.tooltip.content = `Openswap supports this network ${network.name} (${network.chainId}), please switch network in the connected wallet.`;
+      img.tooltip.content = `Openswap supports this network ${network.chainName} (${network.chainId}), please switch network in the connected wallet.`;
       img.classList.add('icon-disabled');
     }
-    img.setAttribute('network-name', network.name);
+    img.setAttribute('network-name', network.chainName);
     img.setAttribute('chain-id', `${network.chainId}`);
     img.onClick = () => this.onSelectSourceChain(network, img);
     this.srcChainList.appendChild(img);
@@ -2200,7 +2209,7 @@ export default class ScomSwap extends Module implements PageBlock {
     this.desChainList.innerHTML = '';
     this.srcChain = undefined;
     this.desChain = undefined;
-    this.supportedChainList.forEach((network: INetwork) => {
+    this.supportedChainList.forEach((network: IExtendedNetwork) => {
       this.initChainIcon(network);
     });
     await this.setDefaultChain();
@@ -2272,14 +2281,14 @@ export default class ScomSwap extends Module implements PageBlock {
       this.supportedNetworksElm.appendChild(<i-label caption={`No networks are supported. Please configure the swap!`} font={{ size: '16px' }} />)
     } else if (this.supportedChainList.some(v => v.chainId == this.chainId)) {
       const network = getNetworkInfo(this.chainId);
-      this.supportedNetworksElm.appendChild(<i-label caption={`The ${network.name} (${network.chainId}) network has not been configured for the swap!`} font={{ size: '16px' }} />)
+      this.supportedNetworksElm.appendChild(<i-label caption={`The ${network.chainName} (${network.chainId}) network has not been configured for the swap!`} font={{ size: '16px' }} />)
     } else {
       this.supportedNetworksElm.appendChild(<i-label caption={`We only support the following ${this.supportedNetworks.length > 1 ? 'networks' : 'network'}:`} font={{ size: '16px' }} />)
       for (const chainId of this.supportedNetworks) {
         const network = getNetworkInfo(chainId);
         if (network) {
           this.supportedNetworksElm.appendChild(
-            <i-label font={{ bold: true, size: '16px' }} caption={`${network.name} (${network.chainId})`} />
+            <i-label font={{ bold: true, size: '16px' }} caption={`${network.chainName} (${network.chainId})`} />
           )
         }
       }
@@ -2314,8 +2323,9 @@ export default class ScomSwap extends Module implements PageBlock {
     const category = this.getAttribute('category', true, "fixed-pair");
     const providers = this.getAttribute('providers', true, []);
     const commissions = this.getAttribute('commissions', true, []);
+    const tokens = this.getAttribute('tokens', true, []);
     this.updateContractAddress();
-    await this.setData({category, providers, commissions});
+    await this.setData({category, providers, commissions, tokens});
     this.isReadyCallbackQueued = false;
     this.executeReadyCallback();
   }

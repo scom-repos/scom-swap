@@ -1,7 +1,8 @@
 import { application } from '@ijstech/components';
 import { Wallet } from '@ijstech/eth-wallet';
-import { EventId, INetwork, IProvider, ITokenObject, SITE_ENV, TokenMapType } from '../global/index';
+import { EventId, IProvider, ITokenObject, SITE_ENV, TokenMapType, IExtendedNetwork } from '../global/index';
 import { ChainNativeTokenByChainId } from './data/index';
+import getNetworkList from '@scom/scom-network-list'
 
 export {
   ChainNativeTokenByChainId
@@ -24,7 +25,7 @@ export const state = {
   transactionDeadline: 30,
   userTokens: {} as { [key: string]: ITokenObject[] },
   infuraId: "",
-  networkMap: {} as { [key: number]: INetwork },
+  networkMap: {} as { [key: number]: IExtendedNetwork },
   providerList: [] as IProvider[],
   proxyAddresses: {} as ProxyAddresses,
   ipfsGatewayUrl: "",
@@ -52,17 +53,6 @@ export const setDataFromSCConfig = (options: any) => {
   if (options.embedderCommissionFee) {
     setEmbedderCommissionFee(options.embedderCommissionFee);
   }
-  if (options.tokens) {
-    setSupportedTokens(options.tokens)
-  }
-}
-
-export const getSupportedTokens = () => {
-  return state.tokens || []
-}
-
-export const setSupportedTokens = (value: ITokenObject[]) => {
-  state.tokens = value
 }
 
 export const setProxyAddresses = (data: ProxyAddresses) => {
@@ -155,22 +145,27 @@ export const getInfuraId = () => {
   return state.infuraId;
 }
 
-const setNetworkList = (networkList: INetwork[], infuraId?: string) => {
+const setNetworkList = (networkList: IExtendedNetwork[], infuraId?: string) => {
   const wallet = Wallet.getClientInstance();
   state.networkMap = {};
+  const defaultNetworkList = getNetworkList();
+  const defaultNetworkMap = defaultNetworkList.reduce((acc, cur) => {
+    acc[cur.chainId] = cur;
+    return acc;
+  }, {});
   for (let network of networkList) {
-    if (infuraId && network.rpc) {
-      network.rpc = network.rpc.replace(/{InfuraId}/g, infuraId);
+    const networkInfo = defaultNetworkMap[network.chainId];
+    if (!networkInfo) continue;
+    if (infuraId && network.rpcUrls && network.rpcUrls.length > 0) {
+      for (let i = 0; i < network.rpcUrls.length; i++) {
+        network.rpcUrls[i] = network.rpcUrls[i].replace(/{InfuraId}/g, infuraId);
+      }
     }
-    state.networkMap[network.chainId] = network;
-
-    if (network.rpc) {
-      const networkInfo = wallet.getNetworkInfo(network.chainId);
-      wallet.setNetworkInfo({
-        ...networkInfo,
-        rpcUrls: [network.rpc]
-      });
-    }
+    state.networkMap[network.chainId] = {
+      ...networkInfo,
+      ...network
+    };
+    wallet.setNetworkInfo(state.networkMap[network.chainId]);
   }
 }
 
@@ -178,7 +173,7 @@ export const getNetworkInfo = (chainId: number) => {
   return state.networkMap[chainId];
 }
 
-export const getFilteredNetworks = (filter: (value: INetwork, index: number, array: INetwork[]) => boolean) => {
+export const getFilteredNetworks = (filter: (value: IExtendedNetwork, index: number, array: IExtendedNetwork[]) => boolean) => {
   let networkFullList = Object.values(state.networkMap);
   return networkFullList.filter(filter);
 }
@@ -239,7 +234,7 @@ function matchFilter<O extends { [keys: string]: any }>(list: O[], filter: Parti
   }));
 }
 
-export const getMatchNetworks = (conditions: NetworkConditions): INetwork[] => {
+export const getMatchNetworks = (conditions: NetworkConditions): IExtendedNetwork[] => {
   let networkFullList = Object.values(state.networkMap);
   let out = matchFilter(networkFullList, conditions);
   return out;

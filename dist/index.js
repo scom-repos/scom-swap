@@ -13637,12 +13637,12 @@ define("@scom/scom-swap/assets.ts", ["require", "exports", "@ijstech/components"
         logo: fullPath('img/logo.svg'),
         img: {
             network: {
-                bsc: fullPath('img/network/bscMainnet.svg'),
-                eth: fullPath('img/network/ethereumNetwork.svg'),
-                amio: fullPath('img/network/bscMainnet.svg'),
-                avax: fullPath('img/network/avax.svg'),
-                ftm: fullPath('img/network/fantom-ftm-logo.svg'),
-                polygon: fullPath('img/network/polygon.svg'),
+                bsc: fullPath('img/networks/bsc.png'),
+                eth: fullPath('img/networks/eth.png'),
+                amio: fullPath('img/networks/amio.png'),
+                avax: fullPath('img/networks/avax.png'),
+                ftm: fullPath('img/networks/ftm.png'),
+                polygon: fullPath('img/networks/polygon.png'),
             }
         },
         fullPath,
@@ -17008,10 +17008,10 @@ define("@scom/scom-swap/store/data/index.ts", ["require", "exports", "@scom/scom
     Object.defineProperty(exports, "getTokenIconPath", { enumerable: true, get: function () { return index_7.getTokenIconPath; } });
     Object.defineProperty(exports, "getOpenSwapToken", { enumerable: true, get: function () { return index_7.getOpenSwapToken; } });
 });
-define("@scom/scom-swap/store/utils.ts", ["require", "exports", "@ijstech/components", "@ijstech/eth-wallet", "@scom/scom-swap/global/index.ts", "@scom/scom-swap/store/data/index.ts", "@scom/scom-swap/store/data/index.ts"], function (require, exports, components_4, eth_wallet_4, index_8, index_9, index_10) {
+define("@scom/scom-swap/store/utils.ts", ["require", "exports", "@ijstech/components", "@ijstech/eth-wallet", "@scom/scom-swap/global/index.ts", "@scom/scom-swap/store/data/index.ts", "@scom/scom-network-list", "@scom/scom-swap/store/data/index.ts"], function (require, exports, components_4, eth_wallet_4, index_8, index_9, scom_network_list_1, index_10) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.getChainNativeToken = exports.getChainId = exports.truncateAddress = exports.hasMetaMask = exports.switchNetwork = exports.isWalletConnected = exports.getWalletProvider = exports.viewOnExplorerByAddress = exports.viewOnExplorerByTxHash = exports.getProviderByKey = exports.getProviderList = exports.setProviderList = exports.hasUserToken = exports.setUserTokens = exports.getTokensDataList = exports.getNetworkExplorerName = exports.getSiteSupportedNetworks = exports.getMatchNetworks = exports.addUserTokens = exports.getUserTokens = exports.getFilteredNetworks = exports.getNetworkInfo = exports.getInfuraId = exports.setTransactionDeadline = exports.getTransactionDeadline = exports.setSlippageTolerance = exports.getSlippageTolerance = exports.toggleExpertMode = exports.isExpertMode = exports.getCurrentChainId = exports.setCurrentChainId = exports.getSiteEnv = exports.setSiteEnv = exports.getAPIGatewayUrl = exports.getEmbedderCommissionFee = exports.setAPIGatewayUrls = exports.getIPFSGatewayUrl = exports.setIPFSGatewayUrl = exports.getProxyAddress = exports.setProxyAddresses = exports.setSupportedTokens = exports.getSupportedTokens = exports.setDataFromSCConfig = exports.state = exports.WalletPlugin = exports.ChainNativeTokenByChainId = void 0;
+    exports.getChainNativeToken = exports.getChainId = exports.truncateAddress = exports.hasMetaMask = exports.switchNetwork = exports.isWalletConnected = exports.getWalletProvider = exports.viewOnExplorerByAddress = exports.viewOnExplorerByTxHash = exports.getProviderByKey = exports.getProviderList = exports.setProviderList = exports.hasUserToken = exports.setUserTokens = exports.getTokensDataList = exports.getNetworkExplorerName = exports.getSiteSupportedNetworks = exports.getMatchNetworks = exports.addUserTokens = exports.getUserTokens = exports.getFilteredNetworks = exports.getNetworkInfo = exports.getInfuraId = exports.setTransactionDeadline = exports.getTransactionDeadline = exports.setSlippageTolerance = exports.getSlippageTolerance = exports.toggleExpertMode = exports.isExpertMode = exports.getCurrentChainId = exports.setCurrentChainId = exports.getSiteEnv = exports.setSiteEnv = exports.getAPIGatewayUrl = exports.getEmbedderCommissionFee = exports.setAPIGatewayUrls = exports.getIPFSGatewayUrl = exports.setIPFSGatewayUrl = exports.getProxyAddress = exports.setProxyAddresses = exports.setDataFromSCConfig = exports.state = exports.WalletPlugin = exports.ChainNativeTokenByChainId = void 0;
     Object.defineProperty(exports, "ChainNativeTokenByChainId", { enumerable: true, get: function () { return index_10.ChainNativeTokenByChainId; } });
     var WalletPlugin;
     (function (WalletPlugin) {
@@ -17054,19 +17054,8 @@ define("@scom/scom-swap/store/utils.ts", ["require", "exports", "@ijstech/compon
         if (options.embedderCommissionFee) {
             setEmbedderCommissionFee(options.embedderCommissionFee);
         }
-        if (options.tokens) {
-            exports.setSupportedTokens(options.tokens);
-        }
     };
     exports.setDataFromSCConfig = setDataFromSCConfig;
-    const getSupportedTokens = () => {
-        return exports.state.tokens || [];
-    };
-    exports.getSupportedTokens = getSupportedTokens;
-    const setSupportedTokens = (value) => {
-        exports.state.tokens = value;
-    };
-    exports.setSupportedTokens = setSupportedTokens;
     const setProxyAddresses = (data) => {
         exports.state.proxyAddresses = data;
     };
@@ -17158,15 +17147,22 @@ define("@scom/scom-swap/store/utils.ts", ["require", "exports", "@ijstech/compon
     const setNetworkList = (networkList, infuraId) => {
         const wallet = eth_wallet_4.Wallet.getClientInstance();
         exports.state.networkMap = {};
+        const defaultNetworkList = scom_network_list_1.default();
+        const defaultNetworkMap = defaultNetworkList.reduce((acc, cur) => {
+            acc[cur.chainId] = cur;
+            return acc;
+        }, {});
         for (let network of networkList) {
-            if (infuraId && network.rpc) {
-                network.rpc = network.rpc.replace(/{InfuraId}/g, infuraId);
+            const networkInfo = defaultNetworkMap[network.chainId];
+            if (!networkInfo)
+                continue;
+            if (infuraId && network.rpcUrls && network.rpcUrls.length > 0) {
+                for (let i = 0; i < network.rpcUrls.length; i++) {
+                    network.rpcUrls[i] = network.rpcUrls[i].replace(/{InfuraId}/g, infuraId);
+                }
             }
-            exports.state.networkMap[network.chainId] = network;
-            if (network.rpc) {
-                const networkInfo = wallet.getNetworkInfo(network.chainId);
-                wallet.setNetworkInfo(Object.assign(Object.assign({}, networkInfo), { rpcUrls: [network.rpc] }));
-            }
+            exports.state.networkMap[network.chainId] = Object.assign(Object.assign({}, networkInfo), network);
+            wallet.setNetworkInfo(exports.state.networkMap[network.chainId]);
         }
     };
     const getNetworkInfo = (chainId) => {
@@ -17379,7 +17375,7 @@ define("@scom/scom-swap/store/tokens.ts", ["require", "exports", "@ijstech/eth-w
         getTokenList(chainId) {
             if (!chainId)
                 return [];
-            const tokenList = [...this._defaultTokensByChain[chainId]];
+            const tokenList = [...(this._defaultTokensByChain[chainId] || [])];
             const userCustomTokens = utils_1.getUserTokens(chainId);
             if (userCustomTokens) {
                 userCustomTokens.forEach(v => tokenList.push(Object.assign(Object.assign({}, v), { isNew: false, isCustom: true })));
@@ -17518,7 +17514,7 @@ define("@scom/scom-swap/store/tokens.ts", ["require", "exports", "@ijstech/eth-w
 define("@scom/scom-swap/store/index.ts", ["require", "exports", "@scom/scom-swap/assets.ts", "@scom/scom-swap/store/data/index.ts", "@scom/scom-swap/store/tokens.ts", "@scom/scom-swap/store/utils.ts", "@scom/scom-swap/store/data/index.ts", "@scom/scom-swap/store/tokens.ts", "@scom/scom-swap/store/utils.ts", "@scom/scom-swap/store/data/index.ts"], function (require, exports, assets_2, index_11, tokens_1, utils_2, index_12, tokens_2, utils_3, index_13) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.getNetworkName = exports.SupportedNetworks = exports.projectNativeTokenSymbol = exports.projectNativeToken = exports.tokenName = exports.tokenSymbol = exports.getTokenIcon = exports.getTokenDecimals = exports.getWETH = exports.nullAddress = exports.setTokenStore = exports.tokenStore = exports.TokenStore = exports.getOpenSwapToken = exports.getTokenIconPath = exports.tokenPriceAMMReference = exports.ToUSDPriceFeedAddressesMap = exports.DefaultTokens = exports.WETHByChainId = exports.ChainNativeTokenByChainId = exports.DefaultERC20Tokens = void 0;
+    exports.getSupportedTokens = exports.getNetworkName = exports.SupportedNetworks = exports.projectNativeTokenSymbol = exports.projectNativeToken = exports.tokenName = exports.tokenSymbol = exports.getTokenIcon = exports.getTokenDecimals = exports.getWETH = exports.nullAddress = exports.setTokenStore = exports.tokenStore = exports.TokenStore = exports.getOpenSwapToken = exports.getTokenIconPath = exports.tokenPriceAMMReference = exports.ToUSDPriceFeedAddressesMap = exports.DefaultTokens = exports.WETHByChainId = exports.ChainNativeTokenByChainId = exports.DefaultERC20Tokens = void 0;
     Object.defineProperty(exports, "DefaultERC20Tokens", { enumerable: true, get: function () { return index_12.DefaultERC20Tokens; } });
     Object.defineProperty(exports, "ChainNativeTokenByChainId", { enumerable: true, get: function () { return index_12.ChainNativeTokenByChainId; } });
     Object.defineProperty(exports, "WETHByChainId", { enumerable: true, get: function () { return index_12.WETHByChainId; } });
@@ -17597,23 +17593,26 @@ define("@scom/scom-swap/store/index.ts", ["require", "exports", "@scom/scom-swap
     exports.projectNativeTokenSymbol = projectNativeTokenSymbol;
     exports.SupportedNetworks = [
         {
-            name: "BSC Testnet",
-            chainId: 97,
-            img: "bsc"
+            chainName: 'BNB Chain Testnet',
+            chainId: 97
         },
         {
-            name: "Avalanche FUJI C-Chain",
-            chainId: 43113,
-            img: "avax"
+            chainName: "Avalanche FUJI Testnet",
+            chainId: 43113
         }
     ];
     const getNetworkName = (chainId) => {
         var _a;
-        return ((_a = exports.SupportedNetworks.find(v => v.chainId === chainId)) === null || _a === void 0 ? void 0 : _a.name) || "";
+        const network = exports.SupportedNetworks.find(v => v.chainId === chainId);
+        return network ? (((_a = utils_2.getNetworkInfo(network.chainId)) === null || _a === void 0 ? void 0 : _a.image) || '') : '';
     };
     exports.getNetworkName = getNetworkName;
     __exportStar(utils_3, exports);
     __exportStar(index_13, exports);
+    const getSupportedTokens = (tokens, chainId) => {
+        return tokens.filter(token => token.chainId === chainId) || [];
+    };
+    exports.getSupportedTokens = getSupportedTokens;
 });
 define("@scom/scom-swap/contracts/scom-commission-proxy-contract/contracts/Proxy.json.ts", ["require", "exports"], function (require, exports) {
     "use strict";
@@ -21606,7 +21605,7 @@ define("@scom/scom-swap/config/index.css.ts", ["require", "exports", "@ijstech/c
         }
     });
 });
-define("@scom/scom-swap/config/index.tsx", ["require", "exports", "@ijstech/components", "@ijstech/eth-wallet", "@scom/scom-swap/store/index.ts", "@scom/scom-swap/global/index.ts", "@scom/scom-swap/assets.ts", "@scom/scom-swap/config/index.css.ts"], function (require, exports, components_21, eth_wallet_11, index_27, index_28, assets_7, index_css_4) {
+define("@scom/scom-swap/config/index.tsx", ["require", "exports", "@ijstech/components", "@ijstech/eth-wallet", "@scom/scom-swap/store/index.ts", "@scom/scom-swap/global/index.ts", "@scom/scom-swap/config/index.css.ts"], function (require, exports, components_21, eth_wallet_11, index_27, index_28, index_css_4) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     const Theme = components_21.Styles.Theme.ThemeVars;
@@ -21623,7 +21622,8 @@ define("@scom/scom-swap/config/index.tsx", ["require", "exports", "@ijstech/comp
                         const network = index_27.SupportedNetworks.find(net => net.chainId === columnData);
                         if (!network)
                             return this.$render("i-panel", null);
-                        const imgUrl = assets_7.default.img.network[network.img] || '';
+                        const networkInfo = index_27.getNetworkInfo(network.chainId);
+                        const imgUrl = networkInfo.image || '';
                         const hstack = new components_21.HStack(undefined, {
                             verticalAlignment: 'center',
                             gap: 5
@@ -21632,7 +21632,7 @@ define("@scom/scom-swap/config/index.tsx", ["require", "exports", "@ijstech/comp
                             image: { url: imgUrl, width: 16, height: 16 }
                         });
                         const lbName = new components_21.Label(hstack, {
-                            caption: network.name || '',
+                            caption: networkInfo.chainName || '',
                             font: { size: '0.875rem' }
                         });
                         hstack.append(imgEl, lbName);
@@ -21883,106 +21883,75 @@ define("@scom/scom-swap/scconfig.json.ts", ["require", "exports"], function (req
         "infuraId": InfuraId,
         "networks": [
             {
-                "name": "Ethereum",
                 "chainId": 1,
-                "img": "img/network/ethereumNetwork.svg",
-                "rpc": `https://mainnet.infura.io/v3/${InfuraId}`,
                 "explorerName": "Etherscan",
                 "explorerTxUrl": "https://etherscan.io/tx/",
                 "explorerAddressUrl": "https://etherscan.io/address/"
             },
             {
-                "name": "Cronos Mainnet",
                 "chainId": 25,
-                "img": "img/network/cronosMainnet.svg",
                 "isDisabled": true
             },
             {
-                "name": "Binance Smart Chain",
                 "chainId": 56,
-                "img": "img/network/bscMainnet.svg",
-                "rpc": "https://bsc-dataseed.binance.org/",
+                "shortName": "BSC",
                 "isMainChain": true,
+                "isCrossChainSupported": true,
                 "explorerName": "BSCScan",
                 "explorerTxUrl": "https://bscscan.com/tx/",
                 "explorerAddressUrl": "https://bscscan.com/address/"
             },
             {
-                "name": "Polygon",
                 "chainId": 137,
-                "img": "img/network/polygon.svg",
                 "explorerName": "PolygonScan",
                 "explorerTxUrl": "https://polygonscan.com/tx/",
                 "explorerAddressUrl": "https://polygonscan.com/address/"
             },
             {
-                "name": "Fantom Opera",
                 "chainId": 250,
-                "img": "img/network/fantom-ftm-logo.svg",
-                "rpc": "https://rpc.ftm.tools/",
                 "explorerName": "FTMScan",
                 "explorerTxUrl": "https://ftmscan.com/tx/",
                 "explorerAddressUrl": "https://ftmscan.com/address/"
             },
             {
-                "name": "BSC Testnet",
                 "chainId": 97,
-                "img": "img/network/bscMainnet.svg",
-                "rpc": "https://rpc.ankr.com/bsc_testnet_chapel",
                 "isMainChain": true,
+                "isCrossChainSupported": true,
                 "explorerName": "BSCScan",
                 "explorerTxUrl": "https://testnet.bscscan.com/tx/",
                 "explorerAddressUrl": "https://testnet.bscscan.com/address/",
                 "isTestnet": true
             },
             {
-                "name": "Cronos Mainnet",
                 "chainId": 338,
-                "img": "img/network/cronosMainnet.svg",
                 "isDisabled": true
             },
             {
-                "name": "Amino Testnet",
-                "chainId": 31337,
-                "img": "img/network/animoTestnet.svg",
-                "isDisabled": true,
-                "isTestnet": true
-            },
-            {
-                "name": "Mumbai",
                 "chainId": 80001,
-                "img": "img/network/polygon.svg",
-                "rpc": "https://matic-mumbai.chainstacklabs.com",
                 "explorerName": "PolygonScan",
                 "explorerTxUrl": "https://mumbai.polygonscan.com/tx/",
                 "explorerAddressUrl": "https://mumbai.polygonscan.com/address/",
-                "isDisabled": true,
                 "isTestnet": true
             },
             {
-                "name": "Avalanche FUJI C-Chain",
                 "chainId": 43113,
-                "img": "img/network/avax.svg",
-                "rpc": "https://api.avax-test.network/ext/bc/C/rpc",
+                "shortName": "AVAX Testnet",
+                "isCrossChainSupported": true,
                 "explorerName": "SnowTrace",
                 "explorerTxUrl": "https://testnet.snowtrace.io/tx/",
                 "explorerAddressUrl": "https://testnet.snowtrace.io/address/",
                 "isTestnet": true
             },
             {
-                "name": "Avalanche Mainnet C-Chain",
                 "chainId": 43114,
-                "img": "img/network/avax.svg",
-                "rpc": "https://api.avax.network/ext/bc/C/rpc",
+                "shortName": "AVAX",
+                "isCrossChainSupported": true,
                 "explorerName": "SnowTrace",
                 "explorerTxUrl": "https://snowtrace.io/tx/",
                 "explorerAddressUrl": "https://snowtrace.io/address/"
             },
             {
-                "name": "Fantom Testnet",
                 "chainId": 4002,
-                "img": "img/network/fantom-ftm-logo.svg",
-                "rpc": "https://rpc.testnet.fantom.network/",
                 "explorerName": "FTMScan",
                 "explorerTxUrl": "https://testnet.ftmscan.com/tx/",
                 "explorerAddressUrl": "https://testnet.ftmscan.com/address/",
@@ -21990,13 +21959,18 @@ define("@scom/scom-swap/scconfig.json.ts", ["require", "exports"], function (req
                 "isTestnet": true
             },
             {
-                "name": "AminoX Testnet",
                 "chainId": 13370,
-                "img": "img/network/aminoXTestnet.svg",
                 "isDisabled": true,
                 "explorerName": "AminoX Explorer",
                 "explorerTxUrl": "https://aminoxtestnet.blockscout.alphacarbon.network/tx/",
                 "explorerAddressUrl": "https://aminoxtestnet.blockscout.alphacarbon.network/address/",
+                "isTestnet": true
+            },
+            {
+                "chainId": 421613,
+                "explorerName": "ArbiScan",
+                "explorerTxUrl": "https://goerli.arbiscan.io/tx/",
+                "explorerAddressUrl": "https://goerli.arbiscan.io/address/",
                 "isTestnet": true
             }
         ],
@@ -22005,33 +21979,10 @@ define("@scom/scom-swap/scconfig.json.ts", ["require", "exports"], function (req
             "43113": "0x7f1EAB0db83c02263539E3bFf99b638E61916B96"
         },
         "ipfsGatewayUrl": "https://ipfs.scom.dev/ipfs/",
-        "embedderCommissionFee": "0.01",
-        "tokens": [
-            {
-                "name": "OpenSwap",
-                "address": "0x45eee762aaeA4e5ce317471BDa8782724972Ee19",
-                "symbol": "OSWAP",
-                "decimals": 18,
-                "isCommon": true
-            },
-            {
-                "name": "USDT",
-                "address": "0x29386B60e0A9A1a30e1488ADA47256577ca2C385",
-                "symbol": "USDT",
-                "decimals": 6,
-                "isCommon": true
-            },
-            {
-                "name": "BUSD Token",
-                "symbol": "BUSD",
-                "address": "0xDe9334C157968320f26e449331D6544b89bbD00F",
-                "decimals": 18,
-                "isCommon": true
-            }
-        ]
+        "embedderCommissionFee": "0.01"
     };
 });
-define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstech/eth-wallet", "@scom/scom-swap/assets.ts", "@scom/scom-swap/store/index.ts", "@scom/scom-swap/swap-utils/index.ts", "@scom/scom-swap/global/index.ts", "@scom/scom-swap/price-info/index.tsx", "@scom/scom-swap/result/index.tsx", "@scom/scom-swap/expert-mode-settings/index.tsx", "@scom/scom-swap/transaction-settings/index.tsx", "@scom/scom-swap/scconfig.json.ts", "@scom/scom-swap/index.css.ts"], function (require, exports, components_22, eth_wallet_12, assets_8, index_29, index_30, index_31, index_32, index_33, index_34, index_35, scconfig_json_1) {
+define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstech/eth-wallet", "@scom/scom-swap/assets.ts", "@scom/scom-swap/store/index.ts", "@scom/scom-swap/swap-utils/index.ts", "@scom/scom-swap/global/index.ts", "@scom/scom-swap/price-info/index.tsx", "@scom/scom-swap/result/index.tsx", "@scom/scom-swap/expert-mode-settings/index.tsx", "@scom/scom-swap/transaction-settings/index.tsx", "@scom/scom-swap/scconfig.json.ts", "@scom/scom-swap/index.css.ts"], function (require, exports, components_22, eth_wallet_12, assets_7, index_29, index_30, index_31, index_32, index_33, index_34, index_35, scconfig_json_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     const priceImpactTooHighMsg = 'Price Impact Too High. If you want to bypass this check, please turn on Expert Mode';
@@ -22041,17 +21992,19 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
             super(parent, options);
             this._oldData = {
                 category: 'fixed-pair',
-                providers: []
+                providers: [],
+                tokens: []
             };
             this._data = {
                 category: 'fixed-pair',
-                providers: []
+                providers: [],
+                tokens: []
             };
             this.oldTag = {};
             this.tag = {};
             this.defaultEdit = true;
             this.isInited = false;
-            this.fallbackUrl = assets_8.default.fullPath('img/tokens/Custom.png');
+            this.fallbackUrl = assets_7.default.fullPath('img/tokens/Custom.png');
             this._lastUpdated = 0;
             this.oldSupportedChainList = [];
             this.supportedChainList = [];
@@ -22176,7 +22129,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                 if (!this.isFixedPair) {
                     this.setDefaultToken();
                 }
-                this.firstTokenSelection.tokenDataListProp = index_29.getSupportedTokens(); // [];
+                this.firstTokenSelection.tokenDataListProp = index_29.getSupportedTokens(this._data.tokens || [], this.chainId);
                 this.setTargetTokenList();
                 //if (connected) {
                 (_a = this.actionSetting) === null || _a === void 0 ? void 0 : _a.classList.remove("hidden");
@@ -22419,7 +22372,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                 if ((this.srcChain && this.srcChain.chainId != obj.chainId) || !this.srcChain) {
                     await index_29.switchNetwork(obj.chainId);
                     this.srcChain = obj;
-                    this.srcChainLabel.caption = this.srcChain.name;
+                    this.srcChainLabel.caption = this.srcChain.chainName;
                     const selected = this.srcChainList.querySelector('.icon-selected');
                     if (selected) {
                         selected.classList.remove('icon-selected');
@@ -22438,7 +22391,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                 if (this.secondTokenSelection.targetChainId != srcChainId) {
                     this.secondTokenSelection.targetChainId = srcChainId;
                 }
-                this.secondTokenSelection.tokenDataListProp = index_29.getSupportedTokens(); // [];
+                this.secondTokenSelection.tokenDataListProp = index_29.getSupportedTokens(this._data.tokens || [], srcChainId);
             };
             this.onSourceChainChanged = () => {
                 var _a;
@@ -22451,8 +22404,8 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                     this.chainId = this.supportedChainList[0].chainId;
                 const currentNetwork = this.supportedChainList.find((f) => f.chainId == this.chainId);
                 this.srcChain = currentNetwork;
-                this.srcChainLabel.caption = ((_a = this.srcChain) === null || _a === void 0 ? void 0 : _a.name) || '-';
-                const img = this.srcChainList.querySelector(`[network-name="${currentNetwork === null || currentNetwork === void 0 ? void 0 : currentNetwork.name}"]`);
+                this.srcChainLabel.caption = ((_a = this.srcChain) === null || _a === void 0 ? void 0 : _a.chainName) || '-';
+                const img = this.srcChainList.querySelector(`[network-name="${currentNetwork === null || currentNetwork === void 0 ? void 0 : currentNetwork.chainName}"]`);
                 if (img) {
                     img.classList.add('icon-selected');
                 }
@@ -22480,7 +22433,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                         this.receiveBalance.caption = `Balance: ${index_31.formatNumber(balance, 4)} ${this.toToken.symbol}`;
                     }
                     this.setTargetTokenList();
-                    this.desChainLabel.caption = ((_a = this.desChain) === null || _a === void 0 ? void 0 : _a.name) || '-';
+                    this.desChainLabel.caption = ((_a = this.desChain) === null || _a === void 0 ? void 0 : _a.chainName) || '-';
                 }
                 else {
                     this.setTargetTokenList(true);
@@ -22488,15 +22441,15 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
             };
             this.initChainIcon = (network) => {
                 const img = new components_22.Image();
-                img.url = assets_8.default.fullPath(network.img);
-                img.tooltip.content = network.name;
+                img.url = network.image;
+                img.tooltip.content = network.chainName;
                 img.classList.add('chain-icon');
-                img.setAttribute('data-tooltip', network.name); // for query
+                img.setAttribute('data-tooltip', network.chainName); // for query
                 if (!this.isMetaMask) {
-                    img.tooltip.content = `Openswap supports this network ${network.name} (${network.chainId}), please switch network in the connected wallet.`;
+                    img.tooltip.content = `Openswap supports this network ${network.chainName} (${network.chainId}), please switch network in the connected wallet.`;
                     img.classList.add('icon-disabled');
                 }
-                img.setAttribute('network-name', network.name);
+                img.setAttribute('network-name', network.chainName);
                 img.setAttribute('chain-id', `${network.chainId}`);
                 img.onClick = () => this.onSelectSourceChain(network, img);
                 this.srcChainList.appendChild(img);
@@ -22601,6 +22554,12 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
         }
         set commissions(value) {
             this._data.commissions = value;
+        }
+        get tokens() {
+            return this._data.tokens;
+        }
+        set tokens(value) {
+            this._data.tokens = value;
         }
         getEmbedderActions() {
             const propertiesSchema = {
@@ -23288,10 +23247,10 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                 return;
             this.setupCrossChainPopup();
             const slippageTolerance = index_29.getSlippageTolerance();
-            this.fromTokenImage.url = assets_8.default.fullPath(index_29.getTokenIconPath(this.fromToken, this.chainId));
+            this.fromTokenImage.url = assets_7.default.fullPath(index_29.getTokenIconPath(this.fromToken, this.chainId));
             this.fromTokenLabel.caption = (_b = (_a = this.fromToken) === null || _a === void 0 ? void 0 : _a.symbol) !== null && _b !== void 0 ? _b : '';
             this.fromTokenValue.caption = index_31.formatNumber(this.totalAmount(), 4);
-            this.toTokenImage.url = assets_8.default.fullPath(index_29.getTokenIconPath(this.toToken, this.chainId));
+            this.toTokenImage.url = assets_7.default.fullPath(index_29.getTokenIconPath(this.toToken, this.chainId));
             this.toTokenLabel.caption = (_d = (_c = this.toToken) === null || _c === void 0 ? void 0 : _c.symbol) !== null && _d !== void 0 ? _d : '';
             this.toTokenValue.caption = index_31.formatNumber(this.toInputValue, 4);
             const minimumReceived = this.getMinReceivedMaxSold();
@@ -24095,14 +24054,14 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
             }
             else if (this.supportedChainList.some(v => v.chainId == this.chainId)) {
                 const network = index_29.getNetworkInfo(this.chainId);
-                this.supportedNetworksElm.appendChild(this.$render("i-label", { caption: `The ${network.name} (${network.chainId}) network has not been configured for the swap!`, font: { size: '16px' } }));
+                this.supportedNetworksElm.appendChild(this.$render("i-label", { caption: `The ${network.chainName} (${network.chainId}) network has not been configured for the swap!`, font: { size: '16px' } }));
             }
             else {
                 this.supportedNetworksElm.appendChild(this.$render("i-label", { caption: `We only support the following ${this.supportedNetworks.length > 1 ? 'networks' : 'network'}:`, font: { size: '16px' } }));
                 for (const chainId of this.supportedNetworks) {
                     const network = index_29.getNetworkInfo(chainId);
                     if (network) {
-                        this.supportedNetworksElm.appendChild(this.$render("i-label", { font: { bold: true, size: '16px' }, caption: `${network.name} (${network.chainId})` }));
+                        this.supportedNetworksElm.appendChild(this.$render("i-label", { font: { bold: true, size: '16px' }, caption: `${network.chainName} (${network.chainId})` }));
                     }
                 }
             }
@@ -24133,8 +24092,9 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
             const category = this.getAttribute('category', true, "fixed-pair");
             const providers = this.getAttribute('providers', true, []);
             const commissions = this.getAttribute('commissions', true, []);
+            const tokens = this.getAttribute('tokens', true, []);
             this.updateContractAddress();
-            await this.setData({ category, providers, commissions });
+            await this.setData({ category, providers, commissions, tokens });
             this.isReadyCallbackQueued = false;
             this.executeReadyCallback();
         }
@@ -24143,7 +24103,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                 this.$render("i-panel", { class: "pageblock-swap" },
                     this.$render("i-panel", { id: "swapContainer" },
                         this.$render("i-panel", { class: "bill-board" },
-                            this.$render("i-image", { url: assets_8.default.fullPath("img/swap/swap.svg") })),
+                            this.$render("i-image", { url: assets_7.default.fullPath("img/swap/swap.svg") })),
                         this.$render("i-panel", null,
                             this.$render("i-hstack", { wrap: "wrap", horizontalAlignment: "space-between", verticalAlignment: "center" },
                                 this.$render("i-panel", { id: "iconList", class: "icon-list" }),
@@ -24175,7 +24135,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                                 this.$render("i-label", { id: 'lbYouPayTitle', caption: "You Pay", font: { size: '1.125rem', color: '#fff' } }),
                                 this.$render("i-label", { id: 'lbYouPayValue', caption: '0', font: { size: '1.125rem', color: '#fff' } })),
                             this.$render("i-panel", { class: "toggle-reverse" },
-                                this.$render("i-image", { id: "toggleReverseImage", width: 32, height: 32, class: "icon-swap rounded-icon", url: assets_8.default.fullPath("img/swap/icon-swap.png"), onClick: this.onRevertSwap.bind(this) })),
+                                this.$render("i-image", { id: "toggleReverseImage", width: 32, height: 32, class: "icon-swap rounded-icon", url: assets_7.default.fullPath("img/swap/icon-swap.png"), onClick: this.onRevertSwap.bind(this) })),
                             this.$render("i-panel", { class: "token-box" },
                                 this.$render("i-vstack", { id: "receiveContainer", class: "input--token-container" },
                                     this.$render("i-vstack", { class: "balance-info", width: "100%" },

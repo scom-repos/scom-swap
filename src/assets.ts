@@ -38,12 +38,12 @@ export default {
   logo: fullPath('img/logo.svg'),
   img: {
     network: {
-      bsc: fullPath('img/network/bscMainnet.svg'),
-      eth: fullPath('img/network/ethereumNetwork.svg'),
-      amio: fullPath('img/network/bscMainnet.svg'),
-      avax: fullPath('img/network/avax.svg'),
-      ftm: fullPath('img/network/fantom-ftm-logo.svg'),
-      polygon: fullPath('img/network/polygon.svg'),
+      bsc: fullPath('img/networks/bsc.png'),
+      eth: fullPath('img/networks/eth.png'),
+      amio: fullPath('img/networks/amio.png'),
+      avax: fullPath('img/networks/avax.png'),
+      ftm: fullPath('img/networks/ftm.png'),
+      polygon: fullPath('img/networks/polygon.png'),
     }
   },
   fullPath,

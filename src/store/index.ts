@@ -1,10 +1,8 @@
-import { application } from '@ijstech/components';
-import { Wallet } from '@ijstech/eth-wallet';
-import { EventId, INetwork, ITokenObject } from '../global/index';
+import { IExtendedNetwork, ITokenObject } from '../global/index';
 import Assets from '../assets';
 import { DefaultTokens, getTokenIconPath, WETHByChainId } from './data/index';
 import { TokenStore } from './tokens';
-import { getChainId, getChainNativeToken, isWalletConnected, setCurrentChainId } from './utils';
+import { getChainId, getChainNativeToken, getNetworkInfo, isWalletConnected } from './utils';
 
 export {
   DefaultERC20Tokens,
@@ -82,22 +80,25 @@ export const projectNativeTokenSymbol = () => {
   return token ? token.symbol : ''
 };
 
-export const SupportedNetworks: INetwork[] = [
+export const SupportedNetworks = [
   {
-    name: "BSC Testnet",
-    chainId: 97,
-    img: "bsc"
+    chainName: 'BNB Chain Testnet',
+    chainId: 97
   },
   {
-    name: "Avalanche FUJI C-Chain",
-    chainId: 43113,
-    img: "avax"
+    chainName: "Avalanche FUJI Testnet",
+    chainId: 43113
   }
 ];
 
 export const getNetworkName = (chainId: number) => {
-  return SupportedNetworks.find(v => v.chainId === chainId)?.name || ""
+  const network = SupportedNetworks.find(v => v.chainId === chainId)
+  return network ? (getNetworkInfo(network.chainId)?.image || '') : ''
 }
 
 export * from './utils';
 export * from './data/index';
+
+export const getSupportedTokens = (tokens: ITokenObject[], chainId: number) => {
+  return tokens.filter(token => token.chainId === chainId) || []
+}

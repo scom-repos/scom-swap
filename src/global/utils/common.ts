@@ -13,6 +13,7 @@ export interface ITokenObject {
   isNative?: boolean | null;
   isWETH?: boolean | null;
   isNew?: boolean | null;
+  chainId?: number;
 };
 
 export type TokenMapType = { [token: string]: ITokenObject; };

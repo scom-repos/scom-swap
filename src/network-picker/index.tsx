@@ -14,10 +14,10 @@ import {
   Control
 } from '@ijstech/components'
 import { } from '@ijstech/eth-contract'
-import { INetwork } from '../global/index'
 import { switchNetwork } from '../store/index'
 import Assets from '../assets'
 import customStyles from './index.css'
+import { INetwork } from '@ijstech/eth-wallet'
 
 interface PickerElement extends ControlElement {
   networks?: INetwork[] | '*';
@@ -84,16 +84,13 @@ export default class ScomNetworkPicker extends Module {
 
   private setNetwork(network: INetwork) {
     this._selectedNetwork = network;
-    const img = this._selectedNetwork?.img
-      ? Assets.img.network[this._selectedNetwork.img] ||
-      application.assets(this._selectedNetwork.img)
-      : undefined
+    const img = this._selectedNetwork.image || undefined
     if (this.btnNetwork) {
       this.btnNetwork.caption = `<i-hstack verticalAlignment="center" gap="1.125rem">
         <i-panel>
           <i-image width=${17} height=${17} url="${img}"></i-image>
         </i-panel>
-        <i-label caption="${this._selectedNetwork?.name ?? ''}"></i-label>
+        <i-label caption="${this._selectedNetwork?.chainName ?? ''}"></i-label>
       </i-hstack>`
     }
     this.networkMapper?.forEach((value, key) => {
@@ -112,9 +109,9 @@ export default class ScomNetworkPicker extends Module {
     this.networkMapper = new Map()
     this.gridNetworkGroup.append(
       ...this._networkList.map((network) => {
-        const img = network.img ? (
+        const img = network.image ? (
           <i-image
-            url={Assets.img.network[network.img] || application.assets(network.img)}
+            url={network.image}
             width={16}
             height={16}
           />
@@ -140,7 +137,7 @@ export default class ScomNetworkPicker extends Module {
             >
               <i-panel>{img}</i-panel>
               <i-label
-                caption={network.name}
+                caption={network.chainName}
                 wordBreak='break-word'
                 font={{
                   size: '.875rem',

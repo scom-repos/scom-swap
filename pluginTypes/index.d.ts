@@ -9584,6 +9584,7 @@ declare module "@scom/scom-swap/global/utils/common.ts" {
         isNative?: boolean | null;
         isWETH?: boolean | null;
         isNew?: boolean | null;
+        chainId?: number;
     }
     export type TokenMapType = {
         [token: string]: ITokenObject;
@@ -9702,6 +9703,7 @@ declare module "@scom/scom-swap/global/utils/approvalModel.ts" {
 }
 /// <amd-module name="@scom/scom-swap/global/utils/swapInterface.ts" />
 declare module "@scom/scom-swap/global/utils/swapInterface.ts" {
+    import { ITokenObject } from "@scom/scom-swap/global/utils/common.ts";
     export type Category = 'fixed-pair' | 'aggregator';
     export interface ISwapConfig {
         category: Category;
@@ -9750,6 +9752,7 @@ declare module "@scom/scom-swap/global/utils/swapInterface.ts" {
         category: Category;
         providers: IProviderUI[];
         commissions?: ICommissionInfo[];
+        tokens?: ITokenObject[];
     }
     export interface IEmbedData {
         category?: Category;
@@ -9768,17 +9771,18 @@ declare module "@scom/scom-swap/global/utils/index.ts" {
 }
 /// <amd-module name="@scom/scom-swap/global/index.ts" />
 declare module "@scom/scom-swap/global/index.ts" {
-    export interface INetwork {
-        chainId: number;
-        name: string;
-        img: string;
-        rpc?: string;
+    import { INetwork } from '@ijstech/eth-wallet';
+    export interface IExtendedNetwork extends INetwork {
+        shortName?: string;
         isDisabled?: boolean;
         isMainChain?: boolean;
+        isCrossChainSupported?: boolean;
         explorerName?: string;
         explorerTxUrl?: string;
         explorerAddressUrl?: string;
         isTestnet?: boolean;
+        symbol?: string;
+        env?: string;
     }
     export const ABIKeys: {
         Factory: string;
@@ -10190,7 +10194,7 @@ declare module "@scom/scom-swap/store/data/index.ts" {
 }
 /// <amd-module name="@scom/scom-swap/store/utils.ts" />
 declare module "@scom/scom-swap/store/utils.ts" {
-    import { INetwork, IProvider, ITokenObject, SITE_ENV, TokenMapType } from "@scom/scom-swap/global/index.ts";
+    import { IProvider, ITokenObject, SITE_ENV, TokenMapType, IExtendedNetwork } from "@scom/scom-swap/global/index.ts";
     export { ChainNativeTokenByChainId } from "@scom/scom-swap/store/data/index.ts";
     export enum WalletPlugin {
         MetaMask = "metamask",
@@ -10210,7 +10214,7 @@ declare module "@scom/scom-swap/store/utils.ts" {
         };
         infuraId: string;
         networkMap: {
-            [key: number]: INetwork;
+            [key: number]: IExtendedNetwork;
         };
         providerList: IProvider[];
         proxyAddresses: ProxyAddresses;
@@ -10220,8 +10224,6 @@ declare module "@scom/scom-swap/store/utils.ts" {
         tokens: any[];
     };
     export const setDataFromSCConfig: (options: any) => void;
-    export const getSupportedTokens: () => any[];
-    export const setSupportedTokens: (value: ITokenObject[]) => void;
     export const setProxyAddresses: (data: ProxyAddresses) => void;
     export const getProxyAddress: (chainId?: number) => string;
     export const setIPFSGatewayUrl: (url: string) => void;
@@ -10241,8 +10243,8 @@ declare module "@scom/scom-swap/store/utils.ts" {
     export const getTransactionDeadline: () => any;
     export const setTransactionDeadline: (value: any) => void;
     export const getInfuraId: () => string;
-    export const getNetworkInfo: (chainId: number) => INetwork;
-    export const getFilteredNetworks: (filter: (value: INetwork, index: number, array: INetwork[]) => boolean) => INetwork[];
+    export const getNetworkInfo: (chainId: number) => IExtendedNetwork;
+    export const getFilteredNetworks: (filter: (value: IExtendedNetwork, index: number, array: IExtendedNetwork[]) => boolean) => IExtendedNetwork[];
     export const getUserTokens: (chainId: number) => any[] | null;
     export const addUserTokens: (token: ITokenObject) => void;
     interface NetworkConditions {
@@ -10250,8 +10252,8 @@ declare module "@scom/scom-swap/store/utils.ts" {
         isTestnet?: boolean;
         isMainChain?: boolean;
     }
-    export const getMatchNetworks: (conditions: NetworkConditions) => INetwork[];
-    export const getSiteSupportedNetworks: () => INetwork[];
+    export const getMatchNetworks: (conditions: NetworkConditions) => IExtendedNetwork[];
+    export const getSiteSupportedNetworks: () => IExtendedNetwork[];
     export const getNetworkExplorerName: (chainId: number) => string;
     export const getTokensDataList: (tokenMapData: TokenMapType, tokenBalances: any) => Promise<any[]>;
     export const setUserTokens: (token: ITokenObject, chainId: number) => void;
@@ -10296,7 +10298,7 @@ declare module "@scom/scom-swap/store/tokens.ts" {
 }
 /// <amd-module name="@scom/scom-swap/store/index.ts" />
 declare module "@scom/scom-swap/store/index.ts" {
-    import { INetwork, ITokenObject } from "@scom/scom-swap/global/index.ts";
+    import { ITokenObject } from "@scom/scom-swap/global/index.ts";
     import { TokenStore } from "@scom/scom-swap/store/tokens.ts";
     export { DefaultERC20Tokens, ChainNativeTokenByChainId, WETHByChainId, DefaultTokens, ToUSDPriceFeedAddressesMap, tokenPriceAMMReference, getTokenIconPath, getOpenSwapToken } from "@scom/scom-swap/store/data/index.ts";
     export { TokenStore, TokenBalancesType, DefaultTokensByChainType } from "@scom/scom-swap/store/tokens.ts";
@@ -10312,10 +10314,14 @@ declare module "@scom/scom-swap/store/index.ts" {
         address: string;
     }) | null;
     export const projectNativeTokenSymbol: () => string;
-    export const SupportedNetworks: INetwork[];
+    export const SupportedNetworks: {
+        chainName: string;
+        chainId: number;
+    }[];
     export const getNetworkName: (chainId: number) => string;
     export * from "@scom/scom-swap/store/utils.ts";
     export * from "@scom/scom-swap/store/data/index.ts";
+    export const getSupportedTokens: (tokens: ITokenObject[], chainId: number) => ITokenObject[];
 }
 /// <amd-module name="@scom/scom-swap/contracts/scom-commission-proxy-contract/contracts/Proxy.json.ts" />
 declare module "@scom/scom-swap/contracts/scom-commission-proxy-contract/contracts/Proxy.json.ts" {
@@ -11204,7 +11210,7 @@ declare module "@scom/scom-swap/scom-network-picker/assets.ts" {
 declare module "@scom/scom-swap/scom-network-picker/store/interface.ts" {
     export interface INetwork {
         chainId: number;
-        name: string;
+        name?: string;
         img?: string;
         rpc?: string;
         symbol?: string;
@@ -11308,7 +11314,7 @@ declare module "@scom/scom-swap/config/index.css.ts" {
 /// <amd-module name="@scom/scom-swap/config/index.tsx" />
 declare module "@scom/scom-swap/config/index.tsx" {
     import { Module, ControlElement } from '@ijstech/components';
-    import { INetwork, IEmbedData } from "@scom/scom-swap/global/index.ts";
+    import { IExtendedNetwork, IEmbedData } from "@scom/scom-swap/global/index.ts";
     global {
         namespace JSX {
             interface IntrinsicElements {
@@ -11338,7 +11344,7 @@ declare module "@scom/scom-swap/config/index.tsx" {
         onAddCommissionClicked(): void;
         onConfirmCommissionClicked(): Promise<void>;
         validateModalFields(): boolean;
-        onNetworkSelected(network: INetwork): void;
+        onNetworkSelected(network: IExtendedNetwork): void;
         onInputWalletAddressChanged(): void;
         private toggleVisible;
         render(): any;
@@ -11393,87 +11399,59 @@ declare module "@scom/scom-swap/scconfig.json.ts" {
         };
         infuraId: string;
         networks: ({
-            name: string;
             chainId: number;
-            img: string;
-            rpc: string;
             explorerName: string;
             explorerTxUrl: string;
             explorerAddressUrl: string;
             isDisabled?: undefined;
+            shortName?: undefined;
             isMainChain?: undefined;
+            isCrossChainSupported?: undefined;
             isTestnet?: undefined;
         } | {
-            name: string;
             chainId: number;
-            img: string;
             isDisabled: boolean;
-            rpc?: undefined;
             explorerName?: undefined;
             explorerTxUrl?: undefined;
             explorerAddressUrl?: undefined;
+            shortName?: undefined;
             isMainChain?: undefined;
+            isCrossChainSupported?: undefined;
             isTestnet?: undefined;
         } | {
-            name: string;
             chainId: number;
-            img: string;
-            rpc: string;
+            shortName: string;
             isMainChain: boolean;
+            isCrossChainSupported: boolean;
             explorerName: string;
             explorerTxUrl: string;
             explorerAddressUrl: string;
             isDisabled?: undefined;
             isTestnet?: undefined;
         } | {
-            name: string;
             chainId: number;
-            img: string;
-            explorerName: string;
-            explorerTxUrl: string;
-            explorerAddressUrl: string;
-            rpc?: undefined;
-            isDisabled?: undefined;
-            isMainChain?: undefined;
-            isTestnet?: undefined;
-        } | {
-            name: string;
-            chainId: number;
-            img: string;
-            rpc: string;
             isMainChain: boolean;
+            isCrossChainSupported: boolean;
             explorerName: string;
             explorerTxUrl: string;
             explorerAddressUrl: string;
             isTestnet: boolean;
             isDisabled?: undefined;
+            shortName?: undefined;
         } | {
-            name: string;
             chainId: number;
-            img: string;
-            isDisabled: boolean;
-            isTestnet: boolean;
-            rpc?: undefined;
-            explorerName?: undefined;
-            explorerTxUrl?: undefined;
-            explorerAddressUrl?: undefined;
-            isMainChain?: undefined;
-        } | {
-            name: string;
-            chainId: number;
-            img: string;
-            rpc: string;
             explorerName: string;
             explorerTxUrl: string;
             explorerAddressUrl: string;
-            isDisabled: boolean;
             isTestnet: boolean;
+            isDisabled?: undefined;
+            shortName?: undefined;
             isMainChain?: undefined;
+            isCrossChainSupported?: undefined;
         } | {
-            name: string;
             chainId: number;
-            img: string;
-            rpc: string;
+            shortName: string;
+            isCrossChainSupported: boolean;
             explorerName: string;
             explorerTxUrl: string;
             explorerAddressUrl: string;
@@ -11481,16 +11459,25 @@ declare module "@scom/scom-swap/scconfig.json.ts" {
             isDisabled?: undefined;
             isMainChain?: undefined;
         } | {
-            name: string;
             chainId: number;
-            img: string;
-            isDisabled: boolean;
+            shortName: string;
+            isCrossChainSupported: boolean;
             explorerName: string;
             explorerTxUrl: string;
             explorerAddressUrl: string;
-            isTestnet: boolean;
-            rpc?: undefined;
+            isDisabled?: undefined;
             isMainChain?: undefined;
+            isTestnet?: undefined;
+        } | {
+            chainId: number;
+            explorerName: string;
+            explorerTxUrl: string;
+            explorerAddressUrl: string;
+            isDisabled: boolean;
+            isTestnet: boolean;
+            shortName?: undefined;
+            isMainChain?: undefined;
+            isCrossChainSupported?: undefined;
         })[];
         proxyAddresses: {
             "97": string;
@@ -11498,13 +11485,6 @@ declare module "@scom/scom-swap/scconfig.json.ts" {
         };
         ipfsGatewayUrl: string;
         embedderCommissionFee: string;
-        tokens: {
-            name: string;
-            address: string;
-            symbol: string;
-            decimals: number;
-            isCommon: boolean;
-        }[];
     };
     export default _default_57;
 }
@@ -11513,13 +11493,14 @@ declare module "@scom/scom-swap" {
     import { Module, Panel, Image, Container, Control, ControlElement, IDataSchema } from '@ijstech/components';
     import { BigNumber } from '@ijstech/eth-wallet';
     import "@scom/scom-swap/index.css.ts";
-    import { ITokenObject, ApprovalStatus, INetwork, PageBlock, IProvider, ISwapConfigUI, IProviderUI, Category, ICommissionInfo } from "@scom/scom-swap/global/index.ts";
+    import { ITokenObject, ApprovalStatus, IExtendedNetwork, PageBlock, IProvider, ISwapConfigUI, IProviderUI, Category, ICommissionInfo } from "@scom/scom-swap/global/index.ts";
     import { PriceInfo } from "@scom/scom-swap/price-info/index.tsx";
     import Config from "@scom/scom-swap/config/index.tsx";
     type StatusMapType = 'approve' | 'swap';
     interface ScomSwapElement extends ControlElement {
         category: Category;
         providers: IProviderUI[];
+        tokens?: ITokenObject[];
     }
     global {
         namespace JSX {
@@ -11624,6 +11605,8 @@ declare module "@scom/scom-swap" {
         set providers(value: IProviderUI[]);
         get commissions(): ICommissionInfo[];
         set commissions(value: ICommissionInfo[]);
+        get tokens(): ITokenObject[];
+        set tokens(value: ITokenObject[]);
         getEmbedderActions(): ({
             name: string;
             icon: string;
@@ -11859,12 +11842,12 @@ declare module "@scom/scom-swap" {
         get isMetaMask(): boolean;
         getSupportedChainList: () => void;
         disableSelectChain: (disabled: boolean, isDes?: boolean) => void;
-        selectSourceChain: (obj: INetwork, img?: Image) => Promise<void>;
+        selectSourceChain: (obj: IExtendedNetwork, img?: Image) => Promise<void>;
         setTargetTokenList: (isDisabled?: boolean) => void;
         onSourceChainChanged: () => void;
-        onSelectSourceChain: (obj: INetwork, img?: Image) => Promise<void>;
+        onSelectSourceChain: (obj: IExtendedNetwork, img?: Image) => Promise<void>;
         setDefaultChain: () => Promise<void>;
-        initChainIcon: (network: INetwork) => void;
+        initChainIcon: (network: IExtendedNetwork) => void;
         updateSrcChainIconList: () => void;
         onRenderChainList: () => Promise<void>;
         showModalFees: () => void;
