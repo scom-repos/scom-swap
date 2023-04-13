@@ -36,16 +36,6 @@ function tokenPath(tokenObj?: ITokenObject, chainId?: number): string {
 
 export default {
   logo: fullPath('img/logo.svg'),
-  img: {
-    network: {
-      bsc: fullPath('img/networks/bsc.png'),
-      eth: fullPath('img/networks/eth.png'),
-      amio: fullPath('img/networks/amio.png'),
-      avax: fullPath('img/networks/avax.png'),
-      ftm: fullPath('img/networks/ftm.png'),
-      polygon: fullPath('img/networks/polygon.png'),
-    }
-  },
   fullPath,
   tokenPath
 };
