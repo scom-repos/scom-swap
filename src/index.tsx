@@ -24,6 +24,7 @@ import {
   getProxyAddress,
   getIPFSGatewayUrl,
   WalletPlugin,
+  getSupportedTokens,
 } from "./store/index";
 
 import {
@@ -963,7 +964,7 @@ export default class ScomSwap extends Module implements PageBlock {
       this.setDefaultToken();
     }
 
-    this.firstTokenSelection.tokenDataListProp = [];
+    this.firstTokenSelection.tokenDataListProp = getSupportedTokens() // [];
     this.setTargetTokenList();
 
     //if (connected) {
@@ -2105,7 +2106,7 @@ export default class ScomSwap extends Module implements PageBlock {
     if (this.secondTokenSelection.targetChainId != srcChainId) {
       this.secondTokenSelection.targetChainId = srcChainId;
     }
-    this.secondTokenSelection.tokenDataListProp = [];
+    this.secondTokenSelection.tokenDataListProp = getSupportedTokens()// [];
   }
 
   onSourceChainChanged = () => {

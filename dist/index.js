@@ -17011,7 +17011,7 @@ define("@scom/scom-swap/store/data/index.ts", ["require", "exports", "@scom/scom
 define("@scom/scom-swap/store/utils.ts", ["require", "exports", "@ijstech/components", "@ijstech/eth-wallet", "@scom/scom-swap/global/index.ts", "@scom/scom-swap/store/data/index.ts", "@scom/scom-swap/store/data/index.ts"], function (require, exports, components_4, eth_wallet_4, index_8, index_9, index_10) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.getChainNativeToken = exports.getChainId = exports.truncateAddress = exports.hasMetaMask = exports.switchNetwork = exports.isWalletConnected = exports.getWalletProvider = exports.viewOnExplorerByAddress = exports.viewOnExplorerByTxHash = exports.getProviderByKey = exports.getProviderList = exports.setProviderList = exports.hasUserToken = exports.setUserTokens = exports.getTokensDataList = exports.getNetworkExplorerName = exports.getSiteSupportedNetworks = exports.getMatchNetworks = exports.addUserTokens = exports.getUserTokens = exports.getFilteredNetworks = exports.getNetworkInfo = exports.getInfuraId = exports.setTransactionDeadline = exports.getTransactionDeadline = exports.setSlippageTolerance = exports.getSlippageTolerance = exports.toggleExpertMode = exports.isExpertMode = exports.getCurrentChainId = exports.setCurrentChainId = exports.getSiteEnv = exports.setSiteEnv = exports.getAPIGatewayUrl = exports.getEmbedderCommissionFee = exports.setAPIGatewayUrls = exports.getIPFSGatewayUrl = exports.setIPFSGatewayUrl = exports.getProxyAddress = exports.setProxyAddresses = exports.setDataFromSCConfig = exports.state = exports.WalletPlugin = exports.ChainNativeTokenByChainId = void 0;
+    exports.getChainNativeToken = exports.getChainId = exports.truncateAddress = exports.hasMetaMask = exports.switchNetwork = exports.isWalletConnected = exports.getWalletProvider = exports.viewOnExplorerByAddress = exports.viewOnExplorerByTxHash = exports.getProviderByKey = exports.getProviderList = exports.setProviderList = exports.hasUserToken = exports.setUserTokens = exports.getTokensDataList = exports.getNetworkExplorerName = exports.getSiteSupportedNetworks = exports.getMatchNetworks = exports.addUserTokens = exports.getUserTokens = exports.getFilteredNetworks = exports.getNetworkInfo = exports.getInfuraId = exports.setTransactionDeadline = exports.getTransactionDeadline = exports.setSlippageTolerance = exports.getSlippageTolerance = exports.toggleExpertMode = exports.isExpertMode = exports.getCurrentChainId = exports.setCurrentChainId = exports.getSiteEnv = exports.setSiteEnv = exports.getAPIGatewayUrl = exports.getEmbedderCommissionFee = exports.setAPIGatewayUrls = exports.getIPFSGatewayUrl = exports.setIPFSGatewayUrl = exports.getProxyAddress = exports.setProxyAddresses = exports.setSupportedTokens = exports.getSupportedTokens = exports.setDataFromSCConfig = exports.state = exports.WalletPlugin = exports.ChainNativeTokenByChainId = void 0;
     Object.defineProperty(exports, "ChainNativeTokenByChainId", { enumerable: true, get: function () { return index_10.ChainNativeTokenByChainId; } });
     var WalletPlugin;
     (function (WalletPlugin) {
@@ -17032,7 +17032,8 @@ define("@scom/scom-swap/store/utils.ts", ["require", "exports", "@ijstech/compon
         proxyAddresses: {},
         ipfsGatewayUrl: "",
         apiGatewayUrls: {},
-        embedderCommissionFee: "0"
+        embedderCommissionFee: "0",
+        tokens: []
     };
     const setDataFromSCConfig = (options) => {
         if (options.infuraId) {
@@ -17053,8 +17054,19 @@ define("@scom/scom-swap/store/utils.ts", ["require", "exports", "@ijstech/compon
         if (options.embedderCommissionFee) {
             setEmbedderCommissionFee(options.embedderCommissionFee);
         }
+        if (options.tokens) {
+            exports.setSupportedTokens(options.tokens);
+        }
     };
     exports.setDataFromSCConfig = setDataFromSCConfig;
+    const getSupportedTokens = () => {
+        return exports.state.tokens || [];
+    };
+    exports.getSupportedTokens = getSupportedTokens;
+    const setSupportedTokens = (value) => {
+        exports.state.tokens = value;
+    };
+    exports.setSupportedTokens = setSupportedTokens;
     const setProxyAddresses = (data) => {
         exports.state.proxyAddresses = data;
     };
@@ -20915,12 +20927,12 @@ define("@scom/scom-swap/scom-network-picker/assets.ts", ["require", "exports", "
     exports.default = {
         img: {
             network: {
-                bsc: fullPath('img/network/bsc.png'),
-                eth: fullPath('img/network/eth.png'),
-                amio: fullPath('img/network/amio.png'),
-                avax: fullPath('img/network/avax.png'),
-                ftm: fullPath('img/network/ftm.png'),
-                polygon: fullPath('img/network/polygon.png'),
+                bsc: fullPath('img/networks/bsc.png'),
+                eth: fullPath('img/networks/eth.png'),
+                amio: fullPath('img/networks/amio.png'),
+                avax: fullPath('img/networks/avax.png'),
+                ftm: fullPath('img/networks/ftm.png'),
+                polygon: fullPath('img/networks/polygon.png'),
             }
         },
         fullPath
@@ -21298,6 +21310,9 @@ define("@scom/scom-swap/scom-network-picker/index.css.ts", ["require", "exports"
                                 }
                             }
                         }
+                    },
+                    '&> div': {
+                        transform: 'scale(1)'
                     }
                 }
             },
@@ -21503,7 +21518,7 @@ define("@scom/scom-swap/scom-network-picker/index.tsx", ["require", "exports", "
                 },
                 border: { radius: 5, width: '1px', style: 'solid', color: Theme.divider },
                 font: { color: Theme.text.primary },
-                rightIcon: { name: 'angle-down', width: 20, height: 20, fill: 'rgba(0,0,0,.45)' },
+                rightIcon: { name: 'angle-down', width: 20, height: 20, fill: Theme.text.primary },
                 background: { color: 'transparent' },
                 caption: this.getNetworkLabel(),
                 onClick: () => {
@@ -21990,7 +22005,30 @@ define("@scom/scom-swap/scconfig.json.ts", ["require", "exports"], function (req
             "43113": "0x7f1EAB0db83c02263539E3bFf99b638E61916B96"
         },
         "ipfsGatewayUrl": "https://ipfs.scom.dev/ipfs/",
-        "embedderCommissionFee": "0.01"
+        "embedderCommissionFee": "0.01",
+        "tokens": [
+            {
+                "name": "OpenSwap",
+                "address": "0x45eee762aaeA4e5ce317471BDa8782724972Ee19",
+                "symbol": "OSWAP",
+                "decimals": 18,
+                "isCommon": true
+            },
+            {
+                "name": "USDT",
+                "address": "0x29386B60e0A9A1a30e1488ADA47256577ca2C385",
+                "symbol": "USDT",
+                "decimals": 6,
+                "isCommon": true
+            },
+            {
+                "name": "BUSD Token",
+                "symbol": "BUSD",
+                "address": "0xDe9334C157968320f26e449331D6544b89bbD00F",
+                "decimals": 18,
+                "isCommon": true
+            }
+        ]
     };
 });
 define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstech/eth-wallet", "@scom/scom-swap/assets.ts", "@scom/scom-swap/store/index.ts", "@scom/scom-swap/swap-utils/index.ts", "@scom/scom-swap/global/index.ts", "@scom/scom-swap/price-info/index.tsx", "@scom/scom-swap/result/index.tsx", "@scom/scom-swap/expert-mode-settings/index.tsx", "@scom/scom-swap/transaction-settings/index.tsx", "@scom/scom-swap/scconfig.json.ts", "@scom/scom-swap/index.css.ts"], function (require, exports, components_22, eth_wallet_12, assets_8, index_29, index_30, index_31, index_32, index_33, index_34, index_35, scconfig_json_1) {
@@ -22138,7 +22176,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                 if (!this.isFixedPair) {
                     this.setDefaultToken();
                 }
-                this.firstTokenSelection.tokenDataListProp = [];
+                this.firstTokenSelection.tokenDataListProp = index_29.getSupportedTokens(); // [];
                 this.setTargetTokenList();
                 //if (connected) {
                 (_a = this.actionSetting) === null || _a === void 0 ? void 0 : _a.classList.remove("hidden");
@@ -22400,7 +22438,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                 if (this.secondTokenSelection.targetChainId != srcChainId) {
                     this.secondTokenSelection.targetChainId = srcChainId;
                 }
-                this.secondTokenSelection.tokenDataListProp = [];
+                this.secondTokenSelection.tokenDataListProp = index_29.getSupportedTokens(); // [];
             };
             this.onSourceChainChanged = () => {
                 var _a;

@@ -10217,8 +10217,11 @@ declare module "@scom/scom-swap/store/utils.ts" {
         ipfsGatewayUrl: string;
         apiGatewayUrls: Record<string, string>;
         embedderCommissionFee: string;
+        tokens: any[];
     };
     export const setDataFromSCConfig: (options: any) => void;
+    export const getSupportedTokens: () => any[];
+    export const setSupportedTokens: (value: ITokenObject[]) => void;
     export const setProxyAddresses: (data: ProxyAddresses) => void;
     export const getProxyAddress: (chainId?: number) => string;
     export const setIPFSGatewayUrl: (url: string) => void;
@@ -11495,6 +11498,13 @@ declare module "@scom/scom-swap/scconfig.json.ts" {
         };
         ipfsGatewayUrl: string;
         embedderCommissionFee: string;
+        tokens: {
+            name: string;
+            address: string;
+            symbol: string;
+            decimals: number;
+            isCommon: boolean;
+        }[];
     };
     export default _default_57;
 }

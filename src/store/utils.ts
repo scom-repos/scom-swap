@@ -29,7 +29,8 @@ export const state = {
   proxyAddresses: {} as ProxyAddresses,
   ipfsGatewayUrl: "",
   apiGatewayUrls: {} as Record<string, string>,
-  embedderCommissionFee: "0"
+  embedderCommissionFee: "0",
+  tokens: []
 }
 
 export const setDataFromSCConfig = (options: any) => {
@@ -51,6 +52,17 @@ export const setDataFromSCConfig = (options: any) => {
   if (options.embedderCommissionFee) {
     setEmbedderCommissionFee(options.embedderCommissionFee);
   }
+  if (options.tokens) {
+    setSupportedTokens(options.tokens)
+  }
+}
+
+export const getSupportedTokens = () => {
+  return state.tokens || []
+}
+
+export const setSupportedTokens = (value: ITokenObject[]) => {
+  state.tokens = value
 }
 
 export const setProxyAddresses = (data: ProxyAddresses) => {
