@@ -9833,16 +9833,6 @@ declare module "@scom/scom-swap/assets.ts" {
     function tokenPath(tokenObj?: ITokenObject, chainId?: number): string;
     const _default_48: {
         logo: string;
-        img: {
-            network: {
-                bsc: string;
-                eth: string;
-                amio: string;
-                avax: string;
-                ftm: string;
-                polygon: string;
-            };
-        };
         fullPath: typeof fullPath;
         tokenPath: typeof tokenPath;
     };
@@ -11188,124 +11178,6 @@ declare module "@scom/scom-swap/transaction-settings/index.tsx" {
         render(): any;
     }
 }
-/// <amd-module name="@scom/scom-swap/scom-network-picker/assets.ts" />
-declare module "@scom/scom-swap/scom-network-picker/assets.ts" {
-    function fullPath(path: string): string;
-    const _default_55: {
-        img: {
-            network: {
-                bsc: string;
-                eth: string;
-                amio: string;
-                avax: string;
-                ftm: string;
-                polygon: string;
-            };
-        };
-        fullPath: typeof fullPath;
-    };
-    export default _default_55;
-}
-/// <amd-module name="@scom/scom-swap/scom-network-picker/store/interface.ts" />
-declare module "@scom/scom-swap/scom-network-picker/store/interface.ts" {
-    export interface INetwork {
-        chainId: number;
-        name?: string;
-        img?: string;
-        rpc?: string;
-        symbol?: string;
-        env?: string;
-        explorerName?: string;
-        explorerTxUrl?: string;
-        explorerAddressUrl?: string;
-        isDisabled?: boolean;
-    }
-    export const enum EventId {
-        ConnectWallet = "connectWallet",
-        IsWalletConnected = "isWalletConnected",
-        chainChanged = "chainChanged",
-        IsWalletDisconnected = "IsWalletDisconnected"
-    }
-}
-/// <amd-module name="@scom/scom-swap/scom-network-picker/store/index.ts" />
-declare module "@scom/scom-swap/scom-network-picker/store/index.ts" {
-    import { EventId, INetwork } from "@scom/scom-swap/scom-network-picker/store/interface.ts";
-    export { EventId, INetwork };
-    export enum WalletPlugin {
-        MetaMask = "metamask",
-        WalletConnect = "walletconnect"
-    }
-    export const networks: INetwork[];
-    export const updateNetworks: (options: any) => void;
-    export function getChainId(): number;
-    export function getWalletProvider(): string;
-    export const getNetworkInfo: (chainId: number) => INetwork | undefined;
-    export const getNetworkList: () => INetwork[];
-    export const getNetworkType: (chainId: number) => string;
-    export const getDefaultChainId: () => number;
-    export const getSiteSupportedNetworks: () => INetwork[];
-    export const isValidEnv: (env: string) => boolean;
-    export const getInfuraId: () => string;
-    export const getEnv: () => string;
-    export const isDefaultNetworkFromWallet: () => boolean;
-    export function isWalletConnected(): boolean;
-    export function switchNetwork(chainId: number): Promise<void>;
-}
-/// <amd-module name="@scom/scom-swap/scom-network-picker/index.css.ts" />
-declare module "@scom/scom-swap/scom-network-picker/index.css.ts" {
-    const _default_56: string;
-    export default _default_56;
-}
-/// <amd-module name="@scom/scom-swap/scom-network-picker/index.tsx" />
-declare module "@scom/scom-swap/scom-network-picker/index.tsx" {
-    import { ControlElement, Module, Container } from '@ijstech/components';
-    import { INetwork } from "@scom/scom-swap/scom-network-picker/store/index.ts";
-    type IType = 'button' | 'combobox';
-    interface PickerElement extends ControlElement {
-        type?: IType;
-        networks?: INetwork[] | '*';
-        selectedChainId?: number;
-        switchNetworkOnSelect?: boolean;
-        onCustomNetworkSelected?: (network: INetwork) => void;
-    }
-    global {
-        namespace JSX {
-            interface IntrinsicElements {
-                ['i-scom-network-picker']: PickerElement;
-            }
-        }
-    }
-    export default class ScomNetworkPicker extends Module {
-        private mdNetwork;
-        private gridNetworkGroup;
-        private pnlNetwork;
-        private btnNetwork;
-        private _type;
-        private networkMapper;
-        private _networkList;
-        private _selectedNetwork;
-        private _switchNetworkOnSelect;
-        private networkPlaceholder;
-        private _onCustomNetworkSelected;
-        constructor(parent?: Container, options?: any);
-        get selectedNetwork(): INetwork;
-        get type(): IType;
-        set type(value: IType);
-        setNetworkByChainId(chainId: number): void;
-        clearNetwork(): void;
-        private getNetwork;
-        private getNetworkLabel;
-        private setNetwork;
-        private onNetworkSelected;
-        private renderNetworks;
-        private renderModalItem;
-        private renderUI;
-        private renderButton;
-        private renderCombobox;
-        init(): void;
-        render(): any;
-    }
-}
 /// <amd-module name="@scom/scom-swap/config/index.css.ts" />
 declare module "@scom/scom-swap/config/index.css.ts" {
     export const customStyle: string;
@@ -11352,7 +11224,7 @@ declare module "@scom/scom-swap/config/index.tsx" {
 }
 /// <amd-module name="@scom/scom-swap/scconfig.json.ts" />
 declare module "@scom/scom-swap/scconfig.json.ts" {
-    const _default_57: {
+    const _default_55: {
         name: string;
         env: string;
         version: string;
@@ -11486,7 +11358,7 @@ declare module "@scom/scom-swap/scconfig.json.ts" {
         ipfsGatewayUrl: string;
         embedderCommissionFee: string;
     };
-    export default _default_57;
+    export default _default_55;
 }
 /// <amd-module name="@scom/scom-swap" />
 declare module "@scom/scom-swap" {

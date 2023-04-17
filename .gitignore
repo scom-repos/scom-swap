@@ -3,5 +3,3 @@ package-lock.json
 test/dist
 test/ref
 repos
-src/scom-network-picker
-src/img/network

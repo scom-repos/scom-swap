@@ -98,11 +98,15 @@ export class TokenStore {
               let balance = await Wallet.getClientInstance().balance;
               allTokenBalancesMap[token.symbol] = balance.toFixed();
             }
-          } catch (error) { }
+          } catch (error) { 
+            console.log('error', error);
+          }
         }));
         await Promise.all(promises);
       }
-    } catch (error) { }
+    } catch (error) { 
+      console.log('error', error);
+    }
     return allTokenBalancesMap;
   }
 

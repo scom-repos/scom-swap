@@ -932,7 +932,9 @@ export default class ScomSwap extends Module implements PageBlock {
     // this.getAddressFromUrl();
     this.chainId = _chainId ? _chainId : getChainId();
     tokenStore.updateTokenMapData();
-    await tokenStore.updateAllTokenBalances();
+    if (connected) {
+      await tokenStore.updateAllTokenBalances();
+    }
     if (this.supportedNetworks.every((v: string | number) => v != this.chainId)) {
       this.showNetworkErrModal();
       this.resetUI();
@@ -1492,6 +1494,7 @@ export default class ScomSwap extends Module implements PageBlock {
     }
     this.listRouting.clearInnerHTML();
     this.listRouting.append(...nodeItems);
+    this.routingContainer.visible = listRouting.length > 1;
     this.routeFound.caption = listRouting.length + ' Route(s) Found';
     if (listRouting.length > 1)
       this.toggleRoutes.classList.remove('hidden');
@@ -2326,6 +2329,7 @@ export default class ScomSwap extends Module implements PageBlock {
     const tokens = this.getAttribute('tokens', true, []);
     this.updateContractAddress();
     await this.setData({category, providers, commissions, tokens});
+    await this.onSetupPage(Wallet.getClientInstance().isConnected);
     this.isReadyCallbackQueued = false;
     this.executeReadyCallback();
   }
@@ -2335,21 +2339,19 @@ export default class ScomSwap extends Module implements PageBlock {
       <i-panel id="swapComponent" background={{ color: '#0c1234' }}>
         <i-panel class="pageblock-swap">
           <i-panel id="swapContainer">
-            <i-panel class="bill-board">
-              <i-image url={Assets.fullPath("img/swap/swap.svg")}></i-image>
-            </i-panel>
-            <i-panel>
-              <i-hstack wrap="wrap" horizontalAlignment="space-between" verticalAlignment="center">
-                <i-panel id="iconList" class="icon-list">
-                </i-panel>
-                <i-panel id="actionSetting" class="action-setting hidden">
-                  <i-label id="lbLastUpdated"></i-label>
-                  <i-icon width={26} height={26} class="rounded-icon" name="sync-alt" fill="white" onClick={this.onRefresh}></i-icon>
-                  <i-icon width={26} height={26} class="rounded-icon" name="cog" fill="white" onClick={this.onSetting}></i-icon>
-                </i-panel>
-              </i-hstack>
-            </i-panel>
             <i-panel class="content-swap">
+              <i-hstack horizontalAlignment="space-between" verticalAlignment="center">
+                <i-label caption='Swap' font={{ size: '1.125rem', color: '#fff' }}></i-label>
+                <i-hstack wrap="wrap" horizontalAlignment="space-between" verticalAlignment="center">
+                  <i-panel id="iconList" class="icon-list">
+                  </i-panel>
+                  <i-panel id="actionSetting" class="action-setting hidden">
+                    <i-label id="lbLastUpdated"></i-label>
+                    <i-icon width={26} height={26} class="rounded-icon" name="sync-alt" fill="white" onClick={this.onRefresh}></i-icon>
+                    <i-icon width={26} height={26} class="rounded-icon" name="cog" fill="white" onClick={this.onSetting}></i-icon>
+                  </i-panel>
+                </i-hstack>   
+              </i-hstack>           
               <i-vstack id="srcChainBox" class="my-2 w-100">
                 <i-hstack verticalAlignment="center" horizontalAlignment="space-between">
                   <i-label class="text--grey" caption="Selected Chain" />

@@ -224,10 +224,13 @@ export class TokenSelection extends Module {
   }
 
   private get tokenDataList(): ITokenObject[] {
+    let tokenList: ITokenObject[] = [];
     if (this.tokenDataListProp && this.tokenDataListProp.length) {
-      return this.tokenDataListProp;
+      tokenList = this.tokenDataListProp;
     }
-    const tokenList = tokenStore.getTokenList(this.chainId);
+    else {
+      tokenList = tokenStore.getTokenList(this.chainId);
+    }
     return tokenList.map((token: ITokenObject) => {
       const tokenObject = { ...token };
       const nativeToken = ChainNativeTokenByChainId[this.chainId];

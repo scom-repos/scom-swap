@@ -15,7 +15,7 @@ import {
   HStack
 } from '@ijstech/components';
 import { BigNumber } from '@ijstech/eth-wallet';
-import ScomNetworkPicker from '../scom-network-picker/index';
+import ScomNetworkPicker from '@scom/scom-network-picker';
 import { getEmbedderCommissionFee, getNetworkInfo, SupportedNetworks } from '../store/index';
 import { IExtendedNetwork, formatNumber, isWalletAddress, ICommissionInfo, IEmbedData } from '../global/index';
 import { customStyle, tableStyle } from './index.css'
