@@ -2,7 +2,6 @@ const InfuraId = "adc596bf88b648e2a8902bc9093930c5";
 
 export default {
   "name": "@pageblock-swap/main",
-  "env": "mainnet",
   "version": "0.1.0",
   "moduleDir": "src",
   "main": "@pageblock-swap/main",
@@ -46,38 +45,7 @@ export default {
     "@scom/scom-commission-proxy-contract": "*"
   },
   "infuraId": InfuraId,
-  "networks": [
-    {
-      "chainId": 1,
-      "explorerName": "Etherscan",
-      "explorerTxUrl": "https://etherscan.io/tx/",
-      "explorerAddressUrl": "https://etherscan.io/address/"
-    },
-    {
-      "chainId": 25,
-      "isDisabled": true
-    },    
-    {
-      "chainId": 56,
-      "shortName": "BSC",
-      "isMainChain": true,
-      "isCrossChainSupported": true,
-      "explorerName": "BSCScan",
-      "explorerTxUrl": "https://bscscan.com/tx/",
-      "explorerAddressUrl": "https://bscscan.com/address/"
-    },
-    {
-      "chainId": 137,
-      "explorerName": "PolygonScan",
-      "explorerTxUrl": "https://polygonscan.com/tx/",
-      "explorerAddressUrl": "https://polygonscan.com/address/"
-    },    
-    {
-      "chainId": 250,
-      "explorerName": "FTMScan",
-      "explorerTxUrl": "https://ftmscan.com/tx/",
-      "explorerAddressUrl": "https://ftmscan.com/address/"
-    },    
+  "networks": [  
     {
       "chainId": 97,
       "isMainChain": true,
@@ -85,17 +53,6 @@ export default {
       "explorerName": "BSCScan",
       "explorerTxUrl": "https://testnet.bscscan.com/tx/",
       "explorerAddressUrl": "https://testnet.bscscan.com/address/",
-      "isTestnet": true
-    },
-    {
-      "chainId": 338,
-      "isDisabled": true
-    },  
-    {
-      "chainId": 80001,
-      "explorerName": "PolygonScan",
-      "explorerTxUrl": "https://mumbai.polygonscan.com/tx/",
-      "explorerAddressUrl": "https://mumbai.polygonscan.com/address/",
       "isTestnet": true
     },    
     {
@@ -106,38 +63,7 @@ export default {
       "explorerTxUrl": "https://testnet.snowtrace.io/tx/",
       "explorerAddressUrl": "https://testnet.snowtrace.io/address/",
       "isTestnet": true
-    },    
-    {
-      "chainId": 43114,
-      "shortName": "AVAX",
-      "isCrossChainSupported": true,
-      "explorerName": "SnowTrace",
-      "explorerTxUrl": "https://snowtrace.io/tx/",
-      "explorerAddressUrl": "https://snowtrace.io/address/"
-    },
-    {
-      "chainId": 4002,
-      "explorerName": "FTMScan",
-      "explorerTxUrl": "https://testnet.ftmscan.com/tx/",
-      "explorerAddressUrl": "https://testnet.ftmscan.com/address/",
-      "isDisabled": true,
-      "isTestnet": true
-    },
-    {
-      "chainId": 13370,
-      "isDisabled": true,
-      "explorerName": "AminoX Explorer",
-      "explorerTxUrl": "https://aminoxtestnet.blockscout.alphacarbon.network/tx/",
-      "explorerAddressUrl": "https://aminoxtestnet.blockscout.alphacarbon.network/address/",
-      "isTestnet": true
-    },
-    {
-      "chainId": 421613,
-      "explorerName": "ArbiScan",
-      "explorerTxUrl": "https://goerli.arbiscan.io/tx/",
-      "explorerAddressUrl": "https://goerli.arbiscan.io/address/",
-      "isTestnet": true
-    }
+    }    
   ],
   "proxyAddresses": {
     "97": "0x9602cB9A782babc72b1b6C96E050273F631a6870",

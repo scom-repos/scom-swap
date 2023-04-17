@@ -2,12 +2,6 @@ import { BigNumber } from "@ijstech/eth-wallet";
 import { moment } from '@ijstech/components';
 import { TokenMapType } from './common';
 
-export enum SITE_ENV {
-  DEV = 'dev',
-  TESTNET = 'testnet',
-  MAINNET = 'mainnet',
-}
-
 export const DefaultDateTimeFormat = 'DD/MM/YYYY HH:mm:ss';
 export const DefaultDateFormat = 'DD/MM/YYYY';
 

@@ -9599,11 +9599,6 @@ declare module "@scom/scom-swap/global/utils/common.ts" {
 declare module "@scom/scom-swap/global/utils/helper.ts" {
     import { BigNumber } from "@ijstech/eth-wallet";
     import { TokenMapType } from "@scom/scom-swap/global/utils/common.ts";
-    export enum SITE_ENV {
-        DEV = "dev",
-        TESTNET = "testnet",
-        MAINNET = "mainnet"
-    }
     export const DefaultDateTimeFormat = "DD/MM/YYYY HH:mm:ss";
     export const DefaultDateFormat = "DD/MM/YYYY";
     export const formatDate: (date: any, customType?: string, showTimezone?: boolean) => string;
@@ -9762,7 +9757,7 @@ declare module "@scom/scom-swap/global/utils/swapInterface.ts" {
 }
 /// <amd-module name="@scom/scom-swap/global/utils/index.ts" />
 declare module "@scom/scom-swap/global/utils/index.ts" {
-    export { getAPI, formatNumber, formatNumberWithSeparators, DefaultDateTimeFormat, DefaultDateFormat, formatDate, formatUTCDate, limitDecimals, limitInputNumber, isInvalidInput, isValidNumber, toWeiInv, numberToBytes32, getParamsFromUrl, formatNumberValue, uniqWith, getWeekDays, compareDate, renderBalanceTooltip, formatPercentNumber, downloadJsonFile, isWalletAddress, SITE_ENV } from "@scom/scom-swap/global/utils/helper.ts";
+    export { getAPI, formatNumber, formatNumberWithSeparators, DefaultDateTimeFormat, DefaultDateFormat, formatDate, formatUTCDate, limitDecimals, limitInputNumber, isInvalidInput, isValidNumber, toWeiInv, numberToBytes32, getParamsFromUrl, formatNumberValue, uniqWith, getWeekDays, compareDate, renderBalanceTooltip, formatPercentNumber, downloadJsonFile, isWalletAddress } from "@scom/scom-swap/global/utils/helper.ts";
     export { parseContractError } from "@scom/scom-swap/global/utils/error.ts";
     export { PageBlock } from "@scom/scom-swap/global/utils/pageBlock.ts";
     export { isTransactionConfirmed, registerSendTxEvents, approveERC20Max, getERC20Allowance, getERC20Amount, ITokenObject, TokenMapType } from "@scom/scom-swap/global/utils/common.ts";
@@ -10184,7 +10179,7 @@ declare module "@scom/scom-swap/store/data/index.ts" {
 }
 /// <amd-module name="@scom/scom-swap/store/utils.ts" />
 declare module "@scom/scom-swap/store/utils.ts" {
-    import { IProvider, ITokenObject, SITE_ENV, TokenMapType, IExtendedNetwork } from "@scom/scom-swap/global/index.ts";
+    import { IProvider, ITokenObject, TokenMapType, IExtendedNetwork } from "@scom/scom-swap/global/index.ts";
     export { ChainNativeTokenByChainId } from "@scom/scom-swap/store/data/index.ts";
     export enum WalletPlugin {
         MetaMask = "metamask",
@@ -10194,7 +10189,6 @@ declare module "@scom/scom-swap/store/utils.ts" {
         [key: number]: string;
     };
     export const state: {
-        siteEnv: SITE_ENV;
         currentChainId: number;
         isExpertMode: boolean;
         slippageTolerance: number;
@@ -10222,8 +10216,6 @@ declare module "@scom/scom-swap/store/utils.ts" {
     export const getEmbedderCommissionFee: () => string;
     export type APIGatewayKey = 'otcQueue';
     export const getAPIGatewayUrl: (key: APIGatewayKey) => string;
-    export const setSiteEnv: (value: string) => void;
-    export const getSiteEnv: () => SITE_ENV;
     export const setCurrentChainId: (value: number) => void;
     export const getCurrentChainId: () => number;
     export const isExpertMode: () => boolean;
@@ -10234,7 +10226,6 @@ declare module "@scom/scom-swap/store/utils.ts" {
     export const setTransactionDeadline: (value: any) => void;
     export const getInfuraId: () => string;
     export const getNetworkInfo: (chainId: number) => IExtendedNetwork;
-    export const getFilteredNetworks: (filter: (value: IExtendedNetwork, index: number, array: IExtendedNetwork[]) => boolean) => IExtendedNetwork[];
     export const getUserTokens: (chainId: number) => any[] | null;
     export const addUserTokens: (token: ITokenObject) => void;
     interface NetworkConditions {
@@ -10243,7 +10234,6 @@ declare module "@scom/scom-swap/store/utils.ts" {
         isMainChain?: boolean;
     }
     export const getMatchNetworks: (conditions: NetworkConditions) => IExtendedNetwork[];
-    export const getSiteSupportedNetworks: () => IExtendedNetwork[];
     export const getNetworkExplorerName: (chainId: number) => string;
     export const getTokensDataList: (tokenMapData: TokenMapType, tokenBalances: any) => Promise<any[]>;
     export const setUserTokens: (token: ITokenObject, chainId: number) => void;
@@ -10300,15 +10290,10 @@ declare module "@scom/scom-swap/store/index.ts" {
     export const getTokenIcon: (address: string) => string;
     export const tokenSymbol: (address: string) => string;
     export const tokenName: (address: string) => string;
-    export const projectNativeToken: () => (ITokenObject & {
-        address: string;
-    }) | null;
-    export const projectNativeTokenSymbol: () => string;
     export const SupportedNetworks: {
         chainName: string;
         chainId: number;
     }[];
-    export const getNetworkName: (chainId: number) => string;
     export * from "@scom/scom-swap/store/utils.ts";
     export * from "@scom/scom-swap/store/data/index.ts";
     export const getSupportedTokens: (tokens: ITokenObject[], chainId: number) => ITokenObject[];
@@ -11226,7 +11211,6 @@ declare module "@scom/scom-swap/config/index.tsx" {
 declare module "@scom/scom-swap/scconfig.json.ts" {
     const _default_55: {
         name: string;
-        env: string;
         version: string;
         moduleDir: string;
         main: string;
@@ -11272,54 +11256,13 @@ declare module "@scom/scom-swap/scconfig.json.ts" {
         infuraId: string;
         networks: ({
             chainId: number;
-            explorerName: string;
-            explorerTxUrl: string;
-            explorerAddressUrl: string;
-            isDisabled?: undefined;
-            shortName?: undefined;
-            isMainChain?: undefined;
-            isCrossChainSupported?: undefined;
-            isTestnet?: undefined;
-        } | {
-            chainId: number;
-            isDisabled: boolean;
-            explorerName?: undefined;
-            explorerTxUrl?: undefined;
-            explorerAddressUrl?: undefined;
-            shortName?: undefined;
-            isMainChain?: undefined;
-            isCrossChainSupported?: undefined;
-            isTestnet?: undefined;
-        } | {
-            chainId: number;
-            shortName: string;
-            isMainChain: boolean;
-            isCrossChainSupported: boolean;
-            explorerName: string;
-            explorerTxUrl: string;
-            explorerAddressUrl: string;
-            isDisabled?: undefined;
-            isTestnet?: undefined;
-        } | {
-            chainId: number;
             isMainChain: boolean;
             isCrossChainSupported: boolean;
             explorerName: string;
             explorerTxUrl: string;
             explorerAddressUrl: string;
             isTestnet: boolean;
-            isDisabled?: undefined;
             shortName?: undefined;
-        } | {
-            chainId: number;
-            explorerName: string;
-            explorerTxUrl: string;
-            explorerAddressUrl: string;
-            isTestnet: boolean;
-            isDisabled?: undefined;
-            shortName?: undefined;
-            isMainChain?: undefined;
-            isCrossChainSupported?: undefined;
         } | {
             chainId: number;
             shortName: string;
@@ -11328,28 +11271,7 @@ declare module "@scom/scom-swap/scconfig.json.ts" {
             explorerTxUrl: string;
             explorerAddressUrl: string;
             isTestnet: boolean;
-            isDisabled?: undefined;
             isMainChain?: undefined;
-        } | {
-            chainId: number;
-            shortName: string;
-            isCrossChainSupported: boolean;
-            explorerName: string;
-            explorerTxUrl: string;
-            explorerAddressUrl: string;
-            isDisabled?: undefined;
-            isMainChain?: undefined;
-            isTestnet?: undefined;
-        } | {
-            chainId: number;
-            explorerName: string;
-            explorerTxUrl: string;
-            explorerAddressUrl: string;
-            isDisabled: boolean;
-            isTestnet: boolean;
-            shortName?: undefined;
-            isMainChain?: undefined;
-            isCrossChainSupported?: undefined;
         })[];
         proxyAddresses: {
             "97": string;
@@ -11435,7 +11357,7 @@ declare module "@scom/scom-swap" {
         private isPriceToggled;
         private record;
         private allTokenBalancesMap;
-        private chainId;
+        private supportedChainId;
         private fallbackUrl;
         private swapButtonStatusMap;
         private approveButtonStatusMap;
@@ -11615,8 +11537,6 @@ declare module "@scom/scom-swap" {
         get lastUpdated(): number;
         set lastUpdated(value: number);
         get isValidToken(): boolean;
-        get targetTokenMap(): import("@scom/scom-swap/global/index.ts").TokenMapType;
-        getAddressFromUrl: () => void;
         private redirectToken;
         private fixedNumber;
         private setFixedPairData;
@@ -11624,7 +11544,6 @@ declare module "@scom/scom-swap" {
         private onSetupPage;
         private initTokenSelection;
         initApprovalModelAction(): Promise<void>;
-        setDefaultToken: () => void;
         onRevertSwap(): Promise<void>;
         tipFormatter(value: any): string;
         private totalAmount;

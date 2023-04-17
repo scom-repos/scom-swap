@@ -20,8 +20,7 @@ export {
   renderBalanceTooltip,
   formatPercentNumber,
   downloadJsonFile,
-  isWalletAddress,
-  SITE_ENV
+  isWalletAddress
 } from './helper';
 
 export { parseContractError } from './error';

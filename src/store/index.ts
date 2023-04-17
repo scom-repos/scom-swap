@@ -68,18 +68,6 @@ export const tokenName = (address: string) => {
   return tokenObject?.name || '';
 }
 
-export const projectNativeToken = (): ITokenObject & { address: string } | null => {
-  let chainId = getChainId();
-  if (chainId == null || chainId == undefined) return null;
-  let stakeToken = DefaultTokens[chainId].find(v => v.symbol == 'OSWAP')
-  return stakeToken ? { ...stakeToken, address: stakeToken.address!.toLowerCase() } : null;
-}
-
-export const projectNativeTokenSymbol = () => {
-  const token = projectNativeToken();
-  return token ? token.symbol : ''
-};
-
 export const SupportedNetworks = [
   {
     chainName: 'BNB Chain Testnet',
@@ -90,11 +78,6 @@ export const SupportedNetworks = [
     chainId: 43113
   }
 ];
-
-export const getNetworkName = (chainId: number) => {
-  const network = SupportedNetworks.find(v => v.chainId === chainId)
-  return network ? (getNetworkInfo(network.chainId)?.image || '') : ''
-}
 
 export * from './utils';
 export * from './data/index';

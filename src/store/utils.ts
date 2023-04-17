@@ -1,6 +1,6 @@
 import { application } from '@ijstech/components';
 import { Wallet } from '@ijstech/eth-wallet';
-import { EventId, IProvider, ITokenObject, SITE_ENV, TokenMapType, IExtendedNetwork } from '../global/index';
+import { EventId, IProvider, ITokenObject, TokenMapType, IExtendedNetwork } from '../global/index';
 import { ChainNativeTokenByChainId } from './data/index';
 import getNetworkList from '@scom/scom-network-list'
 
@@ -18,7 +18,6 @@ const TOKENS = "oswap_user_tokens_";
 export type ProxyAddresses = { [key: number]: string };
 
 export const state = {
-  siteEnv: SITE_ENV.TESTNET,
   currentChainId: 0,
   isExpertMode: false,
   slippageTolerance: 0.5,
@@ -93,18 +92,6 @@ export const getAPIGatewayUrl = (key: APIGatewayKey) => {
   return state.apiGatewayUrls[key];
 }
 
-export const setSiteEnv = (value: string) => {
-  if (Object.values(SITE_ENV).includes(value as SITE_ENV)) {
-    state.siteEnv = value as SITE_ENV;
-  } else {
-    state.siteEnv = SITE_ENV.TESTNET;
-  }
-}
-
-export const getSiteEnv = (): SITE_ENV => {
-  return state.siteEnv;
-}
-
 export const setCurrentChainId = (value: number) => {
   state.currentChainId = value;
 }
@@ -173,11 +160,6 @@ export const getNetworkInfo = (chainId: number) => {
   return state.networkMap[chainId];
 }
 
-export const getFilteredNetworks = (filter: (value: IExtendedNetwork, index: number, array: IExtendedNetwork[]) => boolean) => {
-  let networkFullList = Object.values(state.networkMap);
-  return networkFullList.filter(filter);
-}
-
 export const getUserTokens: (chainId: number) => any[] | null = (chainId: number) => {
   let tokens = localStorage[TOKENS + chainId];
   if (tokens) {
@@ -238,19 +220,6 @@ export const getMatchNetworks = (conditions: NetworkConditions): IExtendedNetwor
   let networkFullList = Object.values(state.networkMap);
   let out = matchFilter(networkFullList, conditions);
   return out;
-}
-
-export const getSiteSupportedNetworks = () => {
-  let networkFullList = Object.values(state.networkMap);
-  let list = networkFullList.filter(network => !getNetworkInfo(network.chainId).isDisabled);
-  const siteEnv = getSiteEnv();
-  if (siteEnv === SITE_ENV.TESTNET) {
-    return list.filter((network) => network.isTestnet);
-  }
-  if (siteEnv === SITE_ENV.DEV) {
-    return list;
-  }
-  return list.filter((network) => !network.isTestnet);
 }
 
 export const getNetworkExplorerName = (chainId: number) => {

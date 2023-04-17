@@ -56,11 +56,11 @@ export default class Config extends Module {
           gap: 5
         })
         const imgEl = new Icon(hstack, {
-          image: {url: imgUrl, width: 16, height: 16}
+          image: { url: imgUrl, width: 16, height: 16 }
         })
         const lbName = new Label(hstack, {
           caption: networkInfo.chainName || '',
-          font: {size: '0.875rem'}
+          font: { size: '0.875rem' }
         })
         hstack.append(imgEl, lbName);
         return hstack;
@@ -75,7 +75,7 @@ export default class Config extends Module {
         const caption = (columnData?.length < 15) ? columnData : columnData.replace(replaced, '...')
         return new Label(undefined, {
           caption: caption || '',
-          font: {size: '0.875rem'},
+          font: { size: '0.875rem' },
           tooltip: {
             content: columnData
           }
@@ -238,6 +238,18 @@ export default class Config extends Module {
     return (
       <i-vstack gap='0.5rem' padding={{ top: '1rem', bottom: '1rem' }} class={customStyle}>
         <i-vstack gap="5px">
+          <i-hstack horizontalAlignment="space-between" verticalAlignment="center">
+            <i-label caption='Network: ' opacity={0.6} font={{ size: '1rem' }}></i-label>
+            <i-scom-network-picker
+              display="block"
+              minWidth='270px'
+              type='combobox'
+              networks={SupportedNetworks}
+              background={{ color: Theme.combobox.background }}
+              border={{ radius: 8, width: '1px', style: 'solid', color: Theme.input.background }}
+              class="nft-network-select"
+            />
+          </i-hstack>
           <i-hstack
             horizontalAlignment="space-between"
             verticalAlignment="center"
@@ -251,30 +263,30 @@ export default class Config extends Module {
             <i-button
               id="btnAddWallet"
               caption="Add Wallet"
-              border={{radius: '58px'}}
-              padding={{top: '0.3rem', bottom: '0.3rem', left: '1rem', right: '1rem'}}
-              background={{color: Theme.colors.primary.main}}
-              font={{color: Theme.colors.primary.contrastText, size: '0.75rem', weight: 400}}
+              border={{ radius: '58px' }}
+              padding={{ top: '0.3rem', bottom: '0.3rem', left: '1rem', right: '1rem' }}
+              background={{ color: Theme.colors.primary.main }}
+              font={{ color: Theme.colors.primary.contrastText, size: '0.75rem', weight: 400 }}
               visible={false}
               onClick={this.onAddCommissionClicked.bind(this)}
             ></i-button>
           </i-hstack>
           <i-vstack
             id="pnlEmptyWallet"
-            border={{radius: '8px'}}
-            background={{color: Theme.background.modal}}
-            padding={{top: '1.875rem', bottom: '1.875rem', left: '1.563rem', right: '1.563rem'}}
+            border={{ radius: '8px' }}
+            background={{ color: Theme.background.modal }}
+            padding={{ top: '1.875rem', bottom: '1.875rem', left: '1.563rem', right: '1.563rem' }}
             gap="1.25rem" width="100%"
             class="text-center"
           >
-            <i-label caption="To receive commission fee please add your wallet address" font={{size: '1rem'}}></i-label>
+            <i-label caption="To receive commission fee please add your wallet address" font={{ size: '1rem' }}></i-label>
             <i-panel>
               <i-button
                 caption="Add Wallet"
-                border={{radius: '58px'}}
-                padding={{top: '0.75rem', bottom: '0.75rem', left: '2.5rem', right: '2.5rem'}}
-                background={{color: Theme.colors.primary.main}}
-                font={{color: Theme.colors.primary.contrastText, size: '0.875rem', weight: 400}}
+                border={{ radius: '58px' }}
+                padding={{ top: '0.75rem', bottom: '0.75rem', left: '2.5rem', right: '2.5rem' }}
+                background={{ color: Theme.colors.primary.main }}
+                font={{ color: Theme.colors.primary.contrastText, size: '0.875rem', weight: 400 }}
                 onClick={this.onAddCommissionClicked.bind(this)}
               ></i-button>
             </i-panel>
@@ -305,43 +317,43 @@ export default class Config extends Module {
               ]
             }>
 
-            <i-hstack width='100%' horizontalAlignment='center' grid={{ area: 'title' }} margin={{bottom: '1.5rem'}}>
-              <i-label caption="Add Wallet" font={{size: '1.5rem'}}></i-label>
+            <i-hstack width='100%' horizontalAlignment='center' grid={{ area: 'title' }} margin={{ bottom: '1.5rem' }}>
+              <i-label caption="Add Wallet" font={{ size: '1.5rem' }}></i-label>
             </i-hstack>
 
-            <i-label caption="Network" grid={{ area: 'lbNetwork' }} font={{size: '1rem'}} />
+            <i-label caption="Network" grid={{ area: 'lbNetwork' }} font={{ size: '1rem' }} />
             <i-scom-network-picker
               id='networkPicker'
               grid={{ area: 'network' }}
               display="block"
               type='combobox'
               networks={SupportedNetworks}
-              background={{color: Theme.combobox.background}}
-              border={{radius: 8, width: '1px', style: 'solid', color: Theme.input.background}}
+              background={{ color: Theme.combobox.background }}
+              border={{ radius: 8, width: '1px', style: 'solid', color: Theme.input.background }}
               onCustomNetworkSelected={this.onNetworkSelected}
               class="nft-network-select"
             />
 
-            <i-label caption="Wallet Address" grid={{ area: 'lbWalletAddress' }} font={{size: '1rem'}} />
+            <i-label caption="Wallet Address" grid={{ area: 'lbWalletAddress' }} font={{ size: '1rem' }} />
             <i-input
               id='inputWalletAddress'
               grid={{ area: 'walletAddress' }}
               width='100%' height={45}
-              border={{radius: 8, width: '1px', style: 'solid', color: Theme.divider}}
+              border={{ radius: 8, width: '1px', style: 'solid', color: Theme.divider }}
               onChanged={this.onInputWalletAddressChanged}
             />
 
             <i-label id='lbErrMsg' font={{ color: '#ed5748' }} grid={{ area: 'errMsg' }}></i-label>
 
-            <i-hstack width='100%' horizontalAlignment='center' grid={{ area: 'btnConfirm' }} margin={{top: '1.25rem'}}>
+            <i-hstack width='100%' horizontalAlignment='center' grid={{ area: 'btnConfirm' }} margin={{ top: '1.25rem' }}>
               <i-button
                 id="btnConfirm"
                 enabled={false}
                 caption="Add Wallet"
-                border={{radius: '58px'}}
-                padding={{top: '0.75rem', bottom: '0.75rem', left: '2.5rem', right: '2.5rem'}}
-                background={{color: Theme.colors.primary.main}}
-                font={{color: Theme.colors.primary.contrastText, size: '0.875rem', weight: 400}}
+                border={{ radius: '58px' }}
+                padding={{ top: '0.75rem', bottom: '0.75rem', left: '2.5rem', right: '2.5rem' }}
+                background={{ color: Theme.colors.primary.main }}
+                font={{ color: Theme.colors.primary.contrastText, size: '0.875rem', weight: 400 }}
                 onClick={this.onConfirmCommissionClicked.bind(this)}
               ></i-button>
             </i-hstack>

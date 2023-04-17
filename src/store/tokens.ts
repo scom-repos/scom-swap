@@ -68,6 +68,9 @@ export class TokenStore {
     let allTokenBalancesMap: TokenBalancesType = {};
     try {
       const wallet = Wallet.getClientInstance();
+      const networkInfo = wallet.getNetworkInfo(wallet.chainId);
+      if (!networkInfo) return allTokenBalancesMap;
+      
       const erc20 = new Contracts.ERC20(wallet);
       const data = wallet.encodeFunctionCall(erc20, 'balanceOf', [wallet.address]);
       const result = await wallet.multiCall(erc20TokenList.map((v: any) => {
