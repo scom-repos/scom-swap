@@ -21,6 +21,10 @@ import { IExtendedNetwork, formatNumber, isWalletAddress, ICommissionInfo, IEmbe
 import { customStyle, tableStyle } from './index.css'
 const Theme = Styles.Theme.ThemeVars;
 
+export interface ISupportedNetworks {
+  chainId: number;
+}
+
 declare global {
   namespace JSX {
     interface IntrinsicElements {
@@ -39,6 +43,7 @@ export default class Config extends Module {
   private lbCommissionShare: Label;
   private btnAddWallet: Button;
   private pnlEmptyWallet: VStack;
+  private _supportedNetworks: ISupportedNetworks[];
   private commissionInfoList: ICommissionInfo[];
   private commissionsTableColumns = [
     {
@@ -139,6 +144,7 @@ export default class Config extends Module {
 
   async init() {
     super.init();
+    this._supportedNetworks = [];
     this.commissionInfoList = [];
     const embedderFee = getEmbedderCommissionFee();
     this.lbCommissionShare.caption = `${formatNumber(new BigNumber(embedderFee).times(100).toFixed(), 4)} %`;
@@ -154,6 +160,15 @@ export default class Config extends Module {
   set data(config: IEmbedData) {
     this.tableCommissions.data = config.commissions || [];
     this.toggleVisible();
+  }
+
+  get supportedNetworks(): ISupportedNetworks[] {
+    return this._supportedNetworks;
+  }
+
+  set supportedNetworks(value: ISupportedNetworks[]) {
+    this._supportedNetworks = value;
+    this.networkPicker.networks = value;
   }
 
   get onCustomCommissionsChanged(): (data: any) => Promise<void> {
@@ -238,18 +253,18 @@ export default class Config extends Module {
     return (
       <i-vstack gap='0.5rem' padding={{ top: '1rem', bottom: '1rem' }} class={customStyle}>
         <i-vstack gap="5px">
-          <i-hstack horizontalAlignment="space-between" verticalAlignment="center">
+          {/* <i-hstack horizontalAlignment="space-between" verticalAlignment="center">
             <i-label caption='Network: ' opacity={0.6} font={{ size: '1rem' }}></i-label>
             <i-scom-network-picker
               display="block"
               minWidth='270px'
               type='combobox'
-              networks={SupportedNetworks}
+              networks={this._supportedNetworks}
               background={{ color: Theme.combobox.background }}
               border={{ radius: 8, width: '1px', style: 'solid', color: Theme.input.background }}
               class="nft-network-select"
             />
-          </i-hstack>
+          </i-hstack> */}
           <i-hstack
             horizontalAlignment="space-between"
             verticalAlignment="center"

@@ -10268,7 +10268,6 @@ declare module "@scom/scom-swap/store/tokens.ts" {
         getTokenList(chainId: number): ITokenObject[];
         private getERC20Balance;
         getTokenBalance(token: ITokenObject): string;
-        getProjectTokenBalance(): string;
         private _updateAllTokenBalances;
         updateAllTokenBalances(): Promise<TokenBalancesType>;
         updateTokenBalances(erc20TokenList: ITokenObject[]): Promise<TokenBalancesType>;
@@ -11172,6 +11171,9 @@ declare module "@scom/scom-swap/config/index.css.ts" {
 declare module "@scom/scom-swap/config/index.tsx" {
     import { Module, ControlElement } from '@ijstech/components';
     import { IExtendedNetwork, IEmbedData } from "@scom/scom-swap/global/index.ts";
+    export interface ISupportedNetworks {
+        chainId: number;
+    }
     global {
         namespace JSX {
             interface IntrinsicElements {
@@ -11187,6 +11189,7 @@ declare module "@scom/scom-swap/config/index.tsx" {
         private lbCommissionShare;
         private btnAddWallet;
         private pnlEmptyWallet;
+        private _supportedNetworks;
         private commissionInfoList;
         private commissionsTableColumns;
         private btnConfirm;
@@ -11195,6 +11198,8 @@ declare module "@scom/scom-swap/config/index.tsx" {
         init(): Promise<void>;
         get data(): IEmbedData;
         set data(config: IEmbedData);
+        get supportedNetworks(): ISupportedNetworks[];
+        set supportedNetworks(value: ISupportedNetworks[]);
         get onCustomCommissionsChanged(): (data: any) => Promise<void>;
         set onCustomCommissionsChanged(value: (data: any) => Promise<void>);
         onModalAddCommissionClosed(): void;
@@ -11357,7 +11362,8 @@ declare module "@scom/scom-swap" {
         private isPriceToggled;
         private record;
         private allTokenBalancesMap;
-        private supportedChainId;
+        private currentChainId;
+        private supportedChainIds;
         private fallbackUrl;
         private swapButtonStatusMap;
         private approveButtonStatusMap;

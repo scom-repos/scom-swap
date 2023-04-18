@@ -56,20 +56,12 @@ export class TokenStore {
     return balance;
   }
   
-  public getProjectTokenBalance(): string {
-    let balance = '0';
-    if (this._projectToken && this._projectToken.address && this._tokenBalances) {
-      balance = this._tokenBalances[this._projectToken.address.toLowerCase()];
-    }
-    return balance;
-  }
-  
   private async _updateAllTokenBalances(erc20TokenList: ITokenObject[], nativeToken: ITokenObject): Promise<TokenBalancesType> {
     let allTokenBalancesMap: TokenBalancesType = {};
     try {
       const wallet = Wallet.getClientInstance();
       const networkInfo = wallet.getNetworkInfo(wallet.chainId);
-      if (!networkInfo) return allTokenBalancesMap;
+      if (!networkInfo || !wallet.isConnected) return allTokenBalancesMap;
       
       const erc20 = new Contracts.ERC20(wallet);
       const data = wallet.encodeFunctionCall(erc20, 'balanceOf', [wallet.address]);

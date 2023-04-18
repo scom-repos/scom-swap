@@ -152,7 +152,8 @@ export default class ScomSwap extends Module implements PageBlock {
   private allTokenBalancesMap: any;
   // private checkHasWallet: boolean;
   // private availableMarkets: any;
-  private supportedChainId: number;
+  private currentChainId: number;
+  private supportedChainIds: number[];
   private fallbackUrl: string = Assets.fullPath('img/tokens/Custom.png');
   private swapButtonStatusMap: any;
   private approveButtonStatusMap: any;
@@ -522,10 +523,15 @@ export default class ScomSwap extends Module implements PageBlock {
         },
         bindOnChanged: (element: Config, callback: (data: any) => Promise<void>) => {
           element.onCustomCommissionsChanged = async (data: any) => {
+            const commissions: ICommissionInfo[] = data.commissions;
+            if (commissions) {
+              this.supportedChainIds = commissions.map(v => v.chainId).filter((v, i, a) => a.indexOf(v) === i);
+            }
             let resultingData = {
               ...self._data,
               ...data
             };
+
             await this.setData(resultingData);
             await callback(data);
           }
@@ -731,7 +737,7 @@ export default class ScomSwap extends Module implements PageBlock {
   }
 
   onWalletConnect = async (connected: boolean) => {
-    if (connected && (this.supportedChainId == null || this.supportedChainId == undefined)) {
+    if (connected && (this.currentChainId == null || this.currentChainId == undefined)) {
       this.onChainChange();
     } else {
       if (this.originalData?.providers?.length) await this.onSetupPage(connected);
@@ -747,9 +753,9 @@ export default class ScomSwap extends Module implements PageBlock {
   }
 
   onChainChange = async () => {
-    this.supportedChainId = getChainId();
-    if (this.supportedChainId != null && this.supportedChainId != undefined)
-      this.swapBtn.classList.remove('hidden');
+    this.currentChainId = getChainId();
+    if (this.currentChainId != null && this.currentChainId != undefined)
+      this.swapBtn.visible = true;
     // this.availableMarkets = getAvailableMarkets() || [];
     this.updateContractAddress();
     if (this.originalData?.providers?.length) await this.onSetupPage(true);
@@ -817,7 +823,7 @@ export default class ScomSwap extends Module implements PageBlock {
 
   private redirectToken = () => {
     let queryRouter: any = {
-      chainId: this.supportedChainId,
+      chainId: this.currentChainId,
       fromToken: this.fromToken?.symbol || this.fromTokenSymbol,
       toToken: this.toToken?.symbol || this.toTokenSymbol,
     };
@@ -852,7 +858,7 @@ export default class ScomSwap extends Module implements PageBlock {
   private setFixedPairData() {
     const providers = this.originalData?.providers;
     if (providers && providers.length) {
-      const contractInfo = (providers[0].contractInfo || {})[this.supportedChainId];
+      const contractInfo = (providers[0].contractInfo || {})[this.currentChainId];
       if (contractInfo) {
         const fromTokenAddress = contractInfo.fromToken || '';
         const toTokenAddress = contractInfo.toToken || '';
@@ -901,12 +907,12 @@ export default class ScomSwap extends Module implements PageBlock {
     this.toggleReverseImage.classList.add('cursor-default');
     clearInterval(this.timer);
     this.lastUpdated = 0;
-    this.swapBtn.classList.add('hidden');
+    this.swapBtn.visible = false;
     this.onRenderPriceInfo();
   }
 
   private onSetupPage = async (connected: boolean, _chainId?: number) => {
-    this.supportedChainId = _chainId ? _chainId : getChainId();
+    this.currentChainId = _chainId ? _chainId : getChainId();
     tokenStore.updateTokenMapData();
     if (connected) {
       await tokenStore.updateAllTokenBalances();
@@ -948,7 +954,7 @@ export default class ScomSwap extends Module implements PageBlock {
         input.value = this.fixedNumber(this.toInputValue);
       }
     }
-    this.firstTokenSelection.tokenDataListProp = getSupportedTokens(this._data.tokens || [], this.supportedChainId);
+    this.firstTokenSelection.tokenDataListProp = getSupportedTokens(this._data.tokens || [], this.currentChainId);
     this.setTargetTokenList();
 
     //if (connected) {
@@ -959,19 +965,11 @@ export default class ScomSwap extends Module implements PageBlock {
     }, 1000)
     this.lastUpdated = 0;
     if (!this.record)
-      this.swapBtn.classList.add('hidden');
+      this.swapBtn.enabled = false;
     // this.onRenderIconList();
     this.onRenderPriceInfo();
     this.redirectToken();
     await this.handleAddRoute();
-    /*
-  } else {
-    this.actionSetting?.classList.add("hidden");
-    clearInterval(this.timer);
-    this.lastUpdated = 0;
-    this.swapBtn.classList.remove('hidden');
-  }
-  */
   }
 
   private async initTokenSelection() {
@@ -1069,10 +1067,10 @@ export default class ScomSwap extends Module implements PageBlock {
     if (!this.record) return;
     this.setupCrossChainPopup();
     const slippageTolerance = getSlippageTolerance();
-    this.fromTokenImage.url = Assets.fullPath(getTokenIconPath(this.fromToken, this.supportedChainId));
+    this.fromTokenImage.url = Assets.fullPath(getTokenIconPath(this.fromToken, this.currentChainId));
     this.fromTokenLabel.caption = this.fromToken?.symbol ?? '';
     this.fromTokenValue.caption = formatNumber(this.totalAmount(), 4);
-    this.toTokenImage.url = Assets.fullPath(getTokenIconPath(this.toToken, this.supportedChainId));
+    this.toTokenImage.url = Assets.fullPath(getTokenIconPath(this.toToken, this.currentChainId));
     this.toTokenLabel.caption = this.toToken?.symbol ?? '';
     this.toTokenValue.caption = formatNumber(this.toInputValue, 4);
     const minimumReceived = this.getMinReceivedMaxSold();
@@ -1299,7 +1297,7 @@ export default class ScomSwap extends Module implements PageBlock {
       }
     }
 
-    this.swapBtn.classList.remove('hidden');
+    this.swapBtn.visible = true;
     this.record = item;
     this.setSwapButtonText();
     const enabled = !this.isSwapButtonDisabled();
@@ -1375,7 +1373,7 @@ export default class ScomSwap extends Module implements PageBlock {
     this.toggleRoutes.classList.add('hidden');
     this.record = null;
     this.isPriceToggled = false;
-    this.swapBtn.classList.add('hidden');
+    this.swapBtn.visible = false;
   }
   async handleAddRoute() {
     if (!this.fromToken || !this.toToken || !(this.fromInputValue.gt(0) || this.toInputValue.gt(0))) return;
@@ -2032,7 +2030,7 @@ export default class ScomSwap extends Module implements PageBlock {
   };
 
   setTargetTokenList = (isDisabled?: boolean) => {
-    const srcChainId = this.srcChain?.chainId || this.supportedChainId;
+    const srcChainId = this.srcChain?.chainId || this.currentChainId;
     if (this.secondTokenSelection.targetChainId != srcChainId) {
       this.secondTokenSelection.targetChainId = srcChainId;
     }
@@ -2045,9 +2043,9 @@ export default class ScomSwap extends Module implements PageBlock {
       selected.classList.remove('icon-selected');
     }
     this.getSupportedChainList();
-    if (!this.supportedChainId)
-      this.supportedChainId = this.supportedChainList[0].chainId;
-    const currentNetwork = this.supportedChainList.find((f: IExtendedNetwork) => f.chainId == this.supportedChainId);
+    if (!this.currentChainId)
+      this.currentChainId = this.supportedChainList[0].chainId;
+    const currentNetwork = this.supportedChainList.find((f: IExtendedNetwork) => f.chainId == this.currentChainId);
     this.srcChain = currentNetwork;
     this.srcChainLabel.caption = this.srcChain?.chainName || '-';
     const img = this.srcChainList.querySelector(`[network-name="${currentNetwork?.chainName}"]`);
@@ -2059,14 +2057,14 @@ export default class ScomSwap extends Module implements PageBlock {
   onSelectSourceChain = async (obj: IExtendedNetwork, img?: Image) => {
     if (this.isMetaMask || !isWalletConnected()) {
       await this.selectSourceChain(obj, img);
-      this.supportedChainId = obj.chainId;
-      await this.onSetupPage(true, this.supportedChainId);
+      this.currentChainId = obj.chainId;
+      await this.onSetupPage(true, this.currentChainId);
     }
   }
 
   setDefaultChain = async () => {
     if (this.supportedChainList && this.supportedChainList.length) {
-      let obj = this.supportedChainList.find((f: IExtendedNetwork) => f.chainId == this.supportedChainId);
+      let obj = this.supportedChainList.find((f: IExtendedNetwork) => f.chainId == this.currentChainId);
       if (!obj)
         obj = this.supportedChainList[0];
       if (!this.srcChain && obj) {
@@ -2199,8 +2197,8 @@ export default class ScomSwap extends Module implements PageBlock {
     this.supportedNetworksElm.clearInnerHTML();
     if (!this.supportedNetworks.length) {
       this.supportedNetworksElm.appendChild(<i-label caption={`No networks are supported. Please configure the swap!`} font={{ size: '16px' }} />)
-    } else if (this.supportedChainList.some(v => v.chainId == this.supportedChainId)) {
-      const network = getNetworkInfo(this.supportedChainId);
+    } else if (this.supportedChainList.some(v => v.chainId == this.currentChainId)) {
+      const network = getNetworkInfo(this.currentChainId);
       this.supportedNetworksElm.appendChild(<i-label caption={`The ${network.chainName} (${network.chainId}) network has not been configured for the swap!`} font={{ size: '16px' }} />)
     } else {
       this.supportedNetworksElm.appendChild(<i-label caption={`We only support the following ${this.supportedNetworks.length > 1 ? 'networks' : 'network'}:`} font={{ size: '16px' }} />)
@@ -2230,7 +2228,7 @@ export default class ScomSwap extends Module implements PageBlock {
 
   async init() {
     this.isReadyCallbackQueued = true;
-    this.supportedChainId = getChainId();
+    this.currentChainId = getChainId();
     setTokenStore();
     // this.availableMarkets = getAvailableMarkets() || [];
     super.init();
@@ -2362,7 +2360,8 @@ export default class ScomSwap extends Module implements PageBlock {
             </i-panel>
             <i-panel class="swap-btn-container" width="100%">
               <i-button
-                id="swapBtn" class="btn-swap btn-os hidden" height={67}
+                id="swapBtn" class="btn-swap btn-os" height={67}
+                visible={false}
                 rightIcon={{ spin: true, visible: false }}
                 onClick={this.onClickSwapButton.bind(this)}
               ></i-button>

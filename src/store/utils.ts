@@ -302,13 +302,13 @@ export function isWalletConnected() {
 }
 
 export async function switchNetwork(chainId: number) {
+  const wallet = Wallet.getClientInstance();
   if (!isWalletConnected()) {
     setCurrentChainId(chainId);
-    Wallet.getClientInstance().chainId = chainId;
+    wallet.chainId = chainId;
     application.EventBus.dispatch(EventId.chainChanged, chainId);
     return;
   }
-  const wallet = Wallet.getClientInstance();
   if (wallet?.clientSideProvider?.name === WalletPlugin.MetaMask) {
     await wallet.switchNetwork(chainId);
   }

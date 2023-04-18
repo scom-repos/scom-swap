@@ -329,7 +329,9 @@ const getAllAvailableRoutes = async (markets: string[], tokenList: ITokenObject[
         tokenOut,
         ...reserveObj
       });
-    } catch (err) { }
+    } catch (err) { 
+      console.log('err', err);
+    }
   }
 
   getPairPromises.push(...markets.map(market => composeAvailableRoutePromise(market, tokenIn, tokenOut)));
