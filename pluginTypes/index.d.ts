@@ -9779,26 +9779,6 @@ declare module "@scom/scom-swap/global/index.ts" {
         symbol?: string;
         env?: string;
     }
-    export const ABIKeys: {
-        Factory: string;
-        Pair: string;
-        OracleFactory: string;
-        OraclePair: string;
-        OracleLiquidityProvider: string;
-        HybridRouterRegistry: string;
-        HybridRouter: string;
-        RangeFactory: string;
-        RangePair: string;
-        RangeLiquidityProvider: string;
-        OracleAdaptor: string;
-        RestrictedFactory: string;
-        RestrictedPair: string;
-        RestrictedLiquidityProvider: string;
-        ConfigStore: string;
-        PeggedOracleFactory: string;
-        PeggedOraclePair: string;
-        PeggedOracleLiquidityProvider: string;
-    };
     export const enum EventId {
         ConnectWallet = "connectWallet",
         IsWalletConnected = "isWalletConnected",
@@ -10156,7 +10136,6 @@ declare module "@scom/scom-swap/store/data/tokens/index.ts" {
     const WETHByChainId: {
         [chainId: number]: ITokenObject;
     };
-    const getOpenSwapToken: (chainId: number) => ITokenObject;
     const DefaultTokens: {
         [chainId: number]: ITokenObject[];
     };
@@ -10171,11 +10150,11 @@ declare module "@scom/scom-swap/store/data/tokens/index.ts" {
         };
     };
     const getTokenIconPath: (tokenObj: any, chainId?: number) => string;
-    export { DefaultERC20Tokens, ChainNativeTokenByChainId, WETHByChainId, DefaultTokens, ToUSDPriceFeedAddressesMap, tokenPriceAMMReference, getTokenIconPath, getOpenSwapToken, };
+    export { DefaultERC20Tokens, ChainNativeTokenByChainId, WETHByChainId, DefaultTokens, ToUSDPriceFeedAddressesMap, tokenPriceAMMReference, getTokenIconPath };
 }
 /// <amd-module name="@scom/scom-swap/store/data/index.ts" />
 declare module "@scom/scom-swap/store/data/index.ts" {
-    export { DefaultERC20Tokens, ChainNativeTokenByChainId, WETHByChainId, DefaultTokens, ToUSDPriceFeedAddressesMap, tokenPriceAMMReference, getTokenIconPath, getOpenSwapToken, } from "@scom/scom-swap/store/data/tokens/index.ts";
+    export { DefaultERC20Tokens, ChainNativeTokenByChainId, WETHByChainId, DefaultTokens, ToUSDPriceFeedAddressesMap, tokenPriceAMMReference, getTokenIconPath } from "@scom/scom-swap/store/data/tokens/index.ts";
 }
 /// <amd-module name="@scom/scom-swap/store/utils.ts" />
 declare module "@scom/scom-swap/store/utils.ts" {
@@ -10225,6 +10204,7 @@ declare module "@scom/scom-swap/store/utils.ts" {
     export const getTransactionDeadline: () => any;
     export const setTransactionDeadline: (value: any) => void;
     export const getInfuraId: () => string;
+    export const getSupportedNetworks: () => IExtendedNetwork[];
     export const getNetworkInfo: (chainId: number) => IExtendedNetwork;
     export const getUserTokens: (chainId: number) => any[] | null;
     export const addUserTokens: (token: ITokenObject) => void;
@@ -10260,11 +10240,9 @@ declare module "@scom/scom-swap/store/tokens.ts" {
         private _defaultTokensByChain;
         private _tokenBalances;
         private _tokenMap;
-        private _projectToken?;
         constructor(defaultTokensByChain: DefaultTokensByChainType);
         get tokenBalances(): TokenBalancesType;
         get tokenMap(): TokenMapType;
-        get projectToken(): ITokenObject;
         getTokenList(chainId: number): ITokenObject[];
         private getERC20Balance;
         getTokenBalance(token: ITokenObject): string;
@@ -10279,7 +10257,7 @@ declare module "@scom/scom-swap/store/tokens.ts" {
 declare module "@scom/scom-swap/store/index.ts" {
     import { ITokenObject } from "@scom/scom-swap/global/index.ts";
     import { TokenStore } from "@scom/scom-swap/store/tokens.ts";
-    export { DefaultERC20Tokens, ChainNativeTokenByChainId, WETHByChainId, DefaultTokens, ToUSDPriceFeedAddressesMap, tokenPriceAMMReference, getTokenIconPath, getOpenSwapToken } from "@scom/scom-swap/store/data/index.ts";
+    export { DefaultERC20Tokens, ChainNativeTokenByChainId, WETHByChainId, DefaultTokens, ToUSDPriceFeedAddressesMap, tokenPriceAMMReference, getTokenIconPath } from "@scom/scom-swap/store/data/index.ts";
     export { TokenStore, TokenBalancesType, DefaultTokensByChainType } from "@scom/scom-swap/store/tokens.ts";
     export let tokenStore: TokenStore;
     export const setTokenStore: () => void;
@@ -10289,10 +10267,6 @@ declare module "@scom/scom-swap/store/index.ts" {
     export const getTokenIcon: (address: string) => string;
     export const tokenSymbol: (address: string) => string;
     export const tokenName: (address: string) => string;
-    export const SupportedNetworks: {
-        chainName: string;
-        chainId: number;
-    }[];
     export * from "@scom/scom-swap/store/utils.ts";
     export * from "@scom/scom-swap/store/data/index.ts";
     export const getSupportedTokens: (tokens: ITokenObject[], chainId: number) => ITokenObject[];
@@ -11189,7 +11163,6 @@ declare module "@scom/scom-swap/config/index.tsx" {
         private lbCommissionShare;
         private btnAddWallet;
         private pnlEmptyWallet;
-        private _supportedNetworks;
         private commissionInfoList;
         private commissionsTableColumns;
         private btnConfirm;
@@ -11198,10 +11171,11 @@ declare module "@scom/scom-swap/config/index.tsx" {
         init(): Promise<void>;
         get data(): IEmbedData;
         set data(config: IEmbedData);
-        get supportedNetworks(): ISupportedNetworks[];
-        set supportedNetworks(value: ISupportedNetworks[]);
         get onCustomCommissionsChanged(): (data: any) => Promise<void>;
         set onCustomCommissionsChanged(value: (data: any) => Promise<void>);
+        getSupportedChainIds(): {
+            chainId: number;
+        }[];
         onModalAddCommissionClosed(): void;
         onAddCommissionClicked(): void;
         onConfirmCommissionClicked(): Promise<void>;
@@ -11220,34 +11194,34 @@ declare module "@scom/scom-swap/scconfig.json.ts" {
         moduleDir: string;
         main: string;
         modules: {
-            "@pageblock-swap/assets": {
+            "@scom/scom-swap/assets": {
                 path: string;
             };
-            "@pageblock-swap/global": {
+            "@scom/scom-swap/global": {
                 path: string;
             };
-            "@pageblock-swap/store": {
+            "@scom/scom-swap/store": {
                 path: string;
             };
-            "@pageblock-swap/result": {
+            "@scom/scom-swap/result": {
                 path: string;
             };
-            "@pageblock-swap/main": {
+            "@scom/scom-swap/main": {
                 path: string;
             };
-            "@pageblock-swap/token-selection": {
+            "@scom/scom-swap/token-selection": {
                 path: string;
             };
-            "@pageblock-swap/swap-utils": {
+            "@scom/scom-swap/swap-utils": {
                 path: string;
             };
-            "@pageblock-swap/price-info": {
+            "@scom/scom-swap/price-info": {
                 path: string;
             };
-            "@pageblock-swap/transaction-settings": {
+            "@scom/scom-swap/transaction-settings": {
                 path: string;
             };
-            "@pageblock-swap/expert-mode-settings": {
+            "@scom/scom-swap/expert-mode-settings": {
                 path: string;
             };
         };

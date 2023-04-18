@@ -156,6 +156,10 @@ const setNetworkList = (networkList: IExtendedNetwork[], infuraId?: string) => {
   }
 }
 
+export const getSupportedNetworks = () => {
+  return Object.values(state.networkMap);
+}
+
 export const getNetworkInfo = (chainId: number) => {
   return state.networkMap[chainId];
 }

@@ -26,20 +26,4 @@ export async function parseContractError(oMessage:string, tokens: string[]):Prom
     }
 
     return staticMessageMap[oMessage] ?? `Unknown Error: ${oMessage}`;
-
-    // switch (oMessage) {
-    //     case 'execution reverted: OracleAdaptor: Exceessive amount':
-    //         try {
-    //             const tokenIn = tokens[0] === MAIN_TOKEN.symbol ? WETH9.address : tokens[0];
-    //             const tokenOut = tokens[1] === MAIN_TOKEN.symbol ? WETH9.address : tokens[1];
-    //             let oracleAdapterAddress = await eth.call('OSWAP_OracleFactory', Address['OSWAP_OracleFactory'], 'oracles', [tokenIn, tokenOut]);
-    //             let maxVal = await eth.call('OSWAP_OracleChainlinkPriceGuardTestnet', oracleAdapterAddress, 'maxValue', [])
-    //             maxVal = web3.utils.fromWei(maxVal);
-    //             return `Exceeded Swap limit of ${maxVal} USD equivalent`;
-    //         } catch {
-    //             return '';
-    //         }
-    //     default:
-    //         return '';
-    // }
 }

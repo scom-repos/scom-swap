@@ -10,7 +10,6 @@ export class TokenStore {
   private _defaultTokensByChain: DefaultTokensByChainType;
   private _tokenBalances: TokenBalancesType;
   private _tokenMap: TokenMapType;
-  private _projectToken?: ITokenObject;
 
   constructor(defaultTokensByChain: DefaultTokensByChainType) {
     this._defaultTokensByChain = defaultTokensByChain;
@@ -23,10 +22,6 @@ export class TokenStore {
 
   public get tokenMap() {
     return this._tokenMap;
-  }
-
-  public get projectToken() {
-    return this._projectToken;
   }
 
   public getTokenList(chainId: number) {
@@ -148,8 +143,6 @@ export class TokenStore {
       if (userCustomTokens) {
         userCustomTokens.forEach(v => allTokensMap[v.address] = {...v, isCustom: true});
       }
-      let stakeToken = defaultTokenList.find(v => v.symbol == 'OSWAP');
-      this._projectToken = stakeToken ? { ...stakeToken, address: stakeToken.address!.toLowerCase() } : undefined;
     }
     return allTokensMap;
   }

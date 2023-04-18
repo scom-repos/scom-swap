@@ -1,39 +1,39 @@
 const InfuraId = "adc596bf88b648e2a8902bc9093930c5";
 
 export default {
-  "name": "@pageblock-swap/main",
+  "name": "@scom/scom-swap/main",
   "version": "0.1.0",
   "moduleDir": "src",
-  "main": "@pageblock-swap/main",
+  "main": "@scom/scom-swap/main",
   "modules": {
-    "@pageblock-swap/assets": {
+    "@scom/scom-swap/assets": {
       "path": "assets"
     },
-    "@pageblock-swap/global": {
+    "@scom/scom-swap/global": {
       "path": "global"
     },
-    "@pageblock-swap/store": {
+    "@scom/scom-swap/store": {
       "path": "store"
     },
-    "@pageblock-swap/result": {
+    "@scom/scom-swap/result": {
       "path": "result"
     },
-    "@pageblock-swap/main": {
+    "@scom/scom-swap/main": {
       "path": "main"
     },
-    "@pageblock-swap/token-selection": {
+    "@scom/scom-swap/token-selection": {
       "path": "token-selection"
     },
-    "@pageblock-swap/swap-utils": {
+    "@scom/scom-swap/swap-utils": {
       "path": "swap-utils"
     },
-    "@pageblock-swap/price-info": {
+    "@scom/scom-swap/price-info": {
       "path": "price-info"
     },
-    "@pageblock-swap/transaction-settings": {
+    "@scom/scom-swap/transaction-settings": {
       "path": "transaction-settings"
     },
-    "@pageblock-swap/expert-mode-settings": {
+    "@scom/scom-swap/expert-mode-settings": {
       "path": "expert-mode-settings"
     }
   },

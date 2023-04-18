@@ -11,8 +11,7 @@ export {
   DefaultTokens,
   ToUSDPriceFeedAddressesMap,
   tokenPriceAMMReference,
-  getTokenIconPath,
-  getOpenSwapToken
+  getTokenIconPath
 } from './data/index'
 
 export { TokenStore, TokenBalancesType, DefaultTokensByChainType } from './tokens';
@@ -67,17 +66,6 @@ export const tokenName = (address: string) => {
   if (!tokenObject) tokenObject = tokenMap[address];
   return tokenObject?.name || '';
 }
-
-export const SupportedNetworks = [
-  {
-    chainName: 'BNB Chain Testnet',
-    chainId: 97
-  },
-  {
-    chainName: "Avalanche FUJI Testnet",
-    chainId: 43113
-  }
-];
 
 export * from './utils';
 export * from './data/index';

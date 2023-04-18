@@ -5,6 +5,5 @@ export {
   DefaultTokens,
   ToUSDPriceFeedAddressesMap,
   tokenPriceAMMReference,
-  getTokenIconPath,
-  getOpenSwapToken,
+  getTokenIconPath
 } from './tokens/index';

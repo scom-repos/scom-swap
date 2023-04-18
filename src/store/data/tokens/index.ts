@@ -41,14 +41,6 @@ const WETHByChainId = Object.keys(DefaultERC20Tokens).reduce((result: {[chainId:
   return result
 }, {});
 
-const getOpenSwapToken = (chainId:number) => {
-  let tokens = DefaultERC20Tokens[chainId];
-  if (!tokens) return null;
-  for (const token of tokens) {
-    if (token.name == "OpenSwap" && token.symbol == "OSWAP") return token;
-  }
-  return null;
-}
 
 const DefaultTokens = Object.keys(ChainNativeTokenByChainId).reduce((result: {[chainId: number]: ITokenObject[]}, key: string) => {
   result[Number(key)] = [...DefaultERC20Tokens[Number(key)], ChainNativeTokenByChainId[Number(key)]]
@@ -141,7 +133,6 @@ export {
   DefaultTokens,
   ToUSDPriceFeedAddressesMap,
   tokenPriceAMMReference,
-  getTokenIconPath,
-  getOpenSwapToken,
+  getTokenIconPath
 }
 

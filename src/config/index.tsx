@@ -16,7 +16,7 @@ import {
 } from '@ijstech/components';
 import { BigNumber } from '@ijstech/eth-wallet';
 import ScomNetworkPicker from '@scom/scom-network-picker';
-import { getEmbedderCommissionFee, getNetworkInfo, SupportedNetworks } from '../store/index';
+import { getEmbedderCommissionFee, getNetworkInfo, getSupportedNetworks } from '../store/index';
 import { IExtendedNetwork, formatNumber, isWalletAddress, ICommissionInfo, IEmbedData } from '../global/index';
 import { customStyle, tableStyle } from './index.css'
 const Theme = Styles.Theme.ThemeVars;
@@ -43,7 +43,6 @@ export default class Config extends Module {
   private lbCommissionShare: Label;
   private btnAddWallet: Button;
   private pnlEmptyWallet: VStack;
-  private _supportedNetworks: ISupportedNetworks[];
   private commissionInfoList: ICommissionInfo[];
   private commissionsTableColumns = [
     {
@@ -52,7 +51,8 @@ export default class Config extends Module {
       key: 'chainId',
       textAlign: 'left' as any,
       onRenderCell: function (source: Control, columnData: number, rowData: any) {
-        const network = SupportedNetworks.find(net => net.chainId === columnData)
+        const supportedNetworks = getSupportedNetworks();
+        const network = supportedNetworks.find(net => net.chainId === columnData)
         if (!network) return <i-panel></i-panel>
         const networkInfo = getNetworkInfo(network.chainId)
         const imgUrl = networkInfo.image || ''
@@ -144,7 +144,6 @@ export default class Config extends Module {
 
   async init() {
     super.init();
-    this._supportedNetworks = [];
     this.commissionInfoList = [];
     const embedderFee = getEmbedderCommissionFee();
     this.lbCommissionShare.caption = `${formatNumber(new BigNumber(embedderFee).times(100).toFixed(), 4)} %`;
@@ -162,21 +161,16 @@ export default class Config extends Module {
     this.toggleVisible();
   }
 
-  get supportedNetworks(): ISupportedNetworks[] {
-    return this._supportedNetworks;
-  }
-
-  set supportedNetworks(value: ISupportedNetworks[]) {
-    this._supportedNetworks = value;
-    this.networkPicker.networks = value;
-  }
-
   get onCustomCommissionsChanged(): (data: any) => Promise<void> {
     return this._onCustomCommissionsChanged;
   }
 
   set onCustomCommissionsChanged(value: (data: any) => Promise<void>) {
     this._onCustomCommissionsChanged = value;
+  }
+
+  getSupportedChainIds() {
+    return getSupportedNetworks().map(v => ({chainId: v.chainId}))
   }
 
   onModalAddCommissionClosed() {
@@ -253,18 +247,6 @@ export default class Config extends Module {
     return (
       <i-vstack gap='0.5rem' padding={{ top: '1rem', bottom: '1rem' }} class={customStyle}>
         <i-vstack gap="5px">
-          {/* <i-hstack horizontalAlignment="space-between" verticalAlignment="center">
-            <i-label caption='Network: ' opacity={0.6} font={{ size: '1rem' }}></i-label>
-            <i-scom-network-picker
-              display="block"
-              minWidth='270px'
-              type='combobox'
-              networks={this._supportedNetworks}
-              background={{ color: Theme.combobox.background }}
-              border={{ radius: 8, width: '1px', style: 'solid', color: Theme.input.background }}
-              class="nft-network-select"
-            />
-          </i-hstack> */}
           <i-hstack
             horizontalAlignment="space-between"
             verticalAlignment="center"
@@ -342,7 +324,7 @@ export default class Config extends Module {
               grid={{ area: 'network' }}
               display="block"
               type='combobox'
-              networks={SupportedNetworks}
+              networks={this.getSupportedChainIds()}
               background={{ color: Theme.combobox.background }}
               border={{ radius: 8, width: '1px', style: 'solid', color: Theme.input.background }}
               onCustomNetworkSelected={this.onNetworkSelected}
