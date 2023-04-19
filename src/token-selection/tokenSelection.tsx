@@ -1,15 +1,16 @@
 import { customElements, Module, Control, ControlElement, Modal, Input, Icon, Panel, Button, Image, observable, application, IEventBus, Container, Styles, GridLayout } from '@ijstech/components';
-import { 
-  ChainNativeTokenByChainId, 
+import {
   isWalletConnected, 
   getChainId, 
-  hasMetaMask, 
-  getTokenIcon,
-  getTokenIconPath,
+  hasMetaMask,
   hasUserToken,
   setUserTokens,
   tokenStore,
+} from '@scom/scom-token-list';
+import {
+  getTokenIcon
 } from '../store/index';
+import { ChainNativeTokenByChainId, assets as tokenAssets } from '@scom/scom-token-list';
 import { ITokenObject, formatNumber, EventId } from '../global/index';
 import { Contracts } from '../contracts/oswap-openswap-contract/index';
 import Assets from '../assets';
@@ -316,7 +317,7 @@ export class TokenSelection extends Module {
     if (this.isCommonShown && this.commonTokenDataList) {
       this.commonTokenPanel.classList.remove('hidden');
       this.commonTokenDataList.forEach((token: ITokenObject) => {
-        const logoAddress = token.address && !this.targetChainId ? getTokenIcon(token.address) : Assets.fullPath(getTokenIconPath(token, this.chainId));
+        const logoAddress = token.address && !this.targetChainId ? getTokenIcon(token.address) : tokenAssets.tokenPath(token, this.chainId);
 
         this.commonTokenList.appendChild(
           <i-hstack
@@ -337,7 +338,7 @@ export class TokenSelection extends Module {
   }
 
   private renderToken(token: ITokenObject) {
-    const logoAddress = token.address && !this.targetChainId ? getTokenIcon(token.address) : Assets.fullPath(getTokenIconPath(token, this.chainId));
+    const logoAddress = token.address && !this.targetChainId ? getTokenIcon(token.address) : tokenAssets.tokenPath(token, this.chainId);
     return (
       <i-hstack
         width="100%"
@@ -443,7 +444,7 @@ export class TokenSelection extends Module {
 
   private addToMetamask(event: Event, token: ITokenObject) {
     event.stopPropagation();
-    const img = `${window.location.origin}${getTokenIconPath(token, this.chainId).substring(1)}`;
+    const img = `${window.location.origin}${tokenAssets.getTokenIconPath(token, this.chainId).substring(1)}`;
     window.ethereum.request({
       method: 'wallet_watchAsset',
       params: {
@@ -502,7 +503,7 @@ export class TokenSelection extends Module {
         if (this.isBtnMaxShown) {
           this.btnMax.classList.remove('hidden');
         }
-        const logoAddress = token.address && !this.targetChainId ? getTokenIcon(token.address) : Assets.fullPath(getTokenIconPath(token, this.chainId));
+        const logoAddress = token.address && !this.targetChainId ? getTokenIcon(token.address) : tokenAssets.tokenPath(token, this.chainId);
         if (!image) {
           image = new Image(btnToken, {
             width: 20,

@@ -28,7 +28,9 @@
         "ts-node": "10.1.0",
         "tsconfig-paths": "3.10.1",
         "typescript": "4.3.5",
-        "@scom/scom-network-picker": "https://github.com/scom-repos/scom-network-picker",
-        "@scom/scom-network-list": "^0.1.0"
+        "@scom/scom-network-picker": "^0.1.1",
+        "@scom/scom-network-list": "^0.1.0",
+        "@scom/scom-token-list": "^0.1.0",
+        "@scom/scom-wallet-modal": "https://github.com/scom-repos/scom-wallet-modal.git"
     }
 }

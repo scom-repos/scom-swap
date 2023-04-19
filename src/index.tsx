@@ -9,14 +9,11 @@ import {
   getSlippageTolerance,
   isWalletConnected,
   switchNetwork,
-  getTokenIconPath,
   getWalletProvider,
   getMatchNetworks,
   setDataFromSCConfig,
   setProviderList,
   getProviderByKey,
-  tokenStore,
-  setTokenStore,
   getNetworkInfo,
   getEmbedderCommissionFee,
   getProxyAddress,
@@ -24,6 +21,7 @@ import {
   WalletPlugin,
   getSupportedTokens
 } from "./store/index";
+import { tokenStore, assets as tokenAssets } from '@scom/scom-token-list';
 
 import {
   getAllRoutesData,
@@ -154,7 +152,6 @@ export default class ScomSwap extends Module implements PageBlock {
   // private availableMarkets: any;
   private currentChainId: number;
   private supportedChainIds: number[];
-  private fallbackUrl: string = Assets.fullPath('img/tokens/Custom.png');
   private swapButtonStatusMap: any;
   private approveButtonStatusMap: any;
   private _lastUpdated: number = 0;
@@ -1067,10 +1064,10 @@ export default class ScomSwap extends Module implements PageBlock {
     if (!this.record) return;
     this.setupCrossChainPopup();
     const slippageTolerance = getSlippageTolerance();
-    this.fromTokenImage.url = Assets.fullPath(getTokenIconPath(this.fromToken, this.currentChainId));
+    this.fromTokenImage.url = tokenAssets.tokenPath(this.fromToken, this.currentChainId);
     this.fromTokenLabel.caption = this.fromToken?.symbol ?? '';
     this.fromTokenValue.caption = formatNumber(this.totalAmount(), 4);
-    this.toTokenImage.url = Assets.fullPath(getTokenIconPath(this.toToken, this.currentChainId));
+    this.toTokenImage.url = tokenAssets.tokenPath(this.toToken, this.currentChainId);
     this.toTokenLabel.caption = this.toToken?.symbol ?? '';
     this.toTokenValue.caption = formatNumber(this.toInputValue, 4);
     const minimumReceived = this.getMinReceivedMaxSold();
@@ -1454,7 +1451,7 @@ export default class ScomSwap extends Module implements PageBlock {
     }
 
     let tokenIcon = `<i-image tooltip='${tooltip}' url="${imageUrl}" width="24" height="24"
-      class="inline-block" fallbackUrl="${this.fallbackUrl}"></i-image>`;
+      class="inline-block" fallbackUrl="${tokenAssets.fallbackUrl}"></i-image>`;
     return `${tokenIcon}`;
   }
   async addRoute(item: any, index: number, pricePercent: any) {
@@ -2229,7 +2226,7 @@ export default class ScomSwap extends Module implements PageBlock {
   async init() {
     this.isReadyCallbackQueued = true;
     this.currentChainId = getChainId();
-    setTokenStore();
+  // setTokenStore();
     // this.availableMarkets = getAvailableMarkets() || [];
     super.init();
     this.setSwapButtonText();

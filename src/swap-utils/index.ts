@@ -12,8 +12,6 @@ import {
 } from "../global/index";
 
 import {
-  ChainNativeTokenByChainId,
-  WETHByChainId,
   getSlippageTolerance, 
   getTransactionDeadline,
   isWalletConnected,
@@ -23,6 +21,10 @@ import {
   getProxyAddress
 } from "../store/index";
 
+import {
+  WETHByChainId,
+  ChainNativeTokenByChainId
+} from '@scom/scom-token-list';
 interface TradeFee {
   fee: string
   base: string
