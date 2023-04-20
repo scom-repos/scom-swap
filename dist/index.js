@@ -16880,7 +16880,6 @@ define("@scom/scom-swap/token-selection/tokenSelection.tsx", ["require", "export
             super(parent, options);
             this._isSortBalanceShown = true;
             this._isBtnMaxShown = true;
-            this.fallbackUrl = assets_3.default.fullPath('img/tokens/token-placeholder.svg');
             this.sortToken = (a, b, asc) => {
                 if (a.balance != b.balance) {
                     return asc ? (a.balance - b.balance) : (b.balance - a.balance);
@@ -17057,7 +17056,7 @@ define("@scom/scom-swap/token-selection/tokenSelection.tsx", ["require", "export
                 var _a;
                 const tokenObject = Object.assign({}, token);
                 const nativeToken = scom_token_list_6.ChainNativeTokenByChainId[this.chainId];
-                if (token.symbol === nativeToken.symbol) {
+                if ((nativeToken === null || nativeToken === void 0 ? void 0 : nativeToken.symbol) && token.symbol === nativeToken.symbol) {
                     Object.assign(tokenObject, { isNative: true });
                 }
                 if (!scom_token_list_5.isWalletConnected()) {
@@ -17127,7 +17126,7 @@ define("@scom/scom-swap/token-selection/tokenSelection.tsx", ["require", "export
                 this.commonTokenDataList.forEach((token) => {
                     const logoAddress = token.address && !this.targetChainId ? index_10.getTokenIcon(token.address) : scom_token_list_6.assets.tokenPath(token, this.chainId);
                     this.commonTokenList.appendChild(this.$render("i-hstack", { background: { color: '#0c1234' }, onClick: () => this.onSelect(token), tooltip: { content: token.name }, verticalAlignment: "center", class: "grid-item" },
-                        this.$render("i-image", { width: 24, height: 24, url: logoAddress, fallbackUrl: this.fallbackUrl }),
+                        this.$render("i-image", { width: 24, height: 24, url: logoAddress, fallbackUrl: scom_token_list_6.assets.fallbackUrl }),
                         this.$render("i-label", { caption: token.symbol, onClick: () => this.onSelect(token) })));
                 });
             }
@@ -17141,7 +17140,7 @@ define("@scom/scom-swap/token-selection/tokenSelection.tsx", ["require", "export
                 this.$render("i-vstack", { width: "100%" },
                     this.$render("i-hstack", null,
                         this.$render("i-hstack", null,
-                            this.$render("i-image", { width: 36, height: 36, url: logoAddress, fallbackUrl: this.fallbackUrl }),
+                            this.$render("i-image", { width: 36, height: 36, url: logoAddress, fallbackUrl: scom_token_list_6.assets.fallbackUrl }),
                             this.$render("i-panel", { class: "token-info" },
                                 this.$render("i-label", { caption: token.symbol, onClick: () => this.onSelect(token) }),
                                 this.$render("i-hstack", { class: "token-name", verticalAlignment: "center" },
@@ -17207,9 +17206,9 @@ define("@scom/scom-swap/token-selection/tokenSelection.tsx", ["require", "export
             this.sortValue = undefined;
             this.iconSortUp.classList.remove('icon-sorted');
             this.iconSortDown.classList.remove('icon-sorted');
-            if (!this.tokenList.innerHTML) {
-                await this.initData();
-            }
+            // if (!this.tokenList.innerHTML) {
+            //   await this.initData();
+            // }
             this.tokenSelectionModal.visible = true;
         }
         updateStatusButton() {
@@ -17250,7 +17249,7 @@ define("@scom/scom-swap/token-selection/tokenSelection.tsx", ["require", "export
                         image = new components_9.Image(btnToken, {
                             width: 20,
                             height: 20,
-                            fallbackUrl: this.fallbackUrl
+                            fallbackUrl: scom_token_list_6.assets.fallbackUrl
                         });
                         btnToken.prepend(image);
                     }
@@ -18940,6 +18939,18 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
         set tokens(value) {
             this._data.tokens = value;
         }
+        get wallets() {
+            return this._data.wallets;
+        }
+        set wallets(value) {
+            this._data.wallets = value;
+        }
+        get networks() {
+            return this._data.networks;
+        }
+        set networks(value) {
+            this._data.networks = value;
+        }
         getEmbedderActions() {
             const propertiesSchema = {
                 type: "object",
@@ -19250,6 +19261,10 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
             this.configDApp.data = value;
             this.updateContractAddress();
             await this.refreshUI();
+            if (this.mdWallet) {
+                this.mdWallet.networks = value.networks;
+                this.mdWallet.wallets = value.wallets;
+            }
         }
         async getTag() {
             return this.tag;
@@ -20349,7 +20364,8 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
         }
         onClickSwapButton() {
             if (!index_19.isWalletConnected()) {
-                this.$eventBus.dispatch("connectWallet" /* ConnectWallet */);
+                // this.$eventBus.dispatch(EventId.ConnectWallet);
+                this.mdWallet.showModal();
                 return;
             }
             if (!this.record || this.isSwapButtonDisabled())
@@ -20473,8 +20489,10 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
             const providers = this.getAttribute('providers', true, []);
             const commissions = this.getAttribute('commissions', true, []);
             const tokens = this.getAttribute('tokens', true, []);
+            const networks = this.getAttribute('networks', true, []);
+            const wallets = this.getAttribute('wallets', true, []);
             this.updateContractAddress();
-            await this.setData({ category, providers, commissions, tokens });
+            await this.setData({ category, providers, commissions, tokens, networks, wallets });
             await this.onSetupPage(eth_wallet_10.Wallet.getClientInstance().isConnected);
             this.isReadyCallbackQueued = false;
             this.executeReadyCallback();
@@ -20584,7 +20602,8 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                             this.$render("i-vstack", { id: "supportedNetworksElm", gap: 10, verticalAlignment: "center" }),
                             this.$render("i-hstack", { verticalAlignment: "center", horizontalAlignment: "center", margin: { top: 16, bottom: 8 } },
                                 this.$render("i-button", { caption: "Close", width: 150, padding: { top: 4, bottom: 4 }, class: "btn-os btn-submit text-center", onClick: () => this.closeNetworkErrModal() }))))),
-                this.$render("i-scom-swap-config", { id: "configDApp", visible: false })));
+                this.$render("i-scom-swap-config", { id: "configDApp", visible: false }),
+                this.$render("i-scom-wallet-modal", { id: "mdWallet", wallets: [] })));
         }
     };
     ScomSwap = __decorate([

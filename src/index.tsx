@@ -49,7 +49,8 @@ import {
   ISwapConfigUI,
   IProviderUI,
   Category,
-  ICommissionInfo
+  ICommissionInfo,
+  INetworkConfig
 } from './global/index';
 
 import { PriceInfo } from './price-info/index';
@@ -59,6 +60,7 @@ import { ExpertModeSettings } from './expert-mode-settings/index'
 import { TransactionSettings } from './transaction-settings/index'
 import Config from './config/index';
 import scconfig from './scconfig.json';
+import ScomWalletModal, {IWalletPlugin} from '@scom/scom-wallet-modal';
 
 const priceImpactTooHighMsg = 'Price Impact Too High. If you want to bypass this check, please turn on Expert Mode';
 const defaultInput = '1';
@@ -68,6 +70,8 @@ interface ScomSwapElement extends ControlElement {
   category: Category;
   providers: IProviderUI[];
   tokens?: ITokenObject[];
+  networks?: INetworkConfig[];
+  wallets?: IWalletPlugin[];
 }
 
 declare global {
@@ -136,6 +140,7 @@ export default class ScomSwap extends Module implements PageBlock {
   private actionSetting: Panel;
   private lbYouPayTitle: Label;
   private lbYouPayValue: Label;
+  private mdWallet: ScomWalletModal;
 
   private isFrom: boolean;
   private fromToken?: ITokenObject;
@@ -212,7 +217,6 @@ export default class ScomSwap extends Module implements PageBlock {
   get commissions() {
     return this._data.commissions ?? [];
   }
-
   set commissions(value: ICommissionInfo[]) {
     this._data.commissions = value;
   }
@@ -222,6 +226,20 @@ export default class ScomSwap extends Module implements PageBlock {
   }
   set tokens(value: ITokenObject[]) {
     this._data.tokens = value;
+  }
+
+  get wallets() {
+    return this._data.wallets;
+  }
+  set wallets(value: IWalletPlugin[]) {
+    this._data.wallets = value;
+  }
+
+  get networks() {
+    return this._data.networks;
+  }
+  set networks(value: INetworkConfig[]) {
+    this._data.networks = value;
   }
 
   getEmbedderActions() {
@@ -546,6 +564,10 @@ export default class ScomSwap extends Module implements PageBlock {
     this.configDApp.data = value;
     this.updateContractAddress();
     await this.refreshUI();
+    if (this.mdWallet) {
+      this.mdWallet.networks = value.networks;
+      this.mdWallet.wallets = value.wallets;
+    }
   }
 
   async getTag() {
@@ -1841,7 +1863,8 @@ export default class ScomSwap extends Module implements PageBlock {
 
   onClickSwapButton() {
     if (!isWalletConnected()) {
-      this.$eventBus.dispatch(EventId.ConnectWallet);
+      // this.$eventBus.dispatch(EventId.ConnectWallet);
+      this.mdWallet.showModal();
       return;
     }
     if (!this.record || this.isSwapButtonDisabled()) return;
@@ -2239,8 +2262,10 @@ export default class ScomSwap extends Module implements PageBlock {
     const providers = this.getAttribute('providers', true, []);
     const commissions = this.getAttribute('commissions', true, []);
     const tokens = this.getAttribute('tokens', true, []);
+    const networks = this.getAttribute('networks', true, []);
+    const wallets = this.getAttribute('wallets', true, []);
     this.updateContractAddress();
-    await this.setData({category, providers, commissions, tokens});
+    await this.setData({category, providers, commissions, tokens, networks, wallets});
     await this.onSetupPage(Wallet.getClientInstance().isConnected);
     this.isReadyCallbackQueued = false;
     this.executeReadyCallback();
@@ -2447,6 +2472,10 @@ export default class ScomSwap extends Module implements PageBlock {
           </i-modal>
         </i-panel>
         <i-scom-swap-config id="configDApp" visible={false} />
+        <i-scom-wallet-modal
+          id="mdWallet"
+          wallets={[]}
+        ></i-scom-wallet-modal>
       </i-panel>
     )
   }

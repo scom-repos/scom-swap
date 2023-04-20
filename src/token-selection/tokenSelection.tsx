@@ -64,7 +64,6 @@ export class TokenSelection extends Module {
   private $eventBus: IEventBus;
   private _disableSelect: boolean;
   private _disabledMaxBtn: boolean;
-  private fallbackUrl: string = Assets.fullPath('img/tokens/token-placeholder.svg');
 
   get token() {
     return this._token;
@@ -235,7 +234,7 @@ export class TokenSelection extends Module {
     return tokenList.map((token: ITokenObject) => {
       const tokenObject = { ...token };
       const nativeToken = ChainNativeTokenByChainId[this.chainId];
-      if (token.symbol === nativeToken.symbol) {
+      if (nativeToken?.symbol && token.symbol === nativeToken.symbol) {
         Object.assign(tokenObject, { isNative: true })
       }
       if (!isWalletConnected()){
@@ -327,7 +326,7 @@ export class TokenSelection extends Module {
             verticalAlignment="center"
             class="grid-item"
           >
-            <i-image width={24} height={24} url={logoAddress} fallbackUrl={this.fallbackUrl} />
+            <i-image width={24} height={24} url={logoAddress} fallbackUrl={tokenAssets.fallbackUrl} />
             <i-label caption={token.symbol} onClick={() => this.onSelect(token)}></i-label>
           </i-hstack>
         )
@@ -349,7 +348,7 @@ export class TokenSelection extends Module {
         <i-vstack width="100%">
           <i-hstack>
             <i-hstack>
-              <i-image width={36} height={36} url={logoAddress} fallbackUrl={this.fallbackUrl} />
+              <i-image width={36} height={36} url={logoAddress} fallbackUrl={tokenAssets.fallbackUrl} />
               <i-panel class="token-info">
                 <i-label caption={token.symbol}  onClick={() => this.onSelect(token)}/>
                 <i-hstack class="token-name" verticalAlignment="center">
@@ -466,9 +465,9 @@ export class TokenSelection extends Module {
     this.sortValue = undefined;
     this.iconSortUp.classList.remove('icon-sorted');
     this.iconSortDown.classList.remove('icon-sorted');
-    if (!this.tokenList.innerHTML) {
-      await this.initData();
-    }
+    // if (!this.tokenList.innerHTML) {
+    //   await this.initData();
+    // }
     this.tokenSelectionModal.visible = true;
   }
 
@@ -508,7 +507,7 @@ export class TokenSelection extends Module {
           image = new Image(btnToken, {
             width: 20,
             height: 20,
-            fallbackUrl: this.fallbackUrl
+            fallbackUrl: tokenAssets.fallbackUrl
           });
           btnToken.prepend(image);
         }

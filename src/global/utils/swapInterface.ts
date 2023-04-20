@@ -1,3 +1,4 @@
+import { IWalletPlugin } from "@scom/scom-wallet-modal";
 import { ITokenObject } from "./common";
 
 export type Category = 'fixed-pair' | 'aggregator';
@@ -49,11 +50,18 @@ export interface ICommissionInfo {
   share: string;
 }
 
+export interface INetworkConfig {
+  chainName?: string;
+  chainId: number;
+}
+
 export interface ISwapConfigUI {
   category: Category;
   providers: IProviderUI[];
   commissions?: ICommissionInfo[];
   tokens?: ITokenObject[];
+  wallets?: IWalletPlugin[];
+  networks?: INetworkConfig[];
 }
 
 export interface IEmbedData {

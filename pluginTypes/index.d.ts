@@ -9698,6 +9698,7 @@ declare module "@scom/scom-swap/global/utils/approvalModel.ts" {
 }
 /// <amd-module name="@scom/scom-swap/global/utils/swapInterface.ts" />
 declare module "@scom/scom-swap/global/utils/swapInterface.ts" {
+    import { IWalletPlugin } from "@scom/scom-wallet-modal";
     import { ITokenObject } from "@scom/scom-swap/global/utils/common.ts";
     export type Category = 'fixed-pair' | 'aggregator';
     export interface ISwapConfig {
@@ -9743,11 +9744,17 @@ declare module "@scom/scom-swap/global/utils/swapInterface.ts" {
         walletAddress: string;
         share: string;
     }
+    export interface INetworkConfig {
+        chainName?: string;
+        chainId: number;
+    }
     export interface ISwapConfigUI {
         category: Category;
         providers: IProviderUI[];
         commissions?: ICommissionInfo[];
         tokens?: ITokenObject[];
+        wallets?: IWalletPlugin[];
+        networks?: INetworkConfig[];
     }
     export interface IEmbedData {
         category?: Category;
@@ -9762,7 +9769,7 @@ declare module "@scom/scom-swap/global/utils/index.ts" {
     export { PageBlock } from "@scom/scom-swap/global/utils/pageBlock.ts";
     export { isTransactionConfirmed, registerSendTxEvents, approveERC20Max, getERC20Allowance, getERC20Amount, ITokenObject, TokenMapType } from "@scom/scom-swap/global/utils/common.ts";
     export { ApprovalStatus, IERC20ApprovalEventOptions, IERC20ApprovalOptions, IERC20ApprovalAction, ERC20ApprovalModel } from "@scom/scom-swap/global/utils/approvalModel.ts";
-    export { IContractInfo, IProvider, ISwapConfig, ISwapConfigUI, IProviderUI, Category, ICommissionInfo, IEmbedData } from "@scom/scom-swap/global/utils/swapInterface.ts";
+    export { IContractInfo, IProvider, ISwapConfig, ISwapConfigUI, IProviderUI, Category, ICommissionInfo, IEmbedData, INetworkConfig } from "@scom/scom-swap/global/utils/swapInterface.ts";
 }
 /// <amd-module name="@scom/scom-swap/global/index.ts" />
 declare module "@scom/scom-swap/global/index.ts" {
@@ -10586,7 +10593,6 @@ declare module "@scom/scom-swap/token-selection/tokenSelection.tsx" {
         private $eventBus;
         private _disableSelect;
         private _disabledMaxBtn;
-        private fallbackUrl;
         get token(): ITokenObject | undefined;
         set token(value: ITokenObject | undefined);
         get targetChainId(): number;
@@ -10896,14 +10902,17 @@ declare module "@scom/scom-swap" {
     import { Module, Panel, Image, Container, Control, ControlElement, IDataSchema } from '@ijstech/components';
     import { BigNumber } from '@ijstech/eth-wallet';
     import "@scom/scom-swap/index.css.ts";
-    import { ITokenObject, ApprovalStatus, IExtendedNetwork, PageBlock, IProvider, ISwapConfigUI, IProviderUI, Category, ICommissionInfo } from "@scom/scom-swap/global/index.ts";
+    import { ITokenObject, ApprovalStatus, IExtendedNetwork, PageBlock, IProvider, ISwapConfigUI, IProviderUI, Category, ICommissionInfo, INetworkConfig } from "@scom/scom-swap/global/index.ts";
     import { PriceInfo } from "@scom/scom-swap/price-info/index.tsx";
     import Config from "@scom/scom-swap/config/index.tsx";
+    import { IWalletPlugin } from '@scom/scom-wallet-modal';
     type StatusMapType = 'approve' | 'swap';
     interface ScomSwapElement extends ControlElement {
         category: Category;
         providers: IProviderUI[];
         tokens?: ITokenObject[];
+        networks?: INetworkConfig[];
+        wallets?: IWalletPlugin[];
     }
     global {
         namespace JSX {
@@ -10955,6 +10964,7 @@ declare module "@scom/scom-swap" {
         private actionSetting;
         private lbYouPayTitle;
         private lbYouPayValue;
+        private mdWallet;
         private isFrom;
         private fromToken?;
         private toToken?;
@@ -11010,6 +11020,10 @@ declare module "@scom/scom-swap" {
         set commissions(value: ICommissionInfo[]);
         get tokens(): ITokenObject[];
         set tokens(value: ITokenObject[]);
+        get wallets(): IWalletPlugin[];
+        set wallets(value: IWalletPlugin[]);
+        get networks(): INetworkConfig[];
+        set networks(value: INetworkConfig[]);
         getEmbedderActions(): ({
             name: string;
             icon: string;
