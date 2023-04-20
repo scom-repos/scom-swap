@@ -1,12 +1,8 @@
 import { application } from '@ijstech/components';
 import { Wallet } from '@ijstech/eth-wallet';
 import { EventId, IProvider, ITokenObject, TokenMapType, IExtendedNetwork } from '../global/index';
-import { ChainNativeTokenByChainId } from './data/index';
+import { ChainNativeTokenByChainId } from '@scom/scom-token-list';
 import getNetworkList from '@scom/scom-network-list'
-
-export {
-  ChainNativeTokenByChainId
-} from './data/index';
 
 export enum WalletPlugin {
   MetaMask = 'metamask',

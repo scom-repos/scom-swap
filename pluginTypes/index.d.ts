@@ -9698,6 +9698,7 @@ declare module "@scom/scom-swap/global/utils/approvalModel.ts" {
 }
 /// <amd-module name="@scom/scom-swap/global/utils/swapInterface.ts" />
 declare module "@scom/scom-swap/global/utils/swapInterface.ts" {
+    import { IWalletPlugin } from "@scom/scom-wallet-modal";
     import { ITokenObject } from "@scom/scom-swap/global/utils/common.ts";
     export type Category = 'fixed-pair' | 'aggregator';
     export interface ISwapConfig {
@@ -9743,11 +9744,17 @@ declare module "@scom/scom-swap/global/utils/swapInterface.ts" {
         walletAddress: string;
         share: string;
     }
+    export interface INetworkConfig {
+        chainName?: string;
+        chainId: number;
+    }
     export interface ISwapConfigUI {
         category: Category;
         providers: IProviderUI[];
         commissions?: ICommissionInfo[];
         tokens?: ITokenObject[];
+        wallets?: IWalletPlugin[];
+        networks?: INetworkConfig[];
     }
     export interface IEmbedData {
         category?: Category;
@@ -9762,7 +9769,7 @@ declare module "@scom/scom-swap/global/utils/index.ts" {
     export { PageBlock } from "@scom/scom-swap/global/utils/pageBlock.ts";
     export { isTransactionConfirmed, registerSendTxEvents, approveERC20Max, getERC20Allowance, getERC20Amount, ITokenObject, TokenMapType } from "@scom/scom-swap/global/utils/common.ts";
     export { ApprovalStatus, IERC20ApprovalEventOptions, IERC20ApprovalOptions, IERC20ApprovalAction, ERC20ApprovalModel } from "@scom/scom-swap/global/utils/approvalModel.ts";
-    export { IContractInfo, IProvider, ISwapConfig, ISwapConfigUI, IProviderUI, Category, ICommissionInfo, IEmbedData } from "@scom/scom-swap/global/utils/swapInterface.ts";
+    export { IContractInfo, IProvider, ISwapConfig, ISwapConfigUI, IProviderUI, Category, ICommissionInfo, IEmbedData, INetworkConfig } from "@scom/scom-swap/global/utils/swapInterface.ts";
 }
 /// <amd-module name="@scom/scom-swap/global/index.ts" />
 declare module "@scom/scom-swap/global/index.ts" {
@@ -9815,351 +9822,9 @@ declare module "@scom/scom-swap/assets.ts" {
 }
 /// <amd-module name="@scom/scom-swap/index.css.ts" />
 declare module "@scom/scom-swap/index.css.ts" { }
-/// <amd-module name="@scom/scom-swap/store/data/tokens/mainnet/avalanche.ts" />
-declare module "@scom/scom-swap/store/data/tokens/mainnet/avalanche.ts" {
-    export const Tokens_Avalanche: ({
-        address: string;
-        name: string;
-        symbol: string;
-        decimals: number;
-        isCommon: boolean;
-        isWETH: boolean;
-    } | {
-        name: string;
-        symbol: string;
-        address: string;
-        decimals: number;
-        isCommon: boolean;
-        isWETH?: undefined;
-    } | {
-        address: string;
-        name: string;
-        symbol: string;
-        decimals: number;
-        isCommon?: undefined;
-        isWETH?: undefined;
-    })[];
-}
-/// <amd-module name="@scom/scom-swap/store/data/tokens/mainnet/ethereum.ts" />
-declare module "@scom/scom-swap/store/data/tokens/mainnet/ethereum.ts" {
-    export const Tokens_Ethereuem: ({
-        address: string;
-        name: string;
-        symbol: string;
-        decimals: number;
-        isCommon?: undefined;
-        isWETH?: undefined;
-    } | {
-        name: string;
-        address: string;
-        symbol: string;
-        decimals: number;
-        isCommon: boolean;
-        isWETH?: undefined;
-    } | {
-        name: string;
-        symbol: string;
-        address: string;
-        decimals: number;
-        isCommon: boolean;
-        isWETH: boolean;
-    })[];
-}
-/// <amd-module name="@scom/scom-swap/store/data/tokens/mainnet/polygon.ts" />
-declare module "@scom/scom-swap/store/data/tokens/mainnet/polygon.ts" {
-    export const Tokens_Polygon: ({
-        address: string;
-        name: string;
-        symbol: string;
-        decimals: number;
-        isCommon: boolean;
-        isWETH: boolean;
-    } | {
-        address: string;
-        name: string;
-        symbol: string;
-        decimals: number;
-        isCommon?: undefined;
-        isWETH?: undefined;
-    } | {
-        address: string;
-        name: string;
-        symbol: string;
-        decimals: number;
-        isCommon: boolean;
-        isWETH?: undefined;
-    })[];
-}
-/// <amd-module name="@scom/scom-swap/store/data/tokens/mainnet/bsc.ts" />
-declare module "@scom/scom-swap/store/data/tokens/mainnet/bsc.ts" {
-    export const Tokens_BSC: ({
-        name: string;
-        symbol: string;
-        address: string;
-        decimals: number;
-        isCommon: boolean;
-        isWETH?: undefined;
-    } | {
-        name: string;
-        symbol: string;
-        address: string;
-        decimals: number;
-        isCommon?: undefined;
-        isWETH?: undefined;
-    } | {
-        name: string;
-        symbol: string;
-        address: string;
-        decimals: number;
-        isCommon: boolean;
-        isWETH: boolean;
-    })[];
-}
-/// <amd-module name="@scom/scom-swap/store/data/tokens/mainnet/fantom.ts" />
-declare module "@scom/scom-swap/store/data/tokens/mainnet/fantom.ts" {
-    export const Tokens_Fantom: ({
-        address: string;
-        name: string;
-        symbol: string;
-        decimals: number;
-        isCommon: boolean;
-        isWETH: boolean;
-    } | {
-        address: string;
-        name: string;
-        symbol: string;
-        decimals: number;
-        isCommon?: undefined;
-        isWETH?: undefined;
-    } | {
-        address: string;
-        name: string;
-        symbol: string;
-        decimals: number;
-        isCommon: boolean;
-        isWETH?: undefined;
-    })[];
-}
-/// <amd-module name="@scom/scom-swap/store/data/tokens/mainnet/cronos.ts" />
-declare module "@scom/scom-swap/store/data/tokens/mainnet/cronos.ts" {
-    export const Tokens_Cronos: ({
-        address: string;
-        name: string;
-        symbol: string;
-        decimals: number;
-        isCommon: boolean;
-        isWETH: boolean;
-    } | {
-        address: string;
-        name: string;
-        symbol: string;
-        decimals: number;
-        isCommon: boolean;
-        isWETH?: undefined;
-    })[];
-}
-/// <amd-module name="@scom/scom-swap/store/data/tokens/mainnet/index.ts" />
-declare module "@scom/scom-swap/store/data/tokens/mainnet/index.ts" {
-    export { Tokens_Avalanche } from "@scom/scom-swap/store/data/tokens/mainnet/avalanche.ts";
-    export { Tokens_Ethereuem } from "@scom/scom-swap/store/data/tokens/mainnet/ethereum.ts";
-    export { Tokens_Polygon } from "@scom/scom-swap/store/data/tokens/mainnet/polygon.ts";
-    export { Tokens_BSC } from "@scom/scom-swap/store/data/tokens/mainnet/bsc.ts";
-    export { Tokens_Fantom } from "@scom/scom-swap/store/data/tokens/mainnet/fantom.ts";
-    export { Tokens_Cronos } from "@scom/scom-swap/store/data/tokens/mainnet/cronos.ts";
-}
-/// <amd-module name="@scom/scom-swap/store/data/tokens/testnet/bsc-testnet.ts" />
-declare module "@scom/scom-swap/store/data/tokens/testnet/bsc-testnet.ts" {
-    export const Tokens_BSC_Testnet: ({
-        name: string;
-        address: string;
-        symbol: string;
-        decimals: number;
-        isCommon: boolean;
-        isWETH: boolean;
-    } | {
-        name: string;
-        address: string;
-        symbol: string;
-        decimals: number;
-        isCommon: boolean;
-        isWETH?: undefined;
-    } | {
-        name: string;
-        address: string;
-        symbol: string;
-        decimals: number;
-        isCommon?: undefined;
-        isWETH?: undefined;
-    })[];
-}
-/// <amd-module name="@scom/scom-swap/store/data/tokens/testnet/fuji.ts" />
-declare module "@scom/scom-swap/store/data/tokens/testnet/fuji.ts" {
-    export const Tokens_Fuji: ({
-        name: string;
-        address: string;
-        symbol: string;
-        decimals: number;
-        isCommon: boolean;
-        isWETH: boolean;
-    } | {
-        name: string;
-        address: string;
-        symbol: string;
-        decimals: number;
-        isCommon?: undefined;
-        isWETH?: undefined;
-    } | {
-        name: string;
-        address: string;
-        symbol: string;
-        decimals: number;
-        isCommon: boolean;
-        isWETH?: undefined;
-    })[];
-}
-/// <amd-module name="@scom/scom-swap/store/data/tokens/testnet/mumbai.ts" />
-declare module "@scom/scom-swap/store/data/tokens/testnet/mumbai.ts" {
-    export const Tokens_Mumbai: ({
-        name: string;
-        address: string;
-        symbol: string;
-        decimals: number;
-        isCommon: boolean;
-        isWETH?: undefined;
-    } | {
-        name: string;
-        address: string;
-        symbol: string;
-        decimals: number;
-        isCommon: boolean;
-        isWETH: boolean;
-    } | {
-        name: string;
-        address: string;
-        symbol: string;
-        decimals: number;
-        isCommon?: undefined;
-        isWETH?: undefined;
-    })[];
-}
-/// <amd-module name="@scom/scom-swap/store/data/tokens/testnet/fantom-testnet.ts" />
-declare module "@scom/scom-swap/store/data/tokens/testnet/fantom-testnet.ts" {
-    export const Tokens_Fantom_Testnet: ({
-        address: string;
-        decimals: number;
-        name: string;
-        symbol: string;
-        isWETH: boolean;
-        isCommon?: undefined;
-    } | {
-        name: string;
-        address: string;
-        symbol: string;
-        decimals: number;
-        isCommon: boolean;
-        isWETH?: undefined;
-    })[];
-}
-/// <amd-module name="@scom/scom-swap/store/data/tokens/testnet/amino.ts" />
-declare module "@scom/scom-swap/store/data/tokens/testnet/amino.ts" {
-    export const Tokens_Amino: ({
-        name: string;
-        address: string;
-        symbol: string;
-        decimals: number;
-        isCommon?: undefined;
-        isWETH?: undefined;
-    } | {
-        name: string;
-        address: string;
-        symbol: string;
-        decimals: number;
-        isCommon: boolean;
-        isWETH: boolean;
-    })[];
-}
-/// <amd-module name="@scom/scom-swap/store/data/tokens/testnet/aminoX-testnet.ts" />
-declare module "@scom/scom-swap/store/data/tokens/testnet/aminoX-testnet.ts" {
-    export const Tokens_AminoXTestnet: ({
-        name: string;
-        address: string;
-        symbol: string;
-        decimals: number;
-        isCommon: boolean;
-        isWETH?: undefined;
-    } | {
-        name: string;
-        address: string;
-        symbol: string;
-        decimals: number;
-        isCommon: boolean;
-        isWETH: boolean;
-    })[];
-}
-/// <amd-module name="@scom/scom-swap/store/data/tokens/testnet/cronos-testnet.ts" />
-declare module "@scom/scom-swap/store/data/tokens/testnet/cronos-testnet.ts" {
-    export const Tokens_Cronos_Testnet: ({
-        address: string;
-        name: string;
-        symbol: string;
-        decimals: number;
-        isCommon: boolean;
-        isWETH: boolean;
-    } | {
-        name: string;
-        address: string;
-        symbol: string;
-        decimals: number;
-        isCommon: boolean;
-        isWETH?: undefined;
-    })[];
-}
-/// <amd-module name="@scom/scom-swap/store/data/tokens/testnet/index.ts" />
-declare module "@scom/scom-swap/store/data/tokens/testnet/index.ts" {
-    export { Tokens_BSC_Testnet } from "@scom/scom-swap/store/data/tokens/testnet/bsc-testnet.ts";
-    export { Tokens_Fuji } from "@scom/scom-swap/store/data/tokens/testnet/fuji.ts";
-    export { Tokens_Mumbai } from "@scom/scom-swap/store/data/tokens/testnet/mumbai.ts";
-    export { Tokens_Fantom_Testnet } from "@scom/scom-swap/store/data/tokens/testnet/fantom-testnet.ts";
-    export { Tokens_Amino } from "@scom/scom-swap/store/data/tokens/testnet/amino.ts";
-    export { Tokens_AminoXTestnet } from "@scom/scom-swap/store/data/tokens/testnet/aminoX-testnet.ts";
-    export { Tokens_Cronos_Testnet } from "@scom/scom-swap/store/data/tokens/testnet/cronos-testnet.ts";
-}
-/// <amd-module name="@scom/scom-swap/store/data/tokens/index.ts" />
-declare module "@scom/scom-swap/store/data/tokens/index.ts" {
-    import { ITokenObject } from "@scom/scom-swap/global/index.ts";
-    const DefaultERC20Tokens: {
-        [chainId: number]: ITokenObject[];
-    };
-    const ChainNativeTokenByChainId: {
-        [chainId: number]: ITokenObject;
-    };
-    const WETHByChainId: {
-        [chainId: number]: ITokenObject;
-    };
-    const DefaultTokens: {
-        [chainId: number]: ITokenObject[];
-    };
-    const ToUSDPriceFeedAddressesMap: {
-        [chainId: number]: {
-            [token: string]: string;
-        };
-    };
-    const tokenPriceAMMReference: {
-        [chainId: number]: {
-            [token: string]: string;
-        };
-    };
-    const getTokenIconPath: (tokenObj: any, chainId?: number) => string;
-    export { DefaultERC20Tokens, ChainNativeTokenByChainId, WETHByChainId, DefaultTokens, ToUSDPriceFeedAddressesMap, tokenPriceAMMReference, getTokenIconPath };
-}
-/// <amd-module name="@scom/scom-swap/store/data/index.ts" />
-declare module "@scom/scom-swap/store/data/index.ts" {
-    export { DefaultERC20Tokens, ChainNativeTokenByChainId, WETHByChainId, DefaultTokens, ToUSDPriceFeedAddressesMap, tokenPriceAMMReference, getTokenIconPath } from "@scom/scom-swap/store/data/tokens/index.ts";
-}
 /// <amd-module name="@scom/scom-swap/store/utils.ts" />
 declare module "@scom/scom-swap/store/utils.ts" {
     import { IProvider, ITokenObject, TokenMapType, IExtendedNetwork } from "@scom/scom-swap/global/index.ts";
-    export { ChainNativeTokenByChainId } from "@scom/scom-swap/store/data/index.ts";
     export enum WalletPlugin {
         MetaMask = "metamask",
         WalletConnect = "walletconnect"
@@ -10231,36 +9896,9 @@ declare module "@scom/scom-swap/store/utils.ts" {
     export function getChainId(): number;
     export const getChainNativeToken: (chainId: number) => ITokenObject;
 }
-/// <amd-module name="@scom/scom-swap/store/tokens.ts" />
-declare module "@scom/scom-swap/store/tokens.ts" {
-    import { ITokenObject, TokenMapType } from "@scom/scom-swap/global/index.ts";
-    export type DefaultTokensByChainType = Record<number, ITokenObject[]>;
-    export type TokenBalancesType = Record<string, string>;
-    export class TokenStore {
-        private _defaultTokensByChain;
-        private _tokenBalances;
-        private _tokenMap;
-        constructor(defaultTokensByChain: DefaultTokensByChainType);
-        get tokenBalances(): TokenBalancesType;
-        get tokenMap(): TokenMapType;
-        getTokenList(chainId: number): ITokenObject[];
-        private getERC20Balance;
-        getTokenBalance(token: ITokenObject): string;
-        private _updateAllTokenBalances;
-        updateAllTokenBalances(): Promise<TokenBalancesType>;
-        updateTokenBalances(erc20TokenList: ITokenObject[]): Promise<TokenBalancesType>;
-        private _updateTokenMapData;
-        updateTokenMapData(): TokenMapType;
-    }
-}
 /// <amd-module name="@scom/scom-swap/store/index.ts" />
 declare module "@scom/scom-swap/store/index.ts" {
     import { ITokenObject } from "@scom/scom-swap/global/index.ts";
-    import { TokenStore } from "@scom/scom-swap/store/tokens.ts";
-    export { DefaultERC20Tokens, ChainNativeTokenByChainId, WETHByChainId, DefaultTokens, ToUSDPriceFeedAddressesMap, tokenPriceAMMReference, getTokenIconPath } from "@scom/scom-swap/store/data/index.ts";
-    export { TokenStore, TokenBalancesType, DefaultTokensByChainType } from "@scom/scom-swap/store/tokens.ts";
-    export let tokenStore: TokenStore;
-    export const setTokenStore: () => void;
     export const nullAddress = "0x0000000000000000000000000000000000000000";
     export const getWETH: (chainId: number) => ITokenObject;
     export const getTokenDecimals: (address: string) => number;
@@ -10268,7 +9906,6 @@ declare module "@scom/scom-swap/store/index.ts" {
     export const tokenSymbol: (address: string) => string;
     export const tokenName: (address: string) => string;
     export * from "@scom/scom-swap/store/utils.ts";
-    export * from "@scom/scom-swap/store/data/index.ts";
     export const getSupportedTokens: (tokens: ITokenObject[], chainId: number) => ITokenObject[];
 }
 /// <amd-module name="@scom/scom-swap/contracts/scom-commission-proxy-contract/contracts/Proxy.json.ts" />
@@ -10956,7 +10593,6 @@ declare module "@scom/scom-swap/token-selection/tokenSelection.tsx" {
         private $eventBus;
         private _disableSelect;
         private _disabledMaxBtn;
-        private fallbackUrl;
         get token(): ITokenObject | undefined;
         set token(value: ITokenObject | undefined);
         get targetChainId(): number;
@@ -11266,14 +10902,17 @@ declare module "@scom/scom-swap" {
     import { Module, Panel, Image, Container, Control, ControlElement, IDataSchema } from '@ijstech/components';
     import { BigNumber } from '@ijstech/eth-wallet';
     import "@scom/scom-swap/index.css.ts";
-    import { ITokenObject, ApprovalStatus, IExtendedNetwork, PageBlock, IProvider, ISwapConfigUI, IProviderUI, Category, ICommissionInfo } from "@scom/scom-swap/global/index.ts";
+    import { ITokenObject, ApprovalStatus, IExtendedNetwork, PageBlock, IProvider, ISwapConfigUI, IProviderUI, Category, ICommissionInfo, INetworkConfig } from "@scom/scom-swap/global/index.ts";
     import { PriceInfo } from "@scom/scom-swap/price-info/index.tsx";
     import Config from "@scom/scom-swap/config/index.tsx";
+    import { IWalletPlugin } from '@scom/scom-wallet-modal';
     type StatusMapType = 'approve' | 'swap';
     interface ScomSwapElement extends ControlElement {
         category: Category;
         providers: IProviderUI[];
         tokens?: ITokenObject[];
+        networks?: INetworkConfig[];
+        wallets?: IWalletPlugin[];
     }
     global {
         namespace JSX {
@@ -11325,6 +10964,7 @@ declare module "@scom/scom-swap" {
         private actionSetting;
         private lbYouPayTitle;
         private lbYouPayValue;
+        private mdWallet;
         private isFrom;
         private fromToken?;
         private toToken?;
@@ -11338,7 +10978,6 @@ declare module "@scom/scom-swap" {
         private allTokenBalancesMap;
         private currentChainId;
         private supportedChainIds;
-        private fallbackUrl;
         private swapButtonStatusMap;
         private approveButtonStatusMap;
         private _lastUpdated;
@@ -11381,6 +11020,10 @@ declare module "@scom/scom-swap" {
         set commissions(value: ICommissionInfo[]);
         get tokens(): ITokenObject[];
         set tokens(value: ITokenObject[]);
+        get wallets(): IWalletPlugin[];
+        set wallets(value: IWalletPlugin[]);
+        get networks(): INetworkConfig[];
+        set networks(value: INetworkConfig[]);
         getEmbedderActions(): ({
             name: string;
             icon: string;

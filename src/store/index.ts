@@ -1,26 +1,6 @@
-import { IExtendedNetwork, ITokenObject } from '../global/index';
-import Assets from '../assets';
-import { DefaultTokens, getTokenIconPath, WETHByChainId } from './data/index';
-import { TokenStore } from './tokens';
-import { getChainId, getChainNativeToken, getNetworkInfo, isWalletConnected } from './utils';
-
-export {
-  DefaultERC20Tokens,
-  ChainNativeTokenByChainId,
-  WETHByChainId,
-  DefaultTokens,
-  ToUSDPriceFeedAddressesMap,
-  tokenPriceAMMReference,
-  getTokenIconPath
-} from './data/index'
-
-export { TokenStore, TokenBalancesType, DefaultTokensByChainType } from './tokens';
-
-export let tokenStore: TokenStore;
-
-export const setTokenStore = () => {
-  tokenStore = new TokenStore(DefaultTokens);
-}
+import {ITokenObject } from '../global/index';
+import { getChainId, getChainNativeToken, isWalletConnected } from './utils';
+import { tokenStore, WETHByChainId, assets as tokenAssets } from '@scom/scom-token-list';
 
 export const nullAddress = "0x0000000000000000000000000000000000000000";
 
@@ -48,7 +28,7 @@ export const getTokenIcon = (address: string) => {
   } else {
     tokenObject = tokenMap[address.toLowerCase()];
   }
-  return Assets.fullPath(getTokenIconPath(tokenObject, getChainId()));
+  return tokenAssets.tokenPath(tokenObject, getChainId());
 }
 
 export const tokenSymbol = (address: string) => {
@@ -68,7 +48,6 @@ export const tokenName = (address: string) => {
 }
 
 export * from './utils';
-export * from './data/index';
 
 export const getSupportedTokens = (tokens: ITokenObject[], chainId: number) => {
   return tokens.filter(token => token.chainId === chainId) || []
