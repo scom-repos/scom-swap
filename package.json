@@ -30,7 +30,7 @@
         "typescript": "4.3.5",
         "@scom/scom-network-picker": "^0.1.1",
         "@scom/scom-network-list": "^0.1.0",
-        "@scom/scom-token-list": "^0.1.0",
+        "@scom/scom-token-list": "https://github.com/scom-repos/scom-token-list.git",
         "@scom/scom-wallet-modal": "https://github.com/scom-repos/scom-wallet-modal.git"
     }
 }

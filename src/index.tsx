@@ -99,9 +99,6 @@ export default class ScomSwap extends Module implements PageBlock {
   private oldTag: any = {};
   tag: any = {};
   defaultEdit: boolean = true
-  readonly onConfirm: () => Promise<void>
-  readonly onDiscard: () => Promise<void>
-  readonly onEdit: () => Promise<void>
 
   private swapComponent: Panel;
   private swapContainer: Container;
@@ -592,24 +589,6 @@ export default class ScomSwap extends Module implements PageBlock {
         this.style.setProperty('--input-background', inputBackgroundColor);
     }
   }
-
-  async confirm() {
-    this.setProviders();
-    if (this._data?.providers?.length) {
-      await this.initData();
-      await this.onSetupPage(isWalletConnected());
-    }
-  }
-
-  async discard() {
-    // this.swapContainer.visible = false;
-  }
-
-  async edit() {
-    // this.swapContainer.visible = false;
-  }
-
-  async config() { }
 
   private setProviders() {
     const providers = this.originalData?.providers || [];
@@ -2082,26 +2061,6 @@ export default class ScomSwap extends Module implements PageBlock {
     }
   }
 
-  setDefaultChain = async () => {
-    if (this.supportedChainList && this.supportedChainList.length) {
-      let obj = this.supportedChainList.find((f: IExtendedNetwork) => f.chainId == this.currentChainId);
-      if (!obj)
-        obj = this.supportedChainList[0];
-      if (!this.srcChain && obj) {
-        await this.selectSourceChain(obj);
-      }
-      this.onSourceChainChanged();
-      if (this.toToken) {
-        const balance = this.getBalance(this.toToken);
-        this.receiveBalance.caption = `Balance: ${formatNumber(balance, 4)} ${this.toToken.symbol}`;
-      }
-      this.setTargetTokenList();
-      this.desChainLabel.caption = this.desChain?.chainName || '-';
-    } else {
-      this.setTargetTokenList(true);
-    }
-  };
-
   initChainIcon = (network: IExtendedNetwork) => {
     const img = new Image();
     img.url = network.image;
@@ -2138,11 +2097,6 @@ export default class ScomSwap extends Module implements PageBlock {
   onRenderChainList = async () => {
     this.oldSupportedChainList = this.supportedChainList;
     this.getSupportedChainList();
-    if (this.oldSupportedChainList[0]?.chainId == this.supportedChainList[0]?.chainId) {
-      this.updateSrcChainIconList();
-      await this.setDefaultChain();
-      return;
-    };
     this.srcChainList.innerHTML = '';
     this.desChainList.innerHTML = '';
     this.srcChain = undefined;
@@ -2150,7 +2104,6 @@ export default class ScomSwap extends Module implements PageBlock {
     this.supportedChainList.forEach((network: IExtendedNetwork) => {
       this.initChainIcon(network);
     });
-    await this.setDefaultChain();
   };
 
   showModalFees = () => {
@@ -2266,7 +2219,6 @@ export default class ScomSwap extends Module implements PageBlock {
     const wallets = this.getAttribute('wallets', true, []);
     this.updateContractAddress();
     await this.setData({category, providers, commissions, tokens, networks, wallets});
-    await this.onSetupPage(Wallet.getClientInstance().isConnected);
     this.isReadyCallbackQueued = false;
     this.executeReadyCallback();
   }

@@ -18796,27 +18796,6 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                     await this.onSetupPage(true, this.currentChainId);
                 }
             };
-            this.setDefaultChain = async () => {
-                var _a;
-                if (this.supportedChainList && this.supportedChainList.length) {
-                    let obj = this.supportedChainList.find((f) => f.chainId == this.currentChainId);
-                    if (!obj)
-                        obj = this.supportedChainList[0];
-                    if (!this.srcChain && obj) {
-                        await this.selectSourceChain(obj);
-                    }
-                    this.onSourceChainChanged();
-                    if (this.toToken) {
-                        const balance = this.getBalance(this.toToken);
-                        this.receiveBalance.caption = `Balance: ${index_21.formatNumber(balance, 4)} ${this.toToken.symbol}`;
-                    }
-                    this.setTargetTokenList();
-                    this.desChainLabel.caption = ((_a = this.desChain) === null || _a === void 0 ? void 0 : _a.chainName) || '-';
-                }
-                else {
-                    this.setTargetTokenList(true);
-                }
-            };
             this.initChainIcon = (network) => {
                 const img = new components_18.Image();
                 img.url = network.image;
@@ -18850,15 +18829,8 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                 }
             };
             this.onRenderChainList = async () => {
-                var _a, _b;
                 this.oldSupportedChainList = this.supportedChainList;
                 this.getSupportedChainList();
-                if (((_a = this.oldSupportedChainList[0]) === null || _a === void 0 ? void 0 : _a.chainId) == ((_b = this.supportedChainList[0]) === null || _b === void 0 ? void 0 : _b.chainId)) {
-                    this.updateSrcChainIconList();
-                    await this.setDefaultChain();
-                    return;
-                }
-                ;
                 this.srcChainList.innerHTML = '';
                 this.desChainList.innerHTML = '';
                 this.srcChain = undefined;
@@ -18866,7 +18838,6 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                 this.supportedChainList.forEach((network) => {
                     this.initChainIcon(network);
                 });
-                await this.setDefaultChain();
             };
             this.showModalFees = () => {
                 const fees = this.getFeeDetails();
@@ -19286,21 +19257,6 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                     this.style.setProperty('--input-background', inputBackgroundColor);
             }
         }
-        async confirm() {
-            var _a, _b;
-            this.setProviders();
-            if ((_b = (_a = this._data) === null || _a === void 0 ? void 0 : _a.providers) === null || _b === void 0 ? void 0 : _b.length) {
-                await this.initData();
-                await this.onSetupPage(index_19.isWalletConnected());
-            }
-        }
-        async discard() {
-            // this.swapContainer.visible = false;
-        }
-        async edit() {
-            // this.swapContainer.visible = false;
-        }
-        async config() { }
         setProviders() {
             var _a;
             const providers = ((_a = this.originalData) === null || _a === void 0 ? void 0 : _a.providers) || [];
@@ -20493,7 +20449,6 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
             const wallets = this.getAttribute('wallets', true, []);
             this.updateContractAddress();
             await this.setData({ category, providers, commissions, tokens, networks, wallets });
-            await this.onSetupPage(eth_wallet_10.Wallet.getClientInstance().isConnected);
             this.isReadyCallbackQueued = false;
             this.executeReadyCallback();
         }

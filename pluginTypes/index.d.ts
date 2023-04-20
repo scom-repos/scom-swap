@@ -9637,13 +9637,6 @@ declare module "@scom/scom-swap/global/utils/pageBlock.ts" {
         validate?: () => boolean;
         defaultEdit?: boolean;
         tag?: any;
-        readonly onEdit: () => Promise<void>;
-        readonly onConfirm: () => Promise<void>;
-        readonly onDiscard: () => Promise<void>;
-        edit: () => Promise<void>;
-        confirm: () => Promise<void>;
-        discard: () => Promise<void>;
-        config: () => Promise<void>;
     }
 }
 /// <amd-module name="@scom/scom-swap/global/utils/approvalModel.ts" />
@@ -10927,9 +10920,6 @@ declare module "@scom/scom-swap" {
         private oldTag;
         tag: any;
         defaultEdit: boolean;
-        readonly onConfirm: () => Promise<void>;
-        readonly onDiscard: () => Promise<void>;
-        readonly onEdit: () => Promise<void>;
         private swapComponent;
         private swapContainer;
         private isInited;
@@ -11135,10 +11125,6 @@ declare module "@scom/scom-swap" {
         getTag(): Promise<any>;
         setTag(value: any): Promise<void>;
         private updateTheme;
-        confirm(): Promise<void>;
-        discard(): Promise<void>;
-        edit(): Promise<void>;
-        config(): Promise<void>;
         private setProviders;
         updateContractAddress(): void;
         private get isFixedPair();
@@ -11260,7 +11246,6 @@ declare module "@scom/scom-swap" {
         setTargetTokenList: (isDisabled?: boolean) => void;
         onSourceChainChanged: () => void;
         onSelectSourceChain: (obj: IExtendedNetwork, img?: Image) => Promise<void>;
-        setDefaultChain: () => Promise<void>;
         initChainIcon: (network: IExtendedNetwork) => void;
         updateSrcChainIconList: () => void;
         onRenderChainList: () => Promise<void>;
