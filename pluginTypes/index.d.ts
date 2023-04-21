@@ -9746,8 +9746,9 @@ declare module "@scom/scom-swap/global/utils/swapInterface.ts" {
         providers: IProviderUI[];
         commissions?: ICommissionInfo[];
         tokens?: ITokenObject[];
-        wallets?: IWalletPlugin[];
-        networks?: INetworkConfig[];
+        wallets: IWalletPlugin[];
+        networks: INetworkConfig[];
+        showHeader?: boolean;
     }
     export interface IEmbedData {
         category?: Category;
@@ -10904,8 +10905,9 @@ declare module "@scom/scom-swap" {
         category: Category;
         providers: IProviderUI[];
         tokens?: ITokenObject[];
-        networks?: INetworkConfig[];
-        wallets?: IWalletPlugin[];
+        networks: INetworkConfig[];
+        wallets: IWalletPlugin[];
+        showHeader?: boolean;
     }
     global {
         namespace JSX {
@@ -10955,6 +10957,7 @@ declare module "@scom/scom-swap" {
         private lbYouPayTitle;
         private lbYouPayValue;
         private mdWallet;
+        private dappContainer;
         private isFrom;
         private fromToken?;
         private toToken?;
@@ -11014,6 +11017,8 @@ declare module "@scom/scom-swap" {
         set wallets(value: IWalletPlugin[]);
         get networks(): INetworkConfig[];
         set networks(value: INetworkConfig[]);
+        get showHeader(): boolean;
+        set showHeader(value: boolean);
         getEmbedderActions(): ({
             name: string;
             icon: string;
