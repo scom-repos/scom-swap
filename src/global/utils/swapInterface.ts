@@ -60,8 +60,9 @@ export interface ISwapConfigUI {
   providers: IProviderUI[];
   commissions?: ICommissionInfo[];
   tokens?: ITokenObject[];
-  wallets?: IWalletPlugin[];
-  networks?: INetworkConfig[];
+  wallets: IWalletPlugin[];
+  networks: INetworkConfig[];
+  showHeader?: boolean;
 }
 
 export interface IEmbedData {

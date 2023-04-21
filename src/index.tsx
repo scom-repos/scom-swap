@@ -42,7 +42,6 @@ import {
   IExtendedNetwork,
   limitDecimals,
   isInvalidInput,
-  registerSendTxEvents,
   PageBlock,
   IProvider,
   uniqWith,
@@ -61,6 +60,7 @@ import { TransactionSettings } from './transaction-settings/index'
 import Config from './config/index';
 import scconfig from './scconfig.json';
 import ScomWalletModal, {IWalletPlugin} from '@scom/scom-wallet-modal';
+import ScomDappContainer from '@scom/scom-dapp-container'
 
 const priceImpactTooHighMsg = 'Price Impact Too High. If you want to bypass this check, please turn on Expert Mode';
 const defaultInput = '1';
@@ -70,8 +70,9 @@ interface ScomSwapElement extends ControlElement {
   category: Category;
   providers: IProviderUI[];
   tokens?: ITokenObject[];
-  networks?: INetworkConfig[];
-  wallets?: IWalletPlugin[];
+  networks: INetworkConfig[];
+  wallets: IWalletPlugin[];
+  showHeader?: boolean;
 }
 
 declare global {
@@ -89,12 +90,16 @@ export default class ScomSwap extends Module implements PageBlock {
   private _oldData: ISwapConfigUI = {
     category: 'fixed-pair',
     providers: [],
-    tokens: []
+    tokens: [],
+    wallets: [],
+    networks: []
   };
   private _data: ISwapConfigUI = {
     category: 'fixed-pair',
     providers: [],
-    tokens: []
+    tokens: [],
+    wallets: [],
+    networks: []
   };
   private oldTag: any = {};
   tag: any = {};
@@ -138,6 +143,7 @@ export default class ScomSwap extends Module implements PageBlock {
   private lbYouPayTitle: Label;
   private lbYouPayValue: Label;
   private mdWallet: ScomWalletModal;
+  private dappContainer: ScomDappContainer;
 
   private isFrom: boolean;
   private fromToken?: ITokenObject;
@@ -219,24 +225,31 @@ export default class ScomSwap extends Module implements PageBlock {
   }
 
   get tokens() {
-    return this._data.tokens;
+    return this._data.tokens ?? [];
   }
   set tokens(value: ITokenObject[]) {
     this._data.tokens = value;
   }
 
   get wallets() {
-    return this._data.wallets;
+    return this._data.wallets ?? [];
   }
   set wallets(value: IWalletPlugin[]) {
     this._data.wallets = value;
   }
 
   get networks() {
-    return this._data.networks;
+    return this._data.networks ?? [];
   }
   set networks(value: INetworkConfig[]) {
     this._data.networks = value;
+  }
+
+  get showHeader() {
+    return this._data.showHeader ?? true;
+  }
+  set showHeader(value: boolean) {
+    this._data.showHeader = value;
   }
 
   getEmbedderActions() {
@@ -910,6 +923,8 @@ export default class ScomSwap extends Module implements PageBlock {
   }
 
   private onSetupPage = async (connected: boolean, _chainId?: number) => {
+    const data: any = { wallets: this.wallets, networks: this.networks, showHeader: this.showHeader }
+    if (this.dappContainer?.setData) this.dappContainer.setData(data)
     this.currentChainId = _chainId ? _chainId : getChainId();
     tokenStore.updateTokenMapData();
     if (connected) {
@@ -2215,220 +2230,224 @@ export default class ScomSwap extends Module implements PageBlock {
     const providers = this.getAttribute('providers', true, []);
     const commissions = this.getAttribute('commissions', true, []);
     const tokens = this.getAttribute('tokens', true, []);
-    const networks = this.getAttribute('networks', true, []);
-    const wallets = this.getAttribute('wallets', true, []);
+    const networks = this.getAttribute('networks', true);
+    const wallets = this.getAttribute('wallets', true);
+    const showHeader = this.getAttribute('showHeader', true);
+
     this.updateContractAddress();
-    await this.setData({category, providers, commissions, tokens, networks, wallets});
+    await this.setData({category, providers, commissions, tokens, networks, wallets, showHeader});
     this.isReadyCallbackQueued = false;
     this.executeReadyCallback();
   }
 
   render() {
     return (
-      <i-panel id="swapComponent" background={{ color: '#0c1234' }}>
-        <i-panel class="pageblock-swap">
-          <i-panel id="swapContainer">
-            <i-panel class="content-swap">
-              <i-hstack 
-                horizontalAlignment="space-between" 
-                verticalAlignment="center" 
-                padding={{bottom: '0.5rem'}} 
-                border={{bottom: {color: '#fff', width: '1px', style: 'solid'}}}
-              >
-                <i-label caption='Swap' font={{ size: '1.3rem', color: '#fff' }}></i-label>
-                <i-hstack wrap="wrap" horizontalAlignment="space-between" verticalAlignment="center">
-                  <i-panel id="iconList" class="icon-list">
-                  </i-panel>
-                  <i-panel id="actionSetting" class="action-setting hidden">
-                    <i-label id="lbLastUpdated"></i-label>
-                    <i-icon width={26} height={26} class="rounded-icon" name="sync-alt" fill="white" onClick={this.onRefresh}></i-icon>
-                    <i-icon width={26} height={26} class="rounded-icon" name="cog" fill="white" onClick={this.onSetting}></i-icon>
-                  </i-panel>
-                </i-hstack>   
-              </i-hstack>           
-              <i-vstack id="srcChainBox" class="my-2 w-100">
-                <i-hstack verticalAlignment="center" horizontalAlignment="space-between">
-                  <i-label class="text--grey" caption="Current Network" />
-                  <i-label id="srcChainLabel" caption="-" />
-                </i-hstack>
-                <i-panel id="srcChainList" visible={false} class="icon-list" maxWidth="100%" />
-              </i-vstack>
-              <i-range
-                id="fromSlider"
-                class="custom--slider"
-                width='100%'
-                min={0}
-                max={100}
-                tooltipFormatter={this.tipFormatter}
-                tooltipVisible
-                stepDots={5}
-                onChanged={debounce(this.onSliderChange.bind(this), 500, this)}
-              />
-              <i-hstack class="my-2" verticalAlignment="center" horizontalAlignment="space-between">
-                <i-label caption="You Buy" font={{ size: '1.125rem', color: '#fff' }}></i-label>
-              </i-hstack>             
-              <i-panel class="token-box">
-                <i-vstack id="payContainer" class="input--token-container" >
-                  <i-hstack class="balance-info" horizontalAlignment="space-between" verticalAlignment="center" width="100%">
-                    <i-label id="payBalance" class="text--grey ml-auto" caption="Balance: 0"></i-label>
-                    <i-button id="maxButton" class="btn-max" caption="Max" enabled={false} onClick={() => this.onSetMaxBalance()}></i-button>
+      <i-scom-dapp-container id="dappContainer">
+        <i-panel id="swapComponent" background={{ color: '#0c1234' }}>
+          <i-panel class="pageblock-swap">
+            <i-panel id="swapContainer">
+              <i-panel class="content-swap">
+                <i-hstack 
+                  horizontalAlignment="space-between" 
+                  verticalAlignment="center" 
+                  padding={{bottom: '0.5rem'}} 
+                  border={{bottom: {color: '#fff', width: '1px', style: 'solid'}}}
+                >
+                  <i-label caption='Swap' font={{ size: '1.3rem', color: '#fff' }}></i-label>
+                  <i-hstack wrap="wrap" horizontalAlignment="space-between" verticalAlignment="center">
+                    <i-panel id="iconList" class="icon-list">
+                    </i-panel>
+                    <i-panel id="actionSetting" class="action-setting hidden">
+                      <i-label id="lbLastUpdated"></i-label>
+                      <i-icon width={26} height={26} class="rounded-icon" name="sync-alt" fill="white" onClick={this.onRefresh}></i-icon>
+                      <i-icon width={26} height={26} class="rounded-icon" name="cog" fill="white" onClick={this.onSetting}></i-icon>
+                    </i-panel>
+                  </i-hstack>   
+                </i-hstack>           
+                <i-vstack id="srcChainBox" class="my-2 w-100">
+                  <i-hstack verticalAlignment="center" horizontalAlignment="space-between">
+                    <i-label class="text--grey" caption="Current Network" />
+                    <i-label id="srcChainLabel" caption="-" />
                   </i-hstack>
-                  <i-panel class="bg-box" width="100%">
-                    <i-hstack class="input--token-box" verticalAlignment="center" horizontalAlignment="space-between" width="100%">
-                      <i-vstack>
-                        <i-scom-swap-token-selection disableSelect={true} id="firstTokenSelection"></i-scom-swap-token-selection>
-                      </i-vstack>
-                      <i-vstack id="payCol">
-                        <i-label class="text-value text-right" caption=" - "></i-label>
-                      </i-vstack>
-                    </i-hstack>
-                  </i-panel>
+                  <i-panel id="srcChainList" visible={false} class="icon-list" maxWidth="100%" />
                 </i-vstack>
-              </i-panel>
-              <i-hstack horizontalAlignment="space-between">
-                <i-label id='lbYouPayTitle' caption="You Pay" font={{ size: '1.125rem', color: '#fff' }}></i-label>
-                <i-label id='lbYouPayValue' caption='0' font={{ size: '1.125rem', color: '#fff' }}></i-label>
-              </i-hstack>
-              <i-panel class="toggle-reverse">
-                <i-image id="toggleReverseImage" width={32} height={32} class="icon-swap rounded-icon" url={Assets.fullPath("img/swap/icon-swap.png")} onClick={this.onRevertSwap.bind(this)} />
-              </i-panel>
-              <i-panel class="token-box">
-                <i-vstack id="receiveContainer" class="input--token-container" >
-                  <i-vstack class="balance-info" width="100%">
-                    <i-vstack width="100%">
-                      <i-label caption="You Receive" font={{ size: '1.125rem', color: '#fff' }}></i-label>
-                    </i-vstack>
-                    <i-vstack id="desChainBox" visible={false} class="my-2 w-100">
-                      <i-hstack verticalAlignment="center" horizontalAlignment="space-between">
-                        <i-label class="text--grey" caption="Selected Destination Chain" />
-                        <i-label id="desChainLabel" class="ml-auto" caption="-" />
-                      </i-hstack>
-                      <i-panel id="desChainList" class="icon-list" maxWidth="100%" />
-                    </i-vstack>
-                    <i-vstack class="text-right" width="100%">
-                      <i-label id="receiveBalance" class="text--grey ml-auto" caption="Balance: 0"></i-label>
-                    </i-vstack>
-                  </i-vstack>
-                  <i-panel class="bg-box" width="100%">
-                    <i-hstack class="input--token-box" verticalAlignment="center" horizontalAlignment="space-between" width="100%">
-                      <i-vstack>
-                        <i-scom-swap-token-selection disableSelect={true} id="secondTokenSelection"></i-scom-swap-token-selection>
-                      </i-vstack>
-                      <i-vstack id="receiveCol">
-                        <i-label class="text-value text-right" caption=" - "></i-label>
-                      </i-vstack>
+                <i-range
+                  id="fromSlider"
+                  class="custom--slider"
+                  width='100%'
+                  min={0}
+                  max={100}
+                  tooltipFormatter={this.tipFormatter}
+                  tooltipVisible
+                  stepDots={5}
+                  onChanged={debounce(this.onSliderChange.bind(this), 500, this)}
+                />
+                <i-hstack class="my-2" verticalAlignment="center" horizontalAlignment="space-between">
+                  <i-label caption="You Buy" font={{ size: '1.125rem', color: '#fff' }}></i-label>
+                </i-hstack>             
+                <i-panel class="token-box">
+                  <i-vstack id="payContainer" class="input--token-container" >
+                    <i-hstack class="balance-info" horizontalAlignment="space-between" verticalAlignment="center" width="100%">
+                      <i-label id="payBalance" class="text--grey ml-auto" caption="Balance: 0"></i-label>
+                      <i-button id="maxButton" class="btn-max" caption="Max" enabled={false} onClick={() => this.onSetMaxBalance()}></i-button>
                     </i-hstack>
-                    <i-panel id="routingContainer" class="routing-container">
-                      <i-panel id="listRouting"></i-panel>
-                      <i-hstack horizontalAlignment='space-between' verticalAlignment='center'>
-                        <i-label id="routeFound" class="total-routes text--grey" caption="0 Route(s) Found"></i-label>
-                        <i-panel id="toggleRoutes" class="toggle-routes hidden" onClick={this.toggleShowRoutes}>
-                          <i-label id="showCaption" caption="Show More"></i-label>
-                          <i-icon id="showIcon" width={30} height={30} fill="#fff" name="angle-down"></i-icon>
-                        </i-panel>
+                    <i-panel class="bg-box" width="100%">
+                      <i-hstack class="input--token-box" verticalAlignment="center" horizontalAlignment="space-between" width="100%">
+                        <i-vstack>
+                          <i-scom-swap-token-selection disableSelect={true} id="firstTokenSelection"></i-scom-swap-token-selection>
+                        </i-vstack>
+                        <i-vstack id="payCol">
+                          <i-label class="text-value text-right" caption=" - "></i-label>
+                        </i-vstack>
                       </i-hstack>
                     </i-panel>
-                  </i-panel>
-                </i-vstack>
+                  </i-vstack>
+                </i-panel>
+                <i-hstack horizontalAlignment="space-between">
+                  <i-label id='lbYouPayTitle' caption="You Pay" font={{ size: '1.125rem', color: '#fff' }}></i-label>
+                  <i-label id='lbYouPayValue' caption='0' font={{ size: '1.125rem', color: '#fff' }}></i-label>
+                </i-hstack>
+                <i-panel class="toggle-reverse">
+                  <i-image id="toggleReverseImage" width={32} height={32} class="icon-swap rounded-icon" url={Assets.fullPath("img/swap/icon-swap.png")} onClick={this.onRevertSwap.bind(this)} />
+                </i-panel>
+                <i-panel class="token-box">
+                  <i-vstack id="receiveContainer" class="input--token-container" >
+                    <i-vstack class="balance-info" width="100%">
+                      <i-vstack width="100%">
+                        <i-label caption="You Receive" font={{ size: '1.125rem', color: '#fff' }}></i-label>
+                      </i-vstack>
+                      <i-vstack id="desChainBox" visible={false} class="my-2 w-100">
+                        <i-hstack verticalAlignment="center" horizontalAlignment="space-between">
+                          <i-label class="text--grey" caption="Selected Destination Chain" />
+                          <i-label id="desChainLabel" class="ml-auto" caption="-" />
+                        </i-hstack>
+                        <i-panel id="desChainList" class="icon-list" maxWidth="100%" />
+                      </i-vstack>
+                      <i-vstack class="text-right" width="100%">
+                        <i-label id="receiveBalance" class="text--grey ml-auto" caption="Balance: 0"></i-label>
+                      </i-vstack>
+                    </i-vstack>
+                    <i-panel class="bg-box" width="100%">
+                      <i-hstack class="input--token-box" verticalAlignment="center" horizontalAlignment="space-between" width="100%">
+                        <i-vstack>
+                          <i-scom-swap-token-selection disableSelect={true} id="secondTokenSelection"></i-scom-swap-token-selection>
+                        </i-vstack>
+                        <i-vstack id="receiveCol">
+                          <i-label class="text-value text-right" caption=" - "></i-label>
+                        </i-vstack>
+                      </i-hstack>
+                      <i-panel id="routingContainer" class="routing-container">
+                        <i-panel id="listRouting"></i-panel>
+                        <i-hstack horizontalAlignment='space-between' verticalAlignment='center'>
+                          <i-label id="routeFound" class="total-routes text--grey" caption="0 Route(s) Found"></i-label>
+                          <i-panel id="toggleRoutes" class="toggle-routes hidden" onClick={this.toggleShowRoutes}>
+                            <i-label id="showCaption" caption="Show More"></i-label>
+                            <i-icon id="showIcon" width={30} height={30} fill="#fff" name="angle-down"></i-icon>
+                          </i-panel>
+                        </i-hstack>
+                      </i-panel>
+                    </i-panel>
+                  </i-vstack>
+                </i-panel>
+              </i-panel>
+              <i-panel class="swap-btn-container" width="100%">
+                <i-button
+                  id="swapBtn" class="btn-swap btn-os" height={67}
+                  visible={false}
+                  rightIcon={{ spin: true, visible: false }}
+                  onClick={this.onClickSwapButton.bind(this)}
+                ></i-button>
               </i-panel>
             </i-panel>
-            <i-panel class="swap-btn-container" width="100%">
-              <i-button
-                id="swapBtn" class="btn-swap btn-os" height={67}
-                visible={false}
-                rightIcon={{ spin: true, visible: false }}
-                onClick={this.onClickSwapButton.bind(this)}
-              ></i-button>
-            </i-panel>
-          </i-panel>
-          <i-modal id="swapModal" class="custom-modal" title="Confirm Swap" closeIcon={{ name: 'times' }}>
-            <i-hstack verticalAlignment='center' horizontalAlignment='start'>
-              <i-panel id="srcChainFirstPanel" class="row-chain">
-                <i-image id="srcChainTokenImage" width="30px" height="30px" url="#" />
-                <i-label id="srcChainTokenLabel" class="token-name" caption="" />
-                <i-icon name="minus" fill='#fff' width={28} height={10} />
+            <i-modal id="swapModal" class="custom-modal" title="Confirm Swap" closeIcon={{ name: 'times' }}>
+              <i-hstack verticalAlignment='center' horizontalAlignment='start'>
+                <i-panel id="srcChainFirstPanel" class="row-chain">
+                  <i-image id="srcChainTokenImage" width="30px" height="30px" url="#" />
+                  <i-label id="srcChainTokenLabel" class="token-name" caption="" />
+                  <i-icon name="minus" fill='#fff' width={28} height={10} />
+                </i-panel>
+                <i-panel class="row-chain">
+                  <i-image id="fromTokenImage" width="30px" height="30px" url="#" />
+                  <i-label id="fromTokenLabel" class="token-name" caption=""></i-label>
+                </i-panel>
+                <i-label id="fromTokenValue" class="token-value" caption=" - "></i-label>
+              </i-hstack>
+              <i-icon name="arrow-down" class="arrow-down" fill="#fff" width={28} height={28} />
+              <i-hstack class="mb-1" verticalAlignment='center' horizontalAlignment='start'>
+                <i-panel id="targetChainFirstPanel" class="row-chain">
+                  <i-image id="targetChainTokenImage" width="30px" height="30px" url="#" />
+                  <i-label id="targetChainTokenLabel" class="token-name" caption="" />
+                  <i-icon name="minus" fill='#fff' width={28} height={10} />
+                </i-panel>
+                <i-panel class="row-chain">
+                  <i-image id="toTokenImage" width="30px" height="30px" url="#" />
+                  <i-label id="toTokenLabel" class="token-name" caption=""></i-label>
+                </i-panel>
+                <i-label id="toTokenValue" class="token-value text-primary bold" caption=" - "></i-label>
+              </i-hstack>
+              <i-panel class="mb-1">
+                <i-label id="lbEstimate"></i-label>
               </i-panel>
-              <i-panel class="row-chain">
-                <i-image id="fromTokenImage" width="30px" height="30px" url="#" />
-                <i-label id="fromTokenLabel" class="token-name" caption=""></i-label>
+              <i-panel class="mb-1">
+                <i-label id="lbPayOrReceive"></i-label>
+                <i-label id="payOrReceiveValue" class="text-primary bold" caption=""></i-label>
+                <i-label id="payOrReceiveToken" caption=""></i-label>
               </i-panel>
-              <i-label id="fromTokenValue" class="token-value" caption=" - "></i-label>
-            </i-hstack>
-            <i-icon name="arrow-down" class="arrow-down" fill="#fff" width={28} height={28} />
-            <i-hstack class="mb-1" verticalAlignment='center' horizontalAlignment='start'>
-              <i-panel id="targetChainFirstPanel" class="row-chain">
-                <i-image id="targetChainTokenImage" width="30px" height="30px" url="#" />
-                <i-label id="targetChainTokenLabel" class="token-name" caption="" />
-                <i-icon name="minus" fill='#fff' width={28} height={10} />
+              <i-panel id="priceInfoContainer" class="bg-box mt-1 mb-1" width="100%">
               </i-panel>
-              <i-panel class="row-chain">
-                <i-image id="toTokenImage" width="30px" height="30px" url="#" />
-                <i-label id="toTokenLabel" class="token-name" caption=""></i-label>
+              <i-label id="lbReminderRejected" class="flex" margin={{ top: 8, bottom: 16 }} />
+              <i-panel class="swap-btn-container" width="100%">
+                <i-button id="swapModalConfirmBtn" class="btn-swap btn-os" height="auto" caption="Confirm Swap" onClick={this.doSwap}></i-button>
               </i-panel>
-              <i-label id="toTokenValue" class="token-value text-primary bold" caption=" - "></i-label>
-            </i-hstack>
-            <i-panel class="mb-1">
-              <i-label id="lbEstimate"></i-label>
-            </i-panel>
-            <i-panel class="mb-1">
-              <i-label id="lbPayOrReceive"></i-label>
-              <i-label id="payOrReceiveValue" class="text-primary bold" caption=""></i-label>
-              <i-label id="payOrReceiveToken" caption=""></i-label>
-            </i-panel>
-            <i-panel id="priceInfoContainer" class="bg-box mt-1 mb-1" width="100%">
-            </i-panel>
-            <i-label id="lbReminderRejected" class="flex" margin={{ top: 8, bottom: 16 }} />
-            <i-panel class="swap-btn-container" width="100%">
-              <i-button id="swapModalConfirmBtn" class="btn-swap btn-os" height="auto" caption="Confirm Swap" onClick={this.doSwap}></i-button>
-            </i-panel>
-          </i-modal>
+            </i-modal>
 
-          <i-modal
-            id="modalFees"
-            class="bg-modal custom-modal"
-            title="Transaction Fee Details"
-            closeIcon={{ name: 'times' }}
-          >
-            <i-panel class="i-modal_content">
-              <i-panel>
-                <i-vstack id="feesInfo" />
+            <i-modal
+              id="modalFees"
+              class="bg-modal custom-modal"
+              title="Transaction Fee Details"
+              closeIcon={{ name: 'times' }}
+            >
+              <i-panel class="i-modal_content">
+                <i-panel>
+                  <i-vstack id="feesInfo" />
+                  <i-hstack verticalAlignment="center" horizontalAlignment="center" margin={{ top: 16, bottom: 8 }}>
+                    <i-button
+                      caption="Close"
+                      class="btn-os btn-submit"
+                      onClick={() => this.closeModalFees()}
+                    />
+                  </i-hstack>
+                </i-panel>
+              </i-panel>
+            </i-modal>
+
+            <i-modal
+              id="networkErrModal"
+              class="bg-modal custom-modal"
+              title="Supported Networks"
+              closeIcon={{ name: 'times' }}
+            >
+              <i-panel class="i-modal_content">
+                <i-vstack id="supportedNetworksElm" gap={10} verticalAlignment="center" />
                 <i-hstack verticalAlignment="center" horizontalAlignment="center" margin={{ top: 16, bottom: 8 }}>
                   <i-button
                     caption="Close"
-                    class="btn-os btn-submit"
-                    onClick={() => this.closeModalFees()}
+                    width={150}
+                    padding={{ top: 4, bottom: 4 }}
+                    class="btn-os btn-submit text-center"
+                    onClick={() => this.closeNetworkErrModal()}
                   />
                 </i-hstack>
               </i-panel>
-            </i-panel>
-          </i-modal>
-
-          <i-modal
-            id="networkErrModal"
-            class="bg-modal custom-modal"
-            title="Supported Networks"
-            closeIcon={{ name: 'times' }}
-          >
-            <i-panel class="i-modal_content">
-              <i-vstack id="supportedNetworksElm" gap={10} verticalAlignment="center" />
-              <i-hstack verticalAlignment="center" horizontalAlignment="center" margin={{ top: 16, bottom: 8 }}>
-                <i-button
-                  caption="Close"
-                  width={150}
-                  padding={{ top: 4, bottom: 4 }}
-                  class="btn-os btn-submit text-center"
-                  onClick={() => this.closeNetworkErrModal()}
-                />
-              </i-hstack>
-            </i-panel>
-          </i-modal>
+            </i-modal>
+          </i-panel>
+          <i-scom-swap-config id="configDApp" visible={false} />
+          <i-scom-wallet-modal
+            id="mdWallet"
+            wallets={[]}
+          ></i-scom-wallet-modal>
         </i-panel>
-        <i-scom-swap-config id="configDApp" visible={false} />
-        <i-scom-wallet-modal
-          id="mdWallet"
-          wallets={[]}
-        ></i-scom-wallet-modal>
-      </i-panel>
+      </i-scom-dapp-container>
     )
   }
 }

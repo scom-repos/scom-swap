@@ -18455,12 +18455,16 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
             this._oldData = {
                 category: 'fixed-pair',
                 providers: [],
-                tokens: []
+                tokens: [],
+                wallets: [],
+                networks: []
             };
             this._data = {
                 category: 'fixed-pair',
                 providers: [],
-                tokens: []
+                tokens: [],
+                wallets: [],
+                networks: []
             };
             this.oldTag = {};
             this.tag = {};
@@ -18528,7 +18532,10 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                 return formatted.replace(/,/g, '');
             };
             this.onSetupPage = async (connected, _chainId) => {
-                var _a;
+                var _a, _b;
+                const data = { wallets: this.wallets, networks: this.networks, showHeader: this.showHeader };
+                if ((_a = this.dappContainer) === null || _a === void 0 ? void 0 : _a.setData)
+                    this.dappContainer.setData(data);
                 this.currentChainId = _chainId ? _chainId : index_19.getChainId();
                 scom_token_list_7.tokenStore.updateTokenMapData();
                 if (connected) {
@@ -18574,7 +18581,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                 this.firstTokenSelection.tokenDataListProp = index_19.getSupportedTokens(this._data.tokens || [], this.currentChainId);
                 this.setTargetTokenList();
                 //if (connected) {
-                (_a = this.actionSetting) === null || _a === void 0 ? void 0 : _a.classList.remove("hidden");
+                (_b = this.actionSetting) === null || _b === void 0 ? void 0 : _b.classList.remove("hidden");
                 clearInterval(this.timer);
                 this.timer = setInterval(() => {
                     this.lastUpdated++;
@@ -18905,22 +18912,32 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
             this._data.commissions = value;
         }
         get tokens() {
-            return this._data.tokens;
+            var _a;
+            return (_a = this._data.tokens) !== null && _a !== void 0 ? _a : [];
         }
         set tokens(value) {
             this._data.tokens = value;
         }
         get wallets() {
-            return this._data.wallets;
+            var _a;
+            return (_a = this._data.wallets) !== null && _a !== void 0 ? _a : [];
         }
         set wallets(value) {
             this._data.wallets = value;
         }
         get networks() {
-            return this._data.networks;
+            var _a;
+            return (_a = this._data.networks) !== null && _a !== void 0 ? _a : [];
         }
         set networks(value) {
             this._data.networks = value;
+        }
+        get showHeader() {
+            var _a;
+            return (_a = this._data.showHeader) !== null && _a !== void 0 ? _a : true;
+        }
+        set showHeader(value) {
+            this._data.showHeader = value;
         }
         getEmbedderActions() {
             const propertiesSchema = {
@@ -20445,120 +20462,122 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
             const providers = this.getAttribute('providers', true, []);
             const commissions = this.getAttribute('commissions', true, []);
             const tokens = this.getAttribute('tokens', true, []);
-            const networks = this.getAttribute('networks', true, []);
-            const wallets = this.getAttribute('wallets', true, []);
+            const networks = this.getAttribute('networks', true);
+            const wallets = this.getAttribute('wallets', true);
+            const showHeader = this.getAttribute('showHeader', true);
             this.updateContractAddress();
-            await this.setData({ category, providers, commissions, tokens, networks, wallets });
+            await this.setData({ category, providers, commissions, tokens, networks, wallets, showHeader });
             this.isReadyCallbackQueued = false;
             this.executeReadyCallback();
         }
         render() {
-            return (this.$render("i-panel", { id: "swapComponent", background: { color: '#0c1234' } },
-                this.$render("i-panel", { class: "pageblock-swap" },
-                    this.$render("i-panel", { id: "swapContainer" },
-                        this.$render("i-panel", { class: "content-swap" },
-                            this.$render("i-hstack", { horizontalAlignment: "space-between", verticalAlignment: "center", padding: { bottom: '0.5rem' }, border: { bottom: { color: '#fff', width: '1px', style: 'solid' } } },
-                                this.$render("i-label", { caption: 'Swap', font: { size: '1.3rem', color: '#fff' } }),
-                                this.$render("i-hstack", { wrap: "wrap", horizontalAlignment: "space-between", verticalAlignment: "center" },
-                                    this.$render("i-panel", { id: "iconList", class: "icon-list" }),
-                                    this.$render("i-panel", { id: "actionSetting", class: "action-setting hidden" },
-                                        this.$render("i-label", { id: "lbLastUpdated" }),
-                                        this.$render("i-icon", { width: 26, height: 26, class: "rounded-icon", name: "sync-alt", fill: "white", onClick: this.onRefresh }),
-                                        this.$render("i-icon", { width: 26, height: 26, class: "rounded-icon", name: "cog", fill: "white", onClick: this.onSetting })))),
-                            this.$render("i-vstack", { id: "srcChainBox", class: "my-2 w-100" },
-                                this.$render("i-hstack", { verticalAlignment: "center", horizontalAlignment: "space-between" },
-                                    this.$render("i-label", { class: "text--grey", caption: "Current Network" }),
-                                    this.$render("i-label", { id: "srcChainLabel", caption: "-" })),
-                                this.$render("i-panel", { id: "srcChainList", visible: false, class: "icon-list", maxWidth: "100%" })),
-                            this.$render("i-range", { id: "fromSlider", class: "custom--slider", width: '100%', min: 0, max: 100, tooltipFormatter: this.tipFormatter, tooltipVisible: true, stepDots: 5, onChanged: index_20.debounce(this.onSliderChange.bind(this), 500, this) }),
-                            this.$render("i-hstack", { class: "my-2", verticalAlignment: "center", horizontalAlignment: "space-between" },
-                                this.$render("i-label", { caption: "You Buy", font: { size: '1.125rem', color: '#fff' } })),
-                            this.$render("i-panel", { class: "token-box" },
-                                this.$render("i-vstack", { id: "payContainer", class: "input--token-container" },
-                                    this.$render("i-hstack", { class: "balance-info", horizontalAlignment: "space-between", verticalAlignment: "center", width: "100%" },
-                                        this.$render("i-label", { id: "payBalance", class: "text--grey ml-auto", caption: "Balance: 0" }),
-                                        this.$render("i-button", { id: "maxButton", class: "btn-max", caption: "Max", enabled: false, onClick: () => this.onSetMaxBalance() })),
-                                    this.$render("i-panel", { class: "bg-box", width: "100%" },
-                                        this.$render("i-hstack", { class: "input--token-box", verticalAlignment: "center", horizontalAlignment: "space-between", width: "100%" },
-                                            this.$render("i-vstack", null,
-                                                this.$render("i-scom-swap-token-selection", { disableSelect: true, id: "firstTokenSelection" })),
-                                            this.$render("i-vstack", { id: "payCol" },
-                                                this.$render("i-label", { class: "text-value text-right", caption: " - " })))))),
-                            this.$render("i-hstack", { horizontalAlignment: "space-between" },
-                                this.$render("i-label", { id: 'lbYouPayTitle', caption: "You Pay", font: { size: '1.125rem', color: '#fff' } }),
-                                this.$render("i-label", { id: 'lbYouPayValue', caption: '0', font: { size: '1.125rem', color: '#fff' } })),
-                            this.$render("i-panel", { class: "toggle-reverse" },
-                                this.$render("i-image", { id: "toggleReverseImage", width: 32, height: 32, class: "icon-swap rounded-icon", url: assets_5.default.fullPath("img/swap/icon-swap.png"), onClick: this.onRevertSwap.bind(this) })),
-                            this.$render("i-panel", { class: "token-box" },
-                                this.$render("i-vstack", { id: "receiveContainer", class: "input--token-container" },
-                                    this.$render("i-vstack", { class: "balance-info", width: "100%" },
-                                        this.$render("i-vstack", { width: "100%" },
-                                            this.$render("i-label", { caption: "You Receive", font: { size: '1.125rem', color: '#fff' } })),
-                                        this.$render("i-vstack", { id: "desChainBox", visible: false, class: "my-2 w-100" },
-                                            this.$render("i-hstack", { verticalAlignment: "center", horizontalAlignment: "space-between" },
-                                                this.$render("i-label", { class: "text--grey", caption: "Selected Destination Chain" }),
-                                                this.$render("i-label", { id: "desChainLabel", class: "ml-auto", caption: "-" })),
-                                            this.$render("i-panel", { id: "desChainList", class: "icon-list", maxWidth: "100%" })),
-                                        this.$render("i-vstack", { class: "text-right", width: "100%" },
-                                            this.$render("i-label", { id: "receiveBalance", class: "text--grey ml-auto", caption: "Balance: 0" }))),
-                                    this.$render("i-panel", { class: "bg-box", width: "100%" },
-                                        this.$render("i-hstack", { class: "input--token-box", verticalAlignment: "center", horizontalAlignment: "space-between", width: "100%" },
-                                            this.$render("i-vstack", null,
-                                                this.$render("i-scom-swap-token-selection", { disableSelect: true, id: "secondTokenSelection" })),
-                                            this.$render("i-vstack", { id: "receiveCol" },
-                                                this.$render("i-label", { class: "text-value text-right", caption: " - " }))),
-                                        this.$render("i-panel", { id: "routingContainer", class: "routing-container" },
-                                            this.$render("i-panel", { id: "listRouting" }),
-                                            this.$render("i-hstack", { horizontalAlignment: 'space-between', verticalAlignment: 'center' },
-                                                this.$render("i-label", { id: "routeFound", class: "total-routes text--grey", caption: "0 Route(s) Found" }),
-                                                this.$render("i-panel", { id: "toggleRoutes", class: "toggle-routes hidden", onClick: this.toggleShowRoutes },
-                                                    this.$render("i-label", { id: "showCaption", caption: "Show More" }),
-                                                    this.$render("i-icon", { id: "showIcon", width: 30, height: 30, fill: "#fff", name: "angle-down" })))))))),
-                        this.$render("i-panel", { class: "swap-btn-container", width: "100%" },
-                            this.$render("i-button", { id: "swapBtn", class: "btn-swap btn-os", height: 67, visible: false, rightIcon: { spin: true, visible: false }, onClick: this.onClickSwapButton.bind(this) }))),
-                    this.$render("i-modal", { id: "swapModal", class: "custom-modal", title: "Confirm Swap", closeIcon: { name: 'times' } },
-                        this.$render("i-hstack", { verticalAlignment: 'center', horizontalAlignment: 'start' },
-                            this.$render("i-panel", { id: "srcChainFirstPanel", class: "row-chain" },
-                                this.$render("i-image", { id: "srcChainTokenImage", width: "30px", height: "30px", url: "#" }),
-                                this.$render("i-label", { id: "srcChainTokenLabel", class: "token-name", caption: "" }),
-                                this.$render("i-icon", { name: "minus", fill: '#fff', width: 28, height: 10 })),
-                            this.$render("i-panel", { class: "row-chain" },
-                                this.$render("i-image", { id: "fromTokenImage", width: "30px", height: "30px", url: "#" }),
-                                this.$render("i-label", { id: "fromTokenLabel", class: "token-name", caption: "" })),
-                            this.$render("i-label", { id: "fromTokenValue", class: "token-value", caption: " - " })),
-                        this.$render("i-icon", { name: "arrow-down", class: "arrow-down", fill: "#fff", width: 28, height: 28 }),
-                        this.$render("i-hstack", { class: "mb-1", verticalAlignment: 'center', horizontalAlignment: 'start' },
-                            this.$render("i-panel", { id: "targetChainFirstPanel", class: "row-chain" },
-                                this.$render("i-image", { id: "targetChainTokenImage", width: "30px", height: "30px", url: "#" }),
-                                this.$render("i-label", { id: "targetChainTokenLabel", class: "token-name", caption: "" }),
-                                this.$render("i-icon", { name: "minus", fill: '#fff', width: 28, height: 10 })),
-                            this.$render("i-panel", { class: "row-chain" },
-                                this.$render("i-image", { id: "toTokenImage", width: "30px", height: "30px", url: "#" }),
-                                this.$render("i-label", { id: "toTokenLabel", class: "token-name", caption: "" })),
-                            this.$render("i-label", { id: "toTokenValue", class: "token-value text-primary bold", caption: " - " })),
-                        this.$render("i-panel", { class: "mb-1" },
-                            this.$render("i-label", { id: "lbEstimate" })),
-                        this.$render("i-panel", { class: "mb-1" },
-                            this.$render("i-label", { id: "lbPayOrReceive" }),
-                            this.$render("i-label", { id: "payOrReceiveValue", class: "text-primary bold", caption: "" }),
-                            this.$render("i-label", { id: "payOrReceiveToken", caption: "" })),
-                        this.$render("i-panel", { id: "priceInfoContainer", class: "bg-box mt-1 mb-1", width: "100%" }),
-                        this.$render("i-label", { id: "lbReminderRejected", class: "flex", margin: { top: 8, bottom: 16 } }),
-                        this.$render("i-panel", { class: "swap-btn-container", width: "100%" },
-                            this.$render("i-button", { id: "swapModalConfirmBtn", class: "btn-swap btn-os", height: "auto", caption: "Confirm Swap", onClick: this.doSwap }))),
-                    this.$render("i-modal", { id: "modalFees", class: "bg-modal custom-modal", title: "Transaction Fee Details", closeIcon: { name: 'times' } },
-                        this.$render("i-panel", { class: "i-modal_content" },
-                            this.$render("i-panel", null,
-                                this.$render("i-vstack", { id: "feesInfo" }),
+            return (this.$render("i-scom-dapp-container", { id: "dappContainer" },
+                this.$render("i-panel", { id: "swapComponent", background: { color: '#0c1234' } },
+                    this.$render("i-panel", { class: "pageblock-swap" },
+                        this.$render("i-panel", { id: "swapContainer" },
+                            this.$render("i-panel", { class: "content-swap" },
+                                this.$render("i-hstack", { horizontalAlignment: "space-between", verticalAlignment: "center", padding: { bottom: '0.5rem' }, border: { bottom: { color: '#fff', width: '1px', style: 'solid' } } },
+                                    this.$render("i-label", { caption: 'Swap', font: { size: '1.3rem', color: '#fff' } }),
+                                    this.$render("i-hstack", { wrap: "wrap", horizontalAlignment: "space-between", verticalAlignment: "center" },
+                                        this.$render("i-panel", { id: "iconList", class: "icon-list" }),
+                                        this.$render("i-panel", { id: "actionSetting", class: "action-setting hidden" },
+                                            this.$render("i-label", { id: "lbLastUpdated" }),
+                                            this.$render("i-icon", { width: 26, height: 26, class: "rounded-icon", name: "sync-alt", fill: "white", onClick: this.onRefresh }),
+                                            this.$render("i-icon", { width: 26, height: 26, class: "rounded-icon", name: "cog", fill: "white", onClick: this.onSetting })))),
+                                this.$render("i-vstack", { id: "srcChainBox", class: "my-2 w-100" },
+                                    this.$render("i-hstack", { verticalAlignment: "center", horizontalAlignment: "space-between" },
+                                        this.$render("i-label", { class: "text--grey", caption: "Current Network" }),
+                                        this.$render("i-label", { id: "srcChainLabel", caption: "-" })),
+                                    this.$render("i-panel", { id: "srcChainList", visible: false, class: "icon-list", maxWidth: "100%" })),
+                                this.$render("i-range", { id: "fromSlider", class: "custom--slider", width: '100%', min: 0, max: 100, tooltipFormatter: this.tipFormatter, tooltipVisible: true, stepDots: 5, onChanged: index_20.debounce(this.onSliderChange.bind(this), 500, this) }),
+                                this.$render("i-hstack", { class: "my-2", verticalAlignment: "center", horizontalAlignment: "space-between" },
+                                    this.$render("i-label", { caption: "You Buy", font: { size: '1.125rem', color: '#fff' } })),
+                                this.$render("i-panel", { class: "token-box" },
+                                    this.$render("i-vstack", { id: "payContainer", class: "input--token-container" },
+                                        this.$render("i-hstack", { class: "balance-info", horizontalAlignment: "space-between", verticalAlignment: "center", width: "100%" },
+                                            this.$render("i-label", { id: "payBalance", class: "text--grey ml-auto", caption: "Balance: 0" }),
+                                            this.$render("i-button", { id: "maxButton", class: "btn-max", caption: "Max", enabled: false, onClick: () => this.onSetMaxBalance() })),
+                                        this.$render("i-panel", { class: "bg-box", width: "100%" },
+                                            this.$render("i-hstack", { class: "input--token-box", verticalAlignment: "center", horizontalAlignment: "space-between", width: "100%" },
+                                                this.$render("i-vstack", null,
+                                                    this.$render("i-scom-swap-token-selection", { disableSelect: true, id: "firstTokenSelection" })),
+                                                this.$render("i-vstack", { id: "payCol" },
+                                                    this.$render("i-label", { class: "text-value text-right", caption: " - " })))))),
+                                this.$render("i-hstack", { horizontalAlignment: "space-between" },
+                                    this.$render("i-label", { id: 'lbYouPayTitle', caption: "You Pay", font: { size: '1.125rem', color: '#fff' } }),
+                                    this.$render("i-label", { id: 'lbYouPayValue', caption: '0', font: { size: '1.125rem', color: '#fff' } })),
+                                this.$render("i-panel", { class: "toggle-reverse" },
+                                    this.$render("i-image", { id: "toggleReverseImage", width: 32, height: 32, class: "icon-swap rounded-icon", url: assets_5.default.fullPath("img/swap/icon-swap.png"), onClick: this.onRevertSwap.bind(this) })),
+                                this.$render("i-panel", { class: "token-box" },
+                                    this.$render("i-vstack", { id: "receiveContainer", class: "input--token-container" },
+                                        this.$render("i-vstack", { class: "balance-info", width: "100%" },
+                                            this.$render("i-vstack", { width: "100%" },
+                                                this.$render("i-label", { caption: "You Receive", font: { size: '1.125rem', color: '#fff' } })),
+                                            this.$render("i-vstack", { id: "desChainBox", visible: false, class: "my-2 w-100" },
+                                                this.$render("i-hstack", { verticalAlignment: "center", horizontalAlignment: "space-between" },
+                                                    this.$render("i-label", { class: "text--grey", caption: "Selected Destination Chain" }),
+                                                    this.$render("i-label", { id: "desChainLabel", class: "ml-auto", caption: "-" })),
+                                                this.$render("i-panel", { id: "desChainList", class: "icon-list", maxWidth: "100%" })),
+                                            this.$render("i-vstack", { class: "text-right", width: "100%" },
+                                                this.$render("i-label", { id: "receiveBalance", class: "text--grey ml-auto", caption: "Balance: 0" }))),
+                                        this.$render("i-panel", { class: "bg-box", width: "100%" },
+                                            this.$render("i-hstack", { class: "input--token-box", verticalAlignment: "center", horizontalAlignment: "space-between", width: "100%" },
+                                                this.$render("i-vstack", null,
+                                                    this.$render("i-scom-swap-token-selection", { disableSelect: true, id: "secondTokenSelection" })),
+                                                this.$render("i-vstack", { id: "receiveCol" },
+                                                    this.$render("i-label", { class: "text-value text-right", caption: " - " }))),
+                                            this.$render("i-panel", { id: "routingContainer", class: "routing-container" },
+                                                this.$render("i-panel", { id: "listRouting" }),
+                                                this.$render("i-hstack", { horizontalAlignment: 'space-between', verticalAlignment: 'center' },
+                                                    this.$render("i-label", { id: "routeFound", class: "total-routes text--grey", caption: "0 Route(s) Found" }),
+                                                    this.$render("i-panel", { id: "toggleRoutes", class: "toggle-routes hidden", onClick: this.toggleShowRoutes },
+                                                        this.$render("i-label", { id: "showCaption", caption: "Show More" }),
+                                                        this.$render("i-icon", { id: "showIcon", width: 30, height: 30, fill: "#fff", name: "angle-down" })))))))),
+                            this.$render("i-panel", { class: "swap-btn-container", width: "100%" },
+                                this.$render("i-button", { id: "swapBtn", class: "btn-swap btn-os", height: 67, visible: false, rightIcon: { spin: true, visible: false }, onClick: this.onClickSwapButton.bind(this) }))),
+                        this.$render("i-modal", { id: "swapModal", class: "custom-modal", title: "Confirm Swap", closeIcon: { name: 'times' } },
+                            this.$render("i-hstack", { verticalAlignment: 'center', horizontalAlignment: 'start' },
+                                this.$render("i-panel", { id: "srcChainFirstPanel", class: "row-chain" },
+                                    this.$render("i-image", { id: "srcChainTokenImage", width: "30px", height: "30px", url: "#" }),
+                                    this.$render("i-label", { id: "srcChainTokenLabel", class: "token-name", caption: "" }),
+                                    this.$render("i-icon", { name: "minus", fill: '#fff', width: 28, height: 10 })),
+                                this.$render("i-panel", { class: "row-chain" },
+                                    this.$render("i-image", { id: "fromTokenImage", width: "30px", height: "30px", url: "#" }),
+                                    this.$render("i-label", { id: "fromTokenLabel", class: "token-name", caption: "" })),
+                                this.$render("i-label", { id: "fromTokenValue", class: "token-value", caption: " - " })),
+                            this.$render("i-icon", { name: "arrow-down", class: "arrow-down", fill: "#fff", width: 28, height: 28 }),
+                            this.$render("i-hstack", { class: "mb-1", verticalAlignment: 'center', horizontalAlignment: 'start' },
+                                this.$render("i-panel", { id: "targetChainFirstPanel", class: "row-chain" },
+                                    this.$render("i-image", { id: "targetChainTokenImage", width: "30px", height: "30px", url: "#" }),
+                                    this.$render("i-label", { id: "targetChainTokenLabel", class: "token-name", caption: "" }),
+                                    this.$render("i-icon", { name: "minus", fill: '#fff', width: 28, height: 10 })),
+                                this.$render("i-panel", { class: "row-chain" },
+                                    this.$render("i-image", { id: "toTokenImage", width: "30px", height: "30px", url: "#" }),
+                                    this.$render("i-label", { id: "toTokenLabel", class: "token-name", caption: "" })),
+                                this.$render("i-label", { id: "toTokenValue", class: "token-value text-primary bold", caption: " - " })),
+                            this.$render("i-panel", { class: "mb-1" },
+                                this.$render("i-label", { id: "lbEstimate" })),
+                            this.$render("i-panel", { class: "mb-1" },
+                                this.$render("i-label", { id: "lbPayOrReceive" }),
+                                this.$render("i-label", { id: "payOrReceiveValue", class: "text-primary bold", caption: "" }),
+                                this.$render("i-label", { id: "payOrReceiveToken", caption: "" })),
+                            this.$render("i-panel", { id: "priceInfoContainer", class: "bg-box mt-1 mb-1", width: "100%" }),
+                            this.$render("i-label", { id: "lbReminderRejected", class: "flex", margin: { top: 8, bottom: 16 } }),
+                            this.$render("i-panel", { class: "swap-btn-container", width: "100%" },
+                                this.$render("i-button", { id: "swapModalConfirmBtn", class: "btn-swap btn-os", height: "auto", caption: "Confirm Swap", onClick: this.doSwap }))),
+                        this.$render("i-modal", { id: "modalFees", class: "bg-modal custom-modal", title: "Transaction Fee Details", closeIcon: { name: 'times' } },
+                            this.$render("i-panel", { class: "i-modal_content" },
+                                this.$render("i-panel", null,
+                                    this.$render("i-vstack", { id: "feesInfo" }),
+                                    this.$render("i-hstack", { verticalAlignment: "center", horizontalAlignment: "center", margin: { top: 16, bottom: 8 } },
+                                        this.$render("i-button", { caption: "Close", class: "btn-os btn-submit", onClick: () => this.closeModalFees() }))))),
+                        this.$render("i-modal", { id: "networkErrModal", class: "bg-modal custom-modal", title: "Supported Networks", closeIcon: { name: 'times' } },
+                            this.$render("i-panel", { class: "i-modal_content" },
+                                this.$render("i-vstack", { id: "supportedNetworksElm", gap: 10, verticalAlignment: "center" }),
                                 this.$render("i-hstack", { verticalAlignment: "center", horizontalAlignment: "center", margin: { top: 16, bottom: 8 } },
-                                    this.$render("i-button", { caption: "Close", class: "btn-os btn-submit", onClick: () => this.closeModalFees() }))))),
-                    this.$render("i-modal", { id: "networkErrModal", class: "bg-modal custom-modal", title: "Supported Networks", closeIcon: { name: 'times' } },
-                        this.$render("i-panel", { class: "i-modal_content" },
-                            this.$render("i-vstack", { id: "supportedNetworksElm", gap: 10, verticalAlignment: "center" }),
-                            this.$render("i-hstack", { verticalAlignment: "center", horizontalAlignment: "center", margin: { top: 16, bottom: 8 } },
-                                this.$render("i-button", { caption: "Close", width: 150, padding: { top: 4, bottom: 4 }, class: "btn-os btn-submit text-center", onClick: () => this.closeNetworkErrModal() }))))),
-                this.$render("i-scom-swap-config", { id: "configDApp", visible: false }),
-                this.$render("i-scom-wallet-modal", { id: "mdWallet", wallets: [] })));
+                                    this.$render("i-button", { caption: "Close", width: 150, padding: { top: 4, bottom: 4 }, class: "btn-os btn-submit text-center", onClick: () => this.closeNetworkErrModal() }))))),
+                    this.$render("i-scom-swap-config", { id: "configDApp", visible: false }),
+                    this.$render("i-scom-wallet-modal", { id: "mdWallet", wallets: [] }))));
         }
     };
     ScomSwap = __decorate([
