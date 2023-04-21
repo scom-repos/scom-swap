@@ -70,6 +70,7 @@ interface ScomSwapElement extends ControlElement {
   category: Category;
   providers: IProviderUI[];
   tokens?: ITokenObject[];
+  defaultChainId: number;
   networks: INetworkConfig[];
   wallets: IWalletPlugin[];
   showHeader?: boolean;
@@ -91,6 +92,7 @@ export default class ScomSwap extends Module implements PageBlock {
     category: 'fixed-pair',
     providers: [],
     tokens: [],
+    defaultChainId: 0,
     wallets: [],
     networks: []
   };
@@ -98,6 +100,7 @@ export default class ScomSwap extends Module implements PageBlock {
     category: 'fixed-pair',
     providers: [],
     tokens: [],
+    defaultChainId: 0,
     wallets: [],
     networks: []
   };
@@ -229,6 +232,14 @@ export default class ScomSwap extends Module implements PageBlock {
   }
   set tokens(value: ITokenObject[]) {
     this._data.tokens = value;
+  }
+
+  get defaultChainId() {
+    return this._data.defaultChainId;
+  }
+
+  set defaultChainId(value: number) {
+    this._data.defaultChainId = value;
   }
 
   get wallets() {
@@ -923,7 +934,12 @@ export default class ScomSwap extends Module implements PageBlock {
   }
 
   private onSetupPage = async (connected: boolean, _chainId?: number) => {
-    const data: any = { wallets: this.wallets, networks: this.networks, showHeader: this.showHeader }
+    const data: any = { 
+      defaultChainId: this.defaultChainId, 
+      wallets: this.wallets, 
+      networks: this.networks, 
+      showHeader: this.showHeader 
+    }
     if (this.dappContainer?.setData) this.dappContainer.setData(data)
     this.currentChainId = _chainId ? _chainId : getChainId();
     tokenStore.updateTokenMapData();
@@ -2230,12 +2246,13 @@ export default class ScomSwap extends Module implements PageBlock {
     const providers = this.getAttribute('providers', true, []);
     const commissions = this.getAttribute('commissions', true, []);
     const tokens = this.getAttribute('tokens', true, []);
+    const defaultChainId = this.getAttribute('defaultChainId', true);
     const networks = this.getAttribute('networks', true);
     const wallets = this.getAttribute('wallets', true);
     const showHeader = this.getAttribute('showHeader', true);
 
     this.updateContractAddress();
-    await this.setData({category, providers, commissions, tokens, networks, wallets, showHeader});
+    await this.setData({category, providers, commissions, tokens, defaultChainId, networks, wallets, showHeader});
     this.isReadyCallbackQueued = false;
     this.executeReadyCallback();
   }

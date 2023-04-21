@@ -18456,6 +18456,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                 category: 'fixed-pair',
                 providers: [],
                 tokens: [],
+                defaultChainId: 0,
                 wallets: [],
                 networks: []
             };
@@ -18463,6 +18464,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                 category: 'fixed-pair',
                 providers: [],
                 tokens: [],
+                defaultChainId: 0,
                 wallets: [],
                 networks: []
             };
@@ -18533,7 +18535,12 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
             };
             this.onSetupPage = async (connected, _chainId) => {
                 var _a, _b;
-                const data = { wallets: this.wallets, networks: this.networks, showHeader: this.showHeader };
+                const data = {
+                    defaultChainId: this.defaultChainId,
+                    wallets: this.wallets,
+                    networks: this.networks,
+                    showHeader: this.showHeader
+                };
                 if ((_a = this.dappContainer) === null || _a === void 0 ? void 0 : _a.setData)
                     this.dappContainer.setData(data);
                 this.currentChainId = _chainId ? _chainId : index_19.getChainId();
@@ -18917,6 +18924,12 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
         }
         set tokens(value) {
             this._data.tokens = value;
+        }
+        get defaultChainId() {
+            return this._data.defaultChainId;
+        }
+        set defaultChainId(value) {
+            this._data.defaultChainId = value;
         }
         get wallets() {
             var _a;
@@ -20462,11 +20475,12 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
             const providers = this.getAttribute('providers', true, []);
             const commissions = this.getAttribute('commissions', true, []);
             const tokens = this.getAttribute('tokens', true, []);
+            const defaultChainId = this.getAttribute('defaultChainId', true);
             const networks = this.getAttribute('networks', true);
             const wallets = this.getAttribute('wallets', true);
             const showHeader = this.getAttribute('showHeader', true);
             this.updateContractAddress();
-            await this.setData({ category, providers, commissions, tokens, networks, wallets, showHeader });
+            await this.setData({ category, providers, commissions, tokens, defaultChainId, networks, wallets, showHeader });
             this.isReadyCallbackQueued = false;
             this.executeReadyCallback();
         }

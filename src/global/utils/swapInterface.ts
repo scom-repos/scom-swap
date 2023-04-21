@@ -60,6 +60,7 @@ export interface ISwapConfigUI {
   providers: IProviderUI[];
   commissions?: ICommissionInfo[];
   tokens?: ITokenObject[];
+  defaultChainId: number;
   wallets: IWalletPlugin[];
   networks: INetworkConfig[];
   showHeader?: boolean;

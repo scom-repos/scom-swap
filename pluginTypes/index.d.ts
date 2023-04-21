@@ -9746,6 +9746,7 @@ declare module "@scom/scom-swap/global/utils/swapInterface.ts" {
         providers: IProviderUI[];
         commissions?: ICommissionInfo[];
         tokens?: ITokenObject[];
+        defaultChainId: number;
         wallets: IWalletPlugin[];
         networks: INetworkConfig[];
         showHeader?: boolean;
@@ -10905,6 +10906,7 @@ declare module "@scom/scom-swap" {
         category: Category;
         providers: IProviderUI[];
         tokens?: ITokenObject[];
+        defaultChainId: number;
         networks: INetworkConfig[];
         wallets: IWalletPlugin[];
         showHeader?: boolean;
@@ -11013,6 +11015,8 @@ declare module "@scom/scom-swap" {
         set commissions(value: ICommissionInfo[]);
         get tokens(): ITokenObject[];
         set tokens(value: ITokenObject[]);
+        get defaultChainId(): number;
+        set defaultChainId(value: number);
         get wallets(): IWalletPlugin[];
         set wallets(value: IWalletPlugin[]);
         get networks(): INetworkConfig[];
