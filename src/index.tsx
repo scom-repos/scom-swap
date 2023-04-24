@@ -2281,12 +2281,12 @@ export default class ScomSwap extends Module implements PageBlock {
                     </i-panel>
                   </i-hstack>   
                 </i-hstack>           
-                <i-vstack id="srcChainBox" class="my-2 w-100">
+                <i-vstack id="srcChainBox" class="my-2 w-100" visible={false}>
                   <i-hstack verticalAlignment="center" horizontalAlignment="space-between">
                     <i-label class="text--grey" caption="Current Network" />
                     <i-label id="srcChainLabel" caption="-" />
                   </i-hstack>
-                  <i-panel id="srcChainList" visible={false} class="icon-list" maxWidth="100%" />
+                  <i-panel id="srcChainList" class="icon-list" maxWidth="100%" />
                 </i-vstack>
                 <i-range
                   id="fromSlider"

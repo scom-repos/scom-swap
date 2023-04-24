@@ -32,6 +32,7 @@
         "@scom/scom-network-list": "^0.1.0",
         "@scom/scom-token-list": "https://github.com/scom-repos/scom-token-list.git",
         "@scom/scom-wallet-modal": "https://github.com/scom-repos/scom-wallet-modal.git",
-        "@scom/scom-dapp-container": "https://github.com/scom-repos/scom-dapp-container.git"
+        "@scom/scom-dapp-container": "https://github.com/scom-repos/scom-dapp-container.git",
+        "@scom/scom-dex-list": "https://github.com/scom-repos/scom-dex-list"
     }
 }

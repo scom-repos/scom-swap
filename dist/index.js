@@ -15362,7 +15362,7 @@ define("@scom/scom-swap/swap-utils/helper.ts", ["require", "exports"], function 
     exports.debounce = debounce;
     ;
 });
-define("@scom/scom-swap/swap-utils/index.ts", ["require", "exports", "@ijstech/eth-wallet", "@scom/scom-swap/contracts/oswap-openswap-contract/index.ts", "@scom/scom-swap/contracts/scom-commission-proxy-contract/index.ts", "@scom/scom-swap/global/index.ts", "@scom/scom-swap/store/index.ts", "@scom/scom-token-list", "@scom/scom-swap/swap-utils/helper.ts"], function (require, exports, eth_wallet_5, index_5, index_6, index_7, index_8, scom_token_list_3, helper_2) {
+define("@scom/scom-swap/swap-utils/index.ts", ["require", "exports", "@ijstech/eth-wallet", "@scom/scom-swap/contracts/oswap-openswap-contract/index.ts", "@scom/scom-swap/contracts/scom-commission-proxy-contract/index.ts", "@scom/scom-dex-list", "@scom/scom-swap/global/index.ts", "@scom/scom-swap/store/index.ts", "@scom/scom-token-list", "@scom/scom-swap/swap-utils/helper.ts"], function (require, exports, eth_wallet_5, index_5, index_6, scom_dex_list_1, index_7, index_8, scom_token_list_3, helper_2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.setApprovalModalSpenderAddress = exports.getApprovalModelAction = exports.setERC20AllowanceToZero = exports.getRouterAddress = exports.getChainNativeToken = exports.executeSwap = exports.getAllRoutesData = exports.getTradeFeeMap = exports.getExtendedRouteObjData = exports.getCommissionAmount = exports.getCurrentCommissions = void 0;
@@ -16060,7 +16060,6 @@ define("@scom/scom-swap/swap-utils/index.ts", ["require", "exports", "@ijstech/e
             addresses.push(routeTokens[i].address || wrappedTokenAddress);
         }
         let receipt;
-        const router = new index_5.Contracts.OSWAP_Router(wallet, routerAddress);
         const proxyAddress = index_8.getProxyAddress();
         const proxy = new index_6.Contracts.Proxy(wallet, proxyAddress);
         const amount = tokenIn.address ? eth_wallet_5.Utils.toDecimals(amountIn, tokenIn.decimals).dp(0) : eth_wallet_5.Utils.toDecimals(amountIn).dp(0);
@@ -16079,14 +16078,18 @@ define("@scom/scom-swap/swap-utils/index.ts", ["require", "exports", "@ijstech/e
                 to: toAddress,
                 deadline
             };
+            let executeSwapOptions = {
+                params,
+                exactType: 'exactIn',
+                feeOnTransfer,
+                tokenInType: 'ETH',
+                tokenOutType: 'ERC20',
+                txOptions: {
+                    value: amount
+                }
+            };
             if (_commissions.length) {
-                let txData;
-                if (feeOnTransfer) {
-                    txData = await router.swapExactETHForTokensSupportingFeeOnTransferTokens.txData(params, amount);
-                }
-                else {
-                    txData = await router.swapExactETHForTokens.txData(params, amount);
-                }
+                let txData = await scom_dex_list_1.getRouterSwapTxData(wallet.chainId, market, executeSwapOptions);
                 receipt = await proxy.proxyCall({
                     target: routerAddress,
                     tokensIn: [
@@ -16103,12 +16106,7 @@ define("@scom/scom-swap/swap-utils/index.ts", ["require", "exports", "@ijstech/e
                 });
             }
             else {
-                if (feeOnTransfer) {
-                    receipt = await router.swapExactETHForTokensSupportingFeeOnTransferTokens(params, amount);
-                }
-                else {
-                    receipt = await router.swapExactETHForTokens(params, amount);
-                }
+                receipt = await scom_dex_list_1.executeRouterSwap(wallet.chainId, market, executeSwapOptions);
             }
         }
         else {
@@ -16125,24 +16123,15 @@ define("@scom/scom-swap/swap-utils/index.ts", ["require", "exports", "@ijstech/e
                 to: toAddress,
                 deadline
             };
+            let executeSwapOptions = {
+                params,
+                exactType: 'exactIn',
+                feeOnTransfer,
+                tokenInType: 'ERC20',
+                tokenOutType: !tokenOut.address ? 'ETH' : 'ERC20'
+            };
             if (_commissions.length) {
-                let txData;
-                if (!tokenOut.address) {
-                    if (feeOnTransfer) {
-                        txData = await router.swapExactTokensForETHSupportingFeeOnTransferTokens.txData(params);
-                    }
-                    else {
-                        txData = await router.swapExactTokensForETH.txData(params);
-                    }
-                }
-                else {
-                    if (feeOnTransfer) {
-                        txData = await router.swapExactTokensForTokensSupportingFeeOnTransferTokens.txData(params);
-                    }
-                    else {
-                        txData = await router.swapExactTokensForTokens.txData(params);
-                    }
-                }
+                let txData = await scom_dex_list_1.getRouterSwapTxData(wallet.chainId, market, executeSwapOptions);
                 receipt = await proxy.proxyCall({
                     target: routerAddress,
                     tokensIn: [
@@ -16154,22 +16143,7 @@ define("@scom/scom-swap/swap-utils/index.ts", ["require", "exports", "@ijstech/e
                 });
             }
             else {
-                if (!tokenOut.address) {
-                    if (feeOnTransfer) {
-                        receipt = await router.swapExactTokensForETHSupportingFeeOnTransferTokens(params);
-                    }
-                    else {
-                        receipt = await router.swapExactTokensForETH(params);
-                    }
-                }
-                else {
-                    if (feeOnTransfer) {
-                        receipt = await router.swapExactTokensForTokensSupportingFeeOnTransferTokens(params);
-                    }
-                    else {
-                        receipt = await router.swapExactTokensForTokens(params);
-                    }
-                }
+                receipt = await scom_dex_list_1.executeRouterSwap(wallet.chainId, market, executeSwapOptions);
             }
         }
         return receipt;
@@ -16181,7 +16155,6 @@ define("@scom/scom-swap/swap-utils/index.ts", ["require", "exports", "@ijstech/e
         let tokenIn = routeTokens[0];
         let tokenOut = routeTokens[routeTokens.length - 1];
         let routerAddress = getRouterAddress(market);
-        let router = new index_5.Contracts.OSWAP_Router(wallet, routerAddress);
         let addresses = [];
         let wrappedTokenAddress = getWrappedTokenAddress();
         for (let i = 0; i < routeTokens.length; i++) {
@@ -16206,9 +16179,18 @@ define("@scom/scom-swap/swap-utils/index.ts", ["require", "exports", "@ijstech/e
                 to: toAddress,
                 deadline
             };
+            let executeSwapOptions = {
+                params,
+                exactType: 'exactOut',
+                feeOnTransfer: false,
+                tokenInType: 'ETH',
+                tokenOutType: 'ERC20',
+                txOptions: {
+                    value: _amountInMax
+                }
+            };
             if (_commissions.length) {
-                const txData = await router.swapETHForExactTokens.txData(params, _amountInMax);
-                ;
+                let txData = await scom_dex_list_1.getRouterSwapTxData(wallet.chainId, market, executeSwapOptions);
                 receipt = await proxy.proxyCall({
                     target: routerAddress,
                     tokensIn: [
@@ -16225,7 +16207,7 @@ define("@scom/scom-swap/swap-utils/index.ts", ["require", "exports", "@ijstech/e
                 });
             }
             else {
-                receipt = await router.swapETHForExactTokens(params, _amountInMax);
+                receipt = await scom_dex_list_1.executeRouterSwap(wallet.chainId, market, executeSwapOptions);
             }
         }
         else {
@@ -16242,14 +16224,15 @@ define("@scom/scom-swap/swap-utils/index.ts", ["require", "exports", "@ijstech/e
                 to: toAddress,
                 deadline
             };
+            let executeSwapOptions = {
+                params,
+                exactType: 'exactOut',
+                feeOnTransfer: false,
+                tokenInType: 'ERC20',
+                tokenOutType: !tokenOut.address ? 'ETH' : 'ERC20'
+            };
             if (_commissions.length) {
-                let txData;
-                if (!tokenOut.address) {
-                    txData = await router.swapTokensForExactETH.txData(params);
-                }
-                else {
-                    txData = await router.swapTokensForExactTokens.txData(params);
-                }
+                let txData = await scom_dex_list_1.getRouterSwapTxData(wallet.chainId, market, executeSwapOptions);
                 receipt = await proxy.proxyCall({
                     target: routerAddress,
                     tokensIn: [
@@ -16263,12 +16246,7 @@ define("@scom/scom-swap/swap-utils/index.ts", ["require", "exports", "@ijstech/e
                 });
             }
             else {
-                if (!tokenOut.address) {
-                    receipt = await router.swapTokensForExactETH(params);
-                }
-                else {
-                    receipt = await router.swapTokensForExactTokens(params);
-                }
+                receipt = await scom_dex_list_1.executeRouterSwap(wallet.chainId, market, executeSwapOptions);
             }
         }
         return receipt;
@@ -20498,11 +20476,11 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                                             this.$render("i-label", { id: "lbLastUpdated" }),
                                             this.$render("i-icon", { width: 26, height: 26, class: "rounded-icon", name: "sync-alt", fill: "white", onClick: this.onRefresh }),
                                             this.$render("i-icon", { width: 26, height: 26, class: "rounded-icon", name: "cog", fill: "white", onClick: this.onSetting })))),
-                                this.$render("i-vstack", { id: "srcChainBox", class: "my-2 w-100" },
+                                this.$render("i-vstack", { id: "srcChainBox", class: "my-2 w-100", visible: false },
                                     this.$render("i-hstack", { verticalAlignment: "center", horizontalAlignment: "space-between" },
                                         this.$render("i-label", { class: "text--grey", caption: "Current Network" }),
                                         this.$render("i-label", { id: "srcChainLabel", caption: "-" })),
-                                    this.$render("i-panel", { id: "srcChainList", visible: false, class: "icon-list", maxWidth: "100%" })),
+                                    this.$render("i-panel", { id: "srcChainList", class: "icon-list", maxWidth: "100%" })),
                                 this.$render("i-range", { id: "fromSlider", class: "custom--slider", width: '100%', min: 0, max: 100, tooltipFormatter: this.tipFormatter, tooltipVisible: true, stepDots: 5, onChanged: index_20.debounce(this.onSliderChange.bind(this), 500, this) }),
                                 this.$render("i-hstack", { class: "my-2", verticalAlignment: "center", horizontalAlignment: "space-between" },
                                     this.$render("i-label", { caption: "You Buy", font: { size: '1.125rem', color: '#fff' } })),

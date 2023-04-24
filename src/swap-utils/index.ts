@@ -1,6 +1,7 @@
 import { Wallet, BigNumber, Utils, Erc20, TransactionReceipt } from "@ijstech/eth-wallet";
 import { Contracts } from "../contracts/oswap-openswap-contract/index";
 import { Contracts as ProxyContracts } from '../contracts/scom-commission-proxy-contract/index';
+import { executeRouterSwap, getRouterSwapTxData, IExecuteSwapOptions } from '@scom/scom-dex-list';
 
 import {
   getAPI,
@@ -778,7 +779,6 @@ const AmmTradeExactIn = async function (wallet: any, market: string, routeTokens
   }
   let receipt;
 
-  const router = new Contracts.OSWAP_Router(wallet, routerAddress)
   const proxyAddress = getProxyAddress();
   const proxy = new ProxyContracts.Proxy(wallet, proxyAddress);
   const amount = tokenIn.address ? Utils.toDecimals(amountIn, tokenIn.decimals).dp(0) : Utils.toDecimals(amountIn).dp(0);
@@ -797,13 +797,19 @@ const AmmTradeExactIn = async function (wallet: any, market: string, routeTokens
       to: toAddress,
       deadline
     };
-    if (_commissions.length) {
-      let txData: string;
-      if (feeOnTransfer) {
-        txData = await router.swapExactETHForTokensSupportingFeeOnTransferTokens.txData(params, amount);
-      } else {
-        txData = await router.swapExactETHForTokens.txData(params, amount);
+
+    let executeSwapOptions: IExecuteSwapOptions = {
+      params,
+      exactType: 'exactIn',
+      feeOnTransfer,
+      tokenInType: 'ETH',
+      tokenOutType: 'ERC20',
+      txOptions: {
+        value: amount
       }
+    }
+    if (_commissions.length) {
+      let txData = await getRouterSwapTxData(wallet.chainId, market, executeSwapOptions);
       receipt = await proxy.proxyCall({
         target: routerAddress,
         tokensIn: [
@@ -818,12 +824,9 @@ const AmmTradeExactIn = async function (wallet: any, market: string, routeTokens
         to: wallet.address,
         tokensOut: []
       })
-    } else {
-      if (feeOnTransfer) {
-        receipt = await router.swapExactETHForTokensSupportingFeeOnTransferTokens(params, amount);
-      } else {
-        receipt = await router.swapExactETHForTokens(params, amount);
-      }
+    }
+    else {
+      receipt = await executeRouterSwap(wallet.chainId, market, executeSwapOptions);
     }
   } else {
     const tokensIn = {
@@ -839,21 +842,16 @@ const AmmTradeExactIn = async function (wallet: any, market: string, routeTokens
       to: toAddress,
       deadline
     };
+
+    let executeSwapOptions: IExecuteSwapOptions = {
+      params,
+      exactType: 'exactIn',
+      feeOnTransfer,
+      tokenInType: 'ERC20',
+      tokenOutType: !tokenOut.address ? 'ETH' : 'ERC20'
+    }
     if (_commissions.length) {
-      let txData: string;
-      if (!tokenOut.address) {
-        if (feeOnTransfer) {
-          txData = await router.swapExactTokensForETHSupportingFeeOnTransferTokens.txData(params);
-        } else {
-          txData = await router.swapExactTokensForETH.txData(params);
-        }
-      } else {
-        if (feeOnTransfer) {
-          txData = await router.swapExactTokensForTokensSupportingFeeOnTransferTokens.txData(params);
-        } else {
-          txData = await router.swapExactTokensForTokens.txData(params);
-        }
-      }
+      let txData = await getRouterSwapTxData(wallet.chainId, market, executeSwapOptions);
       receipt = await proxy.proxyCall({
         target: routerAddress,
         tokensIn: [
@@ -863,20 +861,9 @@ const AmmTradeExactIn = async function (wallet: any, market: string, routeTokens
         to: wallet.address,
         tokensOut: []
       });
-    } else {
-      if (!tokenOut.address) {
-        if (feeOnTransfer) {
-          receipt = await router.swapExactTokensForETHSupportingFeeOnTransferTokens(params);
-        } else {
-          receipt = await router.swapExactTokensForETH(params);
-        }
-      } else {
-        if (feeOnTransfer) {
-          receipt = await router.swapExactTokensForTokensSupportingFeeOnTransferTokens(params);
-        } else {
-          receipt = await router.swapExactTokensForTokens(params);
-        }
-      }
+    }
+    else {
+      receipt = await executeRouterSwap(wallet.chainId, market, executeSwapOptions);
     }
   }
   return receipt;
@@ -890,8 +877,6 @@ const AmmTradeExactOut = async function (wallet: any, market: string, routeToken
   let tokenOut = routeTokens[routeTokens.length - 1];
 
   let routerAddress = getRouterAddress(market);
-  let router = new Contracts.OSWAP_Router(wallet, routerAddress);
-
   let addresses = [];
   let wrappedTokenAddress = getWrappedTokenAddress();
   for (let i = 0; i < routeTokens.length; i++) {
@@ -916,8 +901,18 @@ const AmmTradeExactOut = async function (wallet: any, market: string, routeToken
       to: toAddress,
       deadline
     };
+    let executeSwapOptions: IExecuteSwapOptions = {
+      params,
+      exactType: 'exactOut',
+      feeOnTransfer: false,
+      tokenInType: 'ETH',
+      tokenOutType: 'ERC20',
+      txOptions: {
+        value: _amountInMax
+      }
+    }
     if (_commissions.length) {
-      const txData = await router.swapETHForExactTokens.txData(params, _amountInMax);;
+      let txData = await getRouterSwapTxData(wallet.chainId, market, executeSwapOptions);
       receipt = await proxy.proxyCall({
         target: routerAddress,
         tokensIn: [
@@ -932,8 +927,9 @@ const AmmTradeExactOut = async function (wallet: any, market: string, routeToken
         to: wallet.address,
         tokensOut: []
       })
-    } else {
-      receipt = await router.swapETHForExactTokens(params, _amountInMax);
+    }
+    else {
+      receipt = await executeRouterSwap(wallet.chainId, market, executeSwapOptions);
     }
   } else {
     const tokensIn = {
@@ -949,13 +945,16 @@ const AmmTradeExactOut = async function (wallet: any, market: string, routeToken
       to: toAddress,
       deadline
     };
+    let executeSwapOptions: IExecuteSwapOptions = {
+      params,
+      exactType: 'exactOut',
+      feeOnTransfer: false,
+      tokenInType: 'ERC20',
+      tokenOutType: !tokenOut.address ? 'ETH' : 'ERC20'
+    }
+
     if (_commissions.length) {
-      let txData: string;
-      if (!tokenOut.address) {
-        txData = await router.swapTokensForExactETH.txData(params);
-      } else {
-        txData = await router.swapTokensForExactTokens.txData(params);
-      }
+      let txData = await getRouterSwapTxData(wallet.chainId, market, executeSwapOptions);
       receipt = await proxy.proxyCall({
         target: routerAddress,
         tokensIn: [
@@ -967,12 +966,9 @@ const AmmTradeExactOut = async function (wallet: any, market: string, routeToken
           tokenOut.address
         ]
       });
-    } else {
-      if (!tokenOut.address) {
-        receipt = await router.swapTokensForExactETH(params);
-      } else {
-        receipt = await router.swapTokensForExactTokens(params);
-      }
+    }
+    else {
+      receipt = await executeRouterSwap(wallet.chainId, market, executeSwapOptions);
     }
   }
   return receipt;
