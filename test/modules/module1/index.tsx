@@ -60,6 +60,7 @@ export default class Module1 extends Module {
               gap='2rem'
             >
               <i-scom-swap
+                defaultChainId={43113}
                 category='aggregator'
                 providers={this._providers}
                 tokens={[

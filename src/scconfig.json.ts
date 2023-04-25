@@ -40,8 +40,6 @@ export default {
   "dependencies": {
     "@ijstech/eth-contract": "*",
     "@scom/oswap-openswap-contract": "*",
-    "@scom/oswap-chainlink-contract": "*",
-    "@scom/oswap-oracle-adaptor-contract": "*",
     "@scom/scom-commission-proxy-contract": "*"
   },
   "infuraId": InfuraId,

@@ -18389,8 +18389,6 @@ define("@scom/scom-swap/scconfig.json.ts", ["require", "exports"], function (req
         "dependencies": {
             "@ijstech/eth-contract": "*",
             "@scom/oswap-openswap-contract": "*",
-            "@scom/oswap-chainlink-contract": "*",
-            "@scom/oswap-oracle-adaptor-contract": "*",
             "@scom/scom-commission-proxy-contract": "*"
         },
         "infuraId": InfuraId,

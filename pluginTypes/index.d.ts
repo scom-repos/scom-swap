@@ -10859,8 +10859,6 @@ declare module "@scom/scom-swap/scconfig.json.ts" {
         dependencies: {
             "@ijstech/eth-contract": string;
             "@scom/oswap-openswap-contract": string;
-            "@scom/oswap-chainlink-contract": string;
-            "@scom/oswap-oracle-adaptor-contract": string;
             "@scom/scom-commission-proxy-contract": string;
         };
         infuraId: string;

@@ -14,25 +14,24 @@
         "serve": "npx @ijstech/cli serve 8080",
         "test": "cd test && npm run test && cd .."
     },
-    "devDependencies": {
-        "@ijstech/cli": "^0.1.28",
-        "@ijstech/compiler": "^0.1.22",
+    "dependencies": {
         "@ijstech/components": "^0.1.39",
-        "@ijstech/eth-contract": "^0.1.13",
         "@ijstech/eth-wallet": "^0.1.52",
-        "@scom/oswap-chainlink-contract": "^0.1.0",
-        "@scom/oswap-openswap-contract": "^0.1.2",
-        "@scom/oswap-oracle-adaptor-contract": "^0.1.0",
-        "@scom/scom-commission-proxy-contract": "^0.1.2",
-        "@types/node": "14.17",
-        "ts-node": "10.1.0",
-        "tsconfig-paths": "3.10.1",
-        "typescript": "4.3.5",
+        "@ijstech/eth-contract": "^0.1.13",
         "@scom/scom-network-picker": "^0.1.1",
         "@scom/scom-network-list": "^0.1.0",
         "@scom/scom-token-list": "https://github.com/scom-repos/scom-token-list.git",
         "@scom/scom-wallet-modal": "https://github.com/scom-repos/scom-wallet-modal.git",
         "@scom/scom-dapp-container": "https://github.com/scom-repos/scom-dapp-container.git",
         "@scom/scom-dex-list": "https://github.com/scom-repos/scom-dex-list"
+    },
+    "devDependencies": {
+        "@ijstech/cli": "^0.1.28",
+        "@ijstech/compiler": "^0.1.22",
+        "@scom/oswap-openswap-contract": "^0.1.2",
+        "@scom/scom-commission-proxy-contract": "^0.1.2",
+        "@types/node": "14.17",
+        "ts-node": "10.1.0",
+        "typescript": "4.3.5"
     }
 }

@@ -1,6 +1,5 @@
 import { Module, Panel, Icon, Button, Label, VStack, Image, Container, Range, IEventBus, application, customModule, Modal, Input, observable, HStack, Control, customElements, ControlElement, IDataSchema } from '@ijstech/components';
 import { BigNumber, Wallet } from '@ijstech/eth-wallet';
-import {} from '@ijstech/eth-contract';
 import Assets from './assets';
 import './index.css';
 import {
