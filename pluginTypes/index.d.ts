@@ -11130,7 +11130,9 @@ declare module "@scom/scom-swap" {
         getData(): Promise<ISwapConfigUI>;
         setData(value: ISwapConfigUI): Promise<void>;
         getTag(): Promise<any>;
+        private updateTag;
         setTag(value: any): Promise<void>;
+        private updateStyle;
         private updateTheme;
         private setProviders;
         updateContractAddress(): void;

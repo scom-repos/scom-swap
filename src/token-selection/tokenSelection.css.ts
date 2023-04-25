@@ -1,4 +1,5 @@
 import { Styles } from '@ijstech/components';
+const Theme = Styles.Theme.ThemeVars;
 
 Styles.cssRule('.token-selection', {
   $nest: {
@@ -63,7 +64,7 @@ Styles.cssRule('.token-selection', {
     '.btn-import': {
       background: 'linear-gradient(90deg, #a8327f 0%, #d4626a 100%)',
       borderRadius: '5px',
-      color: '#fff',
+      color: Theme.text.primary,
       fontSize: '1rem',
       padding: '0.25rem 1.25rem'
     },
@@ -71,7 +72,7 @@ Styles.cssRule('.token-selection', {
       width: '3px',
     },
     '::-webkit-scrollbar-thumb': {
-      background: '#F15E61',
+      background: Theme.colors.primary.main,
       borderRadius: '5px',
     },
     '.ml-auto': {
@@ -109,7 +110,7 @@ Styles.cssRule('.token-selection', {
           $nest: {
             '> i-icon': {
               marginRight: '-7px',
-              fill: '#F15E61',
+              fill: Theme.colors.primary.main,
             }
           }
         },
@@ -119,8 +120,8 @@ Styles.cssRule('.token-selection', {
       marginRight: '0.25rem',
     },
     '#btnToken': {
-      background: '#0C1234',
-      color: '#FFFFFF',
+      background: Theme.background.main,
+      color: Theme.text.primary,
       height: '40px',
       width: '100%',
       padding: '0.5rem 0.75rem',
@@ -135,12 +136,12 @@ Styles.cssRule('.token-selection', {
     '.bg-modal': {
       $nest: {
         '.modal': {
-          background: '#192046',
+          background: Theme.background.modal,
           width: 500,
           maxWidth: '100%',
           padding: '0.75rem 1rem',
           borderRadius: '1rem',
-          color: '#fff',
+          color: '#f15e61',
           marginTop: 40
         },
       }
@@ -154,23 +155,23 @@ Styles.cssRule('.token-selection', {
           marginBottom: '1.5rem',
           paddingBottom: '0.5rem',
           borderBottom: `2px solid #F15E61`,
-          color: '#F15E61',
+          color: Theme.colors.primary.main,
           fontSize: '1.25rem',
           fontWeight: 700,
         },
         '.i-modal_header > span': {
-          color: '#F15E61',
+          color: Theme.colors.primary.main,
         },
-        '.i-modal_header > i-icon': {
-          fill: `#F15E61 !important`
-        },
+        // '.i-modal_header > i-icon': {
+        //   fill: `#F15E61 !important`
+        // },
         '.search': {
           position: 'relative',
           marginBottom: '1.5rem',
           $nest: {
             'i-icon': {
               position: 'absolute',
-              top: 'calc(50% - 4px)',
+              top: 'calc(50% - 8px)',
               left: '1rem',
               transform: 'rotate(90deg)',
               opacity: 0.7
@@ -185,7 +186,7 @@ Styles.cssRule('.token-selection', {
               borderRadius: '0.5rem',
               border: '2px solid #2a3675',
               background: 'transparent',
-              color: '#FFFFFF',
+              color: Theme.text.primary,
               fontSize: 'inherit',
             }
           }
@@ -197,7 +198,7 @@ Styles.cssRule('.token-selection', {
           marginBlock: '0.5rem',
           $nest: {
             'i-label *': {
-              color: '#F15E61',
+              color: Theme.colors.primary.main,
               fontSize: '1rem',
             },
             '.token-section': {
@@ -219,7 +220,7 @@ Styles.cssRule('.token-selection', {
               bottom: '2px',
             },
             '.icon-sorted': {
-              fill: '#F15E61',
+              fill: Theme.colors.primary.main,
             }
           }
         },
@@ -237,7 +238,7 @@ Styles.cssRule('.token-selection', {
               cursor: 'pointer',
               $nest: {
                 '&:hover': {
-                  borderColor: '#F15E61'
+                  borderColor: Theme.colors.primary.main
                 },
                 'i-image': {
                   marginRight: '0.5rem'
@@ -275,7 +276,7 @@ Styles.cssRule('.token-selection', {
                   marginTop: 0
                 },
                 'i-label': {
-                  color: '#FFFFFF'
+                  color: Theme.text.primary
                 }
               }
             },

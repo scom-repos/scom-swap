@@ -13585,6 +13585,7 @@ define("@scom/scom-swap/assets.ts", ["require", "exports", "@ijstech/components"
 define("@scom/scom-swap/index.css.ts", ["require", "exports", "@ijstech/components", "@scom/scom-swap/assets.ts"], function (require, exports, components_3, assets_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
+    const Theme = components_3.Styles.Theme.ThemeVars;
     const colorVar = {
         primaryButton: 'transparent linear-gradient(90deg, #AC1D78 0%, #E04862 100%) 0% 0% no-repeat padding-box',
         primaryGradient: 'linear-gradient(255deg,#f15e61,#b52082)',
@@ -13647,15 +13648,15 @@ define("@scom/scom-swap/index.css.ts", ["require", "exports", "@ijstech/componen
     });
     components_3.Styles.cssRule('.pageblock-swap', {
         $nest: {
-            'i-label': {
-                color: '#fff'
-            },
+            // 'i-label': {
+            //   color: Theme.text.primary
+            // },
             '.btn-register': {
                 padding: '0.75rem',
                 display: 'flex',
                 alignItems: 'center',
                 opacity: 1,
-                color: '#fff',
+                color: Theme.colors.primary.contrastText,
                 $nest: {
                     'i-icon': {
                         marginInline: '0.25rem',
@@ -13676,7 +13677,7 @@ define("@scom/scom-swap/index.css.ts", ["require", "exports", "@ijstech/componen
                 width: '3px',
             },
             '::-webkit-scrollbar-thumb': {
-                background: '#F15E61',
+                background: Theme.colors.primary.main,
                 borderRadius: '5px',
             },
             '*': {
@@ -13759,12 +13760,12 @@ define("@scom/scom-swap/index.css.ts", ["require", "exports", "@ijstech/componen
                 // margin: '0.5rem auto 2rem',
                 marginTop: '0.5rem',
                 marginBottom: '2rem',
-                background: '#192046',
+                background: Theme.background.modal,
                 borderRadius: '1rem',
                 $nest: {
                     'i-label.custom-label *': {
                         fontSize: '1.125rem',
-                        color: '#fff',
+                        // color: Theme.text.primary,
                     }
                 }
             },
@@ -13774,7 +13775,8 @@ define("@scom/scom-swap/index.css.ts", ["require", "exports", "@ijstech/componen
                 marginRight: '-15px',
             },
             'i-label.text--grey *': {
-                color: 'hsla(0,0%,100%,0.55)'
+                color: Theme.text.primary,
+                opacity: 0.55, // 'hsla(0,0%,100%,0.55)'
             },
             '.btn-max': {
                 position: 'relative',
@@ -13784,7 +13786,7 @@ define("@scom/scom-swap/index.css.ts", ["require", "exports", "@ijstech/componen
                 marginLeft: '0.5rem',
                 bottom: '1.5px',
                 background: 'transparent linear-gradient(255deg,#e75b66,#b52082) 0% 0% no-repeat padding-box',
-                color: '#fff'
+                color: Theme.colors.primary.contrastText
             },
             '.custom--slider': {
                 width: '100%',
@@ -13796,12 +13798,12 @@ define("@scom/scom-swap/index.css.ts", ["require", "exports", "@ijstech/componen
                         width: '100% !important'
                     },
                     'input[type="range"]': {
-                        background: '#0c1234',
+                        background: Theme.background.main,
                         backgroundImage: `linear-gradient(#f15e61, #f15e61)`,
                         backgroundSize: '0% 100%',
                     },
                     'input[type="range"]::-webkit-slider-thumb': {
-                        backgroundColor: '#f15e61',
+                        backgroundColor: '#F15E61',
                         border: '2px solid #e83e8c'
                     },
                     'input[type="range"]:focus::-webkit-slider-thumb': {
@@ -13813,7 +13815,7 @@ define("@scom/scom-swap/index.css.ts", ["require", "exports", "@ijstech/componen
                 }
             },
             '.bg-box': {
-                background: '#0c1234',
+                background: Theme.background.main,
                 margin: '0.5rem 0',
                 border: '1px solid transparent',
                 borderRadius: '0.75rem'
@@ -13825,7 +13827,7 @@ define("@scom/scom-swap/index.css.ts", ["require", "exports", "@ijstech/componen
                         height: 'auto !important'
                     },
                     'i-button.custom-btn': {
-                        background: '#192046',
+                        background: Theme.background.modal,
                         padding: '0.5rem',
                         borderRadius: '8px',
                         fontSize: '1rem',
@@ -13834,10 +13836,10 @@ define("@scom/scom-swap/index.css.ts", ["require", "exports", "@ijstech/componen
                         alignSelf: 'center',
                         textAlign: 'center',
                         opacity: 1,
-                        color: '#fff',
+                        color: Theme.text.primary,
                         $nest: {
                             '&:not(.disabled):hover': {
-                                background: '#192046'
+                                background: Theme.background.modal
                             },
                             '&> span': {
                                 verticalAlign: 'middle',
@@ -13847,7 +13849,7 @@ define("@scom/scom-swap/index.css.ts", ["require", "exports", "@ijstech/componen
                                 height: '16px !important',
                                 opacity: 0.5,
                                 marginRight: 'unset',
-                                fill: '#fff'
+                                fill: Theme.text.primary
                             },
                             '&> :not(:last-child)': {
                                 marginRight: '0.5rem'
@@ -13875,7 +13877,7 @@ define("@scom/scom-swap/index.css.ts", ["require", "exports", "@ijstech/componen
                         borderRadius: '0.25rem',
                         border: 'none',
                         background: 'transparent',
-                        color: '#fff',
+                        color: Theme.text.primary,
                         fontSize: '1.25rem',
                         textAlign: 'right'
                     }
@@ -13913,7 +13915,7 @@ define("@scom/scom-swap/index.css.ts", ["require", "exports", "@ijstech/componen
                         fontSize: '1.125rem',
                         padding: '1.25rem 0.75rem',
                         opacity: 1,
-                        color: '#fff'
+                        color: Theme.colors.primary.contrastText
                     }
                 }
             },
@@ -13923,22 +13925,22 @@ define("@scom/scom-swap/index.css.ts", ["require", "exports", "@ijstech/componen
             '#tokenModal': {
                 $nest: {
                     '.modal': {
-                        background: '#192046',
+                        background: Theme.background.modal,
                         width: 492,
                         padding: '0.75rem 1rem',
                         borderRadius: '1rem',
-                        color: '#fff'
+                        // color: Theme.text.primary
                     },
                     '.i-modal_header': {
                         marginBottom: '1.5rem',
                         paddingBottom: '0.5rem',
-                        borderBottom: '2px solid #0c1234',
-                        color: '#F15E61',
+                        borderBottom: `2px soid ${Theme.background.main}`,
+                        color: Theme.colors.primary.main,
                         fontSize: '1.25rem',
                         fontWeight: 700,
                     },
                     '.i-modal_header > i-icon': {
-                        fill: '#f15e61 !important'
+                        fill: `${Theme.colors.primary.main} !important`
                     },
                     '.search': {
                         position: 'relative',
@@ -13977,7 +13979,7 @@ define("@scom/scom-swap/index.css.ts", ["require", "exports", "@ijstech/componen
                                 border: '2px solid transparent',
                                 $nest: {
                                     '&:hover': {
-                                        borderColor: '#e83e8c',
+                                        borderColor: Theme.divider,
                                         transform: 'none'
                                     },
                                     'i-image': {
@@ -14017,7 +14019,9 @@ define("@scom/scom-swap/index.css.ts", ["require", "exports", "@ijstech/componen
                             },
                             '.token-name i-label > *': {
                                 fontSize: '0.75rem',
-                                color: 'rgba(255,255,255,0.55)'
+                                // color: 'rgba(255,255,255,0.55)'
+                                color: Theme.text.primary,
+                                opacity: 0.55
                             }
                         }
                     },
@@ -14029,8 +14033,8 @@ define("@scom/scom-swap/index.css.ts", ["require", "exports", "@ijstech/componen
             },
             '.routing-item': {
                 position: 'relative',
-                color: "#fff",
-                background: "#192046",
+                // color: "#fff",
+                background: Theme.background.modal,
                 border: '2px solid #2a3675',
                 padding: '1.25rem 1rem 1rem',
                 borderRadius: '0.75rem',
@@ -14048,10 +14052,10 @@ define("@scom/scom-swap/index.css.ts", ["require", "exports", "@ijstech/componen
                 }
             },
             '.routing-selected': {
-                borderColor: '#e83e8c'
+                borderColor: Theme.divider
             },
             '.best-price': {
-                color: '#fff',
+                // color: Theme.text.primary,
                 position: 'absolute',
                 top: '-15px',
                 left: '30px',
@@ -14071,7 +14075,7 @@ define("@scom/scom-swap/index.css.ts", ["require", "exports", "@ijstech/componen
                 $nest: {
                     'i-label': {
                         fontSize: '14px',
-                        color: '#fff',
+                        // color: Theme.text.primary,
                         marginRight: '8px'
                     },
                     'i-icon': {
@@ -14084,8 +14088,8 @@ define("@scom/scom-swap/index.css.ts", ["require", "exports", "@ijstech/componen
             },
             '.pnl-routing': {
                 position: 'relative',
-                color: '#fff',
-                background: '#192046',
+                // color: Theme.text.primary,
+                background: Theme.background.modal,
                 border: '2px solid #2a3675',
                 padding: '1.25rem 1rem 1rem',
                 borderRadius: '0.75rem',
@@ -14112,14 +14116,14 @@ define("@scom/scom-swap/index.css.ts", ["require", "exports", "@ijstech/componen
                 }
             },
             '.pnl-routing.routing-selected': {
-                borderColor: '#e83e8c'
+                borderColor: Theme.divider
             },
             '.balanceValue': {
                 textAlign: 'right',
                 display: 'block'
             },
             '.price-percent *': {
-                color: '#f7d063',
+                color: Theme.colors.secondary.main,
                 whiteSpace: 'nowrap',
                 textAlign: 'right'
             },
@@ -14127,10 +14131,10 @@ define("@scom/scom-swap/index.css.ts", ["require", "exports", "@ijstech/componen
                 width: '100%',
             },
             '.text-pink': {
-                color: '#F15E61',
+                color: Theme.colors.primary.main,
                 $nest: {
                     '*': {
-                        color: '#F15E61',
+                        color: Theme.colors.primary.main,
                     },
                 },
             },
@@ -14144,7 +14148,7 @@ define("@scom/scom-swap/index.css.ts", ["require", "exports", "@ijstech/componen
                         opacity: 0.9,
                     },
                     'i-label *': {
-                        color: '#f7d063',
+                        color: Theme.colors.secondary.main,
                         marginLeft: '0.25rem',
                     },
                 },
@@ -14161,7 +14165,7 @@ define("@scom/scom-swap/index.css.ts", ["require", "exports", "@ijstech/componen
                         cursor: 'default',
                     },
                     '&.icon-selected': {
-                        borderColor: '#e83e8c',
+                        borderColor: Theme.divider,
                         cursor: 'default',
                         filter: 'inherit',
                     },
@@ -14180,26 +14184,26 @@ define("@scom/scom-swap/index.css.ts", ["require", "exports", "@ijstech/componen
             '.custom-modal': {
                 $nest: {
                     '.modal': {
-                        background: '#192046',
+                        background: Theme.background.modal,
                         width: 490,
                         maxWidth: '100%',
                         padding: '0.75rem 1rem',
                         borderRadius: '1rem',
-                        color: '#fff'
+                        color: Theme.text.primary
                     },
                     '.i-modal_header': {
                         marginBottom: '1.5rem',
                         paddingBottom: '0.5rem',
-                        borderBottom: '2px solid #0c1234',
-                        color: '#F15E61',
+                        borderBottom: `2px soid ${Theme.background.main}`,
+                        color: Theme.colors.primary.main,
                         fontSize: '1.25rem',
                         fontWeight: 700,
                         $nest: {
                             '&> span': {
-                                color: '#F15E61',
+                                color: Theme.colors.primary.main,
                             },
                             '&> i-icon': {
-                                fill: '#f15e61 !important'
+                                fill: `${Theme.colors.primary.main} !important`
                             },
                             '& ~ i-icon': {
                                 display: 'inline-block',
@@ -14216,26 +14220,26 @@ define("@scom/scom-swap/index.css.ts", ["require", "exports", "@ijstech/componen
             '#registerPairModal': {
                 $nest: {
                     '.modal': {
-                        background: '#192046',
+                        background: Theme.background.modal,
                         width: 420,
                         maxWidth: '100%',
                         padding: '0.75rem 1rem 1.25rem 1rem',
                         borderRadius: '1rem',
-                        color: '#fff'
+                        color: Theme.text.primary
                     },
                     '.i-modal_header': {
                         marginBottom: '1.5rem',
                         paddingBottom: '0.5rem',
-                        borderBottom: '2px solid #0c1234',
-                        color: '#F15E61',
+                        borderBottom: `2px soid ${Theme.background.main}`,
+                        color: Theme.colors.primary.main,
                         fontSize: '1.25rem',
                         fontWeight: 700,
                         $nest: {
                             '&> span': {
-                                color: '#F15E61',
+                                color: Theme.colors.primary.main,
                             },
                             '.i-modal-close': {
-                                fill: '#F15E61 !important',
+                                fill: `${Theme.colors.primary.main} !important`,
                             }
                         }
                     },
@@ -14257,7 +14261,7 @@ define("@scom/scom-swap/index.css.ts", ["require", "exports", "@ijstech/componen
                         marginInline: '0.25rem',
                     },
                     '.text-primary *': {
-                        color: '#F15E61',
+                        color: Theme.colors.primary.main,
                     },
                     '.price-info': {
                         padding: '1rem'
@@ -14334,7 +14338,7 @@ define("@scom/scom-swap/index.css.ts", ["require", "exports", "@ijstech/componen
                     },
                     '.btn-cancel': {
                         background: '#eaecef',
-                        color: '#0c1234',
+                        color: Theme.background.main,
                     },
                     '.btn-submit': {
                         textAlign: 'center',
@@ -14377,7 +14381,7 @@ define("@scom/scom-swap/index.css.ts", ["require", "exports", "@ijstech/componen
             '.btn-os': {
                 background: colorVar.primaryButton,
                 height: 'auto !important',
-                color: '#fff',
+                color: Theme.text.primary,
                 transition: 'background .3s ease',
                 fontSize: '1rem',
                 fontWeight: 'bold',
@@ -16459,6 +16463,7 @@ define("@scom/scom-swap/price-info/index.tsx", ["require", "exports", "@ijstech/
 define("@scom/scom-swap/token-selection/tokenSelection.css.ts", ["require", "exports", "@ijstech/components"], function (require, exports, components_7) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
+    const Theme = components_7.Styles.Theme.ThemeVars;
     components_7.Styles.cssRule('.token-selection', {
         $nest: {
             '#tokenSearch': {
@@ -16522,7 +16527,7 @@ define("@scom/scom-swap/token-selection/tokenSelection.css.ts", ["require", "exp
             '.btn-import': {
                 background: 'linear-gradient(90deg, #a8327f 0%, #d4626a 100%)',
                 borderRadius: '5px',
-                color: '#fff',
+                color: Theme.text.primary,
                 fontSize: '1rem',
                 padding: '0.25rem 1.25rem'
             },
@@ -16530,7 +16535,7 @@ define("@scom/scom-swap/token-selection/tokenSelection.css.ts", ["require", "exp
                 width: '3px',
             },
             '::-webkit-scrollbar-thumb': {
-                background: '#F15E61',
+                background: Theme.colors.primary.main,
                 borderRadius: '5px',
             },
             '.ml-auto': {
@@ -16568,7 +16573,7 @@ define("@scom/scom-swap/token-selection/tokenSelection.css.ts", ["require", "exp
                         $nest: {
                             '> i-icon': {
                                 marginRight: '-7px',
-                                fill: '#F15E61',
+                                fill: Theme.colors.primary.main,
                             }
                         }
                     },
@@ -16578,8 +16583,8 @@ define("@scom/scom-swap/token-selection/tokenSelection.css.ts", ["require", "exp
                 marginRight: '0.25rem',
             },
             '#btnToken': {
-                background: '#0C1234',
-                color: '#FFFFFF',
+                background: Theme.background.main,
+                color: Theme.text.primary,
                 height: '40px',
                 width: '100%',
                 padding: '0.5rem 0.75rem',
@@ -16594,12 +16599,12 @@ define("@scom/scom-swap/token-selection/tokenSelection.css.ts", ["require", "exp
             '.bg-modal': {
                 $nest: {
                     '.modal': {
-                        background: '#192046',
+                        background: Theme.background.modal,
                         width: 500,
                         maxWidth: '100%',
                         padding: '0.75rem 1rem',
                         borderRadius: '1rem',
-                        color: '#fff',
+                        color: '#f15e61',
                         marginTop: 40
                     },
                 }
@@ -16613,23 +16618,23 @@ define("@scom/scom-swap/token-selection/tokenSelection.css.ts", ["require", "exp
                         marginBottom: '1.5rem',
                         paddingBottom: '0.5rem',
                         borderBottom: `2px solid #F15E61`,
-                        color: '#F15E61',
+                        color: Theme.colors.primary.main,
                         fontSize: '1.25rem',
                         fontWeight: 700,
                     },
                     '.i-modal_header > span': {
-                        color: '#F15E61',
+                        color: Theme.colors.primary.main,
                     },
-                    '.i-modal_header > i-icon': {
-                        fill: `#F15E61 !important`
-                    },
+                    // '.i-modal_header > i-icon': {
+                    //   fill: `#F15E61 !important`
+                    // },
                     '.search': {
                         position: 'relative',
                         marginBottom: '1.5rem',
                         $nest: {
                             'i-icon': {
                                 position: 'absolute',
-                                top: 'calc(50% - 4px)',
+                                top: 'calc(50% - 8px)',
                                 left: '1rem',
                                 transform: 'rotate(90deg)',
                                 opacity: 0.7
@@ -16644,7 +16649,7 @@ define("@scom/scom-swap/token-selection/tokenSelection.css.ts", ["require", "exp
                                 borderRadius: '0.5rem',
                                 border: '2px solid #2a3675',
                                 background: 'transparent',
-                                color: '#FFFFFF',
+                                color: Theme.text.primary,
                                 fontSize: 'inherit',
                             }
                         }
@@ -16656,7 +16661,7 @@ define("@scom/scom-swap/token-selection/tokenSelection.css.ts", ["require", "exp
                         marginBlock: '0.5rem',
                         $nest: {
                             'i-label *': {
-                                color: '#F15E61',
+                                color: Theme.colors.primary.main,
                                 fontSize: '1rem',
                             },
                             '.token-section': {
@@ -16678,7 +16683,7 @@ define("@scom/scom-swap/token-selection/tokenSelection.css.ts", ["require", "exp
                                 bottom: '2px',
                             },
                             '.icon-sorted': {
-                                fill: '#F15E61',
+                                fill: Theme.colors.primary.main,
                             }
                         }
                     },
@@ -16696,7 +16701,7 @@ define("@scom/scom-swap/token-selection/tokenSelection.css.ts", ["require", "exp
                                 cursor: 'pointer',
                                 $nest: {
                                     '&:hover': {
-                                        borderColor: '#F15E61'
+                                        borderColor: Theme.colors.primary.main
                                     },
                                     'i-image': {
                                         marginRight: '0.5rem'
@@ -16734,7 +16739,7 @@ define("@scom/scom-swap/token-selection/tokenSelection.css.ts", ["require", "exp
                                         marginTop: 0
                                     },
                                     'i-label': {
-                                        color: '#FFFFFF'
+                                        color: Theme.text.primary
                                     }
                                 }
                             },
@@ -16830,11 +16835,11 @@ define("@scom/scom-swap/token-selection/importToken.tsx", ["require", "exports",
                     this.$render("i-hstack", { horizontalAlignment: "center", margin: { bottom: 5 } },
                         this.$render("i-icon", { name: "exclamation-triangle", margin: { right: 3 }, fill: "#e83e8c", width: 30, height: 30 })),
                     this.$render("i-hstack", { horizontalAlignment: "center", class: "text-center", margin: { bottom: 5 } },
-                        this.$render("i-label", { font: { bold: true, color: "#fff" }, caption: "Trade at your own risk!" })),
+                        this.$render("i-label", { font: { bold: true }, caption: "Trade at your own risk!" })),
                     this.$render("i-hstack", { horizontalAlignment: "center", class: "text-center", margin: { bottom: 5 } },
-                        this.$render("i-label", { font: { color: "#fff" }, caption: "Anyone can create a token, including creating fake versions of existing token that claims tp represent projects" })),
+                        this.$render("i-label", { caption: "Anyone can create a token, including creating fake versions of existing token that claims tp represent projects" })),
                     this.$render("i-hstack", { horizontalAlignment: "center", class: "text-center", margin: { bottom: 5 } },
-                        this.$render("i-label", { width: 300, font: { bold: true, color: "#fff" }, caption: "If you purchased this token, you may not be to able sell it back" })),
+                        this.$render("i-label", { width: 300, font: { bold: true }, caption: "If you purchased this token, you may not be to able sell it back" })),
                     this.$render("i-hstack", { horizontalAlignment: "center", class: "text-center" },
                         this.$render("i-checkbox", { id: "tokenAgreeCheckBox", width: "200", margin: { top: 30 }, height: 30, class: "token-agree-input", background: { color: 'transparent' }, caption: "I understand", onChanged: this.onHandleCheck.bind(this) }))),
                 this.$render("i-button", { id: "importBtn", class: "btn-import", width: "100%", caption: "Import", height: 40, enabled: false, onClick: this.onImportToken.bind(this) })));
@@ -16852,6 +16857,7 @@ define("@scom/scom-swap/token-selection/tokenSelection.tsx", ["require", "export
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.TokenSelection = void 0;
+    const Theme = components_9.Styles.Theme.ThemeVars;
     ;
     let TokenSelection = class TokenSelection extends components_9.Module {
         constructor(parent, options) {
@@ -17103,7 +17109,7 @@ define("@scom/scom-swap/token-selection/tokenSelection.tsx", ["require", "export
                 this.commonTokenPanel.classList.remove('hidden');
                 this.commonTokenDataList.forEach((token) => {
                     const logoAddress = token.address && !this.targetChainId ? index_10.getTokenIcon(token.address) : scom_token_list_6.assets.tokenPath(token, this.chainId);
-                    this.commonTokenList.appendChild(this.$render("i-hstack", { background: { color: '#0c1234' }, onClick: () => this.onSelect(token), tooltip: { content: token.name }, verticalAlignment: "center", class: "grid-item" },
+                    this.commonTokenList.appendChild(this.$render("i-hstack", { background: { color: Theme.background.main }, onClick: () => this.onSelect(token), tooltip: { content: token.name }, verticalAlignment: "center", class: "grid-item" },
                         this.$render("i-image", { width: 24, height: 24, url: logoAddress, fallbackUrl: scom_token_list_6.assets.fallbackUrl }),
                         this.$render("i-label", { caption: token.symbol, onClick: () => this.onSelect(token) })));
                 });
@@ -17124,7 +17130,7 @@ define("@scom/scom-swap/token-selection/tokenSelection.tsx", ["require", "export
                                 this.$render("i-hstack", { class: "token-name", verticalAlignment: "center" },
                                     this.$render("i-label", { caption: token.name, onClick: () => this.onSelect(token) }),
                                     token.address && !token.isNative ?
-                                        this.$render("i-icon", { name: "copy", width: "14px", height: "14px", fill: '#fff', margin: { right: 8 }, tooltip: { content: `${token.symbol} has been copied`, trigger: 'click' }, onClick: () => components_9.application.copyToClipboard(token.address || ''), class: "inline-flex pointer" })
+                                        this.$render("i-icon", { name: "copy", width: "14px", height: "14px", fill: Theme.text.primary, margin: { right: 8 }, tooltip: { content: `${token.symbol} has been copied`, trigger: 'click' }, onClick: () => components_9.application.copyToClipboard(token.address || ''), class: "inline-flex pointer" })
                                         : [],
                                     token.address && this.checkHasMetaMask ?
                                         this.$render("i-image", { width: 16, height: 16, url: assets_3.default.fullPath('img/swap/metamask.png'), tooltip: { content: 'Add to MetaMask' }, onClick: (target, event) => this.addToMetamask(event, token) })
@@ -17156,7 +17162,7 @@ define("@scom/scom-swap/token-selection/tokenSelection.tsx", ["require", "export
                 }
                 catch (err) {
                     this.tokenList.innerHTML = '';
-                    this.tokenList.append(this.$render("i-label", { class: "text-center mt-1 mb-1", font: { color: '#fff' }, caption: "No tokens found" }));
+                    this.tokenList.append(this.$render("i-label", { class: "text-center mt-1 mb-1", font: { color: Theme.text.primary }, caption: "No tokens found" }));
                 }
             }
         }
@@ -17276,11 +17282,11 @@ define("@scom/scom-swap/token-selection/tokenSelection.tsx", ["require", "export
             return (this.$render("i-panel", { class: 'token-selection' },
                 this.$render("i-panel", { class: "flex" },
                     this.$render("i-button", { id: "btnMax", enabled: false, class: "custom-btn hidden", caption: "Max", onClick: () => this.onSetMaxBalance() }),
-                    this.$render("i-button", { id: "btnToken", enabled: false, class: "custom-btn", rightIcon: { name: "caret-down", fill: '#fff' }, caption: "Select a token", onClick: () => this.showModal() })),
+                    this.$render("i-button", { id: "btnToken", enabled: false, class: "custom-btn", rightIcon: { name: "caret-down", fill: Theme.text.primary }, caption: "Select a token", onClick: () => this.showModal() })),
                 this.$render("i-modal", { id: "tokenSelectionModal", class: "bg-modal", title: "Select Token", closeIcon: { name: 'times' }, onClose: () => this.onCloseModal() },
                     this.$render("i-panel", { class: "search" },
-                        this.$render("i-icon", { width: 16, height: 16, name: "search", fill: "white" }),
-                        this.$render("i-input", { id: "tokenSearch", placeholder: "Search name or paste address", width: "100%", onKeyUp: this.filterSearch.bind(this) })),
+                        this.$render("i-icon", { width: 16, height: 16, name: "search", fill: Theme.text.primary }),
+                        this.$render("i-input", { id: "tokenSearch", height: "auto", placeholder: "Search name or paste address", width: "100%", onKeyUp: this.filterSearch.bind(this) })),
                     this.$render("i-panel", { id: "commonTokenPanel", class: "common-token" },
                         this.$render("i-label", { caption: "Common Token" }),
                         this.$render("i-grid-layout", { id: "commonTokenList", columnsPerRow: 4, gap: { row: '1rem', column: '1rem' }, class: "common-list", verticalAlignment: "center" })),
@@ -17316,11 +17322,12 @@ define("@scom/scom-swap/token-selection/index.tsx", ["require", "exports", "@sco
 define("@scom/scom-swap/result/result.css.ts", ["require", "exports", "@ijstech/components"], function (require, exports, components_10) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
+    const Theme = components_10.Styles.Theme.ThemeVars;
     exports.default = components_10.Styles.style({
         textAlign: 'center',
         $nest: {
             'i-label > *': {
-                color: '#fff',
+                // color: Theme.text.primary,
                 fontSize: '.875rem',
                 wordBreak: 'normal'
             },
@@ -17375,7 +17382,7 @@ define("@scom/scom-swap/result/result.css.ts", ["require", "exports", "@ijstech/
                 fontFamily: 'Raleway Bold',
                 fontSize: '1rem',
                 fontWeight: 'bold',
-                color: '#fff'
+                color: Theme.colors.secondary.main
             }
         }
     });
@@ -17571,15 +17578,16 @@ define("@scom/scom-swap/result/index.tsx", ["require", "exports", "@scom/scom-sw
 define("@scom/scom-swap/expert-mode-settings/index.css.ts", ["require", "exports", "@ijstech/components"], function (require, exports, components_12) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
+    const Theme = components_12.Styles.Theme.ThemeVars;
     exports.default = components_12.Styles.style({
         textAlign: 'center',
         $nest: {
-            'i-label': {
-                color: '#fff'
-            },
-            'i-button': {
-                color: '#fff'
-            },
+            // 'i-label': {
+            //   color: Theme.text.primary
+            // },
+            // 'i-button': {
+            //   color: Theme.text.primary
+            // },
             '.modal': {
                 borderRadius: '1rem',
                 padding: '1rem',
@@ -17588,18 +17596,18 @@ define("@scom/scom-swap/expert-mode-settings/index.css.ts", ["require", "exports
             '.i-modal_header': {
                 marginBottom: '1.25rem',
                 paddingBottom: '0.75rem',
-                borderBottom: '2px solid #0c1234',
+                borderBottom: `2px soid ${Theme.background.main}`,
                 $nest: {
                     '&> span': {
                         margin: 'auto',
                         padding: '0 2rem',
-                        color: '#f15e61',
+                        color: Theme.colors.primary.main,
                         fontWeight: 700,
                     }
                 }
             },
             '.i-modal-close': {
-                fill: '#f15e61 !important',
+                fill: `${Theme.colors.primary.main} !important`,
             },
             '.expert-content': {
                 fontWeight: 'bold',
@@ -17612,11 +17620,11 @@ define("@scom/scom-swap/expert-mode-settings/index.css.ts", ["require", "exports
                         borderRadius: '0.5rem',
                     },
                     '.warning-box i-label *': {
-                        color: '#fff',
+                        // color: Theme.text.primary,
                         fontSize: '1rem',
                     },
                     'i-label.warning-text *': {
-                        color: '#f7d063',
+                        color: Theme.colors.secondary.main,
                         fontSize: '1.05rem',
                     },
                     'i-button': {
@@ -17674,14 +17682,15 @@ define("@scom/scom-swap/expert-mode-settings/index.tsx", ["require", "exports", 
 define("@scom/scom-swap/transaction-settings/index.css.ts", ["require", "exports", "@ijstech/components"], function (require, exports, components_14) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
+    const Theme = components_14.Styles.Theme.ThemeVars;
     exports.default = components_14.Styles.style({
         textAlign: 'center',
         $nest: {
             'i-label': {
-                color: '#fff'
+                color: Theme.text.primary
             },
             'i-button': {
-                color: '#fff'
+                color: Theme.text.primary
             },
             '.settings-content i-icon': {
                 marginLeft: '4px'
@@ -17697,14 +17706,14 @@ define("@scom/scom-swap/transaction-settings/index.css.ts", ["require", "exports
                 }
             },
             '.pill-slippage': {
-                background: '#0c1234',
+                background: Theme.background.main,
                 lineHeight: '2.25rem',
                 borderRadius: '0.75rem',
                 border: '2px solid transparent',
                 $nest: {
                     '&:not(.disabled):hover': {
                         borderColor: '#a7a9ac',
-                        background: '#0c1234'
+                        background: Theme.background.main
                     },
                 }
             },
@@ -17726,7 +17735,7 @@ define("@scom/scom-swap/transaction-settings/index.css.ts", ["require", "exports
                 minWidth: '5rem',
                 maxWidth: '5.5rem',
                 width: '100%',
-                background: '#0c1234',
+                background: Theme.background.main,
                 borderRadius: '0.75rem',
                 $nest: {
                     '&> input': {
@@ -17734,7 +17743,7 @@ define("@scom/scom-swap/transaction-settings/index.css.ts", ["require", "exports
                         background: 'transparent',
                         border: '2px solid transparent',
                         borderRadius: '0.75rem',
-                        color: '#fff',
+                        color: Theme.text.primary,
                         textAlign: 'center',
                         padding: 0
                     },
@@ -17776,7 +17785,7 @@ define("@scom/scom-swap/transaction-settings/index.css.ts", ["require", "exports
                         width: '88.625px',
                         height: '40px',
                         borderRadius: '12px',
-                        background: '#0c1234',
+                        background: Theme.background.main,
                         outline: 'none',
                         padding: 0,
                     },
@@ -17796,7 +17805,7 @@ define("@scom/scom-swap/transaction-settings/index.css.ts", ["require", "exports
                         transform: 'translateX(48px)',
                     },
                     '.track': {
-                        color: '#fff',
+                        color: Theme.text.primary,
                         $nest: {
                             "&::before, &::after": {
                                 display: 'flex',
@@ -17806,7 +17815,7 @@ define("@scom/scom-swap/transaction-settings/index.css.ts", ["require", "exports
                                 top: 'auto',
                                 transform: 'none',
                                 fontSize: 'inherit',
-                                color: '#fff',
+                                color: Theme.text.primary,
                                 opacity: '1 !important'
                             },
                             "&::before": {
@@ -17829,17 +17838,17 @@ define("@scom/scom-swap/transaction-settings/index.css.ts", ["require", "exports
             '.i-modal_header': {
                 marginBottom: '1rem',
                 paddingBottom: '0.5rem',
-                borderBottom: '2px solid #0c1234',
+                borderBottom: `2px soid ${Theme.background.main}`,
                 $nest: {
                     '&> span': {
                         paddingRight: '2rem',
-                        color: '#f15e61',
+                        color: Theme.colors.primary.main,
                         fontWeight: 700,
                     }
                 }
             },
             '.i-modal-close': {
-                fill: '#f15e61 !important',
+                fill: `${Theme.colors.primary.main} !important`,
             },
         }
     });
@@ -18423,6 +18432,7 @@ define("@scom/scom-swap/scconfig.json.ts", ["require", "exports"], function (req
 define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstech/eth-wallet", "@scom/scom-swap/assets.ts", "@scom/scom-swap/store/index.ts", "@scom/scom-token-list", "@scom/scom-swap/swap-utils/index.ts", "@scom/scom-swap/global/index.ts", "@scom/scom-swap/price-info/index.tsx", "@scom/scom-swap/result/index.tsx", "@scom/scom-swap/expert-mode-settings/index.tsx", "@scom/scom-swap/transaction-settings/index.tsx", "@scom/scom-swap/scconfig.json.ts", "@scom/scom-swap/index.css.ts"], function (require, exports, components_18, eth_wallet_10, assets_5, index_19, scom_token_list_7, index_20, index_21, index_22, index_23, index_24, index_25, scconfig_json_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
+    const Theme = components_18.Styles.Theme.ThemeVars;
     const priceImpactTooHighMsg = 'Price Impact Too High. If you want to bypass this check, please turn on Expert Mode';
     const defaultInput = '1';
     let ScomSwap = class ScomSwap extends components_18.Module {
@@ -18834,10 +18844,10 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                 this.feesInfo.clearInnerHTML();
                 fees.forEach((fee) => {
                     var _a;
-                    this.feesInfo.appendChild(this.$render("i-hstack", { horizontalAlignment: "space-between", verticalAlignment: "center", margin: { top: 10 }, border: { bottom: { color: '#0c1234', width: '2px', style: 'solid' } }, padding: { bottom: 16 } },
+                    this.feesInfo.appendChild(this.$render("i-hstack", { horizontalAlignment: "space-between", verticalAlignment: "center", margin: { top: 10 }, border: { bottom: { color: Theme.background.main, width: '2px', style: 'solid' } }, padding: { bottom: 16 } },
                         this.$render("i-hstack", { verticalAlignment: "center" },
                             this.$render("i-label", { caption: fee.title, margin: { right: 4 } }),
-                            this.$render("i-icon", { name: "question-circle", width: 15, height: 15, fill: "#fff", tooltip: { content: fee.description }, "data-placement": "right" })),
+                            this.$render("i-icon", { name: "question-circle", width: 15, height: 15, fill: Theme.text.primary, tooltip: { content: fee.description }, "data-placement": "right" })),
                         this.$render("i-label", { class: "ml-auto", caption: `${index_21.formatNumber(fee.value)} ${(_a = this.fromToken) === null || _a === void 0 ? void 0 : _a.symbol}` })));
                 });
                 this.feesInfo.appendChild(this.$render("i-hstack", { horizontalAlignment: "space-between", verticalAlignment: "center", margin: { top: 16 } },
@@ -19003,25 +19013,55 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
             const themeSchema = {
                 type: 'object',
                 properties: {
-                    backgroundColor: {
-                        type: 'string',
-                        format: 'color',
-                        readOnly: true
+                    "dark": {
+                        type: 'object',
+                        properties: {
+                            backgroundColor: {
+                                type: 'string',
+                                format: 'color',
+                                readOnly: true
+                            },
+                            fontColor: {
+                                type: 'string',
+                                format: 'color',
+                                readOnly: true
+                            },
+                            inputBackgroundColor: {
+                                type: 'string',
+                                format: 'color',
+                                readOnly: true
+                            },
+                            inputFontColor: {
+                                type: 'string',
+                                format: 'color',
+                                readOnly: true
+                            }
+                        }
                     },
-                    fontColor: {
-                        type: 'string',
-                        format: 'color',
-                        readOnly: true
-                    },
-                    inputBackgroundColor: {
-                        type: 'string',
-                        format: 'color',
-                        readOnly: true
-                    },
-                    inputFontColor: {
-                        type: 'string',
-                        format: 'color',
-                        readOnly: true
+                    "light": {
+                        type: 'object',
+                        properties: {
+                            backgroundColor: {
+                                type: 'string',
+                                format: 'color',
+                                readOnly: true
+                            },
+                            fontColor: {
+                                type: 'string',
+                                format: 'color',
+                                readOnly: true
+                            },
+                            inputBackgroundColor: {
+                                type: 'string',
+                                format: 'color',
+                                readOnly: true
+                            },
+                            inputFontColor: {
+                                type: 'string',
+                                format: 'color',
+                                readOnly: true
+                            }
+                        }
                     }
                 }
             };
@@ -19102,21 +19142,47 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
             const themeSchema = {
                 type: 'object',
                 properties: {
-                    backgroundColor: {
-                        type: 'string',
-                        format: 'color'
+                    "dark": {
+                        type: 'object',
+                        properties: {
+                            backgroundColor: {
+                                type: 'string',
+                                format: 'color'
+                            },
+                            fontColor: {
+                                type: 'string',
+                                format: 'color'
+                            },
+                            inputBackgroundColor: {
+                                type: 'string',
+                                format: 'color'
+                            },
+                            inputFontColor: {
+                                type: 'string',
+                                format: 'color'
+                            }
+                        }
                     },
-                    fontColor: {
-                        type: 'string',
-                        format: 'color'
-                    },
-                    inputBackgroundColor: {
-                        type: 'string',
-                        format: 'color'
-                    },
-                    inputFontColor: {
-                        type: 'string',
-                        format: 'color'
+                    "light": {
+                        type: 'object',
+                        properties: {
+                            backgroundColor: {
+                                type: 'string',
+                                format: 'color'
+                            },
+                            fontColor: {
+                                type: 'string',
+                                format: 'color'
+                            },
+                            inputBackgroundColor: {
+                                type: 'string',
+                                format: 'color'
+                            },
+                            inputFontColor: {
+                                type: 'string',
+                                format: 'color'
+                            }
+                        }
                     }
                 }
             };
@@ -19246,22 +19312,36 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
         async getTag() {
             return this.tag;
         }
+        updateTag(type, value) {
+            var _a;
+            this.tag[type] = (_a = this.tag[type]) !== null && _a !== void 0 ? _a : {};
+            for (let prop in value) {
+                if (value.hasOwnProperty(prop))
+                    this.tag[type][prop] = value[prop];
+            }
+        }
         async setTag(value) {
-            this.tag = value;
+            const newValue = value || {};
+            if (newValue.light)
+                this.updateTag('light', newValue.light);
+            if (newValue.dark)
+                this.updateTag('dark', newValue.dark);
+            if (this.dappContainer)
+                this.dappContainer.setTag(this.tag);
             this.updateTheme();
         }
+        updateStyle(name, value) {
+            value ?
+                this.style.setProperty(name, value) :
+                this.style.removeProperty(name);
+        }
         updateTheme() {
-            if (this.tag) {
-                const { fontColor, backgroundColor, inputFontColor, inputBackgroundColor } = this.tag;
-                if (fontColor)
-                    this.style.setProperty('--text-primary', fontColor);
-                if (backgroundColor)
-                    this.style.setProperty('--background-main', backgroundColor);
-                if (inputFontColor)
-                    this.style.setProperty('--input-font_color', inputFontColor);
-                if (inputBackgroundColor)
-                    this.style.setProperty('--input-background', inputBackgroundColor);
-            }
+            var _a, _b, _c, _d, _e;
+            const themeVar = ((_a = this.dappContainer) === null || _a === void 0 ? void 0 : _a.theme) || 'light';
+            this.updateStyle('--text-primary', (_b = this.tag[themeVar]) === null || _b === void 0 ? void 0 : _b.fontColor);
+            this.updateStyle('--background-main', (_c = this.tag[themeVar]) === null || _c === void 0 ? void 0 : _c.backgroundColor);
+            this.updateStyle('--input-font_color', (_d = this.tag[themeVar]) === null || _d === void 0 ? void 0 : _d.inputFontColor);
+            this.updateStyle('--input-background', (_e = this.tag[themeVar]) === null || _e === void 0 ? void 0 : _e.inputBackgroundColor);
         }
         setProviders() {
             var _a;
@@ -20462,12 +20542,12 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
         }
         render() {
             return (this.$render("i-scom-dapp-container", { id: "dappContainer" },
-                this.$render("i-panel", { id: "swapComponent", background: { color: '#0c1234' } },
+                this.$render("i-panel", { id: "swapComponent", background: { color: Theme.background.main } },
                     this.$render("i-panel", { class: "pageblock-swap" },
                         this.$render("i-panel", { id: "swapContainer" },
                             this.$render("i-panel", { class: "content-swap" },
-                                this.$render("i-hstack", { horizontalAlignment: "space-between", verticalAlignment: "center", padding: { bottom: '0.5rem' }, border: { bottom: { color: '#fff', width: '1px', style: 'solid' } } },
-                                    this.$render("i-label", { caption: 'Swap', font: { size: '1.3rem', color: '#fff' } }),
+                                this.$render("i-hstack", { horizontalAlignment: "space-between", verticalAlignment: "center", padding: { bottom: '0.5rem' }, border: { bottom: { color: Theme.text.primary, width: '1px', style: 'solid' } } },
+                                    this.$render("i-label", { caption: 'Swap', font: { size: '1.3rem' } }),
                                     this.$render("i-hstack", { wrap: "wrap", horizontalAlignment: "space-between", verticalAlignment: "center" },
                                         this.$render("i-panel", { id: "iconList", class: "icon-list" }),
                                         this.$render("i-panel", { id: "actionSetting", class: "action-setting hidden" },
@@ -20481,7 +20561,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                                     this.$render("i-panel", { id: "srcChainList", class: "icon-list", maxWidth: "100%" })),
                                 this.$render("i-range", { id: "fromSlider", class: "custom--slider", width: '100%', min: 0, max: 100, tooltipFormatter: this.tipFormatter, tooltipVisible: true, stepDots: 5, onChanged: index_20.debounce(this.onSliderChange.bind(this), 500, this) }),
                                 this.$render("i-hstack", { class: "my-2", verticalAlignment: "center", horizontalAlignment: "space-between" },
-                                    this.$render("i-label", { caption: "You Buy", font: { size: '1.125rem', color: '#fff' } })),
+                                    this.$render("i-label", { caption: "You Buy", font: { size: '1.125rem' } })),
                                 this.$render("i-panel", { class: "token-box" },
                                     this.$render("i-vstack", { id: "payContainer", class: "input--token-container" },
                                         this.$render("i-hstack", { class: "balance-info", horizontalAlignment: "space-between", verticalAlignment: "center", width: "100%" },
@@ -20494,15 +20574,15 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                                                 this.$render("i-vstack", { id: "payCol" },
                                                     this.$render("i-label", { class: "text-value text-right", caption: " - " })))))),
                                 this.$render("i-hstack", { horizontalAlignment: "space-between" },
-                                    this.$render("i-label", { id: 'lbYouPayTitle', caption: "You Pay", font: { size: '1.125rem', color: '#fff' } }),
-                                    this.$render("i-label", { id: 'lbYouPayValue', caption: '0', font: { size: '1.125rem', color: '#fff' } })),
+                                    this.$render("i-label", { id: 'lbYouPayTitle', caption: "You Pay", font: { size: '1.125rem' } }),
+                                    this.$render("i-label", { id: 'lbYouPayValue', caption: '0', font: { size: '1.125rem' } })),
                                 this.$render("i-panel", { class: "toggle-reverse" },
                                     this.$render("i-image", { id: "toggleReverseImage", width: 32, height: 32, class: "icon-swap rounded-icon", url: assets_5.default.fullPath("img/swap/icon-swap.png"), onClick: this.onRevertSwap.bind(this) })),
                                 this.$render("i-panel", { class: "token-box" },
                                     this.$render("i-vstack", { id: "receiveContainer", class: "input--token-container" },
                                         this.$render("i-vstack", { class: "balance-info", width: "100%" },
                                             this.$render("i-vstack", { width: "100%" },
-                                                this.$render("i-label", { caption: "You Receive", font: { size: '1.125rem', color: '#fff' } })),
+                                                this.$render("i-label", { caption: "You Receive", font: { size: '1.125rem' } })),
                                             this.$render("i-vstack", { id: "desChainBox", visible: false, class: "my-2 w-100" },
                                                 this.$render("i-hstack", { verticalAlignment: "center", horizontalAlignment: "space-between" },
                                                     this.$render("i-label", { class: "text--grey", caption: "Selected Destination Chain" }),
@@ -20522,7 +20602,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                                                     this.$render("i-label", { id: "routeFound", class: "total-routes text--grey", caption: "0 Route(s) Found" }),
                                                     this.$render("i-panel", { id: "toggleRoutes", class: "toggle-routes hidden", onClick: this.toggleShowRoutes },
                                                         this.$render("i-label", { id: "showCaption", caption: "Show More" }),
-                                                        this.$render("i-icon", { id: "showIcon", width: 30, height: 30, fill: "#fff", name: "angle-down" })))))))),
+                                                        this.$render("i-icon", { id: "showIcon", width: 30, height: 30, fill: Theme.text.primary, name: "angle-down" })))))))),
                             this.$render("i-panel", { class: "swap-btn-container", width: "100%" },
                                 this.$render("i-button", { id: "swapBtn", class: "btn-swap btn-os", height: 67, visible: false, rightIcon: { spin: true, visible: false }, onClick: this.onClickSwapButton.bind(this) }))),
                         this.$render("i-modal", { id: "swapModal", class: "custom-modal", title: "Confirm Swap", closeIcon: { name: 'times' } },
@@ -20530,17 +20610,17 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                                 this.$render("i-panel", { id: "srcChainFirstPanel", class: "row-chain" },
                                     this.$render("i-image", { id: "srcChainTokenImage", width: "30px", height: "30px", url: "#" }),
                                     this.$render("i-label", { id: "srcChainTokenLabel", class: "token-name", caption: "" }),
-                                    this.$render("i-icon", { name: "minus", fill: '#fff', width: 28, height: 10 })),
+                                    this.$render("i-icon", { name: "minus", fill: Theme.text.primary, width: 28, height: 10 })),
                                 this.$render("i-panel", { class: "row-chain" },
                                     this.$render("i-image", { id: "fromTokenImage", width: "30px", height: "30px", url: "#" }),
                                     this.$render("i-label", { id: "fromTokenLabel", class: "token-name", caption: "" })),
                                 this.$render("i-label", { id: "fromTokenValue", class: "token-value", caption: " - " })),
-                            this.$render("i-icon", { name: "arrow-down", class: "arrow-down", fill: "#fff", width: 28, height: 28 }),
+                            this.$render("i-icon", { name: "arrow-down", class: "arrow-down", fill: Theme.text.primary, width: 28, height: 28 }),
                             this.$render("i-hstack", { class: "mb-1", verticalAlignment: 'center', horizontalAlignment: 'start' },
                                 this.$render("i-panel", { id: "targetChainFirstPanel", class: "row-chain" },
                                     this.$render("i-image", { id: "targetChainTokenImage", width: "30px", height: "30px", url: "#" }),
                                     this.$render("i-label", { id: "targetChainTokenLabel", class: "token-name", caption: "" }),
-                                    this.$render("i-icon", { name: "minus", fill: '#fff', width: 28, height: 10 })),
+                                    this.$render("i-icon", { name: "minus", fill: Theme.text.primary, width: 28, height: 10 })),
                                 this.$render("i-panel", { class: "row-chain" },
                                     this.$render("i-image", { id: "toTokenImage", width: "30px", height: "30px", url: "#" }),
                                     this.$render("i-label", { id: "toTokenLabel", class: "token-name", caption: "" })),

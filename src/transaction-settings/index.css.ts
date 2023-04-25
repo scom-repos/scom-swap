@@ -1,13 +1,14 @@
 import { Styles } from '@ijstech/components';
+const Theme = Styles.Theme.ThemeVars;
 
 export default Styles.style({
   textAlign: 'center',
   $nest: {
     'i-label': {
-      color: '#fff'
+      color: Theme.text.primary
     },
     'i-button': {
-      color: '#fff'
+      color: Theme.text.primary
     },
     '.settings-content i-icon': {
       marginLeft: '4px'
@@ -23,14 +24,14 @@ export default Styles.style({
       }
     },
     '.pill-slippage': {
-      background: '#0c1234',
+      background: Theme.background.main,
       lineHeight: '2.25rem',
       borderRadius: '0.75rem',
       border: '2px solid transparent',
       $nest: {
         '&:not(.disabled):hover': {
           borderColor: '#a7a9ac',
-          background: '#0c1234'
+          background: Theme.background.main
         },
       }
     },
@@ -52,7 +53,7 @@ export default Styles.style({
       minWidth: '5rem',
       maxWidth: '5.5rem',
       width: '100%',
-      background: '#0c1234',
+      background: Theme.background.main,
       borderRadius: '0.75rem',
       $nest: {
         '&> input': {
@@ -60,7 +61,7 @@ export default Styles.style({
           background: 'transparent',
           border: '2px solid transparent',
           borderRadius: '0.75rem',
-          color: '#fff',
+          color: Theme.text.primary,
           textAlign: 'center',
           padding: 0
         },
@@ -102,7 +103,7 @@ export default Styles.style({
           width: '88.625px',
           height: '40px',
           borderRadius: '12px',
-          background: '#0c1234',
+          background: Theme.background.main,
           outline: 'none',
           padding: 0,
         },
@@ -122,7 +123,7 @@ export default Styles.style({
           transform: 'translateX(48px)',
         },
         '.track': {
-          color: '#fff',
+          color: Theme.text.primary,
           $nest: {
             "&::before, &::after": {
               display: 'flex',
@@ -132,7 +133,7 @@ export default Styles.style({
               top: 'auto',
               transform: 'none',
               fontSize: 'inherit',
-              color: '#fff',
+              color: Theme.text.primary,
               opacity: '1 !important'
             },
             "&::before": {
@@ -155,17 +156,17 @@ export default Styles.style({
     '.i-modal_header': {
       marginBottom: '1rem',
       paddingBottom: '0.5rem',
-      borderBottom: '2px solid #0c1234',
+      borderBottom: `2px soid ${Theme.background.main}`,
       $nest: {
         '&> span': {
           paddingRight: '2rem',
-          color: '#f15e61',
+          color: Theme.colors.primary.main,
           fontWeight: 700,
         }
       }
     },
     '.i-modal-close': {
-      fill: '#f15e61 !important',
+      fill: `${Theme.colors.primary.main} !important`,
     },
   }
 })

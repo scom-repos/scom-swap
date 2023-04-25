@@ -3,10 +3,10 @@ import { Styles } from "@ijstech/components";
 export const configStyle = Styles.style({
   $nest: {
     'i-label': {
-      color: '#fff'
+      color: Theme.text.primary
     },
     'i-button': {
-      color: '#fff',
+      color: Theme.text.primary,
       background: 'transparent linear-gradient(90deg, #AC1D78 0%, #E04862 100%) 0% 0% no-repeat padding-box'
     }
   }

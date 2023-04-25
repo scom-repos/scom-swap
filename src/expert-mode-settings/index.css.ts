@@ -1,14 +1,15 @@
 import { Styles } from '@ijstech/components';
+const Theme = Styles.Theme.ThemeVars;
 
 export default Styles.style({
   textAlign: 'center',
   $nest: {
-    'i-label': {
-      color: '#fff'
-    },
-    'i-button': {
-      color: '#fff'
-    },
+    // 'i-label': {
+    //   color: Theme.text.primary
+    // },
+    // 'i-button': {
+    //   color: Theme.text.primary
+    // },
     '.modal': {
       borderRadius: '1rem',
       padding: '1rem',
@@ -17,18 +18,18 @@ export default Styles.style({
     '.i-modal_header': {
       marginBottom: '1.25rem',
       paddingBottom: '0.75rem',
-      borderBottom: '2px solid #0c1234',
+      borderBottom: `2px soid ${Theme.background.main}`,
       $nest: {
         '&> span': {
           margin: 'auto',
           padding: '0 2rem',
-          color: '#f15e61',
+          color: Theme.colors.primary.main,
           fontWeight: 700,
         }
       }
     },
     '.i-modal-close': {
-      fill: '#f15e61 !important',
+      fill: `${Theme.colors.primary.main} !important`,
     },
     '.expert-content': {
       fontWeight: 'bold',
@@ -41,11 +42,11 @@ export default Styles.style({
           borderRadius: '0.5rem',
         },
         '.warning-box i-label *': {
-          color: '#fff',
+          // color: Theme.text.primary,
           fontSize: '1rem',
         },
         'i-label.warning-text *': {
-          color: '#f7d063',
+          color: Theme.colors.secondary.main,
           fontSize: '1.05rem',
         },
         'i-button': {

@@ -1,10 +1,11 @@
 import { Styles } from '@ijstech/components';
+const Theme = Styles.Theme.ThemeVars;
 
 export default Styles.style({
   textAlign: 'center',
   $nest: {
     'i-label > *': {
-      color: '#fff',
+      // color: Theme.text.primary,
       fontSize: '.875rem',
       wordBreak: 'normal'
     },
@@ -59,7 +60,7 @@ export default Styles.style({
       fontFamily: 'Raleway Bold',
       fontSize: '1rem',
       fontWeight: 'bold',
-      color: '#fff'
+      color: Theme.colors.secondary.main
     }
   }
 })

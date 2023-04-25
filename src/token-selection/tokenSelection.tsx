@@ -18,6 +18,8 @@ import './tokenSelection.css';
 import { ImportToken } from './importToken';
 import { Wallet } from '@ijstech/eth-wallet';
 
+const Theme = Styles.Theme.ThemeVars;
+
 interface TokenSelectionElement extends ControlElement{
   disableSelect?: boolean,
   disabledMaxBtn?: boolean
@@ -320,7 +322,7 @@ export class TokenSelection extends Module {
 
         this.commonTokenList.appendChild(
           <i-hstack
-            background={{ color: '#0c1234' }}
+            background={{ color: Theme.background.main }}
             onClick={() => this.onSelect(token)}
             tooltip={{ content: token.name }}
             verticalAlignment="center"
@@ -358,7 +360,7 @@ export class TokenSelection extends Module {
                       name="copy"
                       width="14px"
                       height="14px"
-                      fill={'#fff'}
+                      fill={Theme.text.primary}
                       margin={{ right: 8 }}
                       tooltip={{ content: `${token.symbol} has been copied`, trigger: 'click' }}
                       onClick={() => application.copyToClipboard(token.address || '')}
@@ -435,7 +437,7 @@ export class TokenSelection extends Module {
       } catch (err) {
         this.tokenList.innerHTML = '';
         this.tokenList.append(
-          <i-label class="text-center mt-1 mb-1" font={{ color: '#fff' }} caption="No tokens found" />
+          <i-label class="text-center mt-1 mb-1" font={{ color: Theme.text.primary }} caption="No tokens found" />
         )
       }
     }
@@ -564,12 +566,12 @@ export class TokenSelection extends Module {
       <i-panel class='token-selection'>
         <i-panel class="flex">
           <i-button id="btnMax" enabled={false} class="custom-btn hidden" caption="Max" onClick={() => this.onSetMaxBalance()} />
-          <i-button id="btnToken" enabled={false} class="custom-btn" rightIcon={{ name: "caret-down", fill: '#fff' }} caption="Select a token" onClick={() => this.showModal()} />
+          <i-button id="btnToken" enabled={false} class="custom-btn" rightIcon={{ name: "caret-down", fill: Theme.text.primary }} caption="Select a token" onClick={() => this.showModal()} />
         </i-panel>
         <i-modal id="tokenSelectionModal" class="bg-modal" title="Select Token" closeIcon={{ name: 'times' }} onClose={() => this.onCloseModal()}>
           <i-panel class="search">
-            <i-icon width={16} height={16} name="search" fill="white" />
-            <i-input id="tokenSearch" placeholder="Search name or paste address" width="100%" onKeyUp={this.filterSearch.bind(this)}></i-input>
+            <i-icon width={16} height={16} name="search" fill={Theme.text.primary} />
+            <i-input id="tokenSearch" height="auto" placeholder="Search name or paste address" width="100%" onKeyUp={this.filterSearch.bind(this)}></i-input>
           </i-panel>
           <i-panel id="commonTokenPanel" class="common-token">
             <i-label caption="Common Token" />

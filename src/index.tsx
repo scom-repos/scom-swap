@@ -1,4 +1,4 @@
-import { Module, Panel, Icon, Button, Label, VStack, Image, Container, Range, IEventBus, application, customModule, Modal, Input, observable, HStack, Control, customElements, ControlElement, IDataSchema } from '@ijstech/components';
+import { Module, Panel, Icon, Button, Label, VStack, Image, Container, Range, IEventBus, application, customModule, Modal, Input, observable, HStack, Control, customElements, ControlElement, IDataSchema, Styles } from '@ijstech/components';
 import { BigNumber, Wallet } from '@ijstech/eth-wallet';
 import Assets from './assets';
 import './index.css';
@@ -61,6 +61,8 @@ import scconfig from './scconfig.json';
 import ScomWalletModal, {IWalletPlugin} from '@scom/scom-wallet-modal';
 import ScomDappContainer from '@scom/scom-dapp-container'
 
+
+const Theme = Styles.Theme.ThemeVars;
 const priceImpactTooHighMsg = 'Price Impact Too High. If you want to bypass this check, please turn on Expert Mode';
 const defaultInput = '1';
 type StatusMapType = 'approve' | 'swap';
@@ -338,25 +340,55 @@ export default class ScomSwap extends Module implements PageBlock {
     const themeSchema: IDataSchema = {
       type: 'object',
       properties: {
-        backgroundColor: {
-          type: 'string',
-          format: 'color',
-          readOnly: true
+        "dark": {
+          type: 'object',
+          properties: {
+            backgroundColor: {
+              type: 'string',
+              format: 'color',
+              readOnly: true
+            },
+            fontColor: {
+              type: 'string',
+              format: 'color',
+              readOnly: true
+            },
+            inputBackgroundColor: {
+              type: 'string',
+              format: 'color',
+              readOnly: true
+            },
+            inputFontColor: {
+              type: 'string',
+              format: 'color',
+              readOnly: true
+            }
+          }
         },
-        fontColor: {
-          type: 'string',
-          format: 'color',
-          readOnly: true
-        },
-        inputBackgroundColor: {
-          type: 'string',
-          format: 'color',
-          readOnly: true
-        },
-        inputFontColor: {
-          type: 'string',
-          format: 'color',
-          readOnly: true
+        "light": {
+          type: 'object',
+          properties: {
+            backgroundColor: {
+              type: 'string',
+              format: 'color',
+              readOnly: true
+            },
+            fontColor: {
+              type: 'string',
+              format: 'color',
+              readOnly: true
+            },
+            inputBackgroundColor: {
+              type: 'string',
+              format: 'color',
+              readOnly: true
+            },
+            inputFontColor: {
+              type: 'string',
+              format: 'color',
+              readOnly: true
+            }
+          }
         }
       }
     }
@@ -440,21 +472,47 @@ export default class ScomSwap extends Module implements PageBlock {
     const themeSchema: IDataSchema = {
       type: 'object',
       properties: {
-        backgroundColor: {
-          type: 'string',
-          format: 'color'
+        "dark": {
+          type: 'object',
+          properties: {
+            backgroundColor: {
+              type: 'string',
+              format: 'color'
+            },
+            fontColor: {
+              type: 'string',
+              format: 'color'
+            },
+            inputBackgroundColor: {
+              type: 'string',
+              format: 'color'
+            },
+            inputFontColor: {
+              type: 'string',
+              format: 'color'
+            }
+          }
         },
-        fontColor: {
-          type: 'string',
-          format: 'color'
-        },
-        inputBackgroundColor: {
-          type: 'string',
-          format: 'color'
-        },
-        inputFontColor: {
-          type: 'string',
-          format: 'color'
+        "light": {
+          type: 'object',
+          properties: {
+            backgroundColor: {
+              type: 'string',
+              format: 'color'
+            },
+            fontColor: {
+              type: 'string',
+              format: 'color'
+            },
+            inputBackgroundColor: {
+              type: 'string',
+              format: 'color'
+            },
+            inputFontColor: {
+              type: 'string',
+              format: 'color'
+            }
+          }
         }
       }
     }
@@ -594,23 +652,35 @@ export default class ScomSwap extends Module implements PageBlock {
     return this.tag;
   }
 
+  private updateTag(type: 'light'|'dark', value: any) {
+    this.tag[type] = this.tag[type] ?? {};
+    for (let prop in value) {
+      if (value.hasOwnProperty(prop))
+        this.tag[type][prop] = value[prop];
+    }
+  }
+
   async setTag(value: any) {
-    this.tag = value;
+    const newValue = value || {};
+    if (newValue.light) this.updateTag('light', newValue.light);
+    if (newValue.dark) this.updateTag('dark', newValue.dark);
+    if (this.dappContainer)
+      this.dappContainer.setTag(this.tag);
     this.updateTheme();
   }
 
+  private updateStyle(name: string, value: any) {
+    value ?
+      this.style.setProperty(name, value) :
+      this.style.removeProperty(name);
+  }
+
   private updateTheme() {
-    if (this.tag) {
-      const { fontColor, backgroundColor, inputFontColor, inputBackgroundColor } = this.tag;
-      if (fontColor)
-        this.style.setProperty('--text-primary', fontColor);
-      if (backgroundColor)
-        this.style.setProperty('--background-main', backgroundColor);
-      if (inputFontColor)
-        this.style.setProperty('--input-font_color', inputFontColor);
-      if (inputBackgroundColor)
-        this.style.setProperty('--input-background', inputBackgroundColor);
-    }
+    const themeVar = this.dappContainer?.theme || 'light';
+    this.updateStyle('--text-primary', this.tag[themeVar]?.fontColor);
+    this.updateStyle('--background-main', this.tag[themeVar]?.backgroundColor);
+    this.updateStyle('--input-font_color', this.tag[themeVar]?.inputFontColor);
+    this.updateStyle('--input-background', this.tag[themeVar]?.inputBackgroundColor);
   }
 
   private setProviders() {
@@ -2143,7 +2213,7 @@ export default class ScomSwap extends Module implements PageBlock {
       this.feesInfo.appendChild(
         <i-hstack
           horizontalAlignment="space-between" verticalAlignment="center" margin={{ top: 10 }}
-          border={{ bottom: { color: '#0c1234', width: '2px', style: 'solid' } }}
+          border={{ bottom: { color: Theme.background.main, width: '2px', style: 'solid' } }}
           padding={{ bottom: 16 }}
         >
           <i-hstack verticalAlignment="center">
@@ -2152,7 +2222,7 @@ export default class ScomSwap extends Module implements PageBlock {
               name="question-circle"
               width={15}
               height={15}
-              fill="#fff"
+              fill={Theme.text.primary}
               tooltip={{ content: fee.description }}
               data-placement="right"
             />
@@ -2259,7 +2329,7 @@ export default class ScomSwap extends Module implements PageBlock {
   render() {
     return (
       <i-scom-dapp-container id="dappContainer">
-        <i-panel id="swapComponent" background={{ color: '#0c1234' }}>
+        <i-panel id="swapComponent" background={{ color: Theme.background.main }}>
           <i-panel class="pageblock-swap">
             <i-panel id="swapContainer">
               <i-panel class="content-swap">
@@ -2267,9 +2337,9 @@ export default class ScomSwap extends Module implements PageBlock {
                   horizontalAlignment="space-between" 
                   verticalAlignment="center" 
                   padding={{bottom: '0.5rem'}} 
-                  border={{bottom: {color: '#fff', width: '1px', style: 'solid'}}}
+                  border={{bottom: {color: Theme.text.primary, width: '1px', style: 'solid'}}}
                 >
-                  <i-label caption='Swap' font={{ size: '1.3rem', color: '#fff' }}></i-label>
+                  <i-label caption='Swap' font={{ size: '1.3rem' }}></i-label>
                   <i-hstack wrap="wrap" horizontalAlignment="space-between" verticalAlignment="center">
                     <i-panel id="iconList" class="icon-list">
                     </i-panel>
@@ -2299,7 +2369,7 @@ export default class ScomSwap extends Module implements PageBlock {
                   onChanged={debounce(this.onSliderChange.bind(this), 500, this)}
                 />
                 <i-hstack class="my-2" verticalAlignment="center" horizontalAlignment="space-between">
-                  <i-label caption="You Buy" font={{ size: '1.125rem', color: '#fff' }}></i-label>
+                  <i-label caption="You Buy" font={{ size: '1.125rem' }}></i-label>
                 </i-hstack>             
                 <i-panel class="token-box">
                   <i-vstack id="payContainer" class="input--token-container" >
@@ -2320,8 +2390,8 @@ export default class ScomSwap extends Module implements PageBlock {
                   </i-vstack>
                 </i-panel>
                 <i-hstack horizontalAlignment="space-between">
-                  <i-label id='lbYouPayTitle' caption="You Pay" font={{ size: '1.125rem', color: '#fff' }}></i-label>
-                  <i-label id='lbYouPayValue' caption='0' font={{ size: '1.125rem', color: '#fff' }}></i-label>
+                  <i-label id='lbYouPayTitle' caption="You Pay" font={{ size: '1.125rem' }}></i-label>
+                  <i-label id='lbYouPayValue' caption='0' font={{ size: '1.125rem' }}></i-label>
                 </i-hstack>
                 <i-panel class="toggle-reverse">
                   <i-image id="toggleReverseImage" width={32} height={32} class="icon-swap rounded-icon" url={Assets.fullPath("img/swap/icon-swap.png")} onClick={this.onRevertSwap.bind(this)} />
@@ -2330,7 +2400,7 @@ export default class ScomSwap extends Module implements PageBlock {
                   <i-vstack id="receiveContainer" class="input--token-container" >
                     <i-vstack class="balance-info" width="100%">
                       <i-vstack width="100%">
-                        <i-label caption="You Receive" font={{ size: '1.125rem', color: '#fff' }}></i-label>
+                        <i-label caption="You Receive" font={{ size: '1.125rem' }}></i-label>
                       </i-vstack>
                       <i-vstack id="desChainBox" visible={false} class="my-2 w-100">
                         <i-hstack verticalAlignment="center" horizontalAlignment="space-between">
@@ -2358,7 +2428,7 @@ export default class ScomSwap extends Module implements PageBlock {
                           <i-label id="routeFound" class="total-routes text--grey" caption="0 Route(s) Found"></i-label>
                           <i-panel id="toggleRoutes" class="toggle-routes hidden" onClick={this.toggleShowRoutes}>
                             <i-label id="showCaption" caption="Show More"></i-label>
-                            <i-icon id="showIcon" width={30} height={30} fill="#fff" name="angle-down"></i-icon>
+                            <i-icon id="showIcon" width={30} height={30} fill={Theme.text.primary} name="angle-down"></i-icon>
                           </i-panel>
                         </i-hstack>
                       </i-panel>
@@ -2380,7 +2450,7 @@ export default class ScomSwap extends Module implements PageBlock {
                 <i-panel id="srcChainFirstPanel" class="row-chain">
                   <i-image id="srcChainTokenImage" width="30px" height="30px" url="#" />
                   <i-label id="srcChainTokenLabel" class="token-name" caption="" />
-                  <i-icon name="minus" fill='#fff' width={28} height={10} />
+                  <i-icon name="minus" fill={Theme.text.primary} width={28} height={10} />
                 </i-panel>
                 <i-panel class="row-chain">
                   <i-image id="fromTokenImage" width="30px" height="30px" url="#" />
@@ -2388,12 +2458,12 @@ export default class ScomSwap extends Module implements PageBlock {
                 </i-panel>
                 <i-label id="fromTokenValue" class="token-value" caption=" - "></i-label>
               </i-hstack>
-              <i-icon name="arrow-down" class="arrow-down" fill="#fff" width={28} height={28} />
+              <i-icon name="arrow-down" class="arrow-down" fill={Theme.text.primary} width={28} height={28} />
               <i-hstack class="mb-1" verticalAlignment='center' horizontalAlignment='start'>
                 <i-panel id="targetChainFirstPanel" class="row-chain">
                   <i-image id="targetChainTokenImage" width="30px" height="30px" url="#" />
                   <i-label id="targetChainTokenLabel" class="token-name" caption="" />
-                  <i-icon name="minus" fill='#fff' width={28} height={10} />
+                  <i-icon name="minus" fill={Theme.text.primary} width={28} height={10} />
                 </i-panel>
                 <i-panel class="row-chain">
                   <i-image id="toTokenImage" width="30px" height="30px" url="#" />

@@ -1,5 +1,6 @@
 import { Styles } from '@ijstech/components';
 import Assets from './assets';
+const Theme = Styles.Theme.ThemeVars;
 
 const colorVar = {
   primaryButton: 'transparent linear-gradient(90deg, #AC1D78 0%, #E04862 100%) 0% 0% no-repeat padding-box',
@@ -74,15 +75,15 @@ Styles.fontFace({
 
 Styles.cssRule('.pageblock-swap', {
   $nest: {
-    'i-label': {
-      color: '#fff'
-    },
+    // 'i-label': {
+    //   color: Theme.text.primary
+    // },
     '.btn-register': {
       padding: '0.75rem',
       display: 'flex',
       alignItems: 'center',
       opacity: 1,
-      color: '#fff',
+      color: Theme.colors.primary.contrastText,
       $nest: {
         'i-icon': {
           marginInline: '0.25rem',
@@ -104,7 +105,7 @@ Styles.cssRule('.pageblock-swap', {
 
     },
     '::-webkit-scrollbar-thumb': {
-      background: '#F15E61',
+      background: Theme.colors.primary.main,
       borderRadius: '5px',
     },
     '*': {
@@ -187,12 +188,12 @@ Styles.cssRule('.pageblock-swap', {
       // margin: '0.5rem auto 2rem',
       marginTop: '0.5rem',
       marginBottom: '2rem',
-      background: '#192046',
+      background: Theme.background.modal,
       borderRadius: '1rem',
       $nest: {
         'i-label.custom-label *': {
           fontSize: '1.125rem',
-          color: '#fff',
+          // color: Theme.text.primary,
         }
       }
     },
@@ -202,7 +203,8 @@ Styles.cssRule('.pageblock-swap', {
       marginRight: '-15px',
     },
     'i-label.text--grey *': {
-      color: 'hsla(0,0%,100%,0.55)'
+      color: Theme.text.primary,
+      opacity: 0.55, // 'hsla(0,0%,100%,0.55)'
     },
     '.btn-max': {
       position: 'relative',
@@ -212,7 +214,7 @@ Styles.cssRule('.pageblock-swap', {
       marginLeft: '0.5rem',
       bottom: '1.5px',
       background: 'transparent linear-gradient(255deg,#e75b66,#b52082) 0% 0% no-repeat padding-box',
-      color: '#fff'
+      color: Theme.colors.primary.contrastText
     },
     '.custom--slider': {
       width: '100%',
@@ -224,12 +226,12 @@ Styles.cssRule('.pageblock-swap', {
           width: '100% !important'
         },
         'input[type="range"]': {
-          background: '#0c1234',
+          background: Theme.background.main,
           backgroundImage: `linear-gradient(#f15e61, #f15e61)`,
           backgroundSize: '0% 100%',
         },
         'input[type="range"]::-webkit-slider-thumb': {
-          backgroundColor: '#f15e61',
+          backgroundColor: '#F15E61',
           border: '2px solid #e83e8c'
         },
         'input[type="range"]:focus::-webkit-slider-thumb': {
@@ -241,7 +243,7 @@ Styles.cssRule('.pageblock-swap', {
       }
     },
     '.bg-box': {
-      background: '#0c1234',
+      background: Theme.background.main,
       margin: '0.5rem 0',
       border: '1px solid transparent',
       borderRadius: '0.75rem'
@@ -253,7 +255,7 @@ Styles.cssRule('.pageblock-swap', {
           height: 'auto !important'
         },
         'i-button.custom-btn': {
-          background: '#192046',
+          background: Theme.background.modal,
           padding: '0.5rem',
           borderRadius: '8px',
           fontSize: '1rem',
@@ -262,10 +264,10 @@ Styles.cssRule('.pageblock-swap', {
           alignSelf: 'center',
           textAlign: 'center',
           opacity: 1,
-          color: '#fff',
+          color: Theme.text.primary,
           $nest: {
             '&:not(.disabled):hover': {
-              background: '#192046'
+              background: Theme.background.modal
             },
             '&> span': {
               verticalAlign: 'middle',
@@ -275,7 +277,7 @@ Styles.cssRule('.pageblock-swap', {
               height: '16px !important',
               opacity: 0.5,
               marginRight: 'unset',
-              fill: '#fff'
+              fill: Theme.text.primary
             },
             '&> :not(:last-child)': {
               marginRight: '0.5rem'
@@ -303,7 +305,7 @@ Styles.cssRule('.pageblock-swap', {
           borderRadius: '0.25rem',
           border: 'none',
           background: 'transparent',
-          color: '#fff',
+          color: Theme.text.primary,
           fontSize: '1.25rem',
           textAlign: 'right'
         }
@@ -341,7 +343,7 @@ Styles.cssRule('.pageblock-swap', {
           fontSize: '1.125rem',
           padding: '1.25rem 0.75rem',
           opacity: 1,
-          color: '#fff'
+          color: Theme.colors.primary.contrastText
         }
       }
     },
@@ -351,22 +353,22 @@ Styles.cssRule('.pageblock-swap', {
     '#tokenModal': {
       $nest: {
         '.modal': {
-          background: '#192046',
+          background: Theme.background.modal,
           width: 492,
           padding: '0.75rem 1rem',
           borderRadius: '1rem',
-          color: '#fff'
+          // color: Theme.text.primary
         },
         '.i-modal_header': {
           marginBottom: '1.5rem',
           paddingBottom: '0.5rem',
-          borderBottom: '2px solid #0c1234',
-          color: '#F15E61',
+          borderBottom: `2px soid ${Theme.background.main}`,
+          color: Theme.colors.primary.main,
           fontSize: '1.25rem',
           fontWeight: 700,
         },
         '.i-modal_header > i-icon': {
-          fill: '#f15e61 !important'
+          fill: `${Theme.colors.primary.main} !important`
         },
         '.search': {
           position: 'relative',
@@ -405,7 +407,7 @@ Styles.cssRule('.pageblock-swap', {
               border: '2px solid transparent',
               $nest: {
                 '&:hover': {
-                  borderColor: '#e83e8c',
+                  borderColor: Theme.divider,
                   transform: 'none'
                 },
                 'i-image': {
@@ -445,7 +447,9 @@ Styles.cssRule('.pageblock-swap', {
             },
             '.token-name i-label > *': {
               fontSize: '0.75rem',
-              color: 'rgba(255,255,255,0.55)'
+              // color: 'rgba(255,255,255,0.55)'
+              color: Theme.text.primary,
+              opacity: 0.55
             }
           }
         },
@@ -457,8 +461,8 @@ Styles.cssRule('.pageblock-swap', {
     },
     '.routing-item': {
       position: 'relative',
-      color: "#fff",
-      background: "#192046",
+      // color: "#fff",
+      background: Theme.background.modal,
       border: '2px solid #2a3675',
       padding: '1.25rem 1rem 1rem',
       borderRadius: '0.75rem',
@@ -476,10 +480,10 @@ Styles.cssRule('.pageblock-swap', {
       }
     },
     '.routing-selected': {
-      borderColor: '#e83e8c'
+      borderColor: Theme.divider
     },
     '.best-price': {
-      color: '#fff',
+      // color: Theme.text.primary,
       position: 'absolute',
       top: '-15px',
       left: '30px',
@@ -499,7 +503,7 @@ Styles.cssRule('.pageblock-swap', {
       $nest: {
         'i-label': {
           fontSize: '14px',
-          color: '#fff',
+          // color: Theme.text.primary,
           marginRight: '8px'
         },
         'i-icon': {
@@ -512,8 +516,8 @@ Styles.cssRule('.pageblock-swap', {
     },
     '.pnl-routing': {
       position: 'relative',
-      color: '#fff',
-      background: '#192046',
+      // color: Theme.text.primary,
+      background: Theme.background.modal,
       border: '2px solid #2a3675',
       padding: '1.25rem 1rem 1rem',
       borderRadius: '0.75rem',
@@ -540,14 +544,14 @@ Styles.cssRule('.pageblock-swap', {
       }
     },
     '.pnl-routing.routing-selected': {
-      borderColor: '#e83e8c'
+      borderColor: Theme.divider
     },
     '.balanceValue': {
       textAlign: 'right',
       display: 'block'
     },
     '.price-percent *': {
-      color: '#f7d063',
+      color: Theme.colors.secondary.main, // '#f7d063',
       whiteSpace: 'nowrap',
       textAlign: 'right'
     },
@@ -555,10 +559,10 @@ Styles.cssRule('.pageblock-swap', {
       width: '100%',
     },
     '.text-pink': {
-      color: '#F15E61',
+      color: Theme.colors.primary.main,
       $nest: {
         '*': {
-          color: '#F15E61',
+          color: Theme.colors.primary.main,
         },
       },
     },
@@ -572,7 +576,7 @@ Styles.cssRule('.pageblock-swap', {
           opacity: 0.9,
         },
         'i-label *': {
-          color: '#f7d063',
+          color: Theme.colors.secondary.main,
           marginLeft: '0.25rem',
         },
       },
@@ -589,7 +593,7 @@ Styles.cssRule('.pageblock-swap', {
           cursor: 'default',
         },
         '&.icon-selected': {
-          borderColor: '#e83e8c',
+          borderColor: Theme.divider,
           cursor: 'default',
           filter: 'inherit',
         },
@@ -608,26 +612,26 @@ Styles.cssRule('.pageblock-swap', {
     '.custom-modal': {
       $nest: {
         '.modal': {
-          background: '#192046',
+          background: Theme.background.modal,
           width: 490,
           maxWidth: '100%',
           padding: '0.75rem 1rem',
           borderRadius: '1rem',
-          color: '#fff'
+          color: Theme.text.primary
         },
         '.i-modal_header': {
           marginBottom: '1.5rem',
           paddingBottom: '0.5rem',
-          borderBottom: '2px solid #0c1234',
-          color: '#F15E61',
+          borderBottom: `2px soid ${Theme.background.main}`,
+          color: Theme.colors.primary.main,
           fontSize: '1.25rem',
           fontWeight: 700,
           $nest: {
             '&> span': {
-              color: '#F15E61',
+              color: Theme.colors.primary.main,
             },
             '&> i-icon': {
-              fill: '#f15e61 !important'
+              fill: `${Theme.colors.primary.main} !important`
             },
             '& ~ i-icon': {
               display: 'inline-block',
@@ -644,26 +648,26 @@ Styles.cssRule('.pageblock-swap', {
     '#registerPairModal': {
       $nest: {
         '.modal': {
-          background: '#192046',
+          background: Theme.background.modal,
           width: 420,
           maxWidth: '100%',
           padding: '0.75rem 1rem 1.25rem 1rem',
           borderRadius: '1rem',
-          color: '#fff'
+          color: Theme.text.primary
         },
         '.i-modal_header': {
           marginBottom: '1.5rem',
           paddingBottom: '0.5rem',
-          borderBottom: '2px solid #0c1234',
-          color: '#F15E61',
+          borderBottom: `2px soid ${Theme.background.main}`,
+          color: Theme.colors.primary.main,
           fontSize: '1.25rem',
           fontWeight: 700,
           $nest: {
             '&> span': {
-              color: '#F15E61',
+              color: Theme.colors.primary.main,
             },
             '.i-modal-close': {
-              fill: '#F15E61 !important',
+              fill: `${Theme.colors.primary.main} !important`,
             }
           }
         },
@@ -685,7 +689,7 @@ Styles.cssRule('.pageblock-swap', {
           marginInline: '0.25rem',
         },
         '.text-primary *': {
-          color: '#F15E61',
+          color: Theme.colors.primary.main,
         },
         '.price-info': {
           padding: '1rem'
@@ -762,7 +766,7 @@ Styles.cssRule('.pageblock-swap', {
         },
         '.btn-cancel': {
           background: '#eaecef',
-          color: '#0c1234',
+          color: Theme.background.main,
         },
         '.btn-submit': {
           textAlign: 'center',
@@ -805,7 +809,7 @@ Styles.cssRule('.pageblock-swap', {
     '.btn-os': {
       background: colorVar.primaryButton,
       height: 'auto !important',
-      color: '#fff',
+      color: Theme.text.primary,
       transition: 'background .3s ease',
       fontSize: '1rem',
       fontWeight: 'bold',

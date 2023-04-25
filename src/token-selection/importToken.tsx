@@ -121,13 +121,13 @@ export class ImportToken extends Module {
             <i-icon name="exclamation-triangle" margin={{ right: 3 }} fill="#e83e8c" width={30} height={30} />
           </i-hstack>
           <i-hstack  horizontalAlignment="center" class="text-center" margin={{ bottom: 5 }}> 
-            <i-label font={{bold:true, color:"#fff"}} caption="Trade at your own risk!"/> 
+            <i-label font={{bold:true}} caption="Trade at your own risk!"/> 
           </i-hstack>
           <i-hstack  horizontalAlignment="center" class="text-center" margin={{ bottom: 5 }}> 
-            <i-label font={{color:"#fff"}} caption="Anyone can create a token, including creating fake versions of existing token that claims tp represent projects"/> 
+            <i-label caption="Anyone can create a token, including creating fake versions of existing token that claims tp represent projects"/> 
           </i-hstack>
           <i-hstack  horizontalAlignment="center" class="text-center" margin={{ bottom: 5 }}> 
-            <i-label width={300} font={{bold:true, color:"#fff"}} caption="If you purchased this token, you may not be to able sell it back"/> 
+            <i-label width={300} font={{bold:true}} caption="If you purchased this token, you may not be to able sell it back"/> 
           </i-hstack>
           <i-hstack  horizontalAlignment="center" class="text-center">
             <i-checkbox
