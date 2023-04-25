@@ -15,6 +15,7 @@
     "@scom/dapp": "*",
     "@scom/scom-swap": "*",
     "@scom/scom-dapp-container": "*",
+    "@scom/scom-dex-list": "*",
     "@ijstech/eth-contract": "*",
     "@ijstech/eth-wallet": "*",
     "@scom/scom-wallet-modal": "*",
@@ -71,5 +72,6 @@
     "mobile": 414,
     "tablet": 1280,
     "desktop": 1920
-  }
+  },
+  "showThemeButton": true
 }

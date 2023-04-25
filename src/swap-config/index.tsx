@@ -1,9 +1,10 @@
-import { customElements, Module, ControlElement, Input, VStack, Control, Upload, ComboBox, IComboItem, HStack } from '@ijstech/components';
-import { BigNumber } from '@ijstech/eth-wallet';
+import { customElements, Module, ControlElement, Input, VStack, Control, Upload, ComboBox, IComboItem, HStack, Styles } from '@ijstech/components';
 import { Category, IContractInfo, IProvider, ISwapConfig, ITokenObject } from '../global/index';
 import { comboboxStyle, configStyle, pointerStyle, tokenSelectionStyle, uploadStyle } from './swap-config.css';
 import { TokenSelection } from '../token-selection';
-import { getNetworkInfo, isWalletConnected } from '../store/index';
+import { getNetworkInfo } from '../store/index';
+
+const Theme = Styles.Theme.ThemeVars;
 
 interface IContractInfoUI {
   chainId: string;
@@ -313,7 +314,7 @@ export class SwapConfig extends Module {
         <i-hstack gap={8} verticalAlignment="center" wrap="wrap">
           <i-hstack gap={2} width={60}>
             <i-label caption="Caption" />
-            <i-label caption="*" font={{ color: '#f15e61' }} />
+            <i-label caption="*" font={{ color: Theme.colors.primary.main }} />
             <i-label caption=":" />
           </i-hstack>
           <i-input
@@ -325,14 +326,14 @@ export class SwapConfig extends Module {
         </i-hstack>
         <i-hstack gap={2} width={60}>
           <i-label caption="Image" />
-          <i-label caption="*" font={{ color: '#f15e61' }} />
+          <i-label caption="*" font={{ color: Theme.colors.primary.main }} />
           <i-label caption=":" />
         </i-hstack>
         {uploadElm}
         <i-hstack gap={8} verticalAlignment="center" wrap="wrap">
           <i-hstack gap={2} width={60}>
             <i-label caption="Key" />
-            <i-label caption="*" font={{ color: '#f15e61' }} />
+            <i-label caption="*" font={{ color: Theme.colors.primary.main }} />
             <i-label caption=":" />
           </i-hstack>
           <i-input
@@ -357,7 +358,7 @@ export class SwapConfig extends Module {
         <i-hstack gap={8} verticalAlignment="center" wrap="wrap">
           <i-hstack gap={2} width={120}>
             <i-label caption="Contract Info" />
-            <i-label caption="*" font={{ color: '#f15e61' }} />
+            <i-label caption="*" font={{ color: Theme.colors.primary.main }} />
             <i-label caption=":" />
           </i-hstack>
           {contractInfoElm}
@@ -434,7 +435,7 @@ export class SwapConfig extends Module {
         <i-hstack gap={8} verticalAlignment="center" wrap="wrap">
           <i-hstack gap={2} width={120}>
             <i-label caption="Chain Id" />
-            <i-label caption="*" font={{ color: '#f15e61' }} />
+            <i-label caption="*" font={{ color: Theme.colors.primary.main }} />
             <i-label caption=":" />
           </i-hstack>
           {comboBoxChain}
@@ -442,7 +443,7 @@ export class SwapConfig extends Module {
         <i-hstack gap={8} verticalAlignment="center" wrap="wrap">
           <i-hstack gap={2} width={120}>
             <i-label caption="Factory Address" />
-            <i-label caption="*" font={{ color: '#f15e61' }} />
+            <i-label caption="*" font={{ color: Theme.colors.primary.main }} />
             <i-label caption=":" />
           </i-hstack>
           <i-input
@@ -456,7 +457,7 @@ export class SwapConfig extends Module {
         <i-hstack gap={8} verticalAlignment="center" wrap="wrap">
           <i-hstack gap={2} width={120}>
             <i-label caption="Router Address" />
-            <i-label caption="*" font={{ color: '#f15e61' }} />
+            <i-label caption="*" font={{ color: Theme.colors.primary.main }} />
             <i-label caption=":" />
           </i-hstack>
           <i-input
@@ -470,7 +471,7 @@ export class SwapConfig extends Module {
         <i-hstack visible={this.isFixedPair} class="wrapper-token--selection" gap={8} verticalAlignment="center" wrap="wrap">
           <i-hstack gap={2} width={120}>
             <i-label caption="From Token" />
-            <i-label caption="*" font={{ color: '#f15e61' }} />
+            <i-label caption="*" font={{ color: Theme.colors.primary.main }} />
             <i-label caption=":" />
           </i-hstack>
           {fromTokenSelection}
@@ -478,14 +479,14 @@ export class SwapConfig extends Module {
         <i-hstack visible={this.isFixedPair} class="wrapper-token--selection" gap={8} verticalAlignment="center" wrap="wrap">
           <i-hstack gap={2} width={120}>
             <i-label caption="To Token" />
-            <i-label caption="*" font={{ color: '#f15e61' }} />
+            <i-label caption="*" font={{ color: Theme.colors.primary.main }} />
             <i-label caption=":" />
           </i-hstack>
           {toTokenSelection}
         </i-hstack>
         <i-hstack gap={2}>
           <i-label caption="Trade Fee" />
-          <i-label caption="*" font={{ color: '#f15e61' }} />
+          <i-label caption="*" font={{ color: Theme.colors.primary.main }} />
           <i-label caption=":" />
         </i-hstack>
         <i-vstack
@@ -496,7 +497,7 @@ export class SwapConfig extends Module {
           <i-hstack gap={8} verticalAlignment="center" wrap="wrap">
             <i-hstack gap={2} width={104}>
               <i-label caption="Fee" />
-              <i-label caption="*" font={{ color: '#f15e61' }} />
+              <i-label caption="*" font={{ color: Theme.colors.primary.main }} />
               <i-label caption=":" />
             </i-hstack>
             <i-input
@@ -510,7 +511,7 @@ export class SwapConfig extends Module {
           <i-hstack gap={8} verticalAlignment="center" wrap="wrap">
             <i-hstack gap={2} width={104}>
               <i-label caption="Base" />
-              <i-label caption="*" font={{ color: '#f15e61' }} />
+              <i-label caption="*" font={{ color: Theme.colors.primary.main }} />
               <i-label caption=":" />
             </i-hstack>
             <i-input
@@ -544,7 +545,7 @@ export class SwapConfig extends Module {
         <i-vstack gap="1rem" verticalAlignment="center" maxWidth={260}>
           <i-hstack gap={2} verticalAlignment="center">
             <i-label caption="Category" />
-            <i-label caption="*" font={{ color: '#f15e61' }} />
+            <i-label caption="*" font={{ color: Theme.colors.primary.main }} />
             <i-label caption=":" />
             <i-combo-box
               id="cbbCategory"
