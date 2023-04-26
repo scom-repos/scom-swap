@@ -303,35 +303,6 @@ export default class ScomSwap extends Module implements PageBlock {
                 type: "number",
                 enum: [1, 56, 137, 250, 97, 80001, 43113, 43114],
                 required: true
-              },
-              factoryAddress: {
-                type: "string",
-                required: true
-              },
-              routerAddress: {
-                type: "string",
-                required: true
-              },
-              fromToken: {
-                type: "string",
-                title: "From Token (Fixed pair)"
-              },
-              toToken: {
-                type: "string",
-                title: "To Token (Fixed pair)"
-              },
-              tradeFee: {
-                type: "object",
-                properties: {
-                  fee: {
-                    type: "string",
-                    required: true
-                  },
-                  base: {
-                    type: "string",
-                    required: true
-                  }
-                }
               }
             }
           }
@@ -435,35 +406,6 @@ export default class ScomSwap extends Module implements PageBlock {
                 type: "number",
                 enum: [1, 56, 137, 250, 97, 80001, 43113, 43114],
                 required: true
-              },
-              factoryAddress: {
-                type: "string",
-                required: true
-              },
-              routerAddress: {
-                type: "string",
-                required: true
-              },
-              fromToken: {
-                type: "string",
-                title: "From Token (Fixed pair)"
-              },
-              toToken: {
-                type: "string",
-                title: "To Token (Fixed pair)"
-              },
-              tradeFee: {
-                type: "object",
-                properties: {
-                  fee: {
-                    type: "string",
-                    required: true
-                  },
-                  base: {
-                    type: "string",
-                    required: true
-                  }
-                }
               }
             }
           }
