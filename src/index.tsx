@@ -18,7 +18,8 @@ import {
   getProxyAddress,
   getIPFSGatewayUrl,
   WalletPlugin,
-  getSupportedTokens
+  getSupportedTokens,
+  setDexInfoList
 } from "./store/index";
 import { tokenStore, assets as tokenAssets } from '@scom/scom-token-list';
 
@@ -60,6 +61,7 @@ import Config from './config/index';
 import scconfig from './scconfig.json';
 import ScomWalletModal, {IWalletPlugin} from '@scom/scom-wallet-modal';
 import ScomDappContainer from '@scom/scom-dapp-container'
+import getDexList from '@scom/scom-dex-list';
 
 
 const Theme = Styles.Theme.ThemeVars;
@@ -703,37 +705,6 @@ export default class ScomSwap extends Module implements PageBlock {
     }
   }
 
-  // private isEmptyObject(obj: any): boolean {
-  //   for (let prop in obj) {
-  //     if (!obj[prop] && prop !== 'dexId') {
-  //       return true;
-  //     }
-  //   }
-  //   return false;
-  // }
-
-  // validate() {
-  //   const data = this.cardConfig.data?.providers || [];
-  //   if (!data || !data.length) return false;
-  //   for (let item of data) {
-  //     if (this.isEmptyObject(item)) {
-  //       return false;
-  //     }
-  //     const contractInfo = item.contractInfo || {};
-  //     const contractChainIds = Object.keys(contractInfo);
-  //     if (!contractChainIds.length) {
-  //       return false;
-  //     }
-  //     for (const chainId of contractChainIds) {
-  //       const hasTradeFee = !this.isEmptyObject(contractInfo[chainId].tradeFee);
-  //       if (!hasTradeFee || this.isEmptyObject(contractInfo[chainId])) {
-  //         return false;
-  //       }
-  //     }
-  //   }
-  //   return true;
-  // }
-
   private get isFixedPair() {
     return this._data?.category === 'fixed-pair';
   }
@@ -749,22 +720,8 @@ export default class ScomSwap extends Module implements PageBlock {
         caption,
         image,
         key,
-        dexId,
-        contractInfo: {}
+        dexId
       };
-      const arr = providers.filter(v => v.key === key);
-      arr.forEach(v => {
-        if (!defaultProvider.contractInfo[v.chainId]) {
-          const { factoryAddress, routerAddress, tradeFee, fromToken, toToken } = v;
-          defaultProvider.contractInfo[v.chainId] = {
-            factoryAddress,
-            routerAddress,
-            tradeFee,
-            fromToken,
-            toToken
-          }
-        }
-      });
       _providers.push(defaultProvider);
     } else {
       let providersByKeys: { [key: string]: IProviderUI[] } = {};
@@ -781,19 +738,8 @@ export default class ScomSwap extends Module implements PageBlock {
           caption,
           image,
           key,
-          dexId,
-          contractInfo: {}
+          dexId
         }
-        arr.forEach(v => {
-          const { factoryAddress, routerAddress, tradeFee } = v;
-          if (!defaultProvider.contractInfo[v.chainId]) {
-            defaultProvider.contractInfo[v.chainId] = {
-              factoryAddress,
-              routerAddress,
-              tradeFee
-            }
-          }
-        });
         _providers.push(defaultProvider);
       })
     }
@@ -801,6 +747,8 @@ export default class ScomSwap extends Module implements PageBlock {
   }
 
   private async refreshUI() {
+    const dexList = getDexList();
+    setDexInfoList(dexList);
     this.setProviders();
     await this.initData();
     await this.onSetupPage(isWalletConnected());
@@ -853,17 +801,17 @@ export default class ScomSwap extends Module implements PageBlock {
     this.setSwapButtonText();
   }
 
-  get supportedNetworks() {
-    let providers: IProvider[] = [];
-    if (this.originalData?.providers) {
-      providers = this.isFixedPair ? [this.originalData.providers[0]] : this.originalData.providers;
-    }
-    let supportedNetworks = [];
-    for (const provider of providers) {
-      supportedNetworks.push(...Object.keys(provider.contractInfo));
-    }
-    return uniqWith(supportedNetworks, (cur: any, oth: any) => { return cur == oth });
-  }
+  // get supportedNetworks() {
+  //   let providers: IProvider[] = [];
+  //   if (this.originalData?.providers) {
+  //     providers = this.isFixedPair ? [this.originalData.providers[0]] : this.originalData.providers;
+  //   }
+  //   let supportedNetworks = [];
+  //   for (const provider of providers) {
+  //     supportedNetworks.push(...Object.keys(provider.contractInfo));
+  //   }
+  //   return uniqWith(supportedNetworks, (cur: any, oth: any) => { return cur == oth });
+  // }
 
   get isApproveButtonShown(): boolean {
     const warningMessageText = this.getWarningMessageText();
@@ -947,27 +895,24 @@ export default class ScomSwap extends Module implements PageBlock {
   }
 
   private setFixedPairData() {
+    let currentChainTokens = this.tokens.filter((token) => token.chainId === this.currentChainId);
+    if (currentChainTokens.length < 2) return;
     const providers = this.originalData?.providers;
     if (providers && providers.length) {
-      const contractInfo = (providers[0].contractInfo || {})[this.currentChainId];
-      if (contractInfo) {
-        const fromTokenAddress = contractInfo.fromToken || '';
-        const toTokenAddress = contractInfo.toToken || '';
-        const fromToken = fromTokenAddress.toLowerCase().startsWith('0x') ? fromTokenAddress.toLowerCase() : fromTokenAddress;
-        const toToken = toTokenAddress.toLowerCase().startsWith('0x') ? toTokenAddress.toLowerCase() : toTokenAddress;
-        this.fromToken = tokenStore.tokenMap[fromToken];
-        this.toToken = tokenStore.tokenMap[toToken];
-        this.fromTokenSymbol = this.fromToken?.symbol;
-        this.toTokenSymbol = this.toToken?.symbol;
-        this.fromInputValue = new BigNumber(defaultInput);
-        this.onUpdateToken(this.fromToken, true);
-        this.onUpdateToken(this.toToken, false);
-        this.firstTokenSelection.token = this.fromToken;
-        this.secondTokenSelection.token = this.toToken;
-        this.toggleReverseImage.classList.add('cursor-default');
-      } else {
-        this.resetUI();
-      }
+      const fromTokenAddress = currentChainTokens[0].address;
+      const toTokenAddress = currentChainTokens[1].address;
+      const fromToken = fromTokenAddress.toLowerCase().startsWith('0x') ? fromTokenAddress.toLowerCase() : fromTokenAddress;
+      const toToken = toTokenAddress.toLowerCase().startsWith('0x') ? toTokenAddress.toLowerCase() : toTokenAddress;
+      this.fromToken = tokenStore.tokenMap[fromToken];
+      this.toToken = tokenStore.tokenMap[toToken];
+      this.fromTokenSymbol = this.fromToken?.symbol;
+      this.toTokenSymbol = this.toToken?.symbol;
+      this.fromInputValue = new BigNumber(defaultInput);
+      this.onUpdateToken(this.fromToken, true);
+      this.onUpdateToken(this.toToken, false);
+      this.firstTokenSelection.token = this.fromToken;
+      this.secondTokenSelection.token = this.toToken;
+      this.toggleReverseImage.classList.add('cursor-default');
     }
   }
 
@@ -1015,12 +960,6 @@ export default class ScomSwap extends Module implements PageBlock {
     if (connected) {
       await tokenStore.updateAllTokenBalances();
     }
-    // if (this.supportedNetworks.every((v: string | number) => v != this.chainId)) {
-    //   this.showNetworkErrModal();
-    //   this.resetUI();
-    //   this.onRenderChainList();
-    //   return;
-    // }
     this.closeNetworkErrModal();
     if (this.isFixedPair) {
       this.setFixedPairData();
@@ -1064,7 +1003,6 @@ export default class ScomSwap extends Module implements PageBlock {
     this.lastUpdated = 0;
     if (!this.record)
       this.swapBtn.enabled = false;
-    // this.onRenderIconList();
     this.onRenderPriceInfo();
     this.redirectToken();
     await this.handleAddRoute();
@@ -1216,15 +1154,6 @@ export default class ScomSwap extends Module implements PageBlock {
       const enabled = !this.isMaxDisabled();
       this.fromSlider.enabled = enabled;
       this.maxButton.enabled = enabled;
-      /*if (this.toToken?.symbol === token.symbol && !this.isCrossChain) {
-        this.initRoutes();
-        this.toToken = undefined;
-        this.toInputValue = new BigNumber(0);
-        this.receiveBalance.caption = 'Balance: 0';
-        this.secondTokenSelection.token = undefined;
-        this.updateTokenInput(false, true);
-        this.priceInfo.Items = this.getPriceInfo();
-      }*/
       if (this.fromInputValue.gt(0)) {
         const fromInput = this.payCol.getElementsByTagName('I-INPUT')?.[0] as Input;
         // const toInput = this.receiveCol.getElementsByTagName('I-INPUT')?.[0] as Input;
@@ -1242,18 +1171,6 @@ export default class ScomSwap extends Module implements PageBlock {
       this.updateTokenInput(true);
     } else {
       this.toToken = token;
-      /*if (this.fromToken?.symbol === token.symbol && !this.isCrossChain) {
-        this.initRoutes();
-        this.fromToken = undefined;
-        this.fromSlider.enabled = false;
-        this.onUpdateSliderValue(0);
-        this.maxButton.enabled = false;
-        this.fromInputValue = new BigNumber(0);
-        this.payBalance.caption = 'Balance: 0';
-        this.firstTokenSelection.token = undefined;
-        this.updateTokenInput(true, true);
-        this.priceInfo.Items = this.getPriceInfo();
-      }*/
       if (this.toInputValue.gt(0)) {
         const toInput = this.receiveCol.getElementsByTagName('I-INPUT')?.[0] as Input;
         const limit = limitDecimals(this.toInputValue.toFixed(), token.decimals || 18);
@@ -1288,14 +1205,6 @@ export default class ScomSwap extends Module implements PageBlock {
   setApprovalSpenderAddress() {
     const item = this.record;
     if (!item) return;
-    // if (this.isCrossChain && item.contractAddress){
-    //   setApprovalModalSpenderAddress(Market.HYBRID, item.contractAddress)
-    // } else if (item?.provider && this.availableMarkets.includes(item.provider)) {
-    //   const market = ProviderConfigMap[item.key].marketCode;
-    //   setApprovalModalSpenderAddress(market);
-    // } else {
-    //   setApprovalModalSpenderAddress(Market.HYBRID);
-    // }
     const market =  getProviderByKey(item.provider)?.key || '';
     if (this.approvalModelAction) {
       if (getCurrentCommissions(this.commissions).length) {
@@ -2046,19 +1955,6 @@ export default class ScomSwap extends Module implements PageBlock {
     if (isNaN(val)) return;
     this.fromSlider.value = val > 100 ? 100 : val;
   }
-  async onRenderIconList() {
-    // this.iconList.innerHTML = '';
-    // this.availableMarkets.forEach(async (item: any) => {
-    //   const config = getProviderList().find(p => p.key === item)  // ProviderConfigMap[item];
-    //   if (config) {
-    //     const image = new Image();
-    //     image.url = config.image;
-    //     image.tooltip.content = config.key;
-    //     image.classList.add('icon-item');
-    //     this.iconList.appendChild(image);
-    //   }
-    // })
-  }
   onRenderPriceInfo() {
     if (!this.priceInfo) {
       this.priceInfo = new PriceInfo();
@@ -2266,26 +2162,26 @@ export default class ScomSwap extends Module implements PageBlock {
     })
   }
 
-  private showNetworkErrModal() {
-    this.supportedNetworksElm.clearInnerHTML();
-    if (!this.supportedNetworks.length) {
-      this.supportedNetworksElm.appendChild(<i-label caption={`No networks are supported. Please configure the swap!`} font={{ size: '16px' }} />)
-    } else if (this.supportedChainList.some(v => v.chainId == this.currentChainId)) {
-      const network = getNetworkInfo(this.currentChainId);
-      this.supportedNetworksElm.appendChild(<i-label caption={`The ${network.chainName} (${network.chainId}) network has not been configured for the swap!`} font={{ size: '16px' }} />)
-    } else {
-      this.supportedNetworksElm.appendChild(<i-label caption={`We only support the following ${this.supportedNetworks.length > 1 ? 'networks' : 'network'}:`} font={{ size: '16px' }} />)
-      for (const chainId of this.supportedNetworks) {
-        const network = getNetworkInfo(chainId);
-        if (network) {
-          this.supportedNetworksElm.appendChild(
-            <i-label font={{ bold: true, size: '16px' }} caption={`${network.chainName} (${network.chainId})`} />
-          )
-        }
-      }
-    }
-    this.networkErrModal.visible = true;
-  }
+  // private showNetworkErrModal() {
+  //   this.supportedNetworksElm.clearInnerHTML();
+  //   if (!this.supportedNetworks.length) {
+  //     this.supportedNetworksElm.appendChild(<i-label caption={`No networks are supported. Please configure the swap!`} font={{ size: '16px' }} />)
+  //   } else if (this.supportedChainList.some(v => v.chainId == this.currentChainId)) {
+  //     const network = getNetworkInfo(this.currentChainId);
+  //     this.supportedNetworksElm.appendChild(<i-label caption={`The ${network.chainName} (${network.chainId}) network has not been configured for the swap!`} font={{ size: '16px' }} />)
+  //   } else {
+  //     this.supportedNetworksElm.appendChild(<i-label caption={`We only support the following ${this.supportedNetworks.length > 1 ? 'networks' : 'network'}:`} font={{ size: '16px' }} />)
+  //     for (const chainId of this.supportedNetworks) {
+  //       const network = getNetworkInfo(chainId);
+  //       if (network) {
+  //         this.supportedNetworksElm.appendChild(
+  //           <i-label font={{ bold: true, size: '16px' }} caption={`${network.chainName} (${network.chainId})`} />
+  //         )
+  //       }
+  //     }
+  //   }
+  //   this.networkErrModal.visible = true;
+  // }
 
   private closeNetworkErrModal() {
     this.networkErrModal.visible = false;
@@ -2303,7 +2199,6 @@ export default class ScomSwap extends Module implements PageBlock {
     this.isReadyCallbackQueued = true;
     this.currentChainId = getChainId();
   // setTokenStore();
-    // this.availableMarkets = getAvailableMarkets() || [];
     super.init();
     this.setSwapButtonText();
     this.openswapResult = new Result();

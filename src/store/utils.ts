@@ -3,6 +3,7 @@ import { Wallet } from '@ijstech/eth-wallet';
 import { EventId, IProvider, ITokenObject, TokenMapType, IExtendedNetwork } from '../global/index';
 import { ChainNativeTokenByChainId } from '@scom/scom-token-list';
 import getNetworkList from '@scom/scom-network-list'
+import { IDexInfo } from '@scom/scom-dex-list';
 
 export enum WalletPlugin {
   MetaMask = 'metamask',
@@ -21,6 +22,7 @@ export const state = {
   userTokens: {} as { [key: string]: ITokenObject[] },
   infuraId: "",
   networkMap: {} as { [key: number]: IExtendedNetwork },
+  dexInfoList: [] as IDexInfo[],
   providerList: [] as IProvider[],
   proxyAddresses: {} as ProxyAddresses,
   ipfsGatewayUrl: "",
@@ -260,6 +262,14 @@ export const setUserTokens = (token: ITokenObject, chainId: number) => {
 
 export const hasUserToken = (address: string, chainId: number) => {
   return state.userTokens[chainId]?.some((token: ITokenObject) => token.address?.toLocaleLowerCase() === address?.toLocaleLowerCase());
+}
+
+export const setDexInfoList = (value: IDexInfo[]) => {
+  state.dexInfoList = value;
+}
+
+export const getDexInfoList = () => {
+  return state.dexInfoList || [];
 }
 
 export const setProviderList = (value: IProvider[]) => {

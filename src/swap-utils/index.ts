@@ -19,7 +19,8 @@ import {
   getChainId,
   getNetworkInfo,
   getProviderList,
-  getProxyAddress
+  getProxyAddress,
+  getDexInfoList
 } from "../store/index";
 
 import {
@@ -56,14 +57,14 @@ const getWrappedTokenAddress = (): string => {
 };
 
 const getFactoryAddress = (key: string): string => {
-  const providers = getProviderList();
-  const contractInfo = providers.find(item => item.key === key)?.contractInfo || {};
-  return contractInfo[getChainId()]?.factoryAddress || '';
+  const dexInfoList = getDexInfoList();
+  const factoryAddress = dexInfoList.find(v => v.chainId == getChainId() && v.dexCode == key)?.factoryAddress || '';
+  return factoryAddress;
 }
 function getRouterAddress(key: string): string {
-  const providers = getProviderList();
-  const contractInfo = providers.find(item => item.key === key)?.contractInfo || {};
-  return contractInfo[getChainId()]?.routerAddress || '';
+  const dexInfoList = getDexInfoList();
+  const routerAddress = dexInfoList.find(v => v.chainId == getChainId() && v.dexCode == key)?.routerAddress || '';
+  return routerAddress;
 }
 
 async function allowanceRouter(wallet: any, market: string, token: ITokenObject, owner: string, contractAddress: string, callback?: any) {
@@ -154,17 +155,19 @@ async function composeRouteObj(wallet: any, routeObj: any, market: string, first
   };
 }
 
-async function getTradeFeeMap() {
+function getTradeFeeMap() {
   let tradeFeeMap: TradeFeeMap = {};
-  const providers = getProviderList();
-  providers.forEach(item => tradeFeeMap[item.key] = (item.contractInfo || {})[getChainId()]?.tradeFee);
+  const dexInfoList = getDexInfoList().filter(v => v.chainId == getChainId());
+  for (let dexInfo of dexInfoList) {
+    tradeFeeMap[dexInfo.dexCode] = dexInfo.tradeFee;
+  }
   return tradeFeeMap;
 }
 
 async function getBestAmountInRouteFromAPI(wallet: any, tokenIn: ITokenObject, tokenOut: ITokenObject, amountOut: string, chainId?: number) {
   chainId = getChainId();
   let wrappedTokenAddress = getWETH();
-  let tradeFeeMap = await getTradeFeeMap();
+  let tradeFeeMap = getTradeFeeMap();
   let network = chainId ? getNetworkInfo(chainId) : null;
   let api = network?.isTestnet || network?.isDisabled ? newRouteAPI : routeAPI;
   let routeObjArr = await getAPI(api, {
@@ -175,58 +178,58 @@ async function getBestAmountInRouteFromAPI(wallet: any, tokenIn: ITokenObject, t
     ignoreHybrid: 1
   })
   if (!routeObjArr) return [];
-  let providerConfigByDexId: any = {};
-  getProviderList().filter(v => {!!v.contractInfo && Object.keys(v.contractInfo).includes((chainId!).toString())}).forEach((v, i) => {
-    if (v.dexId == undefined) return;
-    providerConfigByDexId[v.dexId] = v;
-  });
   let bestRouteObjArr: any[] = [];
-  for (let i = 0; i < routeObjArr.length; i++) {
-    let routeObj = routeObjArr[i];
-    routeObj.tokens[0] = tokenIn;
-    routeObj.tokens[routeObj.tokens.length - 1] = tokenOut;
-    let dexId = [5, 6].includes(routeObj.dexId) ? 5 : routeObj.dexId;
-    if (!providerConfigByDexId[dexId]) continue;
-    let bestRouteObj = {
-      pairs: routeObj.route.map((v: any) => v.address),
-      isRegistered: routeObj.route.map((v: any) => v.isRegistered),
-      market: routeObj.route.map((v: any) => {
-        let dexId = [5, 6].includes(v.dexId) ? 5 : v.dexId;
-        return providerConfigByDexId[dexId].key
-      }),
-      route: routeObj.tokens,
-      customDataList: routeObj.route.map((v: any) => {
-        return {
-          queueType: v.queueType,
-          orderIds: v.orderIds,
-          reserveA: v.reserves.reserve0,
-          reserveB: v.reserves.reserve1
-        }
-      })
-    };
+  // let providerConfigByDexId: any = {};
+  // getProviderList().filter(v => {!!v.contractInfo && Object.keys(v.contractInfo).includes((chainId!).toString())}).forEach((v, i) => {
+  //   if (v.dexId == undefined) return;
+  //   providerConfigByDexId[v.dexId] = v;
+  // });
+  // for (let i = 0; i < routeObjArr.length; i++) {
+  //   let routeObj = routeObjArr[i];
+  //   routeObj.tokens[0] = tokenIn;
+  //   routeObj.tokens[routeObj.tokens.length - 1] = tokenOut;
+  //   let dexId = [5, 6].includes(routeObj.dexId) ? 5 : routeObj.dexId;
+  //   if (!providerConfigByDexId[dexId]) continue;
+  //   let bestRouteObj = {
+  //     pairs: routeObj.route.map((v: any) => v.address),
+  //     isRegistered: routeObj.route.map((v: any) => v.isRegistered),
+  //     market: routeObj.route.map((v: any) => {
+  //       let dexId = [5, 6].includes(v.dexId) ? 5 : v.dexId;
+  //       return providerConfigByDexId[dexId].key
+  //     }),
+  //     route: routeObj.tokens,
+  //     customDataList: routeObj.route.map((v: any) => {
+  //       return {
+  //         queueType: v.queueType,
+  //         orderIds: v.orderIds,
+  //         reserveA: v.reserves.reserve0,
+  //         reserveB: v.reserves.reserve1
+  //       }
+  //     })
+  //   };
 
-    let amountIn = new BigNumber(routeObj.amountIn).shiftedBy(-tokenIn.decimals);
-    let swapPrice = new BigNumber(amountIn).div(amountOut);
-    // TODO: check later
-    // let isHybridOrQueue = providerConfigByDexId[dexId].key == Market.HYBRID || routeObj.queueType;
-    let extendedData = await getExtendedRouteObjData(wallet, bestRouteObj, tradeFeeMap, swapPrice, routeObj.queueType);
-    let provider = providerConfigByDexId[dexId].key
-    let key = provider + '|' + (routeObj.isDirectRoute ? '0' : '1');
-    bestRouteObjArr.push({
-      ...extendedData,
-      provider,
-      key,
-      amountIn,
-      queueType: routeObj.queueType
-    });
-  }
+  //   let amountIn = new BigNumber(routeObj.amountIn).shiftedBy(-tokenIn.decimals);
+  //   let swapPrice = new BigNumber(amountIn).div(amountOut);
+  //   // TODO: check later
+  //   // let isHybridOrQueue = providerConfigByDexId[dexId].key == Market.HYBRID || routeObj.queueType;
+  //   let extendedData = await getExtendedRouteObjData(wallet, bestRouteObj, tradeFeeMap, swapPrice, routeObj.queueType);
+  //   let provider = providerConfigByDexId[dexId].key
+  //   let key = provider + '|' + (routeObj.isDirectRoute ? '0' : '1');
+  //   bestRouteObjArr.push({
+  //     ...extendedData,
+  //     provider,
+  //     key,
+  //     amountIn,
+  //     queueType: routeObj.queueType
+  //   });
+  // }
   return bestRouteObjArr;
 }
 
 async function getBestAmountOutRouteFromAPI(wallet: any, tokenIn: ITokenObject, tokenOut: ITokenObject, amountIn: string, chainId?: number) {
   chainId = getChainId();
   let wrappedTokenAddress = getWETH();
-  let tradeFeeMap = await getTradeFeeMap();
+  let tradeFeeMap = getTradeFeeMap();
   let network = chainId ? getNetworkInfo(chainId) : null;
   let api = network?.isTestnet || network?.isDisabled ? newRouteAPI : routeAPI;
   let routeObjArr = await getAPI(api, {
@@ -237,50 +240,49 @@ async function getBestAmountOutRouteFromAPI(wallet: any, tokenIn: ITokenObject, 
     ignoreHybrid: 1
   })
   if (!routeObjArr) return [];
-  let providerConfigByDexId: any = {};
-  getProviderList().filter(v => {!!v.contractInfo && Object.keys(v.contractInfo).includes((chainId!).toString())}).forEach((v, i) => {
-    if (v.dexId == undefined) return;
-    providerConfigByDexId[v.dexId] = v;
-  });
   let bestRouteObjArr = [];
-  for (let i = 0; i < routeObjArr.length; i++) {
-    let routeObj = routeObjArr[i];
-    routeObj.tokens[0] = tokenIn;
-    routeObj.tokens[routeObj.tokens.length - 1] = tokenOut;
-    let dexId = [5, 6].includes(routeObj.dexId) ? 5 : routeObj.dexId;
-    if (!providerConfigByDexId[dexId]) continue;
-    let bestRouteObj = {
-      pairs: routeObj.route.map((v: any) => v.address),
-      isRegistered: routeObj.route.map((v: any) => v.isRegistered),
-      market: routeObj.route.map((v: any) => {
-        let dexId = [5, 6].includes(v.dexId) ? 5 : v.dexId;
-        return providerConfigByDexId[dexId].key;
-      }),
-      route: routeObj.tokens,
-      customDataList: routeObj.route.map((v: any) => {
-        return {
-          queueType: v.queueType,
-          orderIds: v.orderIds,
-          reserveA: v.reserves.reserve0,
-          reserveB: v.reserves.reserve1
-        }
-      })
-    };
-    let amountOut = new BigNumber(routeObj.amountOut).shiftedBy(-tokenOut.decimals);
-    let swapPrice = new BigNumber(amountIn).div(amountOut);
-    // let isHybridOrQueue = providerConfigByDexId[dexId].key == Market.HYBRID || routeObj.queueType;
-    let extendedData = await getExtendedRouteObjData(wallet, bestRouteObj, tradeFeeMap, swapPrice, routeObj.queueType);
-    let provider = providerConfigByDexId[dexId].key;
-    let key = provider + '|' + (routeObj.isDirectRoute ? '0' : '1');
-    bestRouteObjArr.push({
-      ...extendedData,
-      provider,
-      key,
-      amountOut,
-      queueType: routeObj.queueType
-    });
-  }
-
+  // let providerConfigByDexId: any = {};
+  // getProviderList().filter(v => {!!v.contractInfo && Object.keys(v.contractInfo).includes((chainId!).toString())}).forEach((v, i) => {
+  //   if (v.dexId == undefined) return;
+  //   providerConfigByDexId[v.dexId] = v;
+  // });
+  // for (let i = 0; i < routeObjArr.length; i++) {
+  //   let routeObj = routeObjArr[i];
+  //   routeObj.tokens[0] = tokenIn;
+  //   routeObj.tokens[routeObj.tokens.length - 1] = tokenOut;
+  //   let dexId = [5, 6].includes(routeObj.dexId) ? 5 : routeObj.dexId;
+  //   if (!providerConfigByDexId[dexId]) continue;
+  //   let bestRouteObj = {
+  //     pairs: routeObj.route.map((v: any) => v.address),
+  //     isRegistered: routeObj.route.map((v: any) => v.isRegistered),
+  //     market: routeObj.route.map((v: any) => {
+  //       let dexId = [5, 6].includes(v.dexId) ? 5 : v.dexId;
+  //       return providerConfigByDexId[dexId].key;
+  //     }),
+  //     route: routeObj.tokens,
+  //     customDataList: routeObj.route.map((v: any) => {
+  //       return {
+  //         queueType: v.queueType,
+  //         orderIds: v.orderIds,
+  //         reserveA: v.reserves.reserve0,
+  //         reserveB: v.reserves.reserve1
+  //       }
+  //     })
+  //   };
+  //   let amountOut = new BigNumber(routeObj.amountOut).shiftedBy(-tokenOut.decimals);
+  //   let swapPrice = new BigNumber(amountIn).div(amountOut);
+  //   // let isHybridOrQueue = providerConfigByDexId[dexId].key == Market.HYBRID || routeObj.queueType;
+  //   let extendedData = await getExtendedRouteObjData(wallet, bestRouteObj, tradeFeeMap, swapPrice, routeObj.queueType);
+  //   let provider = providerConfigByDexId[dexId].key;
+  //   let key = provider + '|' + (routeObj.isDirectRoute ? '0' : '1');
+  //   bestRouteObjArr.push({
+  //     ...extendedData,
+  //     provider,
+  //     key,
+  //     amountOut,
+  //     queueType: routeObj.queueType
+  //   });
+  // }
   return bestRouteObjArr;
 }
 
@@ -580,7 +582,7 @@ const getBestAmountInRoute = async (markets: string[], tokenIn: ITokenObject, to
   if (allAvailableRoutes.length == 0) return null;
 
   let wallet: any = Wallet.getClientInstance();
-  let tradeFeeMap = await getTradeFeeMap();
+  let tradeFeeMap = getTradeFeeMap();
   let allPaths = await getAllExactAmountOutPaths(tradeFeeMap, allAvailableRoutes, tokenIn, tokenOut, amountOut);
   if (allPaths.length == 0) {
     return null;
@@ -610,7 +612,7 @@ const getBestAmountOutRoute = async (markets: string[], tokenIn: ITokenObject, t
     return null;
   }
   let wallet: any = Wallet.getClientInstance();
-  let tradeFeeMap = await getTradeFeeMap();
+  let tradeFeeMap = getTradeFeeMap();
   let allPaths = await getAllExactAmountInPaths(tradeFeeMap, allAvailableRoutes, tokenIn, tokenOut, amountIn);
   if (allPaths.length == 0) {
     return null;
@@ -679,18 +681,11 @@ async function getAllRoutesData(firstTokenObject: ITokenObject, secondTokenObjec
         const providerKey = getProviderList()[0]?.key;
         let routeObj = await getBestAmountInRoute(providerKey ? [providerKey] : [], firstTokenObject, secondTokenObject, secondInput.toString(), []);
         if (routeObj && routeObj.market.length == 1) {
-          let providerConfigByMarketCode: any = {};
-          let _chainId = getChainId();
-          getProviderList().filter(v => {
-            return !!v.contractInfo && Object.keys(v.contractInfo).includes((_chainId!).toString())
-          }).forEach((v, i) => {
-            providerConfigByMarketCode[v.key] = v;
-          });
           let price = parseFloat(routeObj.price);
           let priceSwap = new BigNumber(1).div(routeObj.price).toNumber();
           let priceImpact = Number(routeObj.priceImpact) * 100;
           let tradeFee = parseFloat(routeObj.tradeFee);
-          let provider = providerConfigByMarketCode[routeObj.market[0]]?.key
+          const provider = routeObj.market[0];
           let key = provider + '|0';
           routeDataArr.push({
             ...routeObj,
@@ -709,18 +704,11 @@ async function getAllRoutesData(firstTokenObject: ITokenObject, secondTokenObjec
         const providerKey = getProviderList()[0]?.key;
         let routeObj = await getBestAmountOutRoute(providerKey ? [providerKey] : [], firstTokenObject, secondTokenObject, firstInput.toString(), [], false);
         if (routeObj && routeObj.market.length == 1) {
-          let providerConfigByMarketCode: any = {};
-          let _chainId = getChainId();
-          getProviderList().filter(v => {
-            return !!v.contractInfo && Object.keys(v.contractInfo).includes((_chainId!).toString())
-          }).forEach((v, i) => {
-            providerConfigByMarketCode[v.key] = v;
-          });
           let price = parseFloat(routeObj.price);
           let priceSwap = new BigNumber(1).div(routeObj.price).toNumber();
           let priceImpact = Number(routeObj.priceImpact) * 100;
           let tradeFee = parseFloat(routeObj.tradeFee);
-          let provider = providerConfigByMarketCode[routeObj.market[0]]?.key
+          const provider = routeObj.market[0];
           let key = provider + '|0';
           routeDataArr.push({
             ...routeObj,

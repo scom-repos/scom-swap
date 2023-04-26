@@ -24,7 +24,6 @@ export interface IProvider {
   image: string;
   key: string;
   dexId?: number;
-  contractInfo: { [chainId: string]: IContractInfo };
 }
 
 export interface IProviderUI {
@@ -32,16 +31,7 @@ export interface IProviderUI {
   image: string;
   key: string;
   dexId?: number;
-  // Contract Info
   chainId: string | number;
-  factoryAddress: string;
-  routerAddress: string;
-  fromToken?: string;
-  toToken?: string;
-  tradeFee: {
-    fee: string;
-    base: string;
-  }
 }
 
 export interface ICommissionInfo {

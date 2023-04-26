@@ -9713,9 +9713,6 @@ declare module "@scom/scom-swap/global/utils/swapInterface.ts" {
         image: string;
         key: string;
         dexId?: number;
-        contractInfo: {
-            [chainId: string]: IContractInfo;
-        };
     }
     export interface IProviderUI {
         caption: string;
@@ -9723,14 +9720,6 @@ declare module "@scom/scom-swap/global/utils/swapInterface.ts" {
         key: string;
         dexId?: number;
         chainId: string | number;
-        factoryAddress: string;
-        routerAddress: string;
-        fromToken?: string;
-        toToken?: string;
-        tradeFee: {
-            fee: string;
-            base: string;
-        };
     }
     export interface ICommissionInfo {
         chainId: number;
@@ -9820,6 +9809,7 @@ declare module "@scom/scom-swap/index.css.ts" { }
 /// <amd-module name="@scom/scom-swap/store/utils.ts" />
 declare module "@scom/scom-swap/store/utils.ts" {
     import { IProvider, ITokenObject, TokenMapType, IExtendedNetwork } from "@scom/scom-swap/global/index.ts";
+    import { IDexInfo } from '@scom/scom-dex-list';
     export enum WalletPlugin {
         MetaMask = "metamask",
         WalletConnect = "walletconnect"
@@ -9839,6 +9829,7 @@ declare module "@scom/scom-swap/store/utils.ts" {
         networkMap: {
             [key: number]: IExtendedNetwork;
         };
+        dexInfoList: IDexInfo[];
         providerList: IProvider[];
         proxyAddresses: ProxyAddresses;
         ipfsGatewayUrl: string;
@@ -9878,6 +9869,8 @@ declare module "@scom/scom-swap/store/utils.ts" {
     export const getTokensDataList: (tokenMapData: TokenMapType, tokenBalances: any) => Promise<any[]>;
     export const setUserTokens: (token: ITokenObject, chainId: number) => void;
     export const hasUserToken: (address: string, chainId: number) => boolean;
+    export const setDexInfoList: (value: IDexInfo[]) => void;
+    export const getDexInfoList: () => IDexInfo[];
     export const setProviderList: (value: IProvider[]) => void;
     export const getProviderList: () => IProvider[];
     export const getProviderByKey: (providerKey: string) => IProvider;
@@ -10454,7 +10447,7 @@ declare module "@scom/scom-swap/swap-utils/index.ts" {
     }
     const getChainNativeToken: () => ITokenObject;
     function getRouterAddress(key: string): string;
-    function getTradeFeeMap(): Promise<TradeFeeMap>;
+    function getTradeFeeMap(): TradeFeeMap;
     function getExtendedRouteObjData(wallet: any, bestRouteObj: any, tradeFeeMap: TradeFeeMap, swapPrice: BigNumber, isHybridOrQueue: boolean): Promise<any>;
     function getAllRoutesData(firstTokenObject: ITokenObject, secondTokenObject: ITokenObject, firstInput: BigNumber, secondInput: BigNumber, isFromEstimated: boolean, useAPI: boolean, commissions: ICommissionInfo[]): Promise<any[]>;
     export const getCurrentCommissions: (commissions: ICommissionInfo[]) => ICommissionInfo[];
@@ -11144,7 +11137,6 @@ declare module "@scom/scom-swap" {
         onWalletConnect: (connected: boolean) => Promise<void>;
         onWalletDisconnect: (connected: boolean) => Promise<void>;
         onChainChange: () => Promise<void>;
-        get supportedNetworks(): any;
         get isApproveButtonShown(): boolean;
         get isPriceImpactTooHigh(): boolean;
         get isInsufficientBalance(): boolean;
@@ -11244,7 +11236,6 @@ declare module "@scom/scom-swap" {
         isMaxDisabled: () => boolean;
         onSliderChange(source: Control, event: Event): void;
         onUpdateSliderValue(value?: number): void;
-        onRenderIconList(): Promise<void>;
         onRenderPriceInfo(): void;
         private onRefresh;
         private onSetting;
@@ -11262,7 +11253,6 @@ declare module "@scom/scom-swap" {
         closeModalFees: () => void;
         private showResultMessage;
         private initExpertModal;
-        private showNetworkErrModal;
         private closeNetworkErrModal;
         private initData;
         init(): Promise<void>;
