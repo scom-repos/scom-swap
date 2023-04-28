@@ -14425,7 +14425,7 @@ define("@scom/scom-swap/index.css.ts", ["require", "exports", "@ijstech/componen
 define("@scom/scom-swap/store/utils.ts", ["require", "exports", "@ijstech/components", "@ijstech/eth-wallet", "@scom/scom-token-list", "@scom/scom-network-list"], function (require, exports, components_4, eth_wallet_4, scom_token_list_1, scom_network_list_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.getChainNativeToken = exports.getChainId = exports.truncateAddress = exports.hasMetaMask = exports.switchNetwork = exports.isWalletConnected = exports.getWalletProvider = exports.viewOnExplorerByAddress = exports.viewOnExplorerByTxHash = exports.getProviderByKey = exports.getProviderList = exports.setProviderList = exports.getDexInfoList = exports.setDexInfoList = exports.hasUserToken = exports.setUserTokens = exports.getTokensDataList = exports.getNetworkExplorerName = exports.getMatchNetworks = exports.addUserTokens = exports.getUserTokens = exports.getNetworkInfo = exports.getSupportedNetworks = exports.getInfuraId = exports.setTransactionDeadline = exports.getTransactionDeadline = exports.setSlippageTolerance = exports.getSlippageTolerance = exports.toggleExpertMode = exports.isExpertMode = exports.getCurrentChainId = exports.setCurrentChainId = exports.getAPIGatewayUrl = exports.getEmbedderCommissionFee = exports.setAPIGatewayUrls = exports.getIPFSGatewayUrl = exports.setIPFSGatewayUrl = exports.getProxyAddress = exports.setProxyAddresses = exports.setDataFromSCConfig = exports.state = exports.WalletPlugin = void 0;
+    exports.getChainNativeToken = exports.getChainId = exports.truncateAddress = exports.hasMetaMask = exports.switchNetwork = exports.isWalletConnected = exports.getWalletProvider = exports.viewOnExplorerByAddress = exports.viewOnExplorerByTxHash = exports.getProviderByKey = exports.getProviderList = exports.setProviderList = exports.getDexInfoList = exports.setDexInfoList = exports.hasUserToken = exports.setUserTokens = exports.getNetworkExplorerName = exports.getMatchNetworks = exports.addUserTokens = exports.getUserTokens = exports.getNetworkInfo = exports.getSupportedNetworks = exports.getInfuraId = exports.setTransactionDeadline = exports.getTransactionDeadline = exports.setSlippageTolerance = exports.getSlippageTolerance = exports.toggleExpertMode = exports.isExpertMode = exports.getCurrentChainId = exports.setCurrentChainId = exports.getEmbedderCommissionFee = exports.setAPIGatewayUrls = exports.getIPFSGatewayUrl = exports.setIPFSGatewayUrl = exports.getProxyAddress = exports.setProxyAddresses = exports.setDataFromConfig = exports.state = exports.WalletPlugin = void 0;
     var WalletPlugin;
     (function (WalletPlugin) {
         WalletPlugin["MetaMask"] = "metamask";
@@ -14448,7 +14448,7 @@ define("@scom/scom-swap/store/utils.ts", ["require", "exports", "@ijstech/compon
         embedderCommissionFee: "0",
         tokens: []
     };
-    const setDataFromSCConfig = (options) => {
+    const setDataFromConfig = (options) => {
         if (options.infuraId) {
             setInfuraId(options.infuraId);
         }
@@ -14468,7 +14468,7 @@ define("@scom/scom-swap/store/utils.ts", ["require", "exports", "@ijstech/compon
             setEmbedderCommissionFee(options.embedderCommissionFee);
         }
     };
-    exports.setDataFromSCConfig = setDataFromSCConfig;
+    exports.setDataFromConfig = setDataFromConfig;
     const setProxyAddresses = (data) => {
         exports.state.proxyAddresses = data;
     };
@@ -14501,10 +14501,6 @@ define("@scom/scom-swap/store/utils.ts", ["require", "exports", "@ijstech/compon
         return exports.state.embedderCommissionFee;
     };
     exports.getEmbedderCommissionFee = getEmbedderCommissionFee;
-    const getAPIGatewayUrl = (key) => {
-        return exports.state.apiGatewayUrls[key];
-    };
-    exports.getAPIGatewayUrl = getAPIGatewayUrl;
     const setCurrentChainId = (value) => {
         exports.state.currentChainId = value;
     };
@@ -14637,21 +14633,6 @@ define("@scom/scom-swap/store/utils.ts", ["require", "exports", "@ijstech/compon
         return 'Unknown';
     };
     exports.getNetworkExplorerName = getNetworkExplorerName;
-    const getTokensDataList = async (tokenMapData, tokenBalances) => {
-        let dataList = [];
-        for (let i = 0; i < Object.keys(tokenMapData).length; i++) {
-            let tokenAddress = Object.keys(tokenMapData)[i];
-            let tokenObject = tokenMapData[tokenAddress];
-            if (tokenBalances) {
-                dataList.push(Object.assign(Object.assign({}, tokenObject), { status: false, value: tokenBalances[tokenAddress] ? tokenBalances[tokenAddress] : 0 }));
-            }
-            else {
-                dataList.push(Object.assign(Object.assign({}, tokenObject), { status: null }));
-            }
-        }
-        return dataList;
-    };
-    exports.getTokensDataList = getTokensDataList;
     const setUserTokens = (token, chainId) => {
         if (!exports.state.userTokens[chainId]) {
             exports.state.userTokens[chainId] = [token];
@@ -18354,53 +18335,12 @@ define("@scom/scom-swap/config/index.tsx", ["require", "exports", "@ijstech/comp
     ], Config);
     exports.default = Config;
 });
-define("@scom/scom-swap/scconfig.json.ts", ["require", "exports"], function (require, exports) {
+define("@scom/scom-swap/data.json.ts", ["require", "exports"], function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    ///<amd-module name='@scom/scom-swap/scconfig.json.ts'/> 
+    ///<amd-module name='@scom/scom-swap/data.json.ts'/> 
     const InfuraId = "adc596bf88b648e2a8902bc9093930c5";
     exports.default = {
-        "name": "@scom/scom-swap/main",
-        "version": "0.1.0",
-        "moduleDir": "src",
-        "main": "@scom/scom-swap/main",
-        "modules": {
-            "@scom/scom-swap/assets": {
-                "path": "assets"
-            },
-            "@scom/scom-swap/global": {
-                "path": "global"
-            },
-            "@scom/scom-swap/store": {
-                "path": "store"
-            },
-            "@scom/scom-swap/result": {
-                "path": "result"
-            },
-            "@scom/scom-swap/main": {
-                "path": "main"
-            },
-            "@scom/scom-swap/token-selection": {
-                "path": "token-selection"
-            },
-            "@scom/scom-swap/swap-utils": {
-                "path": "swap-utils"
-            },
-            "@scom/scom-swap/price-info": {
-                "path": "price-info"
-            },
-            "@scom/scom-swap/transaction-settings": {
-                "path": "transaction-settings"
-            },
-            "@scom/scom-swap/expert-mode-settings": {
-                "path": "expert-mode-settings"
-            }
-        },
-        "dependencies": {
-            "@ijstech/eth-contract": "*",
-            "@scom/oswap-openswap-contract": "*",
-            "@scom/scom-commission-proxy-contract": "*"
-        },
         "infuraId": InfuraId,
         "networks": [
             {
@@ -18430,7 +18370,7 @@ define("@scom/scom-swap/scconfig.json.ts", ["require", "exports"], function (req
         "embedderCommissionFee": "0.01"
     };
 });
-define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstech/eth-wallet", "@scom/scom-swap/assets.ts", "@scom/scom-swap/store/index.ts", "@scom/scom-token-list", "@scom/scom-swap/swap-utils/index.ts", "@scom/scom-swap/global/index.ts", "@scom/scom-swap/price-info/index.tsx", "@scom/scom-swap/result/index.tsx", "@scom/scom-swap/expert-mode-settings/index.tsx", "@scom/scom-swap/transaction-settings/index.tsx", "@scom/scom-swap/scconfig.json.ts", "@scom/scom-dex-list", "@scom/scom-swap/index.css.ts"], function (require, exports, components_18, eth_wallet_10, assets_5, index_19, scom_token_list_7, index_20, index_21, index_22, index_23, index_24, index_25, scconfig_json_1, scom_dex_list_2) {
+define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstech/eth-wallet", "@scom/scom-swap/assets.ts", "@scom/scom-swap/store/index.ts", "@scom/scom-token-list", "@scom/scom-swap/swap-utils/index.ts", "@scom/scom-swap/global/index.ts", "@scom/scom-swap/price-info/index.tsx", "@scom/scom-swap/result/index.tsx", "@scom/scom-swap/expert-mode-settings/index.tsx", "@scom/scom-swap/transaction-settings/index.tsx", "@scom/scom-swap/data.json.ts", "@scom/scom-dex-list", "@scom/scom-swap/index.css.ts"], function (require, exports, components_18, eth_wallet_10, assets_5, index_19, scom_token_list_7, index_20, index_21, index_22, index_23, index_24, index_25, data_json_1, scom_dex_list_2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     const Theme = components_18.Styles.Theme.ThemeVars;
@@ -18866,7 +18806,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                 result.message = Object.assign({}, params);
                 result.showModal();
             };
-            index_19.setDataFromSCConfig(scconfig_json_1.default);
+            index_19.setDataFromConfig(data_json_1.default);
             this.fromInputValue = new eth_wallet_10.BigNumber(0);
             this.toInputValue = new eth_wallet_10.BigNumber(0);
             this.swapButtonStatusMap = {};

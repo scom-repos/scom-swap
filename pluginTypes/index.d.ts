@@ -9808,7 +9808,7 @@ declare module "@scom/scom-swap/assets.ts" {
 declare module "@scom/scom-swap/index.css.ts" { }
 /// <amd-module name="@scom/scom-swap/store/utils.ts" />
 declare module "@scom/scom-swap/store/utils.ts" {
-    import { IProvider, ITokenObject, TokenMapType, IExtendedNetwork } from "@scom/scom-swap/global/index.ts";
+    import { IProvider, ITokenObject, IExtendedNetwork } from "@scom/scom-swap/global/index.ts";
     import { IDexInfo } from '@scom/scom-dex-list';
     export enum WalletPlugin {
         MetaMask = "metamask",
@@ -9837,15 +9837,13 @@ declare module "@scom/scom-swap/store/utils.ts" {
         embedderCommissionFee: string;
         tokens: any[];
     };
-    export const setDataFromSCConfig: (options: any) => void;
+    export const setDataFromConfig: (options: any) => void;
     export const setProxyAddresses: (data: ProxyAddresses) => void;
     export const getProxyAddress: (chainId?: number) => string;
     export const setIPFSGatewayUrl: (url: string) => void;
     export const getIPFSGatewayUrl: () => string;
     export const setAPIGatewayUrls: (urls: Record<string, string>) => void;
     export const getEmbedderCommissionFee: () => string;
-    export type APIGatewayKey = 'otcQueue';
-    export const getAPIGatewayUrl: (key: APIGatewayKey) => string;
     export const setCurrentChainId: (value: number) => void;
     export const getCurrentChainId: () => number;
     export const isExpertMode: () => boolean;
@@ -9866,7 +9864,6 @@ declare module "@scom/scom-swap/store/utils.ts" {
     }
     export const getMatchNetworks: (conditions: NetworkConditions) => IExtendedNetwork[];
     export const getNetworkExplorerName: (chainId: number) => string;
-    export const getTokensDataList: (tokenMapData: TokenMapType, tokenBalances: any) => Promise<any[]>;
     export const setUserTokens: (token: ITokenObject, chainId: number) => void;
     export const hasUserToken: (address: string, chainId: number) => boolean;
     export const setDexInfoList: (value: IDexInfo[]) => void;
@@ -10810,50 +10807,9 @@ declare module "@scom/scom-swap/config/index.tsx" {
         render(): any;
     }
 }
-/// <amd-module name="@scom/scom-swap/scconfig.json.ts" />
-declare module "@scom/scom-swap/scconfig.json.ts" {
+/// <amd-module name="@scom/scom-swap/data.json.ts" />
+declare module "@scom/scom-swap/data.json.ts" {
     const _default_55: {
-        name: string;
-        version: string;
-        moduleDir: string;
-        main: string;
-        modules: {
-            "@scom/scom-swap/assets": {
-                path: string;
-            };
-            "@scom/scom-swap/global": {
-                path: string;
-            };
-            "@scom/scom-swap/store": {
-                path: string;
-            };
-            "@scom/scom-swap/result": {
-                path: string;
-            };
-            "@scom/scom-swap/main": {
-                path: string;
-            };
-            "@scom/scom-swap/token-selection": {
-                path: string;
-            };
-            "@scom/scom-swap/swap-utils": {
-                path: string;
-            };
-            "@scom/scom-swap/price-info": {
-                path: string;
-            };
-            "@scom/scom-swap/transaction-settings": {
-                path: string;
-            };
-            "@scom/scom-swap/expert-mode-settings": {
-                path: string;
-            };
-        };
-        dependencies: {
-            "@ijstech/eth-contract": string;
-            "@scom/oswap-openswap-contract": string;
-            "@scom/scom-commission-proxy-contract": string;
-        };
         infuraId: string;
         networks: ({
             chainId: number;

@@ -31,7 +31,7 @@ export const state = {
   tokens: []
 }
 
-export const setDataFromSCConfig = (options: any) => {
+export const setDataFromConfig = (options: any) => {
   if (options.infuraId) {
     setInfuraId(options.infuraId)
   }
@@ -83,11 +83,6 @@ const setEmbedderCommissionFee = (fee: string) => {
 
 export const getEmbedderCommissionFee = () => {
   return state.embedderCommissionFee;
-}
-
-export type APIGatewayKey = 'otcQueue';
-export const getAPIGatewayUrl = (key: APIGatewayKey) => {
-  return state.apiGatewayUrls[key];
 }
 
 export const setCurrentChainId = (value: number) => {
@@ -229,27 +224,6 @@ export const getNetworkExplorerName = (chainId: number) => {
     return getNetworkInfo(chainId).explorerName;
   }
   return 'Unknown';
-}
-
-export const getTokensDataList = async (tokenMapData: TokenMapType, tokenBalances: any): Promise<any[]> => {
-  let dataList: any[] = [];
-  for (let i = 0; i < Object.keys(tokenMapData).length; i++) {
-    let tokenAddress = Object.keys(tokenMapData)[i];
-    let tokenObject = tokenMapData[tokenAddress];
-    if (tokenBalances) {
-      dataList.push({
-        ...tokenObject,
-        status: false,
-        value: tokenBalances[tokenAddress] ? tokenBalances[tokenAddress] : 0,
-      });
-    } else {
-      dataList.push({
-        ...tokenObject,
-        status: null,
-      })
-    }
-  }
-  return dataList;
 }
 
 export const setUserTokens = (token: ITokenObject, chainId: number) => {

@@ -10,7 +10,7 @@ import {
   switchNetwork,
   getWalletProvider,
   getMatchNetworks,
-  setDataFromSCConfig,
+  setDataFromConfig,
   setProviderList,
   getProviderByKey,
   getNetworkInfo,
@@ -58,7 +58,7 @@ import { Result } from './result/index';
 import { ExpertModeSettings } from './expert-mode-settings/index'
 import { TransactionSettings } from './transaction-settings/index'
 import Config from './config/index';
-import scconfig from './scconfig.json';
+import configData from './data.json';
 import ScomWalletModal, {IWalletPlugin} from '@scom/scom-wallet-modal';
 import ScomDappContainer from '@scom/scom-dapp-container'
 import getDexList from '@scom/scom-dex-list';
@@ -698,7 +698,7 @@ export default class ScomSwap extends Module implements PageBlock {
 
   constructor(parent?: Container, options?: any) {
     super(parent, options);
-    setDataFromSCConfig(scconfig);
+    setDataFromConfig(configData);
     this.fromInputValue = new BigNumber(0);
     this.toInputValue = new BigNumber(0);
     this.swapButtonStatusMap = {};
