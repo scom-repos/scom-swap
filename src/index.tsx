@@ -90,7 +90,7 @@ declare const window: any;
 
 @customModule
 @customElements('i-scom-swap')
-export default class ScomSwap extends Module implements PageBlock {
+export default class ScomSwap extends Module {
   private _oldData: ISwapConfigUI = {
     category: 'fixed-pair',
     providers: [],
@@ -266,110 +266,7 @@ export default class ScomSwap extends Module implements PageBlock {
     this._data.showHeader = value;
   }
 
-  getEmbedderActions() {
-    const propertiesSchema: IDataSchema = {
-      type: "object",
-      properties: {
-        category: {
-          type: "string",
-          required: true,
-          enum: [
-            "fixed-pair",
-            "aggregator"
-          ]
-        },
-        providers: {
-          type: "array",
-          required: true,
-          items: {
-            type: "object",
-            properties: {
-              caption: {
-                type: "string",
-                required: true
-              },
-              image: {
-                type: "string",
-                required: true
-              },
-              key: {
-                type: "string",
-                required: true
-              },
-              dexId: {
-                type: "number"
-              },
-              chainId: {
-                type: "number",
-                enum: [1, 56, 137, 250, 97, 80001, 43113, 43114],
-                required: true
-              }
-            }
-          }
-        }
-      }
-    }
-
-    const themeSchema: IDataSchema = {
-      type: 'object',
-      properties: {
-        "dark": {
-          type: 'object',
-          properties: {
-            backgroundColor: {
-              type: 'string',
-              format: 'color',
-              readOnly: true
-            },
-            fontColor: {
-              type: 'string',
-              format: 'color',
-              readOnly: true
-            },
-            inputBackgroundColor: {
-              type: 'string',
-              format: 'color',
-              readOnly: true
-            },
-            inputFontColor: {
-              type: 'string',
-              format: 'color',
-              readOnly: true
-            }
-          }
-        },
-        "light": {
-          type: 'object',
-          properties: {
-            backgroundColor: {
-              type: 'string',
-              format: 'color',
-              readOnly: true
-            },
-            fontColor: {
-              type: 'string',
-              format: 'color',
-              readOnly: true
-            },
-            inputBackgroundColor: {
-              type: 'string',
-              format: 'color',
-              readOnly: true
-            },
-            inputFontColor: {
-              type: 'string',
-              format: 'color',
-              readOnly: true
-            }
-          }
-        }
-      }
-    }
-
-    return this._getActions(propertiesSchema, themeSchema);
-  }
-
-  getActions() {
+  private getActions() {
     const propertiesSchema: IDataSchema = {
       type: "object",
       properties: {
@@ -464,7 +361,7 @@ export default class ScomSwap extends Module implements PageBlock {
     return this._getActions(propertiesSchema, themeSchema);
   }
 
-  _getActions(propertiesSchema: IDataSchema, themeSchema: IDataSchema) {
+  private _getActions(propertiesSchema: IDataSchema, themeSchema: IDataSchema) {
     const actions = [
       {
         name: 'Settings',
@@ -516,7 +413,7 @@ export default class ScomSwap extends Module implements PageBlock {
           return {
             execute: async () => {
               if (!userInputData) return;
-              this.oldTag = { ...this.tag };
+              this.oldTag = JSON.parse(JSON.stringify(this.tag));
               this.setTag(userInputData);
               if (builder) builder.setTag(userInputData);
             },
@@ -538,7 +435,16 @@ export default class ScomSwap extends Module implements PageBlock {
     let self = this;
     return [
       {
-        name: 'Commissions',
+        name: 'Builder Configurator',
+        target: 'Builders',
+        getActions: this.getActions.bind(this),
+        getData: this.getData.bind(this),
+        setData: this.setData.bind(this),
+        getTag: this.getTag.bind(this),
+        setTag: this.setTag.bind(this)
+      },
+      {
+        name: 'Emdedder Configurator',
         target: 'Embedders',
         elementName: 'i-scom-swap-config',
         getLinkParams: () => {
@@ -572,16 +478,20 @@ export default class ScomSwap extends Module implements PageBlock {
             await this.setData(resultingData);
             await callback(data);
           }
-        }
+        },
+        getData: this.getData.bind(this),
+        setData: this.setData.bind(this),
+        getTag: this.getTag.bind(this),
+        setTag: this.setTag.bind(this)
       }
     ]
   }
 
-  async getData() {
+  private async getData() {
     return this._data;
   }
 
-  async setData(value: ISwapConfigUI) {
+  private async setData(value: ISwapConfigUI) {
     this._data = value;
     this.configDApp.data = value;
     this.updateContractAddress();
@@ -592,7 +502,7 @@ export default class ScomSwap extends Module implements PageBlock {
     }
   }
 
-  async getTag() {
+  private async getTag() {
     return this.tag;
   }
 
@@ -604,7 +514,7 @@ export default class ScomSwap extends Module implements PageBlock {
     }
   }
 
-  async setTag(value: any) {
+  private async setTag(value: any) {
     const newValue = value || {};
     if (newValue.light) this.updateTag('light', newValue.light);
     if (newValue.dark) this.updateTag('dark', newValue.dark);
@@ -636,7 +546,7 @@ export default class ScomSwap extends Module implements PageBlock {
     }
   }
 
-  updateContractAddress() {
+  private updateContractAddress() {
     if (this.approvalModelAction) {
       if (getCurrentCommissions(this.commissions).length) {
         this.contractAddress = getProxyAddress();
@@ -717,7 +627,7 @@ export default class ScomSwap extends Module implements PageBlock {
     });
   }
 
-  onWalletConnect = async (connected: boolean) => {
+  private onWalletConnect = async (connected: boolean) => {
     if (connected && (this.currentChainId == null || this.currentChainId == undefined)) {
       this.onChainChange();
     } else {
@@ -725,7 +635,7 @@ export default class ScomSwap extends Module implements PageBlock {
     }
   }
 
-  onWalletDisconnect = async (connected: boolean) => {
+  private onWalletDisconnect = async (connected: boolean) => {
     if (!connected) {
       //await this.handleAddRoute();
       //await this.updateBalance();
@@ -733,7 +643,7 @@ export default class ScomSwap extends Module implements PageBlock {
     }
   }
 
-  onChainChange = async () => {
+  private onChainChange = async () => {
     this.currentChainId = getChainId();
     if (this.currentChainId != null && this.currentChainId != undefined)
       this.swapBtn.visible = true;
@@ -962,7 +872,7 @@ export default class ScomSwap extends Module implements PageBlock {
     this.secondTokenSelection.isBtnMaxShown = false;
     this.secondTokenSelection.isCommonShown = true;
   }
-  async initApprovalModelAction() {
+  private async initApprovalModelAction() {
     this.approvalModelAction = await getApprovalModelAction({
       sender: this,
       payAction: this.onSubmit,
@@ -1003,7 +913,7 @@ export default class ScomSwap extends Module implements PageBlock {
     })
   }
 
-  async onRevertSwap() {
+  private async onRevertSwap() {
     this.onUpdateEstimatedPosition(!this.isEstimated('from'), true);
     [this.fromToken, this.toToken] = [this.toToken, this.fromToken];
     [this.fromInputValue, this.toInputValue] = [this.toInputValue, this.fromInputValue];
@@ -1022,7 +932,7 @@ export default class ScomSwap extends Module implements PageBlock {
     await this.handleAddRoute();
   }
 
-  tipFormatter(value: any) {
+  private tipFormatter(value: any) {
     return `${Number(value).toFixed()}%`;
   }
 
@@ -1031,7 +941,7 @@ export default class ScomSwap extends Module implements PageBlock {
     return this.fromInputValue.plus(commissionAmount);
   }
 
-  setupCrossChainPopup() {
+  private setupCrossChainPopup() {
     const arrows = this.swapModal.querySelectorAll('i-icon.arrow-down');
     arrows.forEach((arrow: Element) => {
       arrow.classList.remove('arrow-down--chain');
@@ -1041,7 +951,7 @@ export default class ScomSwap extends Module implements PageBlock {
     this.targetChainFirstPanel.classList.add('hidden');
   }
 
-  handleSwapPopup() {
+  private handleSwapPopup() {
     if (!this.record) return;
     this.setupCrossChainPopup();
     const slippageTolerance = getSlippageTolerance();
@@ -1064,10 +974,10 @@ export default class ScomSwap extends Module implements PageBlock {
 
     this.swapModal.visible = true;
   }
-  doSwap() {
+  private doSwap() {
     this.approvalModelAction.doPayAction(this.record);
   }
-  getMinReceivedMaxSold = (): number | null => {
+  private getMinReceivedMaxSold = (): number | null => {
     const slippageTolerance = getSlippageTolerance();
     if (!slippageTolerance) return null;
     if (this.isFrom) {
@@ -1084,11 +994,11 @@ export default class ScomSwap extends Module implements PageBlock {
     }
   }
 
-  onCloseSwapModal() {
+  private onCloseSwapModal() {
     this.swapModal.visible = false;
   }
 
-  onUpdateToken(token: ITokenObject, isFrom: boolean) {
+  private onUpdateToken(token: ITokenObject, isFrom: boolean) {
     if (!token) return;
     const balance = this.getBalance(token);
     if (isFrom) {
@@ -1130,7 +1040,7 @@ export default class ScomSwap extends Module implements PageBlock {
     }
     this.onUpdateSliderValue();
   }
-  async onSelectToken(token: ITokenObject, isFrom: boolean) {
+  private async onSelectToken(token: ITokenObject, isFrom: boolean) {
     this.firstTokenSelection.enabled = false;
     this.secondTokenSelection.enabled = false;
     if (token.isNew && isWalletConnected()) {
@@ -1144,7 +1054,7 @@ export default class ScomSwap extends Module implements PageBlock {
     this.secondTokenSelection.enabled = true;
   }
 
-  setApprovalSpenderAddress() {
+  private setApprovalSpenderAddress() {
     const item = this.record;
     if (!item) return;
     const market =  getProviderByKey(item.provider)?.key || '';
@@ -1158,14 +1068,14 @@ export default class ScomSwap extends Module implements PageBlock {
     }
   }
 
-  getInputValue(isFrom: boolean) {
+  private getInputValue(isFrom: boolean) {
     const token = isFrom ? this.fromToken : this.toToken;
     const value = isFrom ? this.fromInputValue : this.toInputValue;
     if (!value || value.isNaN()) return '';
     return limitDecimals(value.toFixed(), token?.decimals || 18);
   }
 
-  async updateTokenInput(isFrom: boolean, init?: boolean) {
+  private async updateTokenInput(isFrom: boolean, init?: boolean) {
     const _col = isFrom ? this.payCol : this.receiveCol;
     const label = _col.querySelector('i-label') as Node;
     if (init && !label) {
@@ -1189,7 +1099,7 @@ export default class ScomSwap extends Module implements PageBlock {
     }
   }
 
-  addToMetamask(event: Event, token: ITokenObject) {
+  private addToMetamask(event: Event, token: ITokenObject) {
     event.stopPropagation();
     return window.ethereum.request({
       method: 'wallet_watchAsset',
@@ -1205,7 +1115,7 @@ export default class ScomSwap extends Module implements PageBlock {
     });
   }
 
-  toggleShowRoutes(source: Control) {
+  private toggleShowRoutes(source: Control) {
     this.listRouting.classList.toggle('active');
     const items = this.listRouting.querySelectorAll('i-panel.pnl-routing');
     if (this.listRouting.classList.contains('active')) {
@@ -1224,7 +1134,7 @@ export default class ScomSwap extends Module implements PageBlock {
       this.showCaption.caption = "Show More";
     }
   }
-  async onSelectRouteItem(source: Control, item: any) {
+  private async onSelectRouteItem(source: Control, item: any) {
     if (source.classList.contains("routing-selected")) return;
     const selected = this.listRouting.querySelector(".routing-selected");
     selected?.classList.remove("routing-selected");
@@ -1257,7 +1167,7 @@ export default class ScomSwap extends Module implements PageBlock {
     }
     this.priceInfo.Items = this.getPriceInfo();
   }
-  onTokenInputChange(source: Control) {
+  private onTokenInputChange(source: Control) {
     clearTimeout(this.timeout);
     this.timeout = setTimeout(async () => {
       const fromInput = this.payCol.getElementsByTagName('I-INPUT')?.[0] as Input;
@@ -1308,7 +1218,7 @@ export default class ScomSwap extends Module implements PageBlock {
 
     }, 1000);
   }
-  resetValuesByInput() {
+  private resetValuesByInput() {
     this.onUpdateSliderValue(0);
     this.initRoutes();
     this.priceInfo.Items = this.getPriceInfo();
@@ -1316,7 +1226,7 @@ export default class ScomSwap extends Module implements PageBlock {
     this.toInputValue = new BigNumber(0);
     this.redirectToken();
   }
-  initRoutes() {
+  private initRoutes() {
     this.listRouting.innerHTML = '';
     this.routeFound.caption = '0 Route(s) Found';
     this.toggleRoutes.classList.add('hidden');
@@ -1324,7 +1234,7 @@ export default class ScomSwap extends Module implements PageBlock {
     this.isPriceToggled = false;
     this.swapBtn.visible = false;
   }
-  async handleAddRoute() {
+  private async handleAddRoute() {
     if (!this.fromToken || !this.toToken || !(this.fromInputValue.gt(0) || this.toInputValue.gt(0))) return;
     this.initRoutes();
     this.disableSelectChain(true);
@@ -1387,7 +1297,7 @@ export default class ScomSwap extends Module implements PageBlock {
       this.lbYouPayValue.caption = `${formatNumber(total)} ${this.fromToken?.symbol}`;
     }
   }
-  getProviderCaption(provider: string | IProvider, caption: string) {
+  private getProviderCaption(provider: string | IProvider, caption: string) {
     let providerObj: any;
     if (typeof provider === 'string') {
       providerObj = provider ? getProviderByKey(provider) : null;
@@ -1406,7 +1316,7 @@ export default class ScomSwap extends Module implements PageBlock {
       class="inline-block" fallbackUrl="${tokenAssets.fallbackUrl}"></i-image>`;
     return `${tokenIcon}`;
   }
-  async addRoute(item: any, index: number, pricePercent: any) {
+  private async addRoute(item: any, index: number, pricePercent: any) {
     // const isHybrid = ProviderConfigMap[item.provider].marketCode === Market.HYBRID;
     const isBestSmartRoute = item.bestSmartRoute && item.bestSmartRoute.length; // isHybrid && item.bestSmartRoute && item.bestSmartRoute.length;
     const providerByKey = getProviderByKey(item.provider);
@@ -1526,7 +1436,7 @@ export default class ScomSwap extends Module implements PageBlock {
 
     return routingMainPanel;
   }
-  getPricePercent(routes: any, isFrom: boolean) {
+  private getPricePercent(routes: any, isFrom: boolean) {
     if (routes && routes.length > 1) {
       const amountStr = isFrom ? 'amountIn' : 'amountOut'
       const firstAmount = new BigNumber(routes[0][amountStr] || 0);
@@ -1548,15 +1458,15 @@ export default class ScomSwap extends Module implements PageBlock {
     return 0
   }
 
-  sortToken = (a: any, b: any) => {
+  private sortToken = (a: any, b: any) => {
     return b.value - a.value;
   };
   // Price Info
-  onTogglePrice(priceInfo: PriceInfo) {
+  private onTogglePrice(priceInfo: PriceInfo) {
     this.isPriceToggled = !this.isPriceToggled;
     priceInfo.Items = this.getPriceInfo();
   }
-  getRate() {
+  private getRate() {
     const value = this.isPriceToggled ? this.record?.priceSwap : this.record?.price;
     let fromSymbol = this.fromToken?.symbol;
     let toSymbol = this.toToken?.symbol;
@@ -1568,14 +1478,14 @@ export default class ScomSwap extends Module implements PageBlock {
     }
     return '-';
   }
-  getPriceImpact() {
+  private getPriceImpact() {
     const value = this.record?.priceImpact;
     if (value || value == 0) {
       return `${formatNumber(value)}%`;
     }
     return '-';
   }
-  getMinimumReceived() {
+  private getMinimumReceived() {
     const value = this.getMinReceivedMaxSold();
     if (value || value == 0) {
       if (this.isFrom) {
@@ -1585,14 +1495,14 @@ export default class ScomSwap extends Module implements PageBlock {
     }
     return '-';
   }
-  getTradeFeeExactAmount() {
+  private getTradeFeeExactAmount() {
     const tradeFee = this.record?.fromAmount.times(this.record?.tradeFee).toNumber();
     if (tradeFee || tradeFee == 0) {
       return `${formatNumber(tradeFee)} ${this.fromToken?.symbol}`;
     }
     return '-';
   }
-  getFeeDetails() {
+  private getFeeDetails() {
     if (this.record) {
       return [{
         title: "Liquidity Provider Fee",
@@ -1603,7 +1513,7 @@ export default class ScomSwap extends Module implements PageBlock {
       return []
     }
   }
-  getPriceInfo() {
+  private getPriceInfo() {
     const rate = this.getRate();
     const priceImpact = this.getPriceImpact();
     const minimumReceived = this.getMinimumReceived();
@@ -1655,7 +1565,7 @@ export default class ScomSwap extends Module implements PageBlock {
     ];
     return info.filter((f: any) => !f.isHidden);
   }
-  onUpdateEstimatedPosition = (isFrom: boolean, reverseRouting: boolean = false) => {
+  private onUpdateEstimatedPosition = (isFrom: boolean, reverseRouting: boolean = false) => {
     if (this.isFrom != isFrom) {
       this.isFrom = isFrom;
 
@@ -1665,7 +1575,7 @@ export default class ScomSwap extends Module implements PageBlock {
       }
     }
   }
-  isEstimated = (tokenPosition: string, strict = false) => {
+  private isEstimated = (tokenPosition: string, strict = false) => {
     if (tokenPosition === 'from') {
       return strict ? this.isFrom && !this.fromInputValue.isZero() : this.isFrom;
     } else if (tokenPosition === 'to') {
@@ -1674,7 +1584,7 @@ export default class ScomSwap extends Module implements PageBlock {
       return false;
     }
   };
-  getBalance(token?: ITokenObject) {
+  private getBalance(token?: ITokenObject) {
     if (token && this.allTokenBalancesMap) {
       const address = token.address || '';
       let balance = address ? this.allTokenBalancesMap[address.toLowerCase()] ?? 0 : this.allTokenBalancesMap[token.symbol] || 0;
@@ -1682,7 +1592,7 @@ export default class ScomSwap extends Module implements PageBlock {
     }
     return 0;
   }
-  async updateBalance() {
+  private async updateBalance() {
     if (isWalletConnected()) await tokenStore.updateAllTokenBalances();
     this.allTokenBalancesMap = isWalletConnected() ? tokenStore.tokenBalances : [];
     if (this.fromToken) {
@@ -1704,7 +1614,7 @@ export default class ScomSwap extends Module implements PageBlock {
     }
   }
 
-  getSwapButtonText() {
+  private getSwapButtonText() {
     const isApproveButtonShown = this.isApproveButtonShown;
     if (!isWalletConnected()) {
       return "Connect Wallet";
@@ -1731,7 +1641,7 @@ export default class ScomSwap extends Module implements PageBlock {
       return "Swap";
     }
   }
-  getWarningMessageText() {
+  private getWarningMessageText() {
     const tokens = [this.fromToken?.symbol, this.toToken?.symbol];
     if (tokens.every(v => v === 'ETH' || v === 'WETH')) {
       return 'Invalid pair';
@@ -1751,7 +1661,7 @@ export default class ScomSwap extends Module implements PageBlock {
     }
     return '';
   }
-  setMapStatus(type: StatusMapType, key: string, status: ApprovalStatus) {
+  private setMapStatus(type: StatusMapType, key: string, status: ApprovalStatus) {
     let mapStatus = {} as any;
     if (type === 'approve') {
       mapStatus = this.approveButtonStatusMap;
@@ -1768,30 +1678,30 @@ export default class ScomSwap extends Module implements PageBlock {
     }
     this.setSwapButtonText();
   }
-  onSwapConfirming = (key: any) => {
+  private onSwapConfirming = (key: any) => {
     this.setMapStatus('swap', key, ApprovalStatus.APPROVING);
     if (!this.swapBtn.rightIcon.visible)
       this.swapBtn.rightIcon.visible = true;
   }
-  onSwapConfirmed = async (data: any) => {
+  private onSwapConfirmed = async (data: any) => {
     const { key } = data;
     this.setMapStatus('swap', key, ApprovalStatus.TO_BE_APPROVED);
     if (this.swapBtn.rightIcon.visible)
       this.swapBtn.rightIcon.visible = false;
     await this.handleAddRoute();
   }
-  isButtonLoading() {
+  private isButtonLoading() {
     if (this.isApproveButtonShown) {
       return this.isApprovingRouter;
     }
     return this.isSwapping;
   }
-  isSwapButtonDisabled() {
+  private isSwapButtonDisabled() {
     const warningMessageText = this.getWarningMessageText();
     return (isWalletConnected() && (warningMessageText != '' && !this.isPriceImpactTooHigh));
   }
 
-  onClickSwapButton() {
+  private onClickSwapButton() {
     if (!isWalletConnected()) {
       // this.$eventBus.dispatch(EventId.ConnectWallet);
       this.mdWallet.showModal();
@@ -1810,7 +1720,7 @@ export default class ScomSwap extends Module implements PageBlock {
     }
     this.handleSwapPopup();
   }
-  onSubmit = async () => {
+  private onSubmit = async () => {
     try {
       this.swapModal.visible = false;
       this.showResultMessage(this.openswapResult, 'warning', `Swapping ${formatNumber(this.totalAmount(), 4)} ${this.fromToken?.symbol} to ${formatNumber(this.toInputValue, 4)} ${this.toToken?.symbol}`);
@@ -1836,12 +1746,12 @@ export default class ScomSwap extends Module implements PageBlock {
       console.error(error);
     }
   }
-  onApproveRouterMax = () => {
+  private onApproveRouterMax = () => {
     this.showResultMessage(this.openswapResult, 'warning', 'Approving');
     this.setApprovalSpenderAddress();
     this.approvalModelAction.doApproveAction(this.fromToken as ITokenObject, this.totalAmount().toString(), this.record);
   }
-  onSetMaxBalance = async (value?: number) => {
+  private onSetMaxBalance = async (value?: number) => {
     if (!this.fromToken?.symbol) return;
     this.isFrom = false;
     const address = this.fromToken?.address || this.fromToken?.symbol;
@@ -1871,16 +1781,16 @@ export default class ScomSwap extends Module implements PageBlock {
     }
     await this.handleAddRoute();
   }
-  isMaxDisabled = (): boolean => {
+  private isMaxDisabled = (): boolean => {
     const address = this.fromToken?.address || this.fromToken?.symbol;
     let balance = this.getBalance(this.fromToken);
     return !address || balance <= 0
   }
-  onSliderChange(source: Control, event: Event) {
+  private onSliderChange(source: Control, event: Event) {
     const value = (source as Range).value;
     this.onSetMaxBalance(value);
   }
-  onUpdateSliderValue(value?: number) {
+  private onUpdateSliderValue(value?: number) {
     if (value != null) {
       this.fromSlider.value = value;
       return;
@@ -1897,7 +1807,7 @@ export default class ScomSwap extends Module implements PageBlock {
     if (isNaN(val)) return;
     this.fromSlider.value = val > 100 ? 100 : val;
   }
-  onRenderPriceInfo() {
+  private onRenderPriceInfo() {
     if (!this.priceInfo) {
       this.priceInfo = new PriceInfo();
       this.priceInfo.width = 'auto';
@@ -1930,12 +1840,12 @@ export default class ScomSwap extends Module implements PageBlock {
     return getWalletProvider() === WalletPlugin.MetaMask;
   }
 
-  getSupportedChainList = () => {
+  private getSupportedChainList = () => {
     const list = getMatchNetworks({ isDisabled: false });
     this.supportedChainList = list;
   };
 
-  disableSelectChain = (disabled: boolean, isDes?: boolean) => {
+  private disableSelectChain = (disabled: boolean, isDes?: boolean) => {
     const chains = isDes ? this.desChainList : this.srcChainList;
     const imgs = chains.querySelectorAll('i-image');
     imgs.forEach((elm: Element) => {
@@ -1949,7 +1859,7 @@ export default class ScomSwap extends Module implements PageBlock {
     });
   }
 
-  selectSourceChain = async (obj: IExtendedNetwork, img?: Image) => {
+  private selectSourceChain = async (obj: IExtendedNetwork, img?: Image) => {
     if ((this.srcChain && this.srcChain.chainId != obj.chainId) || !this.srcChain) {
       await switchNetwork(obj.chainId);
       this.srcChain = obj;
@@ -1966,7 +1876,7 @@ export default class ScomSwap extends Module implements PageBlock {
     }
   };
 
-  setTargetTokenList = (isDisabled?: boolean) => {
+  private setTargetTokenList = (isDisabled?: boolean) => {
     const srcChainId = this.srcChain?.chainId || this.currentChainId;
     if (this.secondTokenSelection.targetChainId != srcChainId) {
       this.secondTokenSelection.targetChainId = srcChainId;
@@ -1974,7 +1884,7 @@ export default class ScomSwap extends Module implements PageBlock {
     this.secondTokenSelection.tokenDataListProp = getSupportedTokens(this._data.tokens || [], srcChainId);
   }
 
-  onSourceChainChanged = () => {
+  private onSourceChainChanged = () => {
     const selected = this.srcChainList.querySelector('.icon-selected');
     if (selected) {
       selected.classList.remove('icon-selected');
@@ -1991,7 +1901,7 @@ export default class ScomSwap extends Module implements PageBlock {
     }
   }
 
-  onSelectSourceChain = async (obj: IExtendedNetwork, img?: Image) => {
+  private onSelectSourceChain = async (obj: IExtendedNetwork, img?: Image) => {
     if (this.isMetaMask || !isWalletConnected()) {
       await this.selectSourceChain(obj, img);
       this.currentChainId = obj.chainId;
@@ -1999,7 +1909,7 @@ export default class ScomSwap extends Module implements PageBlock {
     }
   }
 
-  initChainIcon = (network: IExtendedNetwork) => {
+  private initChainIcon = (network: IExtendedNetwork) => {
     const img = new Image();
     img.url = network.image;
     img.tooltip.content = network.chainName;
@@ -2015,7 +1925,7 @@ export default class ScomSwap extends Module implements PageBlock {
     this.srcChainList.appendChild(img);
   };
 
-  updateSrcChainIconList = () => {
+  private updateSrcChainIconList = () => {
     const listElm = this.srcChainList.querySelectorAll('i-image');
     for (const elm of listElm) {
       const networkName = elm.getAttribute('network-name');
@@ -2032,7 +1942,7 @@ export default class ScomSwap extends Module implements PageBlock {
     }
   };
 
-  onRenderChainList = async () => {
+  private onRenderChainList = async () => {
     this.oldSupportedChainList = this.supportedChainList;
     this.getSupportedChainList();
     this.srcChainList.innerHTML = '';
@@ -2044,7 +1954,7 @@ export default class ScomSwap extends Module implements PageBlock {
     });
   };
 
-  showModalFees = () => {
+  private showModalFees = () => {
     const fees = this.getFeeDetails();
     this.feesInfo.clearInnerHTML();
     fees.forEach((fee) => {
@@ -2080,7 +1990,7 @@ export default class ScomSwap extends Module implements PageBlock {
     this.modalFees.visible = true;
   }
 
-  closeModalFees = () => {
+  private closeModalFees = () => {
     this.modalFees.visible = false;
   }
 

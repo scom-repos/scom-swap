@@ -18872,106 +18872,6 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
         set showHeader(value) {
             this._data.showHeader = value;
         }
-        getEmbedderActions() {
-            const propertiesSchema = {
-                type: "object",
-                properties: {
-                    category: {
-                        type: "string",
-                        required: true,
-                        enum: [
-                            "fixed-pair",
-                            "aggregator"
-                        ]
-                    },
-                    providers: {
-                        type: "array",
-                        required: true,
-                        items: {
-                            type: "object",
-                            properties: {
-                                caption: {
-                                    type: "string",
-                                    required: true
-                                },
-                                image: {
-                                    type: "string",
-                                    required: true
-                                },
-                                key: {
-                                    type: "string",
-                                    required: true
-                                },
-                                dexId: {
-                                    type: "number"
-                                },
-                                chainId: {
-                                    type: "number",
-                                    enum: [1, 56, 137, 250, 97, 80001, 43113, 43114],
-                                    required: true
-                                }
-                            }
-                        }
-                    }
-                }
-            };
-            const themeSchema = {
-                type: 'object',
-                properties: {
-                    "dark": {
-                        type: 'object',
-                        properties: {
-                            backgroundColor: {
-                                type: 'string',
-                                format: 'color',
-                                readOnly: true
-                            },
-                            fontColor: {
-                                type: 'string',
-                                format: 'color',
-                                readOnly: true
-                            },
-                            inputBackgroundColor: {
-                                type: 'string',
-                                format: 'color',
-                                readOnly: true
-                            },
-                            inputFontColor: {
-                                type: 'string',
-                                format: 'color',
-                                readOnly: true
-                            }
-                        }
-                    },
-                    "light": {
-                        type: 'object',
-                        properties: {
-                            backgroundColor: {
-                                type: 'string',
-                                format: 'color',
-                                readOnly: true
-                            },
-                            fontColor: {
-                                type: 'string',
-                                format: 'color',
-                                readOnly: true
-                            },
-                            inputBackgroundColor: {
-                                type: 'string',
-                                format: 'color',
-                                readOnly: true
-                            },
-                            inputFontColor: {
-                                type: 'string',
-                                format: 'color',
-                                readOnly: true
-                            }
-                        }
-                    }
-                }
-            };
-            return this._getActions(propertiesSchema, themeSchema);
-        }
         getActions() {
             const propertiesSchema = {
                 type: "object",
@@ -19141,7 +19041,16 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
             let self = this;
             return [
                 {
-                    name: 'Commissions',
+                    name: 'Builder Configurator',
+                    target: 'Builders',
+                    getActions: this.getActions.bind(this),
+                    getData: this.getData.bind(this),
+                    setData: this.setData.bind(this),
+                    getTag: this.getTag.bind(this),
+                    setTag: this.setTag.bind(this)
+                },
+                {
+                    name: 'Emdedder Configurator',
                     target: 'Embedders',
                     elementName: 'i-scom-swap-config',
                     getLinkParams: () => {
@@ -19168,7 +19077,11 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                             await this.setData(resultingData);
                             await callback(data);
                         };
-                    }
+                    },
+                    getData: this.getData.bind(this),
+                    setData: this.setData.bind(this),
+                    getTag: this.getTag.bind(this),
+                    setTag: this.setTag.bind(this)
                 }
             ];
         }
