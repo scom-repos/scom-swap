@@ -10841,14 +10841,12 @@ declare module "@scom/scom-swap/data.json.ts" {
 }
 /// <amd-module name="@scom/scom-swap" />
 declare module "@scom/scom-swap" {
-    import { Module, Panel, Image, Container, Control, ControlElement, IDataSchema } from '@ijstech/components';
+    import { Module, Container, ControlElement } from '@ijstech/components';
     import { BigNumber } from '@ijstech/eth-wallet';
     import "@scom/scom-swap/index.css.ts";
-    import { ITokenObject, ApprovalStatus, IExtendedNetwork, PageBlock, IProvider, ISwapConfigUI, IProviderUI, Category, ICommissionInfo, INetworkConfig } from "@scom/scom-swap/global/index.ts";
-    import { PriceInfo } from "@scom/scom-swap/price-info/index.tsx";
+    import { ITokenObject, IProviderUI, Category, ICommissionInfo, INetworkConfig } from "@scom/scom-swap/global/index.ts";
     import Config from "@scom/scom-swap/config/index.tsx";
     import { IWalletPlugin } from '@scom/scom-wallet-modal';
-    type StatusMapType = 'approve' | 'swap';
     interface ScomSwapElement extends ControlElement {
         category: Category;
         providers: IProviderUI[];
@@ -10865,7 +10863,7 @@ declare module "@scom/scom-swap" {
             }
         }
     }
-    export default class ScomSwap extends Module implements PageBlock {
+    export default class ScomSwap extends Module {
         private _oldData;
         private _data;
         private oldTag;
@@ -10970,103 +10968,21 @@ declare module "@scom/scom-swap" {
         set networks(value: INetworkConfig[]);
         get showHeader(): boolean;
         set showHeader(value: boolean);
-        getEmbedderActions(): ({
+        private getActions;
+        private _getActions;
+        getConfigurators(): ({
             name: string;
-            icon: string;
-            command: (builder: any, userInputData: any) => {
-                execute: () => Promise<void>;
-                undo: () => void;
-                redo: () => void;
-            };
-            userInputDataSchema: IDataSchema;
-            userInputUISchema: {
-                type: string;
-                elements: {
-                    type: string;
-                    scope: string;
-                    options: {
-                        detail: {
-                            type: string;
-                        };
-                    };
-                }[];
-            };
+            target: string;
+            getActions: any;
+            getData: any;
+            setData: any;
+            getTag: any;
+            setTag: any;
+            elementName?: undefined;
+            getLinkParams?: undefined;
+            setLinkParams?: undefined;
+            bindOnChanged?: undefined;
         } | {
-            name: string;
-            icon: string;
-            command: (builder: any, userInputData: any) => {
-                execute: () => Promise<void>;
-                undo: () => void;
-                redo: () => void;
-            };
-            userInputDataSchema: IDataSchema;
-            userInputUISchema?: undefined;
-        })[];
-        getActions(): ({
-            name: string;
-            icon: string;
-            command: (builder: any, userInputData: any) => {
-                execute: () => Promise<void>;
-                undo: () => void;
-                redo: () => void;
-            };
-            userInputDataSchema: IDataSchema;
-            userInputUISchema: {
-                type: string;
-                elements: {
-                    type: string;
-                    scope: string;
-                    options: {
-                        detail: {
-                            type: string;
-                        };
-                    };
-                }[];
-            };
-        } | {
-            name: string;
-            icon: string;
-            command: (builder: any, userInputData: any) => {
-                execute: () => Promise<void>;
-                undo: () => void;
-                redo: () => void;
-            };
-            userInputDataSchema: IDataSchema;
-            userInputUISchema?: undefined;
-        })[];
-        _getActions(propertiesSchema: IDataSchema, themeSchema: IDataSchema): ({
-            name: string;
-            icon: string;
-            command: (builder: any, userInputData: any) => {
-                execute: () => Promise<void>;
-                undo: () => void;
-                redo: () => void;
-            };
-            userInputDataSchema: IDataSchema;
-            userInputUISchema: {
-                type: string;
-                elements: {
-                    type: string;
-                    scope: string;
-                    options: {
-                        detail: {
-                            type: string;
-                        };
-                    };
-                }[];
-            };
-        } | {
-            name: string;
-            icon: string;
-            command: (builder: any, userInputData: any) => {
-                execute: () => Promise<void>;
-                undo: () => void;
-                redo: () => void;
-            };
-            userInputDataSchema: IDataSchema;
-            userInputUISchema?: undefined;
-        })[];
-        getConfigurators(): {
             name: string;
             target: string;
             elementName: string;
@@ -11075,24 +10991,29 @@ declare module "@scom/scom-swap" {
             };
             setLinkParams: (params: any) => Promise<void>;
             bindOnChanged: (element: Config, callback: (data: any) => Promise<void>) => void;
-        }[];
-        getData(): Promise<ISwapConfigUI>;
-        setData(value: ISwapConfigUI): Promise<void>;
-        getTag(): Promise<any>;
+            getData: any;
+            setData: any;
+            getTag: any;
+            setTag: any;
+            getActions?: undefined;
+        })[];
+        private getData;
+        private setData;
+        private getTag;
         private updateTag;
-        setTag(value: any): Promise<void>;
+        private setTag;
         private updateStyle;
         private updateTheme;
         private setProviders;
-        updateContractAddress(): void;
+        private updateContractAddress;
         private get isFixedPair();
         private get originalData();
         private refreshUI;
         constructor(parent?: Container, options?: any);
         private registerEvent;
-        onWalletConnect: (connected: boolean) => Promise<void>;
-        onWalletDisconnect: (connected: boolean) => Promise<void>;
-        onChainChange: () => Promise<void>;
+        private onWalletConnect;
+        private onWalletDisconnect;
+        private onChainChange;
         get isApproveButtonShown(): boolean;
         get isPriceImpactTooHigh(): boolean;
         get isInsufficientBalance(): boolean;
@@ -11109,104 +11030,72 @@ declare module "@scom/scom-swap" {
         private resetUI;
         private onSetupPage;
         private initTokenSelection;
-        initApprovalModelAction(): Promise<void>;
-        onRevertSwap(): Promise<void>;
-        tipFormatter(value: any): string;
+        private initApprovalModelAction;
+        private onRevertSwap;
+        private tipFormatter;
         private totalAmount;
-        setupCrossChainPopup(): void;
-        handleSwapPopup(): void;
-        doSwap(): void;
-        getMinReceivedMaxSold: () => number | null;
-        onCloseSwapModal(): void;
-        onUpdateToken(token: ITokenObject, isFrom: boolean): void;
-        onSelectToken(token: ITokenObject, isFrom: boolean): Promise<void>;
-        setApprovalSpenderAddress(): void;
-        getInputValue(isFrom: boolean): any;
-        updateTokenInput(isFrom: boolean, init?: boolean): Promise<void>;
-        addToMetamask(event: Event, token: ITokenObject): any;
-        toggleShowRoutes(source: Control): void;
-        onSelectRouteItem(source: Control, item: any): Promise<void>;
-        onTokenInputChange(source: Control): void;
-        resetValuesByInput(): void;
-        initRoutes(): void;
-        handleAddRoute(): Promise<void>;
-        getProviderCaption(provider: string | IProvider, caption: string): string;
-        addRoute(item: any, index: number, pricePercent: any): Promise<Panel>;
-        getPricePercent(routes: any, isFrom: boolean): string | 0;
-        sortToken: (a: any, b: any) => number;
-        onTogglePrice(priceInfo: PriceInfo): void;
-        getRate(): string;
-        getPriceImpact(): string;
-        getMinimumReceived(): string;
-        getTradeFeeExactAmount(): string;
-        getFeeDetails(): {
-            title: string;
-            description: string;
-            value: any;
-        }[];
-        getPriceInfo(): ({
-            title: string;
-            value: string;
-            isToggleShown: boolean;
-            isHidden?: undefined;
-            tooltip?: undefined;
-            onClick?: undefined;
-        } | {
-            title: string;
-            value: string;
-            isHidden: boolean;
-            isToggleShown?: undefined;
-            tooltip?: undefined;
-            onClick?: undefined;
-        } | {
-            title: string;
-            value: string;
-            isToggleShown?: undefined;
-            isHidden?: undefined;
-            tooltip?: undefined;
-            onClick?: undefined;
-        } | {
-            title: string;
-            value: string;
-            tooltip: any;
-            onClick: () => void;
-            isToggleShown?: undefined;
-            isHidden?: undefined;
-        })[];
-        onUpdateEstimatedPosition: (isFrom: boolean, reverseRouting?: boolean) => void;
-        isEstimated: (tokenPosition: string, strict?: boolean) => boolean;
-        getBalance(token?: ITokenObject): any;
-        updateBalance(): Promise<void>;
+        private setupCrossChainPopup;
+        private handleSwapPopup;
+        private doSwap;
+        private getMinReceivedMaxSold;
+        private onCloseSwapModal;
+        private onUpdateToken;
+        private onSelectToken;
+        private setApprovalSpenderAddress;
+        private getInputValue;
+        private updateTokenInput;
+        private addToMetamask;
+        private toggleShowRoutes;
+        private onSelectRouteItem;
+        private onTokenInputChange;
+        private resetValuesByInput;
+        private initRoutes;
+        private handleAddRoute;
+        private getProviderCaption;
+        private addRoute;
+        private getPricePercent;
+        private sortToken;
+        private onTogglePrice;
+        private getRate;
+        private getPriceImpact;
+        private getMinimumReceived;
+        private getTradeFeeExactAmount;
+        private getFeeDetails;
+        private getPriceInfo;
+        private onUpdateEstimatedPosition;
+        private isEstimated;
+        private getBalance;
+        private updateBalance;
         private setSwapButtonText;
-        getSwapButtonText(): string;
-        getWarningMessageText(): string;
-        setMapStatus(type: StatusMapType, key: string, status: ApprovalStatus): void;
-        onSwapConfirming: (key: any) => void;
-        onSwapConfirmed: (data: any) => Promise<void>;
-        isButtonLoading(): boolean;
-        isSwapButtonDisabled(): boolean;
-        onClickSwapButton(): void;
-        onSubmit: () => Promise<void>;
-        onApproveRouterMax: () => void;
-        onSetMaxBalance: (value?: number) => Promise<void>;
-        isMaxDisabled: () => boolean;
-        onSliderChange(source: Control, event: Event): void;
-        onUpdateSliderValue(value?: number): void;
-        onRenderPriceInfo(): void;
+        private getSwapButtonText;
+        private getWarningMessageText;
+        private setMapStatus;
+        private onSwapConfirming;
+        private onSwapConfirmed;
+        private isButtonLoading;
+        private isSwapButtonDisabled;
+        private onClickSwapButton;
+        private onSubmit;
+        private onApproveRouterMax;
+        private onSetMaxBalance;
+        private isMaxDisabled;
+        private onSliderChange;
+        private onUpdateSliderValue;
+        private onRenderPriceInfo;
         private onRefresh;
         private onSetting;
         get isMetaMask(): boolean;
-        getSupportedChainList: () => void;
-        disableSelectChain: (disabled: boolean, isDes?: boolean) => void;
-        selectSourceChain: (obj: IExtendedNetwork, img?: Image) => Promise<void>;
-        setTargetTokenList: (isDisabled?: boolean) => void;
-        onSourceChainChanged: () => void;
-        onSelectSourceChain: (obj: IExtendedNetwork, img?: Image) => Promise<void>;
-        initChainIcon: (network: IExtendedNetwork) => void;
-        updateSrcChainIconList: () => void;
-        onRenderChainList: () => Promise<void>;
-        showModalFees: () => void;
-        closeModalFees: () => void;
+        private getSupportedChainList;
+        private disableSelectChain;
+        private selectSourceChain;
+        private setTargetTokenList;
+        private onSourceChainChanged;
+        private onSelectSourceChain;
+        private initChainIcon;
+        private updateSrcChainIconList;
+        private onRenderChainList;
+        private showModalFees;
+        private closeModalFees;
         private showResultMessage;
         private initExpertModal;
         private closeNetworkErrModal;
