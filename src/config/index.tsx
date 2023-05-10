@@ -25,10 +25,14 @@ export interface ISupportedNetworks {
   chainId: number;
 }
 
+interface ScomSwapConfigElement extends ControlElement {
+  commissions?: ICommissionInfo;
+}
+
 declare global {
   namespace JSX {
     interface IntrinsicElements {
-      ['i-scom-swap-config']: ControlElement;
+      ['i-scom-swap-config']: ScomSwapConfigElement;
     }
   }
 }
@@ -147,6 +151,9 @@ export default class Config extends Module {
     this.commissionInfoList = [];
     const embedderFee = getEmbedderCommissionFee();
     this.lbCommissionShare.caption = `${formatNumber(new BigNumber(embedderFee).times(100).toFixed(), 4)} %`;
+    const commissions = this.getAttribute('commissions', true);
+    this.tableCommissions.data = commissions || [];
+    this.toggleVisible();
   }
 
   get data(): IEmbedData {

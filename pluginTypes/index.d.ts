@@ -10765,14 +10765,17 @@ declare module "@scom/scom-swap/config/index.css.ts" {
 /// <amd-module name="@scom/scom-swap/config/index.tsx" />
 declare module "@scom/scom-swap/config/index.tsx" {
     import { Module, ControlElement } from '@ijstech/components';
-    import { IExtendedNetwork, IEmbedData } from "@scom/scom-swap/global/index.ts";
+    import { IExtendedNetwork, ICommissionInfo, IEmbedData } from "@scom/scom-swap/global/index.ts";
     export interface ISupportedNetworks {
         chainId: number;
+    }
+    interface ScomSwapConfigElement extends ControlElement {
+        commissions?: ICommissionInfo;
     }
     global {
         namespace JSX {
             interface IntrinsicElements {
-                ['i-scom-swap-config']: ControlElement;
+                ['i-scom-swap-config']: ScomSwapConfigElement;
             }
         }
     }
@@ -10836,6 +10839,32 @@ declare module "@scom/scom-swap/data.json.ts" {
         };
         ipfsGatewayUrl: string;
         embedderCommissionFee: string;
+        defaultBuilderData: {
+            providers: {
+                caption: string;
+                image: string;
+                key: string;
+                dexId: number;
+                chainId: number;
+            }[];
+            category: string;
+            tokens: {
+                name: string;
+                address: string;
+                symbol: string;
+                decimals: number;
+                chainId: number;
+            }[];
+            defaultChainId: number;
+            networks: {
+                chainId: number;
+            }[];
+            wallets: {
+                name: string;
+            }[];
+            showHeader: boolean;
+            showFooter: boolean;
+        };
     };
     export default _default_55;
 }
@@ -10975,7 +11004,7 @@ declare module "@scom/scom-swap" {
             target: string;
             getActions: any;
             getData: any;
-            setData: any;
+            setData: (value: any) => Promise<void>;
             getTag: any;
             setTag: any;
             elementName?: undefined;

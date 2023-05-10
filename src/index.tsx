@@ -269,7 +269,7 @@ export default class ScomSwap extends Module {
   private getActions() {
     const propertiesSchema: IDataSchema = {
       type: "object",
-      properties: {
+      properties: {      
         category: {
           type: "string",
           required: true,
@@ -278,6 +278,24 @@ export default class ScomSwap extends Module {
             "aggregator"
           ]
         },
+        tokens: {
+          type: "array",
+          required: true,
+          items: {
+            type: "object",
+            properties: {
+              chainId: {
+                type: "number",
+                enum: [1, 56, 137, 250, 97, 80001, 43113, 43114],
+                required: true
+              },
+              address: {
+                type: "string",
+                required: true
+              }
+            }
+          }
+        }, 
         providers: {
           type: "array",
           required: true,
@@ -362,7 +380,48 @@ export default class ScomSwap extends Module {
   }
 
   private _getActions(propertiesSchema: IDataSchema, themeSchema: IDataSchema) {
+    let self = this;
     const actions = [
+      {
+        name: 'Commissions',
+        icon: 'dollar-sign',
+        command: (builder: any, userInputData: any) => {
+          return {
+            execute: async () => {
+              this._oldData = {...this._data};
+              if (userInputData.commissions) this._data.commissions = userInputData.commissions;
+              this.configDApp.data = this._data;
+              this.refreshUI();
+              if (builder?.setData) builder.setData(this._data);
+            },
+            undo: () => {
+              this._data = {...this._oldData};
+              this.configDApp.data = this._data;
+              this.refreshUI();
+              if (builder?.setData) builder.setData(this._data);
+            },
+            redo: () => { }
+          }
+        },
+        customUI: {
+          render: (data?: any, onConfirm?: (result: boolean, data: any) => void) => {
+            const vstack = new VStack();
+            const config = new Config(null, {
+              commissions: self._data.commissions
+            });
+            const button = new Button(null, {
+              caption: 'Confirm',
+            });
+            vstack.append(config);
+            vstack.append(button);
+            button.onClick = async () => {
+              const commissions = config.data.commissions;
+              if (onConfirm) onConfirm(true, {commissions});
+            }
+            return vstack;
+          }
+        }
+      },      
       {
         name: 'Settings',
         icon: 'cog',
@@ -370,13 +429,24 @@ export default class ScomSwap extends Module {
           return {
             execute: async () => {
               this._oldData = {...this._data};
+              this._data.category = userInputData.category;
+              this._data.providers = userInputData.providers;
+              this._data.tokens = [];
+              if (userInputData.tokens) {
+                for (let inputToken of userInputData.tokens) {
+                  const token = this.tokens.find(v => v.chainId === inputToken.chainId && v.address === inputToken.address);
+                  this._data.tokens.push(token);
+                }
+              }
               this.configDApp.data = this._data;
               this.refreshUI();
+              if (builder?.setData) builder.setData(this._data);
             },
             undo: () => {
               this._data = {...this._oldData};
               this.configDApp.data = this._data;
               this.refreshUI();
+              if (builder?.setData) builder.setData(this._data);
             },
             redo: () => { }
           }
@@ -384,7 +454,7 @@ export default class ScomSwap extends Module {
         userInputDataSchema: propertiesSchema,
         userInputUISchema: {
           type: "Group",
-          elements: [
+          elements: [            
             {
               type: "Control",
               scope: "#/properties/category",
@@ -397,6 +467,15 @@ export default class ScomSwap extends Module {
             {
               type: "Control",
               scope: "#/properties/providers",
+              options: {
+                detail: {
+                  type: "VerticalLayout"
+                }
+              }
+            },
+            {
+              type: "Control",
+              scope: "#/properties/tokens",
               options: {
                 detail: {
                   type: "VerticalLayout"
@@ -439,7 +518,17 @@ export default class ScomSwap extends Module {
         target: 'Builders',
         getActions: this.getActions.bind(this),
         getData: this.getData.bind(this),
-        setData: this.setData.bind(this),
+        setData: async (value: any) => {
+          const defaultData = configData.defaultBuilderData;
+          this._data = {...defaultData, ...value};
+          this.configDApp.data = this._data;
+          this.updateContractAddress();
+          await this.refreshUI();
+          if (this.mdWallet) {
+            this.mdWallet.networks = this._data.networks;
+            this.mdWallet.wallets = this._data.wallets;
+          }
+        },
         getTag: this.getTag.bind(this),
         setTag: this.setTag.bind(this)
       },

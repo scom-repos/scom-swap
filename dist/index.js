@@ -18214,6 +18214,9 @@ define("@scom/scom-swap/config/index.tsx", ["require", "exports", "@ijstech/comp
             this.commissionInfoList = [];
             const embedderFee = index_17.getEmbedderCommissionFee();
             this.lbCommissionShare.caption = `${index_18.formatNumber(new eth_wallet_9.BigNumber(embedderFee).times(100).toFixed(), 4)} %`;
+            const commissions = this.getAttribute('commissions', true);
+            this.tableCommissions.data = commissions || [];
+            this.toggleVisible();
         }
         get data() {
             const config = {};
@@ -18367,10 +18370,75 @@ define("@scom/scom-swap/data.json.ts", ["require", "exports"], function (require
             "43113": "0x7f1EAB0db83c02263539E3bFf99b638E61916B96"
         },
         "ipfsGatewayUrl": "https://ipfs.scom.dev/ipfs/",
-        "embedderCommissionFee": "0.01"
+        "embedderCommissionFee": "0.01",
+        "defaultBuilderData": {
+            "providers": [
+                {
+                    "caption": "OpenSwap",
+                    "image": "ipfs://bafkreidoi5pywhyo4hqdltlosvrvefgqj4nuclmjl325exzmjgnyl2cc4y",
+                    "key": "OpenSwap",
+                    "dexId": 1,
+                    "chainId": 97
+                },
+                {
+                    "caption": "OpenSwap",
+                    "image": "ipfs://bafkreidoi5pywhyo4hqdltlosvrvefgqj4nuclmjl325exzmjgnyl2cc4y",
+                    "key": "OpenSwap",
+                    "dexId": 1,
+                    "chainId": 43113
+                }
+            ],
+            "category": "fixed-pair",
+            "tokens": [
+                {
+                    "name": "USDT",
+                    "address": "0x29386B60e0A9A1a30e1488ADA47256577ca2C385",
+                    "symbol": "USDT",
+                    "decimals": 6,
+                    "chainId": 97
+                },
+                {
+                    "name": "OpenSwap",
+                    "address": "0x45eee762aaeA4e5ce317471BDa8782724972Ee19",
+                    "symbol": "OSWAP",
+                    "decimals": 18,
+                    "chainId": 97
+                },
+                {
+                    "name": "Tether USD",
+                    "address": "0xb9C31Ea1D475c25E58a1bE1a46221db55E5A7C6e",
+                    "symbol": "USDT.e",
+                    "decimals": 6,
+                    "chainId": 43113
+                },
+                {
+                    "name": "OpenSwap",
+                    "address": "0x78d9D80E67bC80A11efbf84B7c8A65Da51a8EF3C",
+                    "symbol": "OSWAP",
+                    "decimals": 18,
+                    "chainId": 43113
+                }
+            ],
+            "defaultChainId": 43113,
+            "networks": [
+                {
+                    "chainId": 43113
+                },
+                {
+                    "chainId": 97
+                }
+            ],
+            "wallets": [
+                {
+                    "name": "metamask"
+                }
+            ],
+            "showHeader": true,
+            "showFooter": true
+        }
     };
 });
-define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstech/eth-wallet", "@scom/scom-swap/assets.ts", "@scom/scom-swap/store/index.ts", "@scom/scom-token-list", "@scom/scom-swap/swap-utils/index.ts", "@scom/scom-swap/global/index.ts", "@scom/scom-swap/price-info/index.tsx", "@scom/scom-swap/result/index.tsx", "@scom/scom-swap/expert-mode-settings/index.tsx", "@scom/scom-swap/transaction-settings/index.tsx", "@scom/scom-swap/data.json.ts", "@scom/scom-dex-list", "@scom/scom-swap/index.css.ts"], function (require, exports, components_18, eth_wallet_10, assets_5, index_19, scom_token_list_7, index_20, index_21, index_22, index_23, index_24, index_25, data_json_1, scom_dex_list_2) {
+define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstech/eth-wallet", "@scom/scom-swap/assets.ts", "@scom/scom-swap/store/index.ts", "@scom/scom-token-list", "@scom/scom-swap/swap-utils/index.ts", "@scom/scom-swap/global/index.ts", "@scom/scom-swap/price-info/index.tsx", "@scom/scom-swap/result/index.tsx", "@scom/scom-swap/expert-mode-settings/index.tsx", "@scom/scom-swap/transaction-settings/index.tsx", "@scom/scom-swap/config/index.tsx", "@scom/scom-swap/data.json.ts", "@scom/scom-dex-list", "@scom/scom-swap/index.css.ts"], function (require, exports, components_18, eth_wallet_10, assets_5, index_19, scom_token_list_7, index_20, index_21, index_22, index_23, index_24, index_25, index_26, data_json_1, scom_dex_list_2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     const Theme = components_18.Styles.Theme.ThemeVars;
@@ -18884,6 +18952,24 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                             "aggregator"
                         ]
                     },
+                    tokens: {
+                        type: "array",
+                        required: true,
+                        items: {
+                            type: "object",
+                            properties: {
+                                chainId: {
+                                    type: "number",
+                                    enum: [1, 56, 137, 250, 97, 80001, 43113, 43114],
+                                    required: true
+                                },
+                                address: {
+                                    type: "string",
+                                    required: true
+                                }
+                            }
+                        }
+                    },
                     providers: {
                         type: "array",
                         required: true,
@@ -18965,7 +19051,52 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
             return this._getActions(propertiesSchema, themeSchema);
         }
         _getActions(propertiesSchema, themeSchema) {
+            let self = this;
             const actions = [
+                {
+                    name: 'Commissions',
+                    icon: 'dollar-sign',
+                    command: (builder, userInputData) => {
+                        return {
+                            execute: async () => {
+                                this._oldData = Object.assign({}, this._data);
+                                if (userInputData.commissions)
+                                    this._data.commissions = userInputData.commissions;
+                                this.configDApp.data = this._data;
+                                this.refreshUI();
+                                if (builder === null || builder === void 0 ? void 0 : builder.setData)
+                                    builder.setData(this._data);
+                            },
+                            undo: () => {
+                                this._data = Object.assign({}, this._oldData);
+                                this.configDApp.data = this._data;
+                                this.refreshUI();
+                                if (builder === null || builder === void 0 ? void 0 : builder.setData)
+                                    builder.setData(this._data);
+                            },
+                            redo: () => { }
+                        };
+                    },
+                    customUI: {
+                        render: (data, onConfirm) => {
+                            const vstack = new components_18.VStack();
+                            const config = new index_26.default(null, {
+                                commissions: self._data.commissions
+                            });
+                            const button = new components_18.Button(null, {
+                                caption: 'Confirm',
+                            });
+                            vstack.append(config);
+                            vstack.append(button);
+                            button.onClick = async () => {
+                                const commissions = config.data.commissions;
+                                if (onConfirm)
+                                    onConfirm(true, { commissions });
+                            };
+                            return vstack;
+                        }
+                    }
+                },
                 {
                     name: 'Settings',
                     icon: 'cog',
@@ -18973,13 +19104,26 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                         return {
                             execute: async () => {
                                 this._oldData = Object.assign({}, this._data);
+                                this._data.category = userInputData.category;
+                                this._data.providers = userInputData.providers;
+                                this._data.tokens = [];
+                                if (userInputData.tokens) {
+                                    for (let inputToken of userInputData.tokens) {
+                                        const token = this.tokens.find(v => v.chainId === inputToken.chainId && v.address === inputToken.address);
+                                        this._data.tokens.push(token);
+                                    }
+                                }
                                 this.configDApp.data = this._data;
                                 this.refreshUI();
+                                if (builder === null || builder === void 0 ? void 0 : builder.setData)
+                                    builder.setData(this._data);
                             },
                             undo: () => {
                                 this._data = Object.assign({}, this._oldData);
                                 this.configDApp.data = this._data;
                                 this.refreshUI();
+                                if (builder === null || builder === void 0 ? void 0 : builder.setData)
+                                    builder.setData(this._data);
                             },
                             redo: () => { }
                         };
@@ -19005,6 +19149,15 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                                         type: "VerticalLayout"
                                     }
                                 }
+                            },
+                            {
+                                type: "Control",
+                                scope: "#/properties/tokens",
+                                options: {
+                                    detail: {
+                                        type: "VerticalLayout"
+                                    }
+                                }
                             }
                         ]
                     }
@@ -19017,7 +19170,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                             execute: async () => {
                                 if (!userInputData)
                                     return;
-                                this.oldTag = Object.assign({}, this.tag);
+                                this.oldTag = JSON.parse(JSON.stringify(this.tag));
                                 this.setTag(userInputData);
                                 if (builder)
                                     builder.setTag(userInputData);
@@ -19045,7 +19198,17 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                     target: 'Builders',
                     getActions: this.getActions.bind(this),
                     getData: this.getData.bind(this),
-                    setData: this.setData.bind(this),
+                    setData: async (value) => {
+                        const defaultData = data_json_1.default.defaultBuilderData;
+                        this._data = Object.assign(Object.assign({}, defaultData), value);
+                        this.configDApp.data = this._data;
+                        this.updateContractAddress();
+                        await this.refreshUI();
+                        if (this.mdWallet) {
+                            this.mdWallet.networks = this._data.networks;
+                            this.mdWallet.wallets = this._data.wallets;
+                        }
+                    },
                     getTag: this.getTag.bind(this),
                     setTag: this.setTag.bind(this)
                 },
