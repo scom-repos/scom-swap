@@ -260,7 +260,7 @@ export default class ScomSwap extends Module {
   }
 
   private getActions() {
-    const propertiesSchema: IDataSchema = {
+    const propertiesSchema: any = {
       type: "object",
       properties: {      
         category: {
@@ -453,34 +453,46 @@ export default class ScomSwap extends Module {
         },
         userInputDataSchema: propertiesSchema,
         userInputUISchema: {
-          type: "Group",
-          elements: [            
+          type: 'VerticalLayout',
+          elements: [
             {
-              type: "Control",
-              scope: "#/properties/category",
-              options: {
-                detail: {
-                  type: "HorizontalLayout"
-                }
-              }
+              type: 'Control',
+              scope: '#/properties/category',
             },
             {
-              type: "Control",
-              scope: "#/properties/providers",
-              options: {
-                detail: {
-                  type: "VerticalLayout"
+              type: 'Categorization',
+              elements: [
+                {
+                  type: 'Category',
+                  label: 'Providers',
+                  elements: [
+                    {
+                      type: 'Control',
+                      scope: '#/properties/providers',
+                      options: {
+                        detail: {
+                          type: 'VerticalLayout'
+                        }
+                      }
+                    }
+                  ]
+                },
+                {
+                  type: 'Category',
+                  label: 'Tokens',
+                  elements: [
+                    {
+                      type: 'Control',
+                      scope: '#/properties/tokens',
+                      options: {
+                        detail: {
+                          type: 'VerticalLayout'
+                        }
+                      }
+                    }
+                  ]
                 }
-              }
-            },
-            {
-              type: "Control",
-              scope: "#/properties/tokens",
-              options: {
-                detail: {
-                  type: "VerticalLayout"
-                }
-              }
+              ]
             }
           ]
         }
