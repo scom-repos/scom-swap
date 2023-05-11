@@ -18110,6 +18110,7 @@ define("@scom/scom-swap/config/index.tsx", ["require", "exports", "@ijstech/comp
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     const Theme = components_17.Styles.Theme.ThemeVars;
+    const CommissionFeeTooltipText = "For each transaction, you'll receive a 1% commission fee based on the total amount. This fee will be transferred to a designated commission contract within the corresponding blockchain network.";
     let Config = class Config extends components_17.Module {
         constructor() {
             super(...arguments);
@@ -18306,7 +18307,7 @@ define("@scom/scom-swap/config/index.tsx", ["require", "exports", "@ijstech/comp
                         this.$render("i-hstack", { gap: "4px" },
                             this.$render("i-label", { caption: "Commission Fee: ", opacity: 0.6, font: { size: '1rem' } }),
                             this.$render("i-label", { id: "lbCommissionShare", font: { size: '1rem' } }),
-                            this.$render("i-icon", { name: "question-circle", fill: Theme.background.modal, width: 20, height: 20 })),
+                            this.$render("i-icon", { name: "question-circle", fill: Theme.background.modal, width: 20, height: 20, tooltip: { content: CommissionFeeTooltipText } })),
                         this.$render("i-button", { id: "btnAddWallet", caption: "Add Wallet", border: { radius: '58px' }, padding: { top: '0.3rem', bottom: '0.3rem', left: '1rem', right: '1rem' }, background: { color: Theme.colors.primary.main }, font: { color: Theme.colors.primary.contrastText, size: '0.75rem', weight: 400 }, visible: false, onClick: this.onAddCommissionClicked.bind(this) })),
                     this.$render("i-vstack", { id: "pnlEmptyWallet", border: { radius: '8px' }, background: { color: Theme.background.modal }, padding: { top: '1.875rem', bottom: '1.875rem', left: '1.563rem', right: '1.563rem' }, gap: "1.25rem", width: "100%", class: "text-center" },
                         this.$render("i-label", { caption: "To receive commission fee please add your wallet address", font: { size: '1rem' } }),
@@ -18906,13 +18907,6 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
         set commissions(value) {
             this._data.commissions = value;
         }
-        get tokens() {
-            var _a;
-            return (_a = this._data.tokens) !== null && _a !== void 0 ? _a : [];
-        }
-        set tokens(value) {
-            this._data.tokens = value;
-        }
         get defaultChainId() {
             return this._data.defaultChainId;
         }
@@ -19109,8 +19103,17 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                                 this._data.tokens = [];
                                 if (userInputData.tokens) {
                                     for (let inputToken of userInputData.tokens) {
-                                        const token = this.tokens.find(v => v.chainId === inputToken.chainId && v.address === inputToken.address);
-                                        this._data.tokens.push(token);
+                                        if (!inputToken.address) {
+                                            const nativeToken = scom_token_list_7.ChainNativeTokenByChainId[inputToken.chainId];
+                                            if (nativeToken)
+                                                this._data.tokens.push(Object.assign(Object.assign({}, nativeToken), { chainId: inputToken.chainId }));
+                                        }
+                                        else {
+                                            const tokens = scom_token_list_7.DefaultERC20Tokens[inputToken.chainId];
+                                            const token = tokens.find(v => v.address === inputToken.address);
+                                            if (token)
+                                                this._data.tokens.push(Object.assign(Object.assign({}, token), { chainId: inputToken.chainId }));
+                                        }
                                     }
                                 }
                                 this.configDApp.data = this._data;
@@ -19441,7 +19444,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
         }
         setFixedPairData() {
             var _a, _b, _c;
-            let currentChainTokens = this.tokens.filter((token) => token.chainId === this.currentChainId);
+            let currentChainTokens = this._data.tokens.filter((token) => token.chainId === this.currentChainId);
             if (currentChainTokens.length < 2)
                 return;
             const providers = (_a = this.originalData) === null || _a === void 0 ? void 0 : _a.providers;

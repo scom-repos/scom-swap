@@ -21,7 +21,7 @@ import {
   getSupportedTokens,
   setDexInfoList
 } from "./store/index";
-import { tokenStore, assets as tokenAssets } from '@scom/scom-token-list';
+import { tokenStore, DefaultERC20Tokens, ChainNativeTokenByChainId, assets as tokenAssets } from '@scom/scom-token-list';
 
 import {
   getAllRoutesData,
@@ -230,13 +230,6 @@ export default class ScomSwap extends Module {
     this._data.commissions = value;
   }
 
-  get tokens() {
-    return this._data.tokens ?? [];
-  }
-  set tokens(value: ITokenObject[]) {
-    this._data.tokens = value;
-  }
-
   get defaultChainId() {
     return this._data.defaultChainId;
   }
@@ -434,8 +427,15 @@ export default class ScomSwap extends Module {
               this._data.tokens = [];
               if (userInputData.tokens) {
                 for (let inputToken of userInputData.tokens) {
-                  const token = this.tokens.find(v => v.chainId === inputToken.chainId && v.address === inputToken.address);
-                  this._data.tokens.push(token);
+                  if (!inputToken.address) {
+                    const nativeToken = ChainNativeTokenByChainId[inputToken.chainId];
+                    if (nativeToken) this._data.tokens.push({...nativeToken, chainId: inputToken.chainId});
+                  }
+                  else {
+                    const tokens = DefaultERC20Tokens[inputToken.chainId]
+                    const token = tokens.find(v => v.address === inputToken.address);
+                    if (token) this._data.tokens.push({...token, chainId: inputToken.chainId});
+                  }
                 }
               }
               this.configDApp.data = this._data;
@@ -836,7 +836,7 @@ export default class ScomSwap extends Module {
   }
 
   private setFixedPairData() {
-    let currentChainTokens = this.tokens.filter((token) => token.chainId === this.currentChainId);
+    let currentChainTokens = this._data.tokens.filter((token) => token.chainId === this.currentChainId);
     if (currentChainTokens.length < 2) return;
     const providers = this.originalData?.providers;
     if (providers && providers.length) {

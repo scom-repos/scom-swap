@@ -10987,8 +10987,6 @@ declare module "@scom/scom-swap" {
         set providers(value: IProviderUI[]);
         get commissions(): ICommissionInfo[];
         set commissions(value: ICommissionInfo[]);
-        get tokens(): ITokenObject[];
-        set tokens(value: ITokenObject[]);
         get defaultChainId(): number;
         set defaultChainId(value: number);
         get wallets(): IWalletPlugin[];
