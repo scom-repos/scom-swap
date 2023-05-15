@@ -607,6 +607,7 @@ export default class ScomSwap extends Module {
     if (this.dappContainer)
       this.dappContainer.setTag(this.tag);
     this.updateTheme();
+    this.resizeLayout();
   }
 
   private updateStyle(name: string, value: any) {
