@@ -140,14 +140,18 @@ Styles.cssRule('.pageblock-swap', {
       boxShadow: '0 0 0 0.2rem rgb(0 123 255 / 25%)'
     },
     '#swapContainer': {
-      width: 690,
+      width: 720,
       maxWidth: '100%',
       minHeight: 340,
-      padding: '1rem'
+      padding: '1rem',
+      marginInline: 'auto'
     },
     '.swap-flex--col': {
       flexDirection: 'column',
       $nest: {
+        '& > i-vstack': {
+          width: '100% !important'
+        },
         '.custom-ic--swap': {
           bottom: '0 !important',
           transform: 'none !importnat'
@@ -334,6 +338,7 @@ Styles.cssRule('.pageblock-swap', {
       padding: '0.25rem 1rem 0.5rem'
     },
     '.swap-btn-container': {
+      marginTop: 10,
       $nest: {
         '.btn-swap': {
           position: 'relative',
