@@ -140,28 +140,22 @@ Styles.cssRule('.pageblock-swap', {
       boxShadow: '0 0 0 0.2rem rgb(0 123 255 / 25%)'
     },
     '#swapContainer': {
-      width: 520,
+      width: 690,
       maxWidth: '100%',
-      padding: '1rem',
-      margin: '0 auto 2rem'
+      minHeight: 340,
+      padding: '1rem'
     },
-    '.bill-board': {
-      display: 'flex',
-      justifyContent: 'center',
-      alignItems: 'center',
-      width: '100%',
-      marginBottom: '2.5rem',
+    '.swap-flex--col': {
+      flexDirection: 'column',
       $nest: {
-        '> i-image': {
-          display: 'inline-block',
-          width: '100%'
-        },
-        '> i-image img': {
-          display: 'block',
-          width: '60%',
-          margin: 'auto'
+        '.custom-ic--swap': {
+          bottom: '0 !important',
+          transform: 'none !importnat'
         }
       }
+    },
+    '.visibility-hidden': {
+      visibility: 'hidden'
     },
     '.icon-list': {
       display: 'flex',
@@ -184,11 +178,8 @@ Styles.cssRule('.pageblock-swap', {
       }
     },
     '.content-swap': {
-      padding: '1.25rem',
-      // margin: '0.5rem auto 2rem',
       marginTop: '0.5rem',
-      marginBottom: '2rem',
-      background: Theme.background.modal,
+      marginBottom: '1rem',
       borderRadius: '1rem',
       $nest: {
         'i-label.custom-label *': {
@@ -197,11 +188,11 @@ Styles.cssRule('.pageblock-swap', {
         }
       }
     },
-    '.input--token-container': {
-      padding: '0.5rem 1rem',
-      marginLeft: '-15px',
-      marginRight: '-15px',
-    },
+    // '.input--token-container': {
+    //   padding: '0.5rem 1rem',
+    //   marginLeft: '-15px',
+    //   marginRight: '-15px',
+    // },
     'i-label.text--grey *': {
       color: Theme.text.primary,
       opacity: 0.55, // 'hsla(0,0%,100%,0.55)'
@@ -243,13 +234,17 @@ Styles.cssRule('.pageblock-swap', {
       }
     },
     '.bg-box': {
-      background: Theme.background.main,
       margin: '0.5rem 0',
-      border: '1px solid transparent',
-      borderRadius: '0.75rem'
+      border: '2px solid transparent',
+      borderRadius: '1rem',
+      $nest: {
+        '&.bg-box--active': {
+          borderColor: '#E53780'
+        }
+      }
     },
     '#swapContainer .input--token-box': {
-      padding: '0.75rem 1rem',
+      padding: '0.5rem 0.25rem',
       $nest: {
         '#btnToken': {
           height: 'auto !important'
@@ -306,7 +301,7 @@ Styles.cssRule('.pageblock-swap', {
           border: 'none',
           background: 'transparent',
           color: Theme.text.primary,
-          fontSize: '1.25rem',
+          fontSize: '1.125rem',
           textAlign: 'right'
         }
       }
@@ -319,6 +314,11 @@ Styles.cssRule('.pageblock-swap', {
         '> .icon-swap': {
           display: 'inline-flex',
           padding: '0.25rem',
+        },
+        '.custom-ic--swap': {
+          bottom: -60,
+          transform: 'rotate(90deg)',
+          padding: '0.45rem !important'
         }
       }
     },
@@ -334,14 +334,13 @@ Styles.cssRule('.pageblock-swap', {
       padding: '0.25rem 1rem 0.5rem'
     },
     '.swap-btn-container': {
-      marginBottom: '1.5rem',
       $nest: {
         '.btn-swap': {
           position: 'relative',
           width: '100%',
           borderRadius: '0.65rem',
           fontSize: '1.125rem',
-          padding: '1.25rem 0.75rem',
+          padding: '0.5rem 0.75rem',
           opacity: 1,
           color: Theme.colors.primary.contrastText
         }
@@ -485,11 +484,12 @@ Styles.cssRule('.pageblock-swap', {
     '.best-price': {
       // color: Theme.text.primary,
       position: 'absolute',
-      top: '-15px',
+      top: '-10px',
       left: '30px',
       background: 'linear-gradient(255deg,#f15e61,#b52082)',
       borderRadius: ' 0.75rem',
-      padding: '0.25rem 1rem',
+      padding: '0.15rem 1rem',
+      zIndex: 1,
       $nest: {
         '&>*': {
           fontSize: 'inherit'

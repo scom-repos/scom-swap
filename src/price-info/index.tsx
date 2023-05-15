@@ -1,4 +1,4 @@
-import { customElements, Module, Control, ControlElement, Panel, Image, Label, observable, Icon, HStack, Container } from '@ijstech/components';
+import { customElements, Module, Control, ControlElement, Panel, Image, Label, Icon, HStack, Container } from '@ijstech/components';
 import './priceInfo.css';
 import Assets from '../assets';
 
@@ -14,14 +14,11 @@ declare global {
 export class PriceInfo extends Module {
   private priceContent: Panel;
 
-  @observable()
-  private headerTitle: string;
   private _items: any[];
   public onTogglePrice: any;
 
   constructor(parent?: Container, options?: any) {
     super(parent, options);
-    this.headerTitle = 'Price Info';
   }
 
   get Items(): any[] {
@@ -151,7 +148,7 @@ export class PriceInfo extends Module {
   render() {
     return (
       <i-panel class="price-info" width="auto">
-        <i-label class="header" caption="Price Info" padding={{ bottom: '0.5rem' }} font={{ size: '1.125rem' }}></i-label>
+        {/* <i-label class="header" caption="Price Info" padding={{ bottom: '0.5rem' }} font={{ size: '1.125rem' }}></i-label> */}
         <i-panel id="priceContent"></i-panel>
       </i-panel>
     )

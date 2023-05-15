@@ -233,6 +233,9 @@ export class TokenSelection extends Module {
     else {
       tokenList = tokenStore.getTokenList(this.chainId);
     }
+    if (!this.tokenBalancesMap || !Object.keys(this.tokenBalancesMap).length) {
+      this.tokenBalancesMap = tokenStore.tokenBalances || {};
+    }
     return tokenList.map((token: ITokenObject) => {
       const tokenObject = { ...token };
       const nativeToken = ChainNativeTokenByChainId[this.chainId];
@@ -492,7 +495,7 @@ export class TokenSelection extends Module {
         token = this.tokenDataList?.find((v: ITokenObject) => (v.address && v.address == this.token?.address) || (v.symbol == this.token?.symbol))
       }
       if (!token) {
-        btnToken.caption = 'Select a token';
+        btnToken.caption = 'Select Token';
         btnToken.classList.remove('has-token');
         this.btnMax.classList.add('hidden');
         if (image) {
@@ -566,7 +569,7 @@ export class TokenSelection extends Module {
       <i-panel class='token-selection'>
         <i-panel class="flex">
           <i-button id="btnMax" enabled={false} class="custom-btn hidden" caption="Max" onClick={() => this.onSetMaxBalance()} />
-          <i-button id="btnToken" enabled={false} class="custom-btn" rightIcon={{ name: "caret-down", fill: Theme.text.primary }} caption="Select a token" onClick={() => this.showModal()} />
+          <i-button id="btnToken" enabled={false} class="custom-btn" rightIcon={{ name: "caret-down", fill: Theme.text.primary }} caption="Select Token" onClick={() => this.showModal()} />
         </i-panel>
         <i-modal id="tokenSelectionModal" class="bg-modal" title="Select Token" closeIcon={{ name: 'times' }} onClose={() => this.onCloseModal()}>
           <i-panel class="search">

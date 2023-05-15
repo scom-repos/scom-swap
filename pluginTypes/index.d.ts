@@ -10486,7 +10486,6 @@ declare module "@scom/scom-swap/price-info/index.tsx" {
     }
     export class PriceInfo extends Module {
         private priceContent;
-        private headerTitle;
         private _items;
         onTogglePrice: any;
         constructor(parent?: Container, options?: any);
@@ -10705,58 +10704,6 @@ declare module "@scom/scom-swap/expert-mode-settings/index.tsx" {
         render(): any;
     }
 }
-/// <amd-module name="@scom/scom-swap/transaction-settings/index.css.ts" />
-declare module "@scom/scom-swap/transaction-settings/index.css.ts" {
-    const _default_54: string;
-    export default _default_54;
-}
-/// <amd-module name="@scom/scom-swap/transaction-settings/index.tsx" />
-declare module "@scom/scom-swap/transaction-settings/index.tsx" {
-    import { Module, Container, ControlElement, Input, Control } from '@ijstech/components';
-    global {
-        namespace JSX {
-            interface IntrinsicElements {
-                ['i-scom-swap-transaction-settings']: ControlElement;
-            }
-        }
-    }
-    export class TransactionSettings extends Module {
-        private transactionModal;
-        private slippageGroup;
-        private slippageInput;
-        private deadlineInput;
-        private deadlineGroup;
-        private deadlineMessage;
-        private warningIcon;
-        private switchBox;
-        private slippageRow;
-        private deadlineRow;
-        private deadlineInputRow;
-        private switchBoxRow;
-        private _showSlippageOnly;
-        private $eventBus;
-        private slippageToleranceMessage;
-        constructor(parent?: Container, options?: any);
-        get showSlippageOnly(): boolean;
-        set showSlippageOnly(value: boolean);
-        registerEvent(): void;
-        onRenderSlippage(): Promise<void>;
-        onRenderWarningElm(): Promise<void>;
-        onActiveItem: (source: Control) => void;
-        onSelectSlippage: (source: Control, val: any) => void;
-        inputSlippageTolerance: (source: Control, val: any) => void;
-        blurSlippageTolerance: (source: Input) => void;
-        setSlippageToleranceMessage: () => "" | "Your transaction may fail" | "Your transaction may be frontrun" | "Please enter a valid slippage percentage";
-        inputDeadline: (source: Control, event: Event) => void;
-        blurTransactionDeadline: (source: Input) => void;
-        handleProcessExpertMode: () => void;
-        setDefaultTransactionSettings(): void;
-        init(): Promise<void>;
-        closeModal(): void;
-        showModal(): void;
-        render(): any;
-    }
-}
 /// <amd-module name="@scom/scom-swap/config/index.css.ts" />
 declare module "@scom/scom-swap/config/index.css.ts" {
     export const customStyle: string;
@@ -10812,7 +10759,7 @@ declare module "@scom/scom-swap/config/index.tsx" {
 }
 /// <amd-module name="@scom/scom-swap/data.json.ts" />
 declare module "@scom/scom-swap/data.json.ts" {
-    const _default_55: {
+    const _default_54: {
         infuraId: string;
         networks: ({
             chainId: number;
@@ -10866,7 +10813,7 @@ declare module "@scom/scom-swap/data.json.ts" {
             showFooter: boolean;
         };
     };
-    export default _default_55;
+    export default _default_54;
 }
 /// <amd-module name="@scom/scom-swap" />
 declare module "@scom/scom-swap" {
@@ -10900,19 +10847,19 @@ declare module "@scom/scom-swap" {
         defaultEdit: boolean;
         private swapComponent;
         private swapContainer;
+        private pnlPriceInfo;
+        private wrapperSwap;
         private isInited;
-        private payContainer;
-        private receiveContainer;
         private payBalance;
         private receiveBalance;
         private firstTokenSelection;
         private secondTokenSelection;
         private payCol;
         private receiveCol;
-        private listRouting;
-        private toggleRoutes;
-        private routeFound;
         private swapModal;
+        private pnlReceive;
+        private lbBestPrice;
+        private lbRouting;
         private priceInfo;
         private priceInfo2;
         private priceInfoContainer;
@@ -10924,12 +10871,9 @@ declare module "@scom/scom-swap" {
         private toTokenValue;
         private payOrReceiveValue;
         private payOrReceiveToken;
-        private routingContainer;
         private openswapResult;
-        private fromSlider;
         private maxButton;
         private swapBtn;
-        private actionSetting;
         private lbYouPayTitle;
         private lbYouPayValue;
         private mdWallet;
@@ -10949,8 +10893,6 @@ declare module "@scom/scom-swap" {
         private supportedChainIds;
         private swapButtonStatusMap;
         private approveButtonStatusMap;
-        private _lastUpdated;
-        private lbLastUpdated;
         private timer;
         private $eventBus;
         private lbEstimate;
@@ -10959,10 +10901,6 @@ declare module "@scom/scom-swap" {
         private toggleReverseImage;
         private oldSupportedChainList;
         private supportedChainList;
-        private srcChainLabel;
-        private srcChainList;
-        private desChainLabel;
-        private desChainList;
         private srcChain;
         private desChain;
         private targetChainId;
@@ -10972,9 +10910,6 @@ declare module "@scom/scom-swap" {
         private modalFees;
         private feesInfo;
         private lbReminderRejected;
-        private showCaption;
-        private showIcon;
-        private transactionModal;
         private expertModal;
         private networkErrModal;
         private supportedNetworksElm;
@@ -10995,6 +10930,7 @@ declare module "@scom/scom-swap" {
         set networks(value: INetworkConfig[]);
         get showHeader(): boolean;
         set showHeader(value: boolean);
+        set width(value: string | number);
         private getActions;
         private _getActions;
         getConfigurators(): ({
@@ -11048,40 +10984,31 @@ declare module "@scom/scom-swap" {
         get isSwapping(): boolean;
         get approveButtonStatus(): any;
         get isApprovingRouter(): boolean;
-        get lastUpdated(): number;
-        set lastUpdated(value: number);
         get isValidToken(): boolean;
         private redirectToken;
         private fixedNumber;
         private setFixedPairData;
-        private resetUI;
         private onSetupPage;
         private initTokenSelection;
         private initApprovalModelAction;
         private onRevertSwap;
-        private tipFormatter;
         private totalAmount;
         private setupCrossChainPopup;
         private handleSwapPopup;
         private doSwap;
         private getMinReceivedMaxSold;
-        private onCloseSwapModal;
         private onUpdateToken;
         private onSelectToken;
         private setApprovalSpenderAddress;
         private getInputValue;
         private updateTokenInput;
         private addToMetamask;
-        private toggleShowRoutes;
         private onSelectRouteItem;
         private onTokenInputChange;
         private resetValuesByInput;
         private initRoutes;
         private handleAddRoute;
-        private getProviderCaption;
-        private addRoute;
         private getPricePercent;
-        private sortToken;
         private onTogglePrice;
         private getRate;
         private getPriceImpact;
@@ -11106,26 +11033,15 @@ declare module "@scom/scom-swap" {
         private onApproveRouterMax;
         private onSetMaxBalance;
         private isMaxDisabled;
-        private onSliderChange;
-        private onUpdateSliderValue;
         private onRenderPriceInfo;
-        private onRefresh;
-        private onSetting;
         get isMetaMask(): boolean;
-        private getSupportedChainList;
-        private disableSelectChain;
-        private selectSourceChain;
         private setTargetTokenList;
-        private onSourceChainChanged;
-        private onSelectSourceChain;
-        private initChainIcon;
-        private updateSrcChainIconList;
-        private onRenderChainList;
         private showModalFees;
         private closeModalFees;
         private showResultMessage;
         private initExpertModal;
         private closeNetworkErrModal;
+        private resizeLayout;
         private initData;
         init(): Promise<void>;
         render(): any;
