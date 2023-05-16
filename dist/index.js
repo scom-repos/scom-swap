@@ -17814,11 +17814,11 @@ define("@scom/scom-swap/config/index.tsx", ["require", "exports", "@ijstech/comp
         }
         async init() {
             super.init();
-            this.commissionInfoList = [];
             const embedderFee = index_16.getEmbedderCommissionFee();
             this.lbCommissionShare.caption = `${index_17.formatNumber(new eth_wallet_9.BigNumber(embedderFee).times(100).toFixed(), 4)} %`;
-            const commissions = this.getAttribute('commissions', true);
-            this.tableCommissions.data = commissions || [];
+            const commissions = this.getAttribute('commissions', true, []);
+            this.commissionInfoList = commissions;
+            this.tableCommissions.data = commissions;
             this.toggleVisible();
         }
         get data() {
