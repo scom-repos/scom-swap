@@ -85,14 +85,6 @@ declare const window: any;
 @customModule
 @customElements('i-scom-swap')
 export default class ScomSwap extends Module {
-  private _oldData: ISwapConfigUI = {
-    category: 'fixed-pair',
-    providers: [],
-    tokens: [],
-    defaultChainId: 0,
-    wallets: [],
-    networks: []
-  };
   private _data: ISwapConfigUI = {
     category: 'fixed-pair',
     providers: [],
@@ -101,7 +93,6 @@ export default class ScomSwap extends Module {
     wallets: [],
     networks: []
   };
-  private oldTag: any = {};
   tag: any = {};
   defaultEdit: boolean = true
 
@@ -364,16 +355,23 @@ export default class ScomSwap extends Module {
         name: 'Commissions',
         icon: 'dollar-sign',
         command: (builder: any, userInputData: any) => {
+          let _oldData: ISwapConfigUI = {
+            category: 'fixed-pair',
+            providers: [],
+            defaultChainId: 0,
+            wallets: [],
+            networks: []
+          }
           return {
             execute: async () => {
-              this._oldData = {...this._data};
+              _oldData = {...this._data};
               if (userInputData.commissions) this._data.commissions = userInputData.commissions;
               this.configDApp.data = this._data;
               this.refreshUI();
               if (builder?.setData) builder.setData(this._data);
             },
             undo: () => {
-              this._data = {...this._oldData};
+              this._data = {..._oldData};
               this.configDApp.data = this._data;
               this.refreshUI();
               if (builder?.setData) builder.setData(this._data);
@@ -404,9 +402,16 @@ export default class ScomSwap extends Module {
         name: 'Settings',
         icon: 'cog',
         command: (builder: any, userInputData: any) => {
+          let _oldData: ISwapConfigUI = {
+            category: 'fixed-pair',
+            providers: [],
+            defaultChainId: 0,
+            wallets: [],
+            networks: []
+          }
           return {
             execute: async () => {
-              this._oldData = {...this._data};
+              _oldData = {...this._data};
               this._data.category = userInputData.category;
               this._data.providers = userInputData.providers;
               this._data.tokens = [];
@@ -428,7 +433,7 @@ export default class ScomSwap extends Module {
               if (builder?.setData) builder.setData(this._data);
             },
             undo: () => {
-              this._data = {...this._oldData};
+              this._data = {..._oldData};
               this.configDApp.data = this._data;
               this.refreshUI();
               if (builder?.setData) builder.setData(this._data);
@@ -486,17 +491,21 @@ export default class ScomSwap extends Module {
         name: 'Theme Settings',
         icon: 'palette',
         command: (builder: any, userInputData: any) => {
+          let oldTag = {};
           return {
             execute: async () => {
               if (!userInputData) return;
-              this.oldTag = JSON.parse(JSON.stringify(this.tag));
-              this.setTag(userInputData);
+              oldTag = JSON.parse(JSON.stringify(this.tag));
               if (builder) builder.setTag(userInputData);
+              else this.setTag(userInputData);
+              if (this.dappContainer) this.dappContainer.setTag(userInputData);
             },
             undo: () => {
               if (!userInputData) return;
-              this.setTag(this.oldTag);
-              if (builder) builder.setTag(this.oldTag);
+              this.tag = JSON.parse(JSON.stringify(oldTag));
+              if (builder) builder.setTag(this.tag);
+              else this.setTag(this.tag);
+              if (this.dappContainer) this.dappContainer.setTag(this.tag);
             },
             redo: () => { }
           }
@@ -602,8 +611,14 @@ export default class ScomSwap extends Module {
 
   private async setTag(value: any) {
     const newValue = value || {};
-    if (newValue.light) this.updateTag('light', newValue.light);
-    if (newValue.dark) this.updateTag('dark', newValue.dark);
+    for (let prop in newValue) {
+      if (newValue.hasOwnProperty(prop)) {
+        if (prop === 'light' || prop === 'dark')
+          this.updateTag(prop, newValue[prop]);
+        else
+          this.tag[prop] = newValue[prop];
+      }
+    }
     if (this.dappContainer)
       this.dappContainer.setTag(this.tag);
     this.updateTheme();
