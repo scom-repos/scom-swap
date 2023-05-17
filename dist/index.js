@@ -18050,14 +18050,6 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
     let ScomSwap = class ScomSwap extends components_16.Module {
         constructor(parent, options) {
             super(parent, options);
-            this._oldData = {
-                category: 'fixed-pair',
-                providers: [],
-                tokens: [],
-                defaultChainId: 0,
-                wallets: [],
-                networks: []
-            };
             this._data = {
                 category: 'fixed-pair',
                 providers: [],
@@ -18066,7 +18058,6 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                 wallets: [],
                 networks: []
             };
-            this.oldTag = {};
             this.tag = {};
             this.defaultEdit = true;
             this.isInited = false;
@@ -18524,9 +18515,16 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                     name: 'Commissions',
                     icon: 'dollar-sign',
                     command: (builder, userInputData) => {
+                        let _oldData = {
+                            category: 'fixed-pair',
+                            providers: [],
+                            defaultChainId: 0,
+                            wallets: [],
+                            networks: []
+                        };
                         return {
                             execute: async () => {
-                                this._oldData = Object.assign({}, this._data);
+                                _oldData = Object.assign({}, this._data);
                                 if (userInputData.commissions)
                                     this._data.commissions = userInputData.commissions;
                                 this.configDApp.data = this._data;
@@ -18535,7 +18533,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                                     builder.setData(this._data);
                             },
                             undo: () => {
-                                this._data = Object.assign({}, this._oldData);
+                                this._data = Object.assign({}, _oldData);
                                 this.configDApp.data = this._data;
                                 this.refreshUI();
                                 if (builder === null || builder === void 0 ? void 0 : builder.setData)
@@ -18568,9 +18566,16 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                     name: 'Settings',
                     icon: 'cog',
                     command: (builder, userInputData) => {
+                        let _oldData = {
+                            category: 'fixed-pair',
+                            providers: [],
+                            defaultChainId: 0,
+                            wallets: [],
+                            networks: []
+                        };
                         return {
                             execute: async () => {
-                                this._oldData = Object.assign({}, this._data);
+                                _oldData = Object.assign({}, this._data);
                                 this._data.category = userInputData.category;
                                 this._data.providers = userInputData.providers;
                                 this._data.tokens = [];
@@ -18595,7 +18600,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                                     builder.setData(this._data);
                             },
                             undo: () => {
-                                this._data = Object.assign({}, this._oldData);
+                                this._data = Object.assign({}, _oldData);
                                 this.configDApp.data = this._data;
                                 this.refreshUI();
                                 if (builder === null || builder === void 0 ? void 0 : builder.setData)
@@ -18654,21 +18659,29 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                     name: 'Theme Settings',
                     icon: 'palette',
                     command: (builder, userInputData) => {
+                        let oldTag = {};
                         return {
                             execute: async () => {
                                 if (!userInputData)
                                     return;
-                                this.oldTag = JSON.parse(JSON.stringify(this.tag));
-                                this.setTag(userInputData);
+                                oldTag = JSON.parse(JSON.stringify(this.tag));
                                 if (builder)
                                     builder.setTag(userInputData);
+                                else
+                                    this.setTag(userInputData);
+                                if (this.dappContainer)
+                                    this.dappContainer.setTag(userInputData);
                             },
                             undo: () => {
                                 if (!userInputData)
                                     return;
-                                this.setTag(this.oldTag);
+                                this.tag = JSON.parse(JSON.stringify(oldTag));
                                 if (builder)
-                                    builder.setTag(this.oldTag);
+                                    builder.setTag(this.tag);
+                                else
+                                    this.setTag(this.tag);
+                                if (this.dappContainer)
+                                    this.dappContainer.setTag(this.tag);
                             },
                             redo: () => { }
                         };
@@ -18762,10 +18775,14 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
         }
         async setTag(value) {
             const newValue = value || {};
-            if (newValue.light)
-                this.updateTag('light', newValue.light);
-            if (newValue.dark)
-                this.updateTag('dark', newValue.dark);
+            for (let prop in newValue) {
+                if (newValue.hasOwnProperty(prop)) {
+                    if (prop === 'light' || prop === 'dark')
+                        this.updateTag(prop, newValue[prop]);
+                    else
+                        this.tag[prop] = newValue[prop];
+                }
+            }
             if (this.dappContainer)
                 this.dappContainer.setTag(this.tag);
             this.updateTheme();

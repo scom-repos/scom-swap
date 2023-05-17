@@ -10840,9 +10840,7 @@ declare module "@scom/scom-swap" {
         }
     }
     export default class ScomSwap extends Module {
-        private _oldData;
         private _data;
-        private oldTag;
         tag: any;
         defaultEdit: boolean;
         private swapComponent;
