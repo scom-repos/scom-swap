@@ -18611,42 +18611,52 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                     },
                     userInputDataSchema: propertiesSchema,
                     userInputUISchema: {
-                        type: 'VerticalLayout',
-                        elements: [
+                        "type": "VerticalLayout",
+                        "elements": [
                             {
-                                type: 'Control',
-                                scope: '#/properties/category',
+                                "type": "HorizontalLayout",
+                                "elements": [
+                                    {
+                                        "type": "Control",
+                                        "scope": "#/properties/category"
+                                    }
+                                ]
                             },
                             {
-                                type: 'Categorization',
-                                elements: [
+                                "type": "HorizontalLayout",
+                                "elements": [
                                     {
-                                        type: 'Category',
-                                        label: 'Providers',
-                                        elements: [
+                                        "type": "Categorization",
+                                        "elements": [
                                             {
-                                                type: 'Control',
-                                                scope: '#/properties/providers',
-                                                options: {
-                                                    detail: {
-                                                        type: 'VerticalLayout'
+                                                "type": "Category",
+                                                "label": "Providers",
+                                                "elements": [
+                                                    {
+                                                        "type": "Control",
+                                                        "scope": "#/properties/providers",
+                                                        "options": {
+                                                            "detail": {
+                                                                "type": "VerticalLayout"
+                                                            }
+                                                        }
                                                     }
-                                                }
-                                            }
-                                        ]
-                                    },
-                                    {
-                                        type: 'Category',
-                                        label: 'Tokens',
-                                        elements: [
+                                                ]
+                                            },
                                             {
-                                                type: 'Control',
-                                                scope: '#/properties/tokens',
-                                                options: {
-                                                    detail: {
-                                                        type: 'VerticalLayout'
+                                                "type": "Category",
+                                                "label": "Tokens",
+                                                "elements": [
+                                                    {
+                                                        "type": "Control",
+                                                        "scope": "#/properties/tokens",
+                                                        "options": {
+                                                            "detail": {
+                                                                "type": "VerticalLayout"
+                                                            }
+                                                        }
                                                     }
-                                                }
+                                                ]
                                             }
                                         ]
                                     }
@@ -18714,7 +18724,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                     setTag: this.setTag.bind(this)
                 },
                 {
-                    name: 'Emdedder Configurator',
+                    name: 'Embedder Configurator',
                     target: 'Embedders',
                     elementName: 'i-scom-swap-config',
                     getLinkParams: () => {

@@ -45,7 +45,7 @@ export async function getERC20Amount(wallet:Wallet, token:string, decimals:numbe
 }
 
 export const approveERC20Max = async (token: ITokenObject, spenderAddress: string, callback?: any, confirmationCallback?: any) => {
-  let wallet = Wallet.getClientInstance() as any;
+  let wallet = Wallet.getClientInstance();
   let amount = new BigNumber(2).pow(256).minus(1);
   let erc20 = new Contracts.ERC20(wallet, token.address);
   registerSendTxEvents({
@@ -61,7 +61,7 @@ export const approveERC20Max = async (token: ITokenObject, spenderAddress: strin
 
 export const getERC20Allowance = async (token: ITokenObject, spenderAddress: string) => {
   if (!token?.address) return null;
-  let wallet = Wallet.getClientInstance() as any;
+  let wallet = Wallet.getClientInstance();
   let erc20 = new Contracts.ERC20(wallet, token.address);
   let allowance = await erc20.allowance({
     owner: wallet.account.address,
