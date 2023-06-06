@@ -13726,7 +13726,7 @@ define("@scom/scom-swap/index.css.ts", ["require", "exports", "@ijstech/componen
                     },
                     '.custom-ic--swap': {
                         bottom: '0 !important',
-                        transform: 'none !importnat'
+                        transform: 'none !important'
                     }
                 }
             },
@@ -19648,7 +19648,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
         }
         resizeLayout() {
             var _a, _b;
-            if (this.offsetWidth < 550) {
+            if (this.offsetWidth !== 0 && this.offsetWidth < 550) {
                 (_a = this.wrapperSwap) === null || _a === void 0 ? void 0 : _a.classList.add('swap-flex--col');
             }
             else {

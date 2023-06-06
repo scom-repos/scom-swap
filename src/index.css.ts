@@ -154,7 +154,7 @@ Styles.cssRule('.pageblock-swap', {
         },
         '.custom-ic--swap': {
           bottom: '0 !important',
-          transform: 'none !importnat'
+          transform: 'none !important'
         }
       }
     },
