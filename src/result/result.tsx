@@ -1,9 +1,10 @@
-import { customElements, Module, ControlElement, Modal, Panel, Label, Image, Button, Container, VStack } from '@ijstech/components';
+import { customElements, Module, ControlElement, Modal, Panel, Label, Image, Button, Container, VStack, Styles } from '@ijstech/components';
 import { Wallet } from '@ijstech/eth-wallet';
 import { parseContractError } from '../global/index';
 import { getNetworkExplorerName, viewOnExplorerByTxHash } from '../store/index';
 import styleClass from './result.css';
 import Assets from '../assets';
+const Theme = Styles.Theme.ThemeVars;
 
 declare global {
 	namespace JSX {
@@ -198,7 +199,8 @@ export class Result extends Module {
 
       const button = new Button(mainSection, {
         width: '100%',
-        caption: 'Cancel'
+        caption: 'Cancel',
+        font: { color: Theme.colors.primary.contrastText }
       });
       button.classList.add('btn-os');
       button.classList.add('mt-1');

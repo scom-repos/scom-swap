@@ -42,16 +42,17 @@ export default Styles.style({
           borderRadius: '0.5rem',
         },
         '.warning-box i-label *': {
-          // color: Theme.text.primary,
+          color: Theme.colors.primary.contrastText,
           fontSize: '1rem',
         },
         'i-label.warning-text *': {
-          color: Theme.colors.secondary.main,
+          color: Theme.colors.warning.light,
           fontSize: '1.05rem',
         },
         'i-button': {
           padding: '0.75rem',
           margin: '1.25rem 0 0.5rem',
+          color: Theme.colors.primary.contrastText,
           background: 'transparent linear-gradient(255deg,#e75b66,#b52082) 0% 0% no-repeat padding-box',
         }
       }

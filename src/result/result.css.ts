@@ -13,7 +13,7 @@ export default Styles.style({
       minWidth: '25%',
       maxWidth: '100%',
       width: 455,
-      background: '#252a48',
+      background: Theme.background.modal,
       borderRadius: 12
     },
     '.i-modal-close svg': {
