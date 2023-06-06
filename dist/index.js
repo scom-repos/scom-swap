@@ -19678,7 +19678,6 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
             const networks = this.getAttribute('networks', true);
             const wallets = this.getAttribute('wallets', true);
             const showHeader = this.getAttribute('showHeader', true);
-            this.updateContractAddress();
             await this.setData({ category, providers, commissions, tokens, defaultChainId, networks, wallets, showHeader });
             this.isReadyCallbackQueued = false;
             this.executeReadyCallback();
