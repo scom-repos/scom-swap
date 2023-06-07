@@ -13709,7 +13709,8 @@ define("@scom/scom-swap/index.css.ts", ["require", "exports", "@ijstech/componen
             },
             '#swapContainer i-button:not(.disabled):hover': {
                 transition: 'all .2s ease-out',
-                background: 'linear-gradient(255deg,#f15e61,#b52082)'
+                background: 'linear-gradient(255deg,#f15e61,#b52082)',
+                color: Theme.colors.primary.contrastText
             },
             '#swapContainer i-button:focus': {
                 outline: 0,
@@ -14376,7 +14377,12 @@ define("@scom/scom-swap/index.css.ts", ["require", "exports", "@ijstech/componen
                         height: '16px !important',
                     },
                     'i-icon.is-spin': {
-                        background: '#fff'
+                        fill: Theme.colors.primary.contrastText,
+                        $nest: {
+                            'svg': {
+                                fill: Theme.colors.primary.contrastText
+                            }
+                        }
                     }
                 },
             },
@@ -16925,8 +16931,8 @@ define("@scom/scom-swap/token-selection/tokenSelection.tsx", ["require", "export
             }
             this.renderTokenItems();
         }
-        async updateDataByChain() {
-            this.tokenBalancesMap = await scom_token_list_5.tokenStore.updateAllTokenBalances();
+        async updateDataByChain(onPaid) {
+            this.tokenBalancesMap = onPaid ? scom_token_list_5.tokenStore.tokenBalances : await scom_token_list_5.tokenStore.updateAllTokenBalances();
             this.renderTokenItems();
             this.updateButton();
         }
@@ -16948,8 +16954,8 @@ define("@scom/scom-swap/token-selection/tokenSelection.tsx", ["require", "export
         async onWalletDisconnect() {
             await this.initData();
         }
-        async onPaid() {
-            await this.updateDataByChain();
+        async onPaid(data) {
+            await this.updateDataByChain(data === 'onPaid');
             await this.initData();
         }
         registerEvent() {
@@ -17194,13 +17200,14 @@ define("@scom/scom-swap/token-selection/tokenSelection.tsx", ["require", "export
             this._isSortBalanceShown = true;
             this._isBtnMaxShown = true;
             this.sortToken = (a, b, asc) => {
+                var _a, _b, _c, _d;
                 if (a.balance != b.balance) {
                     return asc ? (a.balance - b.balance) : (b.balance - a.balance);
                 }
-                if (a.symbol.toLowerCase() < b.symbol.toLowerCase()) {
+                if (((_a = a.symbol) === null || _a === void 0 ? void 0 : _a.toLowerCase()) < ((_b = b.symbol) === null || _b === void 0 ? void 0 : _b.toLowerCase())) {
                     return -1;
                 }
-                if (a.symbol.toLowerCase() > b.symbol.toLowerCase()) {
+                if (((_c = a.symbol) === null || _c === void 0 ? void 0 : _c.toLowerCase()) > ((_d = b.symbol) === null || _d === void 0 ? void 0 : _d.toLowerCase())) {
                     return 1;
                 }
                 return 0;
@@ -17482,7 +17489,8 @@ define("@scom/scom-swap/result/result.tsx", ["require", "exports", "@ijstech/com
                 }
                 const button = new components_11.Button(mainSection, {
                     width: '100%',
-                    caption: 'Close'
+                    caption: 'Close',
+                    font: { color: Theme.colors.primary.contrastText }
                 });
                 button.classList.add('btn-os');
                 button.classList.add('mt-1');
@@ -18083,6 +18091,10 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
         set width(value) {
             this.resizeLayout();
         }
+        get hasData() {
+            const { providers, defaultChainId, networks, wallets } = this._data;
+            return !!((providers === null || providers === void 0 ? void 0 : providers.length) || (networks === null || networks === void 0 ? void 0 : networks.length) || (wallets === null || wallets === void 0 ? void 0 : wallets.length) || !isNaN(Number(defaultChainId)));
+        }
         getActions() {
             const propertiesSchema = {
                 type: "object",
@@ -18652,9 +18664,6 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                     this.dappContainer.setData(data);
                 this.currentChainId = _chainId ? _chainId : (0, index_18.getChainId)();
                 scom_token_list_7.tokenStore.updateTokenMapData();
-                if (connected) {
-                    await scom_token_list_7.tokenStore.updateAllTokenBalances();
-                }
                 this.closeNetworkErrModal();
                 if (this.isFixedPair) {
                     this.setFixedPairData();
@@ -18687,7 +18696,6 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                 }
                 this.firstTokenSelection.tokenDataListProp = (0, index_18.getSupportedTokens)(this._data.tokens || [], this.currentChainId);
                 this.setTargetTokenList();
-                //if (connected) {
                 if (!this.record)
                     this.swapBtn.enabled = false;
                 this.onRenderPriceInfo();
@@ -18817,9 +18825,9 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
             this.setTargetTokenList = (isDisabled) => {
                 var _a;
                 const srcChainId = ((_a = this.srcChain) === null || _a === void 0 ? void 0 : _a.chainId) || this.currentChainId;
-                if (this.secondTokenSelection.targetChainId != srcChainId) {
-                    this.secondTokenSelection.targetChainId = srcChainId;
-                }
+                // if (this.secondTokenSelection.targetChainId != srcChainId) { //Cross chain
+                //   this.secondTokenSelection.targetChainId = srcChainId;
+                // }
                 this.secondTokenSelection.tokenDataListProp = (0, index_18.getSupportedTokens)(this._data.tokens || [], srcChainId);
             };
             this.showModalFees = () => {
@@ -18993,9 +19001,9 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                     this.onSwapConfirming(data.key);
                 },
                 onPaid: async (data) => {
-                    components_16.application.EventBus.dispatch("Paid" /* EventId.Paid */);
                     this.onSwapConfirmed({ key: data.key });
                     await this.updateBalance();
+                    components_16.application.EventBus.dispatch("Paid" /* EventId.Paid */, 'onPaid');
                 },
                 onPayingError: async (err) => {
                     this.showResultMessage(this.openswapResult, 'error', err);
@@ -19465,7 +19473,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
             return 0;
         }
         async updateBalance() {
-            if ((0, index_18.isWalletConnected)())
+            if ((0, index_18.isWalletConnected)() && this.hasData)
                 await scom_token_list_7.tokenStore.updateAllTokenBalances();
             this.allTokenBalancesMap = (0, index_18.isWalletConnected)() ? scom_token_list_7.tokenStore.tokenBalances : [];
             if (this.fromToken) {
@@ -19714,7 +19722,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                                             this.$render("i-label", { id: "lbRouting", caption: "No routing", opacity: 0.75, font: { size: '1rem' }, class: "visibility-hidden" }))))),
                             this.$render("i-panel", { id: "pnlPriceInfo" }),
                             this.$render("i-vstack", { class: "swap-btn-container", horizontalAlignment: "center", width: "100%" },
-                                this.$render("i-button", { id: "swapBtn", class: "btn-swap btn-os", maxWidth: 360, height: 60, visible: false, rightIcon: { spin: true, visible: false }, onClick: this.onClickSwapButton.bind(this) }))),
+                                this.$render("i-button", { id: "swapBtn", class: "btn-swap btn-os", maxWidth: 360, height: 60, visible: false, rightIcon: { spin: true, visible: false, fill: Theme.colors.primary.contrastText }, onClick: this.onClickSwapButton.bind(this) }))),
                         this.$render("i-modal", { id: "swapModal", class: "custom-modal", title: "Confirm Swap", closeIcon: { name: 'times' } },
                             this.$render("i-hstack", { verticalAlignment: 'center', horizontalAlignment: 'start' },
                                 this.$render("i-panel", { id: "srcChainFirstPanel", class: "row-chain" },

@@ -133,7 +133,8 @@ Styles.cssRule('.pageblock-swap', {
     },
     '#swapContainer i-button:not(.disabled):hover': {
       transition: 'all .2s ease-out',
-      background: 'linear-gradient(255deg,#f15e61,#b52082)'
+      background: 'linear-gradient(255deg,#f15e61,#b52082)',
+      color: Theme.colors.primary.contrastText
     },
     '#swapContainer i-button:focus': {
       outline: 0,
@@ -800,7 +801,12 @@ Styles.cssRule('.pageblock-swap', {
           height: '16px !important',
         },
         'i-icon.is-spin': {
-          background: '#fff'
+          fill: Theme.colors.primary.contrastText,
+          $nest: {
+            'svg': {
+              fill: Theme.colors.primary.contrastText
+            }
+          }
         }
       },
     },

@@ -168,7 +168,8 @@ export class Result extends Module {
 
       const button = new Button(mainSection, {
         width: '100%',
-        caption: 'Close'
+        caption: 'Close',
+        font: { color: Theme.colors.primary.contrastText }
       });
       button.classList.add('btn-os');
       button.classList.add('mt-1');
