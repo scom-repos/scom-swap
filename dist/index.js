@@ -1,6 +1,10 @@
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
 }) : (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     o[k2] = m[k];
@@ -223,8 +227,8 @@ define("@scom/scom-swap/contracts/oswap-openswap-contract/contracts/OpenSwap.ts"
             });
         }
     }
-    exports.OpenSwap = OpenSwap;
     OpenSwap._abi = OpenSwap_json_1.default.abi;
+    exports.OpenSwap = OpenSwap;
 });
 define("@scom/scom-swap/contracts/oswap-openswap-contract/contracts/amm/OSWAP_ERC20.json.ts", ["require", "exports"], function (require, exports) {
     "use strict";
@@ -416,8 +420,8 @@ define("@scom/scom-swap/contracts/oswap-openswap-contract/contracts/amm/OSWAP_ER
             });
         }
     }
-    exports.OSWAP_ERC20 = OSWAP_ERC20;
     OSWAP_ERC20._abi = OSWAP_ERC20_json_1.default.abi;
+    exports.OSWAP_ERC20 = OSWAP_ERC20;
 });
 define("@scom/scom-swap/contracts/oswap-openswap-contract/contracts/amm/OSWAP_Factory.json.ts", ["require", "exports"], function (require, exports) {
     "use strict";
@@ -694,8 +698,8 @@ define("@scom/scom-swap/contracts/oswap-openswap-contract/contracts/amm/OSWAP_Fa
             });
         }
     }
-    exports.OSWAP_Factory = OSWAP_Factory;
     OSWAP_Factory._abi = OSWAP_Factory_json_1.default.abi;
+    exports.OSWAP_Factory = OSWAP_Factory;
 });
 define("@scom/scom-swap/contracts/oswap-openswap-contract/contracts/amm/OSWAP_Pair.json.ts", ["require", "exports"], function (require, exports) {
     "use strict";
@@ -1207,8 +1211,8 @@ define("@scom/scom-swap/contracts/oswap-openswap-contract/contracts/amm/OSWAP_Pa
             });
         }
     }
-    exports.OSWAP_Pair = OSWAP_Pair;
     OSWAP_Pair._abi = OSWAP_Pair_json_1.default.abi;
+    exports.OSWAP_Pair = OSWAP_Pair;
 });
 define("@scom/scom-swap/contracts/oswap-openswap-contract/contracts/amm/OSWAP_PairCreator.json.ts", ["require", "exports"], function (require, exports) {
     "use strict";
@@ -1252,8 +1256,8 @@ define("@scom/scom-swap/contracts/oswap-openswap-contract/contracts/amm/OSWAP_Pa
             });
         }
     }
-    exports.OSWAP_PairCreator = OSWAP_PairCreator;
     OSWAP_PairCreator._abi = OSWAP_PairCreator_json_1.default.abi;
+    exports.OSWAP_PairCreator = OSWAP_PairCreator;
 });
 define("@scom/scom-swap/contracts/oswap-openswap-contract/contracts/amm/OSWAP_Router.json.ts", ["require", "exports"], function (require, exports) {
     "use strict";
@@ -1665,8 +1669,8 @@ define("@scom/scom-swap/contracts/oswap-openswap-contract/contracts/amm/OSWAP_Ro
             });
         }
     }
-    exports.OSWAP_Router = OSWAP_Router;
     OSWAP_Router._abi = OSWAP_Router_json_1.default.abi;
+    exports.OSWAP_Router = OSWAP_Router;
 });
 define("@scom/scom-swap/contracts/oswap-openswap-contract/contracts/amm/OSWAP_VotingExecutor1.json.ts", ["require", "exports"], function (require, exports) {
     "use strict";
@@ -1723,8 +1727,8 @@ define("@scom/scom-swap/contracts/oswap-openswap-contract/contracts/amm/OSWAP_Vo
             });
         }
     }
-    exports.OSWAP_VotingExecutor1 = OSWAP_VotingExecutor1;
     OSWAP_VotingExecutor1._abi = OSWAP_VotingExecutor1_json_1.default.abi;
+    exports.OSWAP_VotingExecutor1 = OSWAP_VotingExecutor1;
 });
 define("@scom/scom-swap/contracts/oswap-openswap-contract/contracts/commons/OSWAP_FactoryBase.json.ts", ["require", "exports"], function (require, exports) {
     "use strict";
@@ -1898,8 +1902,8 @@ define("@scom/scom-swap/contracts/oswap-openswap-contract/contracts/commons/OSWA
             });
         }
     }
-    exports.OSWAP_FactoryBase = OSWAP_FactoryBase;
     OSWAP_FactoryBase._abi = OSWAP_FactoryBase_json_1.default.abi;
+    exports.OSWAP_FactoryBase = OSWAP_FactoryBase;
 });
 define("@scom/scom-swap/contracts/oswap-openswap-contract/contracts/commons/OSWAP_PausableFactory.json.ts", ["require", "exports"], function (require, exports) {
     "use strict";
@@ -2016,8 +2020,8 @@ define("@scom/scom-swap/contracts/oswap-openswap-contract/contracts/commons/OSWA
             });
         }
     }
-    exports.OSWAP_PausableFactory = OSWAP_PausableFactory;
     OSWAP_PausableFactory._abi = OSWAP_PausableFactory_json_1.default.abi;
+    exports.OSWAP_PausableFactory = OSWAP_PausableFactory;
 });
 define("@scom/scom-swap/contracts/oswap-openswap-contract/contracts/commons/OSWAP_PausablePair.json.ts", ["require", "exports"], function (require, exports) {
     "use strict";
@@ -2074,8 +2078,8 @@ define("@scom/scom-swap/contracts/oswap-openswap-contract/contracts/commons/OSWA
             });
         }
     }
-    exports.OSWAP_PausablePair = OSWAP_PausablePair;
     OSWAP_PausablePair._abi = OSWAP_PausablePair_json_1.default.abi;
+    exports.OSWAP_PausablePair = OSWAP_PausablePair;
 });
 define("@scom/scom-swap/contracts/oswap-openswap-contract/contracts/gov/OAXDEX_Administrator.json.ts", ["require", "exports"], function (require, exports) {
     "use strict";
@@ -2524,8 +2528,8 @@ define("@scom/scom-swap/contracts/oswap-openswap-contract/contracts/gov/OAXDEX_A
             });
         }
     }
-    exports.OAXDEX_Administrator = OAXDEX_Administrator;
     OAXDEX_Administrator._abi = OAXDEX_Administrator_json_1.default.abi;
+    exports.OAXDEX_Administrator = OAXDEX_Administrator;
 });
 define("@scom/scom-swap/contracts/oswap-openswap-contract/contracts/gov/OAXDEX_Governance.json.ts", ["require", "exports"], function (require, exports) {
     "use strict";
@@ -3208,8 +3212,8 @@ define("@scom/scom-swap/contracts/oswap-openswap-contract/contracts/gov/OAXDEX_G
             });
         }
     }
-    exports.OAXDEX_Governance = OAXDEX_Governance;
     OAXDEX_Governance._abi = OAXDEX_Governance_json_1.default.abi;
+    exports.OAXDEX_Governance = OAXDEX_Governance;
 });
 define("@scom/scom-swap/contracts/oswap-openswap-contract/contracts/gov/OAXDEX_VotingContract.json.ts", ["require", "exports"], function (require, exports) {
     "use strict";
@@ -3455,8 +3459,8 @@ define("@scom/scom-swap/contracts/oswap-openswap-contract/contracts/gov/OAXDEX_V
             });
         }
     }
-    exports.OAXDEX_VotingContract = OAXDEX_VotingContract;
     OAXDEX_VotingContract._abi = OAXDEX_VotingContract_json_1.default.abi;
+    exports.OAXDEX_VotingContract = OAXDEX_VotingContract;
 });
 define("@scom/scom-swap/contracts/oswap-openswap-contract/contracts/gov/OAXDEX_VotingExecutor.json.ts", ["require", "exports"], function (require, exports) {
     "use strict";
@@ -3513,8 +3517,8 @@ define("@scom/scom-swap/contracts/oswap-openswap-contract/contracts/gov/OAXDEX_V
             });
         }
     }
-    exports.OAXDEX_VotingExecutor = OAXDEX_VotingExecutor;
     OAXDEX_VotingExecutor._abi = OAXDEX_VotingExecutor_json_1.default.abi;
+    exports.OAXDEX_VotingExecutor = OAXDEX_VotingExecutor;
 });
 define("@scom/scom-swap/contracts/oswap-openswap-contract/contracts/gov/OAXDEX_VotingRegistry.json.ts", ["require", "exports"], function (require, exports) {
     "use strict";
@@ -3566,8 +3570,8 @@ define("@scom/scom-swap/contracts/oswap-openswap-contract/contracts/gov/OAXDEX_V
             });
         }
     }
-    exports.OAXDEX_VotingRegistry = OAXDEX_VotingRegistry;
     OAXDEX_VotingRegistry._abi = OAXDEX_VotingRegistry_json_1.default.abi;
+    exports.OAXDEX_VotingRegistry = OAXDEX_VotingRegistry;
 });
 define("@scom/scom-swap/contracts/oswap-openswap-contract/contracts/libraries/ERC20.json.ts", ["require", "exports"], function (require, exports) {
     "use strict";
@@ -3748,8 +3752,8 @@ define("@scom/scom-swap/contracts/oswap-openswap-contract/contracts/libraries/ER
             });
         }
     }
-    exports.ERC20 = ERC20;
     ERC20._abi = ERC20_json_1.default.abi;
+    exports.ERC20 = ERC20;
 });
 define("@scom/scom-swap/contracts/oswap-openswap-contract/contracts/oracle/OSWAP_CertiKSecurityOracle.json.ts", ["require", "exports"], function (require, exports) {
     "use strict";
@@ -3789,8 +3793,8 @@ define("@scom/scom-swap/contracts/oswap-openswap-contract/contracts/oracle/OSWAP
             this.oracleAddress = oracleAddress_call;
         }
     }
-    exports.OSWAP_CertiKSecurityOracle = OSWAP_CertiKSecurityOracle;
     OSWAP_CertiKSecurityOracle._abi = OSWAP_CertiKSecurityOracle_json_1.default.abi;
+    exports.OSWAP_CertiKSecurityOracle = OSWAP_CertiKSecurityOracle;
 });
 define("@scom/scom-swap/contracts/oswap-openswap-contract/contracts/oracle/OSWAP_OracleFactory.json.ts", ["require", "exports"], function (require, exports) {
     "use strict";
@@ -4389,8 +4393,8 @@ define("@scom/scom-swap/contracts/oswap-openswap-contract/contracts/oracle/OSWAP
             });
         }
     }
-    exports.OSWAP_OracleFactory = OSWAP_OracleFactory;
     OSWAP_OracleFactory._abi = OSWAP_OracleFactory_json_1.default.abi;
+    exports.OSWAP_OracleFactory = OSWAP_OracleFactory;
 });
 define("@scom/scom-swap/contracts/oswap-openswap-contract/contracts/oracle/OSWAP_OracleLiquidityProvider.json.ts", ["require", "exports"], function (require, exports) {
     "use strict";
@@ -4551,8 +4555,8 @@ define("@scom/scom-swap/contracts/oswap-openswap-contract/contracts/oracle/OSWAP
             });
         }
     }
-    exports.OSWAP_OracleLiquidityProvider = OSWAP_OracleLiquidityProvider;
     OSWAP_OracleLiquidityProvider._abi = OSWAP_OracleLiquidityProvider_json_1.default.abi;
+    exports.OSWAP_OracleLiquidityProvider = OSWAP_OracleLiquidityProvider;
 });
 define("@scom/scom-swap/contracts/oswap-openswap-contract/contracts/oracle/OSWAP_OraclePair.json.ts", ["require", "exports"], function (require, exports) {
     "use strict";
@@ -5202,8 +5206,8 @@ define("@scom/scom-swap/contracts/oswap-openswap-contract/contracts/oracle/OSWAP
             });
         }
     }
-    exports.OSWAP_OraclePair = OSWAP_OraclePair;
     OSWAP_OraclePair._abi = OSWAP_OraclePair_json_1.default.abi;
+    exports.OSWAP_OraclePair = OSWAP_OraclePair;
 });
 define("@scom/scom-swap/contracts/oswap-openswap-contract/contracts/oracle/OSWAP_OraclePairCreator.json.ts", ["require", "exports"], function (require, exports) {
     "use strict";
@@ -5247,8 +5251,8 @@ define("@scom/scom-swap/contracts/oswap-openswap-contract/contracts/oracle/OSWAP
             });
         }
     }
-    exports.OSWAP_OraclePairCreator = OSWAP_OraclePairCreator;
     OSWAP_OraclePairCreator._abi = OSWAP_OraclePairCreator_json_1.default.abi;
+    exports.OSWAP_OraclePairCreator = OSWAP_OraclePairCreator;
 });
 define("@scom/scom-swap/contracts/oswap-openswap-contract/contracts/oracle/OSWAP_VotingExecutor2.json.ts", ["require", "exports"], function (require, exports) {
     "use strict";
@@ -5305,8 +5309,8 @@ define("@scom/scom-swap/contracts/oswap-openswap-contract/contracts/oracle/OSWAP
             });
         }
     }
-    exports.OSWAP_VotingExecutor2 = OSWAP_VotingExecutor2;
     OSWAP_VotingExecutor2._abi = OSWAP_VotingExecutor2_json_1.default.abi;
+    exports.OSWAP_VotingExecutor2 = OSWAP_VotingExecutor2;
 });
 define("@scom/scom-swap/contracts/oswap-openswap-contract/contracts/range/OSWAP_RangeFactory.json.ts", ["require", "exports"], function (require, exports) {
     "use strict";
@@ -5693,8 +5697,8 @@ define("@scom/scom-swap/contracts/oswap-openswap-contract/contracts/range/OSWAP_
             });
         }
     }
-    exports.OSWAP_RangeFactory = OSWAP_RangeFactory;
     OSWAP_RangeFactory._abi = OSWAP_RangeFactory_json_1.default.abi;
+    exports.OSWAP_RangeFactory = OSWAP_RangeFactory;
 });
 define("@scom/scom-swap/contracts/oswap-openswap-contract/contracts/range/OSWAP_RangeLiquidityProvider.json.ts", ["require", "exports"], function (require, exports) {
     "use strict";
@@ -5873,8 +5877,8 @@ define("@scom/scom-swap/contracts/oswap-openswap-contract/contracts/range/OSWAP_
             });
         }
     }
-    exports.OSWAP_RangeLiquidityProvider = OSWAP_RangeLiquidityProvider;
     OSWAP_RangeLiquidityProvider._abi = OSWAP_RangeLiquidityProvider_json_1.default.abi;
+    exports.OSWAP_RangeLiquidityProvider = OSWAP_RangeLiquidityProvider;
 });
 define("@scom/scom-swap/contracts/oswap-openswap-contract/contracts/range/OSWAP_RangePair.json.ts", ["require", "exports"], function (require, exports) {
     "use strict";
@@ -6418,8 +6422,8 @@ define("@scom/scom-swap/contracts/oswap-openswap-contract/contracts/range/OSWAP_
             });
         }
     }
-    exports.OSWAP_RangePair = OSWAP_RangePair;
     OSWAP_RangePair._abi = OSWAP_RangePair_json_1.default.abi;
+    exports.OSWAP_RangePair = OSWAP_RangePair;
 });
 define("@scom/scom-swap/contracts/oswap-openswap-contract/contracts/range/OSWAP_RangePairCreator.json.ts", ["require", "exports"], function (require, exports) {
     "use strict";
@@ -6463,8 +6467,8 @@ define("@scom/scom-swap/contracts/oswap-openswap-contract/contracts/range/OSWAP_
             });
         }
     }
-    exports.OSWAP_RangePairCreator = OSWAP_RangePairCreator;
     OSWAP_RangePairCreator._abi = OSWAP_RangePairCreator_json_1.default.abi;
+    exports.OSWAP_RangePairCreator = OSWAP_RangePairCreator;
 });
 define("@scom/scom-swap/contracts/oswap-openswap-contract/contracts/range/OSWAP_VotingExecutor3.json.ts", ["require", "exports"], function (require, exports) {
     "use strict";
@@ -6527,8 +6531,8 @@ define("@scom/scom-swap/contracts/oswap-openswap-contract/contracts/range/OSWAP_
             });
         }
     }
-    exports.OSWAP_VotingExecutor3 = OSWAP_VotingExecutor3;
     OSWAP_VotingExecutor3._abi = OSWAP_VotingExecutor3_json_1.default.abi;
+    exports.OSWAP_VotingExecutor3 = OSWAP_VotingExecutor3;
 });
 define("@scom/scom-swap/contracts/oswap-openswap-contract/contracts/restricted/OSWAP_ConfigStore.json.ts", ["require", "exports"], function (require, exports) {
     "use strict";
@@ -6634,8 +6638,8 @@ define("@scom/scom-swap/contracts/oswap-openswap-contract/contracts/restricted/O
             });
         }
     }
-    exports.OSWAP_ConfigStore = OSWAP_ConfigStore;
     OSWAP_ConfigStore._abi = OSWAP_ConfigStore_json_1.default.abi;
+    exports.OSWAP_ConfigStore = OSWAP_ConfigStore;
 });
 define("@scom/scom-swap/contracts/oswap-openswap-contract/contracts/restricted/OSWAP_OtcLiquidityProvider.json.ts", ["require", "exports"], function (require, exports) {
     "use strict";
@@ -6850,8 +6854,8 @@ define("@scom/scom-swap/contracts/oswap-openswap-contract/contracts/restricted/O
             });
         }
     }
-    exports.OSWAP_OtcLiquidityProvider = OSWAP_OtcLiquidityProvider;
     OSWAP_OtcLiquidityProvider._abi = OSWAP_OtcLiquidityProvider_json_1.default.abi;
+    exports.OSWAP_OtcLiquidityProvider = OSWAP_OtcLiquidityProvider;
 });
 define("@scom/scom-swap/contracts/oswap-openswap-contract/contracts/restricted/OSWAP_OtcPairOracle.json.ts", ["require", "exports"], function (require, exports) {
     "use strict";
@@ -6915,8 +6919,8 @@ define("@scom/scom-swap/contracts/oswap-openswap-contract/contracts/restricted/O
             this.isSupported = isSupported_call;
         }
     }
-    exports.OSWAP_OtcPairOracle = OSWAP_OtcPairOracle;
     OSWAP_OtcPairOracle._abi = OSWAP_OtcPairOracle_json_1.default.abi;
+    exports.OSWAP_OtcPairOracle = OSWAP_OtcPairOracle;
 });
 define("@scom/scom-swap/contracts/oswap-openswap-contract/contracts/restricted/OSWAP_RestrictedFactory.json.ts", ["require", "exports"], function (require, exports) {
     "use strict";
@@ -7382,8 +7386,8 @@ define("@scom/scom-swap/contracts/oswap-openswap-contract/contracts/restricted/O
             });
         }
     }
-    exports.OSWAP_RestrictedFactory = OSWAP_RestrictedFactory;
     OSWAP_RestrictedFactory._abi = OSWAP_RestrictedFactory_json_1.default.abi;
+    exports.OSWAP_RestrictedFactory = OSWAP_RestrictedFactory;
 });
 define("@scom/scom-swap/contracts/oswap-openswap-contract/contracts/restricted/OSWAP_RestrictedLiquidityProvider1.json.ts", ["require", "exports"], function (require, exports) {
     "use strict";
@@ -7598,8 +7602,8 @@ define("@scom/scom-swap/contracts/oswap-openswap-contract/contracts/restricted/O
             });
         }
     }
-    exports.OSWAP_RestrictedLiquidityProvider1 = OSWAP_RestrictedLiquidityProvider1;
     OSWAP_RestrictedLiquidityProvider1._abi = OSWAP_RestrictedLiquidityProvider1_json_1.default.abi;
+    exports.OSWAP_RestrictedLiquidityProvider1 = OSWAP_RestrictedLiquidityProvider1;
 });
 define("@scom/scom-swap/contracts/oswap-openswap-contract/contracts/restricted/OSWAP_RestrictedLiquidityProvider3.json.ts", ["require", "exports"], function (require, exports) {
     "use strict";
@@ -7774,8 +7778,8 @@ define("@scom/scom-swap/contracts/oswap-openswap-contract/contracts/restricted/O
             });
         }
     }
-    exports.OSWAP_RestrictedLiquidityProvider3 = OSWAP_RestrictedLiquidityProvider3;
     OSWAP_RestrictedLiquidityProvider3._abi = OSWAP_RestrictedLiquidityProvider3_json_1.default.abi;
+    exports.OSWAP_RestrictedLiquidityProvider3 = OSWAP_RestrictedLiquidityProvider3;
 });
 define("@scom/scom-swap/contracts/oswap-openswap-contract/contracts/restricted/OSWAP_RestrictedLiquidityProvider4.json.ts", ["require", "exports"], function (require, exports) {
     "use strict";
@@ -7950,8 +7954,8 @@ define("@scom/scom-swap/contracts/oswap-openswap-contract/contracts/restricted/O
             });
         }
     }
-    exports.OSWAP_RestrictedLiquidityProvider4 = OSWAP_RestrictedLiquidityProvider4;
     OSWAP_RestrictedLiquidityProvider4._abi = OSWAP_RestrictedLiquidityProvider4_json_1.default.abi;
+    exports.OSWAP_RestrictedLiquidityProvider4 = OSWAP_RestrictedLiquidityProvider4;
 });
 define("@scom/scom-swap/contracts/oswap-openswap-contract/contracts/restricted/OSWAP_RestrictedPair.json.ts", ["require", "exports"], function (require, exports) {
     "use strict";
@@ -8437,8 +8441,8 @@ define("@scom/scom-swap/contracts/oswap-openswap-contract/contracts/restricted/O
             });
         }
     }
-    exports.OSWAP_RestrictedPair = OSWAP_RestrictedPair;
     OSWAP_RestrictedPair._abi = OSWAP_RestrictedPair_json_1.default.abi;
+    exports.OSWAP_RestrictedPair = OSWAP_RestrictedPair;
 });
 define("@scom/scom-swap/contracts/oswap-openswap-contract/contracts/restricted/OSWAP_RestrictedPairOracle.json.ts", ["require", "exports"], function (require, exports) {
     "use strict";
@@ -8502,8 +8506,8 @@ define("@scom/scom-swap/contracts/oswap-openswap-contract/contracts/restricted/O
             this.isSupported = isSupported_call;
         }
     }
-    exports.OSWAP_RestrictedPairOracle = OSWAP_RestrictedPairOracle;
     OSWAP_RestrictedPairOracle._abi = OSWAP_RestrictedPairOracle_json_1.default.abi;
+    exports.OSWAP_RestrictedPairOracle = OSWAP_RestrictedPairOracle;
 });
 define("@scom/scom-swap/contracts/oswap-openswap-contract/contracts/restricted/OSWAP_VotingExecutor4.json.ts", ["require", "exports"], function (require, exports) {
     "use strict";
@@ -8566,8 +8570,8 @@ define("@scom/scom-swap/contracts/oswap-openswap-contract/contracts/restricted/O
             });
         }
     }
-    exports.OSWAP_VotingExecutor4 = OSWAP_VotingExecutor4;
     OSWAP_VotingExecutor4._abi = OSWAP_VotingExecutor4_json_1.default.abi;
+    exports.OSWAP_VotingExecutor4 = OSWAP_VotingExecutor4;
 });
 define("@scom/scom-swap/contracts/oswap-openswap-contract/contracts/router/OSWAP_HybridRouter.json.ts", ["require", "exports"], function (require, exports) {
     "use strict";
@@ -8791,8 +8795,8 @@ define("@scom/scom-swap/contracts/oswap-openswap-contract/contracts/router/OSWAP
             });
         }
     }
-    exports.OSWAP_HybridRouter = OSWAP_HybridRouter;
     OSWAP_HybridRouter._abi = OSWAP_HybridRouter_json_1.default.abi;
+    exports.OSWAP_HybridRouter = OSWAP_HybridRouter;
 });
 define("@scom/scom-swap/contracts/oswap-openswap-contract/contracts/router/OSWAP_HybridRouterRegistry.json.ts", ["require", "exports"], function (require, exports) {
     "use strict";
@@ -9221,8 +9225,8 @@ define("@scom/scom-swap/contracts/oswap-openswap-contract/contracts/router/OSWAP
             });
         }
     }
-    exports.OSWAP_HybridRouterRegistry = OSWAP_HybridRouterRegistry;
     OSWAP_HybridRouterRegistry._abi = OSWAP_HybridRouterRegistry_json_1.default.abi;
+    exports.OSWAP_HybridRouterRegistry = OSWAP_HybridRouterRegistry;
 });
 define("@scom/scom-swap/contracts/oswap-openswap-contract/contracts/router/OSWAP_OracleRouter.json.ts", ["require", "exports"], function (require, exports) {
     "use strict";
@@ -9466,8 +9470,8 @@ define("@scom/scom-swap/contracts/oswap-openswap-contract/contracts/router/OSWAP
             });
         }
     }
-    exports.OSWAP_OracleRouter = OSWAP_OracleRouter;
     OSWAP_OracleRouter._abi = OSWAP_OracleRouter_json_1.default.abi;
+    exports.OSWAP_OracleRouter = OSWAP_OracleRouter;
 });
 define("@scom/scom-swap/contracts/oswap-openswap-contract/contracts/restricted/OSWAP_OtcPair.json.ts", ["require", "exports"], function (require, exports) {
     "use strict";
@@ -10102,8 +10106,8 @@ define("@scom/scom-swap/contracts/oswap-openswap-contract/contracts/restricted/O
             });
         }
     }
-    exports.OSWAP_OtcPair = OSWAP_OtcPair;
     OSWAP_OtcPair._abi = OSWAP_OtcPair_json_1.default.abi;
+    exports.OSWAP_OtcPair = OSWAP_OtcPair;
 });
 define("@scom/scom-swap/contracts/oswap-openswap-contract/contracts/restricted/OSWAP_OtcPairCreator.json.ts", ["require", "exports"], function (require, exports) {
     "use strict";
@@ -10147,8 +10151,8 @@ define("@scom/scom-swap/contracts/oswap-openswap-contract/contracts/restricted/O
             });
         }
     }
-    exports.OSWAP_OtcPairCreator = OSWAP_OtcPairCreator;
     OSWAP_OtcPairCreator._abi = OSWAP_OtcPairCreator_json_1.default.abi;
+    exports.OSWAP_OtcPairCreator = OSWAP_OtcPairCreator;
 });
 define("@scom/scom-swap/contracts/oswap-openswap-contract/contracts/restricted/OSWAP_RestrictedPair1.json.ts", ["require", "exports"], function (require, exports) {
     "use strict";
@@ -10778,8 +10782,8 @@ define("@scom/scom-swap/contracts/oswap-openswap-contract/contracts/restricted/O
             });
         }
     }
-    exports.OSWAP_RestrictedPair1 = OSWAP_RestrictedPair1;
     OSWAP_RestrictedPair1._abi = OSWAP_RestrictedPair1_json_1.default.abi;
+    exports.OSWAP_RestrictedPair1 = OSWAP_RestrictedPair1;
 });
 define("@scom/scom-swap/contracts/oswap-openswap-contract/contracts/restricted/OSWAP_RestrictedPair3.json.ts", ["require", "exports"], function (require, exports) {
     "use strict";
@@ -11411,8 +11415,8 @@ define("@scom/scom-swap/contracts/oswap-openswap-contract/contracts/restricted/O
             });
         }
     }
-    exports.OSWAP_RestrictedPair3 = OSWAP_RestrictedPair3;
     OSWAP_RestrictedPair3._abi = OSWAP_RestrictedPair3_json_1.default.abi;
+    exports.OSWAP_RestrictedPair3 = OSWAP_RestrictedPair3;
 });
 define("@scom/scom-swap/contracts/oswap-openswap-contract/contracts/restricted/OSWAP_RestrictedPair4.json.ts", ["require", "exports"], function (require, exports) {
     "use strict";
@@ -12091,8 +12095,8 @@ define("@scom/scom-swap/contracts/oswap-openswap-contract/contracts/restricted/O
             });
         }
     }
-    exports.OSWAP_RestrictedPair4 = OSWAP_RestrictedPair4;
     OSWAP_RestrictedPair4._abi = OSWAP_RestrictedPair4_json_1.default.abi;
+    exports.OSWAP_RestrictedPair4 = OSWAP_RestrictedPair4;
 });
 define("@scom/scom-swap/contracts/oswap-openswap-contract/contracts/restricted/OSWAP_RestrictedPairCreator1.json.ts", ["require", "exports"], function (require, exports) {
     "use strict";
@@ -12136,8 +12140,8 @@ define("@scom/scom-swap/contracts/oswap-openswap-contract/contracts/restricted/O
             });
         }
     }
-    exports.OSWAP_RestrictedPairCreator1 = OSWAP_RestrictedPairCreator1;
     OSWAP_RestrictedPairCreator1._abi = OSWAP_RestrictedPairCreator1_json_1.default.abi;
+    exports.OSWAP_RestrictedPairCreator1 = OSWAP_RestrictedPairCreator1;
 });
 define("@scom/scom-swap/contracts/oswap-openswap-contract/contracts/restricted/OSWAP_RestrictedPairCreator4.json.ts", ["require", "exports"], function (require, exports) {
     "use strict";
@@ -12181,8 +12185,8 @@ define("@scom/scom-swap/contracts/oswap-openswap-contract/contracts/restricted/O
             });
         }
     }
-    exports.OSWAP_RestrictedPairCreator4 = OSWAP_RestrictedPairCreator4;
     OSWAP_RestrictedPairCreator4._abi = OSWAP_RestrictedPairCreator4_json_1.default.abi;
+    exports.OSWAP_RestrictedPairCreator4 = OSWAP_RestrictedPairCreator4;
 });
 define("@scom/scom-swap/contracts/oswap-openswap-contract/contracts/router/OSWAP_HybridRouter2.json.ts", ["require", "exports"], function (require, exports) {
     "use strict";
@@ -12445,8 +12449,8 @@ define("@scom/scom-swap/contracts/oswap-openswap-contract/contracts/router/OSWAP
             });
         }
     }
-    exports.OSWAP_HybridRouter2 = OSWAP_HybridRouter2;
     OSWAP_HybridRouter2._abi = OSWAP_HybridRouter2_json_1.default.abi;
+    exports.OSWAP_HybridRouter2 = OSWAP_HybridRouter2;
 });
 define("@scom/scom-swap/contracts/oswap-openswap-contract/contracts/index.ts", ["require", "exports", "@scom/scom-swap/contracts/oswap-openswap-contract/contracts/OpenSwap.ts", "@scom/scom-swap/contracts/oswap-openswap-contract/contracts/amm/OSWAP_ERC20.ts", "@scom/scom-swap/contracts/oswap-openswap-contract/contracts/amm/OSWAP_Factory.ts", "@scom/scom-swap/contracts/oswap-openswap-contract/contracts/amm/OSWAP_Pair.ts", "@scom/scom-swap/contracts/oswap-openswap-contract/contracts/amm/OSWAP_PairCreator.ts", "@scom/scom-swap/contracts/oswap-openswap-contract/contracts/amm/OSWAP_Router.ts", "@scom/scom-swap/contracts/oswap-openswap-contract/contracts/amm/OSWAP_VotingExecutor1.ts", "@scom/scom-swap/contracts/oswap-openswap-contract/contracts/commons/OSWAP_FactoryBase.ts", "@scom/scom-swap/contracts/oswap-openswap-contract/contracts/commons/OSWAP_PausableFactory.ts", "@scom/scom-swap/contracts/oswap-openswap-contract/contracts/commons/OSWAP_PausablePair.ts", "@scom/scom-swap/contracts/oswap-openswap-contract/contracts/gov/OAXDEX_Administrator.ts", "@scom/scom-swap/contracts/oswap-openswap-contract/contracts/gov/OAXDEX_Governance.ts", "@scom/scom-swap/contracts/oswap-openswap-contract/contracts/gov/OAXDEX_VotingContract.ts", "@scom/scom-swap/contracts/oswap-openswap-contract/contracts/gov/OAXDEX_VotingExecutor.ts", "@scom/scom-swap/contracts/oswap-openswap-contract/contracts/gov/OAXDEX_VotingRegistry.ts", "@scom/scom-swap/contracts/oswap-openswap-contract/contracts/libraries/ERC20.ts", "@scom/scom-swap/contracts/oswap-openswap-contract/contracts/oracle/OSWAP_CertiKSecurityOracle.ts", "@scom/scom-swap/contracts/oswap-openswap-contract/contracts/oracle/OSWAP_OracleFactory.ts", "@scom/scom-swap/contracts/oswap-openswap-contract/contracts/oracle/OSWAP_OracleLiquidityProvider.ts", "@scom/scom-swap/contracts/oswap-openswap-contract/contracts/oracle/OSWAP_OraclePair.ts", "@scom/scom-swap/contracts/oswap-openswap-contract/contracts/oracle/OSWAP_OraclePairCreator.ts", "@scom/scom-swap/contracts/oswap-openswap-contract/contracts/oracle/OSWAP_VotingExecutor2.ts", "@scom/scom-swap/contracts/oswap-openswap-contract/contracts/range/OSWAP_RangeFactory.ts", "@scom/scom-swap/contracts/oswap-openswap-contract/contracts/range/OSWAP_RangeLiquidityProvider.ts", "@scom/scom-swap/contracts/oswap-openswap-contract/contracts/range/OSWAP_RangePair.ts", "@scom/scom-swap/contracts/oswap-openswap-contract/contracts/range/OSWAP_RangePairCreator.ts", "@scom/scom-swap/contracts/oswap-openswap-contract/contracts/range/OSWAP_VotingExecutor3.ts", "@scom/scom-swap/contracts/oswap-openswap-contract/contracts/restricted/OSWAP_ConfigStore.ts", "@scom/scom-swap/contracts/oswap-openswap-contract/contracts/restricted/OSWAP_OtcLiquidityProvider.ts", "@scom/scom-swap/contracts/oswap-openswap-contract/contracts/restricted/OSWAP_OtcPairOracle.ts", "@scom/scom-swap/contracts/oswap-openswap-contract/contracts/restricted/OSWAP_RestrictedFactory.ts", "@scom/scom-swap/contracts/oswap-openswap-contract/contracts/restricted/OSWAP_RestrictedLiquidityProvider1.ts", "@scom/scom-swap/contracts/oswap-openswap-contract/contracts/restricted/OSWAP_RestrictedLiquidityProvider3.ts", "@scom/scom-swap/contracts/oswap-openswap-contract/contracts/restricted/OSWAP_RestrictedLiquidityProvider4.ts", "@scom/scom-swap/contracts/oswap-openswap-contract/contracts/restricted/OSWAP_RestrictedPair.ts", "@scom/scom-swap/contracts/oswap-openswap-contract/contracts/restricted/OSWAP_RestrictedPairOracle.ts", "@scom/scom-swap/contracts/oswap-openswap-contract/contracts/restricted/OSWAP_VotingExecutor4.ts", "@scom/scom-swap/contracts/oswap-openswap-contract/contracts/router/OSWAP_HybridRouter.ts", "@scom/scom-swap/contracts/oswap-openswap-contract/contracts/router/OSWAP_HybridRouterRegistry.ts", "@scom/scom-swap/contracts/oswap-openswap-contract/contracts/router/OSWAP_OracleRouter.ts", "@scom/scom-swap/contracts/oswap-openswap-contract/contracts/restricted/OSWAP_OtcPair.ts", "@scom/scom-swap/contracts/oswap-openswap-contract/contracts/restricted/OSWAP_OtcPairCreator.ts", "@scom/scom-swap/contracts/oswap-openswap-contract/contracts/restricted/OSWAP_RestrictedPair1.ts", "@scom/scom-swap/contracts/oswap-openswap-contract/contracts/restricted/OSWAP_RestrictedPair3.ts", "@scom/scom-swap/contracts/oswap-openswap-contract/contracts/restricted/OSWAP_RestrictedPair4.ts", "@scom/scom-swap/contracts/oswap-openswap-contract/contracts/restricted/OSWAP_RestrictedPairCreator1.ts", "@scom/scom-swap/contracts/oswap-openswap-contract/contracts/restricted/OSWAP_RestrictedPairCreator4.ts", "@scom/scom-swap/contracts/oswap-openswap-contract/contracts/router/OSWAP_HybridRouter2.ts"], function (require, exports, OpenSwap_1, OSWAP_ERC20_1, OSWAP_Factory_1, OSWAP_Pair_1, OSWAP_PairCreator_1, OSWAP_Router_1, OSWAP_VotingExecutor1_1, OSWAP_FactoryBase_1, OSWAP_PausableFactory_1, OSWAP_PausablePair_1, OAXDEX_Administrator_1, OAXDEX_Governance_1, OAXDEX_VotingContract_1, OAXDEX_VotingExecutor_1, OAXDEX_VotingRegistry_1, ERC20_1, OSWAP_CertiKSecurityOracle_1, OSWAP_OracleFactory_1, OSWAP_OracleLiquidityProvider_1, OSWAP_OraclePair_1, OSWAP_OraclePairCreator_1, OSWAP_VotingExecutor2_1, OSWAP_RangeFactory_1, OSWAP_RangeLiquidityProvider_1, OSWAP_RangePair_1, OSWAP_RangePairCreator_1, OSWAP_VotingExecutor3_1, OSWAP_ConfigStore_1, OSWAP_OtcLiquidityProvider_1, OSWAP_OtcPairOracle_1, OSWAP_RestrictedFactory_1, OSWAP_RestrictedLiquidityProvider1_1, OSWAP_RestrictedLiquidityProvider3_1, OSWAP_RestrictedLiquidityProvider4_1, OSWAP_RestrictedPair_1, OSWAP_RestrictedPairOracle_1, OSWAP_VotingExecutor4_1, OSWAP_HybridRouter_1, OSWAP_HybridRouterRegistry_1, OSWAP_OracleRouter_1, OSWAP_OtcPair_1, OSWAP_OtcPairCreator_1, OSWAP_RestrictedPair1_1, OSWAP_RestrictedPair3_1, OSWAP_RestrictedPair4_1, OSWAP_RestrictedPairCreator1_1, OSWAP_RestrictedPairCreator4_1, OSWAP_HybridRouter2_1) {
     "use strict";
@@ -12982,7 +12986,7 @@ define("@scom/scom-swap/global/utils/common.ts", ["require", "exports", "@ijstec
         let wallet = eth_wallet_1.Wallet.getClientInstance();
         let amount = new eth_wallet_1.BigNumber(2).pow(256).minus(1);
         let erc20 = new index_3.Contracts.ERC20(wallet, token.address);
-        exports.registerSendTxEvents({
+        (0, exports.registerSendTxEvents)({
             transactionHash: callback,
             confirmation: confirmationCallback
         });
@@ -13014,24 +13018,24 @@ define("@scom/scom-swap/global/utils/helper.ts", ["require", "exports", "@ijstec
     exports.DefaultDateFormat = 'DD/MM/YYYY';
     const formatDate = (date, customType, showTimezone) => {
         const formatType = customType || exports.DefaultDateFormat;
-        const formatted = components_1.moment(date).format(formatType);
+        const formatted = (0, components_1.moment)(date).format(formatType);
         if (showTimezone) {
-            return `${formatted} (UTC+${components_1.moment().utcOffset() / 60})`;
+            return `${formatted} (UTC+${(0, components_1.moment)().utcOffset() / 60})`;
         }
         return formatted;
     };
     exports.formatDate = formatDate;
     const formatUTCDate = (date, customType, showTimezone) => {
         const formatType = customType || exports.DefaultDateFormat;
-        const formatted = components_1.moment(date).utc().format(formatType);
+        const formatted = (0, components_1.moment)(date).utc().format(formatType);
         return showTimezone ? `${formatted} (UTC)` : formatted;
     };
     exports.formatUTCDate = formatUTCDate;
     const compareDate = (fromDate, toDate) => {
         if (!toDate) {
-            toDate = components_1.moment();
+            toDate = (0, components_1.moment)();
         }
-        return components_1.moment(fromDate).isSameOrBefore(toDate);
+        return (0, components_1.moment)(fromDate).isSameOrBefore(toDate);
     };
     exports.compareDate = compareDate;
     const formatNumber = (value, decimals) => {
@@ -13046,7 +13050,7 @@ define("@scom/scom-swap/global/utils/helper.ts", ["require", "exports", "@ijstec
         if (val != 0 && new eth_wallet_2.BigNumber(val).lt(minValue)) {
             return `<${minValue}`;
         }
-        return exports.formatNumberWithSeparators(val, decimals || 4);
+        return (0, exports.formatNumberWithSeparators)(val, decimals || 4);
     };
     exports.formatNumber = formatNumber;
     const formatPercentNumber = (value, decimals) => {
@@ -13057,7 +13061,7 @@ define("@scom/scom-swap/global/utils/helper.ts", ["require", "exports", "@ijstec
         else if (typeof value === 'object') {
             val = value.toNumber();
         }
-        return exports.formatNumberWithSeparators(val, decimals || 2);
+        return (0, exports.formatNumberWithSeparators)(val, decimals || 2);
     };
     exports.formatPercentNumber = formatPercentNumber;
     const formatNumberWithSeparators = (value, precision) => {
@@ -13101,12 +13105,12 @@ define("@scom/scom-swap/global/utils/helper.ts", ["require", "exports", "@ijstec
     exports.isInvalidInput = isInvalidInput;
     const limitInputNumber = (input, decimals) => {
         const amount = input.value;
-        if (exports.isInvalidInput(amount)) {
+        if ((0, exports.isInvalidInput)(amount)) {
             input.value = '0';
             return;
         }
         if (!new eth_wallet_2.BigNumber(amount).isNaN()) {
-            input.value = exports.limitDecimals(amount, decimals || 18);
+            input.value = (0, exports.limitDecimals)(amount, decimals || 18);
         }
     };
     exports.limitInputNumber = limitInputNumber;
@@ -13183,7 +13187,7 @@ define("@scom/scom-swap/global/utils/helper.ts", ["require", "exports", "@ijstec
             v = value.toString(16);
         }
         v = v.replace("0x", "");
-        v = exports.padLeft(v, 64);
+        v = (0, exports.padLeft)(v, 64);
         if (prefix)
             v = '0x' + v;
         return v;
@@ -13330,7 +13334,7 @@ define("@scom/scom-swap/global/utils/helper.ts", ["require", "exports", "@ijstec
     };
     exports.getWeekDays = getWeekDays;
     const renderBalanceTooltip = (params, tokenMap, isBold) => {
-        const data = exports.formatNumberValue(params, tokenMap);
+        const data = (0, exports.formatNumberValue)(params, tokenMap);
         if (typeof data === "object") {
             const { result, tooltip } = data;
             if (isBold) {
@@ -13429,7 +13433,7 @@ define("@scom/scom-swap/global/utils/approvalModel.ts", ["require", "exports", "
                 onPayingError: async (err) => { }
             };
             this.checkAllowance = async (token, inputAmount) => {
-                let allowance = await common_1.getERC20Allowance(token, this.options.spenderAddress);
+                let allowance = await (0, common_1.getERC20Allowance)(token, this.options.spenderAddress);
                 if (!allowance) {
                     await this.options.onToBePaid.bind(this.options.sender)(token);
                 }
@@ -13453,7 +13457,7 @@ define("@scom/scom-swap/global/utils/approvalModel.ts", ["require", "exports", "
                     await this.options.onApproved.bind(this.options.sender)(token, data);
                     await this.checkAllowance(token, inputAmount);
                 };
-                common_1.approveERC20Max(token, this.options.spenderAddress, txHashCallback, confirmationCallback);
+                (0, common_1.approveERC20Max)(token, this.options.spenderAddress, txHashCallback, confirmationCallback);
             };
             this.doPayAction = async (data) => {
                 const txHashCallback = async (err, receipt) => {
@@ -13467,7 +13471,7 @@ define("@scom/scom-swap/global/utils/approvalModel.ts", ["require", "exports", "
                 const confirmationCallback = async (receipt) => {
                     await this.options.onPaid.bind(this.options.sender)(data);
                 };
-                common_1.registerSendTxEvents({
+                (0, common_1.registerSendTxEvents)({
                     transactionHash: txHashCallback,
                     confirmation: confirmationCallback
                 });
@@ -13726,7 +13730,7 @@ define("@scom/scom-swap/index.css.ts", ["require", "exports", "@ijstech/componen
                     },
                     '.custom-ic--swap': {
                         bottom: '0 !important',
-                        transform: 'none !importnat'
+                        transform: 'none !important'
                     }
                 }
             },
@@ -14059,7 +14063,7 @@ define("@scom/scom-swap/index.css.ts", ["require", "exports", "@ijstech/componen
                 borderColor: Theme.divider
             },
             '.best-price': {
-                // color: Theme.text.primary,
+                color: Theme.colors.primary.contrastText,
                 position: 'absolute',
                 top: '-10px',
                 left: '30px',
@@ -14292,12 +14296,20 @@ define("@scom/scom-swap/index.css.ts", ["require", "exports", "@ijstech/componen
                         display: 'flex',
                         alignItems: 'center',
                     },
+                    'i-icon.custom-icon--fill': {
+                        fill: Theme.colors.primary.contrastText,
+                        $nest: {
+                            'svg': {
+                                fill: Theme.colors.primary.contrastText
+                            }
+                        }
+                    }
                 }
             },
             '#openswapResult': {
                 $nest: {
                     '.modal': {
-                        background: '#252a48',
+                        background: Theme.background.modal,
                         width: '440px',
                         maxWidth: '100%',
                         padding: '0.5rem',
@@ -14317,40 +14329,6 @@ define("@scom/scom-swap/index.css.ts", ["require", "exports", "@ijstech/componen
                         width: '50px',
                         height: '48px'
                     }
-                }
-            },
-            '#modalViewOrder': {
-                $nest: {
-                    'i-label > *': {
-                        fontSize: '.875rem',
-                        wordBreak: 'normal'
-                    },
-                    '.i-modal_content': {
-                        padding: '0 1rem 1rem',
-                    },
-                    '.flex-col': {
-                        flexDirection: 'column',
-                    },
-                    'i-button': {
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        width: '150px',
-                        height: '50px !important',
-                        fontWeight: 600,
-                        borderRadius: 5,
-                        margin: '0.5rem',
-                    },
-                    '.btn-cancel': {
-                        background: '#eaecef',
-                        color: Theme.background.main,
-                    },
-                    '.btn-submit': {
-                        textAlign: 'center',
-                    },
-                    '.btn-submit > *': {
-                        color: `#fff !important`,
-                    },
                 }
             },
             '#modalFees': {
@@ -14461,13 +14439,13 @@ define("@scom/scom-swap/store/utils.ts", ["require", "exports", "@ijstech/compon
             setNetworkList(options.networks, options.infuraId);
         }
         if (options.proxyAddresses) {
-            exports.setProxyAddresses(options.proxyAddresses);
+            (0, exports.setProxyAddresses)(options.proxyAddresses);
         }
         if (options.ipfsGatewayUrl) {
-            exports.setIPFSGatewayUrl(options.ipfsGatewayUrl);
+            (0, exports.setIPFSGatewayUrl)(options.ipfsGatewayUrl);
         }
         if (options.apiGatewayUrls) {
-            exports.setAPIGatewayUrls(options.apiGatewayUrls);
+            (0, exports.setAPIGatewayUrls)(options.apiGatewayUrls);
         }
         if (options.embedderCommissionFee) {
             setEmbedderCommissionFee(options.embedderCommissionFee);
@@ -14548,7 +14526,7 @@ define("@scom/scom-swap/store/utils.ts", ["require", "exports", "@ijstech/compon
     const setNetworkList = (networkList, infuraId) => {
         const wallet = eth_wallet_4.Wallet.getClientInstance();
         exports.state.networkMap = {};
-        const defaultNetworkList = scom_network_list_1.default();
+        const defaultNetworkList = (0, scom_network_list_1.default)();
         const defaultNetworkMap = defaultNetworkList.reduce((acc, cur) => {
             acc[cur.chainId] = cur;
             return acc;
@@ -14632,8 +14610,8 @@ define("@scom/scom-swap/store/utils.ts", ["require", "exports", "@ijstech/compon
     };
     exports.getMatchNetworks = getMatchNetworks;
     const getNetworkExplorerName = (chainId) => {
-        if (exports.getNetworkInfo(chainId)) {
-            return exports.getNetworkInfo(chainId).explorerName;
+        if ((0, exports.getNetworkInfo)(chainId)) {
+            return (0, exports.getNetworkInfo)(chainId).explorerName;
         }
         return 'Unknown';
     };
@@ -14674,7 +14652,7 @@ define("@scom/scom-swap/store/utils.ts", ["require", "exports", "@ijstech/compon
     };
     exports.getProviderByKey = getProviderByKey;
     const viewOnExplorerByTxHash = (chainId, txHash) => {
-        let network = exports.getNetworkInfo(chainId);
+        let network = (0, exports.getNetworkInfo)(chainId);
         if (network && network.explorerTxUrl) {
             let url = `${network.explorerTxUrl}${txHash}`;
             window.open(url);
@@ -14682,7 +14660,7 @@ define("@scom/scom-swap/store/utils.ts", ["require", "exports", "@ijstech/compon
     };
     exports.viewOnExplorerByTxHash = viewOnExplorerByTxHash;
     const viewOnExplorerByAddress = (chainId, address) => {
-        let network = exports.getNetworkInfo(chainId);
+        let network = (0, exports.getNetworkInfo)(chainId);
         if (network && network.explorerAddressUrl) {
             let url = `${network.explorerAddressUrl}${address}`;
             window.open(url);
@@ -14703,9 +14681,9 @@ define("@scom/scom-swap/store/utils.ts", ["require", "exports", "@ijstech/compon
         var _a;
         const wallet = eth_wallet_4.Wallet.getClientInstance();
         if (!isWalletConnected()) {
-            exports.setCurrentChainId(chainId);
+            (0, exports.setCurrentChainId)(chainId);
             wallet.chainId = chainId;
-            components_4.application.EventBus.dispatch("chainChanged" /* chainChanged */, chainId);
+            components_4.application.EventBus.dispatch("chainChanged" /* EventId.chainChanged */, chainId);
             return;
         }
         if (((_a = wallet === null || wallet === void 0 ? void 0 : wallet.clientSideProvider) === null || _a === void 0 ? void 0 : _a.name) === WalletPlugin.MetaMask) {
@@ -14745,9 +14723,9 @@ define("@scom/scom-swap/store/index.ts", ["require", "exports", "@scom/scom-swap
     };
     exports.getWETH = getWETH;
     const getTokenDecimals = (address) => {
-        let chainId = utils_1.getChainId();
-        const WETHAddress = exports.getWETH(chainId).address;
-        const ChainNativeToken = utils_1.getChainNativeToken(chainId);
+        let chainId = (0, utils_1.getChainId)();
+        const WETHAddress = (0, exports.getWETH)(chainId).address;
+        const ChainNativeToken = (0, utils_1.getChainNativeToken)(chainId);
         const tokenObject = (!address || address.toLowerCase() === WETHAddress.toLowerCase()) ? ChainNativeToken : scom_token_list_2.tokenStore.tokenMap[address.toLowerCase()];
         return tokenObject ? tokenObject.decimals : 18;
     };
@@ -14758,14 +14736,14 @@ define("@scom/scom-swap/store/index.ts", ["require", "exports", "@scom/scom-swap
         const tokenMap = scom_token_list_2.tokenStore.tokenMap;
         let ChainNativeToken;
         let tokenObject;
-        if (utils_1.isWalletConnected()) {
-            ChainNativeToken = utils_1.getChainNativeToken(utils_1.getChainId());
+        if ((0, utils_1.isWalletConnected)()) {
+            ChainNativeToken = (0, utils_1.getChainNativeToken)((0, utils_1.getChainId)());
             tokenObject = address == ChainNativeToken.symbol ? ChainNativeToken : tokenMap[address.toLowerCase()];
         }
         else {
             tokenObject = tokenMap[address.toLowerCase()];
         }
-        return scom_token_list_2.assets.tokenPath(tokenObject, utils_1.getChainId());
+        return scom_token_list_2.assets.tokenPath(tokenObject, (0, utils_1.getChainId)());
     };
     exports.getTokenIcon = getTokenIcon;
     const tokenSymbol = (address) => {
@@ -15040,8 +15018,8 @@ define("@scom/scom-swap/contracts/scom-commission-proxy-contract/contracts/Proxy
             });
         }
     }
-    exports.Proxy = Proxy;
     Proxy._abi = Proxy_json_1.default.abi;
+    exports.Proxy = Proxy;
 });
 define("@scom/scom-swap/contracts/scom-commission-proxy-contract/contracts/ProxyV2.json.ts", ["require", "exports"], function (require, exports) {
     "use strict";
@@ -15289,8 +15267,8 @@ define("@scom/scom-swap/contracts/scom-commission-proxy-contract/contracts/Proxy
             });
         }
     }
-    exports.ProxyV2 = ProxyV2;
     ProxyV2._abi = ProxyV2_json_1.default.abi;
+    exports.ProxyV2 = ProxyV2;
 });
 define("@scom/scom-swap/contracts/scom-commission-proxy-contract/contracts/index.ts", ["require", "exports", "@scom/scom-swap/contracts/scom-commission-proxy-contract/contracts/Proxy.ts", "@scom/scom-swap/contracts/scom-commission-proxy-contract/contracts/ProxyV2.ts"], function (require, exports, Proxy_1, ProxyV2_1) {
     "use strict";
@@ -15368,25 +15346,25 @@ define("@scom/scom-swap/swap-utils/index.ts", ["require", "exports", "@ijstech/e
     const routeAPI = 'https://route.openswap.xyz/trading/v1/route';
     const newRouteAPI = 'https://indexer.ijs.dev/trading/v1/route';
     const getChainNativeToken = () => {
-        return scom_token_list_3.ChainNativeTokenByChainId[index_8.getChainId()];
+        return scom_token_list_3.ChainNativeTokenByChainId[(0, index_8.getChainId)()];
     };
     exports.getChainNativeToken = getChainNativeToken;
     const getWETH = () => {
-        return scom_token_list_3.WETHByChainId[index_8.getChainId()];
+        return scom_token_list_3.WETHByChainId[(0, index_8.getChainId)()];
     };
     const getWrappedTokenAddress = () => {
         return getWETH().address;
     };
     const getFactoryAddress = (key) => {
         var _a;
-        const dexInfoList = index_8.getDexInfoList();
-        const factoryAddress = ((_a = dexInfoList.find(v => v.chainId == index_8.getChainId() && v.dexCode == key)) === null || _a === void 0 ? void 0 : _a.factoryAddress) || '';
+        const dexInfoList = (0, index_8.getDexInfoList)();
+        const factoryAddress = ((_a = dexInfoList.find(v => v.chainId == (0, index_8.getChainId)() && v.dexCode == key)) === null || _a === void 0 ? void 0 : _a.factoryAddress) || '';
         return factoryAddress;
     };
     function getRouterAddress(key) {
         var _a;
-        const dexInfoList = index_8.getDexInfoList();
-        const routerAddress = ((_a = dexInfoList.find(v => v.chainId == index_8.getChainId() && v.dexCode == key)) === null || _a === void 0 ? void 0 : _a.routerAddress) || '';
+        const dexInfoList = (0, index_8.getDexInfoList)();
+        const routerAddress = ((_a = dexInfoList.find(v => v.chainId == (0, index_8.getChainId)() && v.dexCode == key)) === null || _a === void 0 ? void 0 : _a.routerAddress) || '';
         return routerAddress;
     }
     exports.getRouterAddress = getRouterAddress;
@@ -15403,7 +15381,7 @@ define("@scom/scom-swap/swap-utils/index.ts", ["require", "exports", "@ijstech/e
         return allowance;
     }
     async function checkIsApproveButtonShown(wallet, firstTokenObject, fromInput, market, contractAddress) {
-        if (!index_8.isWalletConnected())
+        if (!(0, index_8.isWalletConnected)())
             return false;
         let isApproveButtonShown = false;
         const owner = wallet.account.address;
@@ -15422,7 +15400,7 @@ define("@scom/scom-swap/swap-utils/index.ts", ["require", "exports", "@ijstech/e
         return isApproveButtonShown;
     }
     async function composeRouteObj(wallet, routeObj, market, firstTokenObject, firstInput, secondInput, isFromEstimated, commissions) {
-        const slippageTolerance = index_8.getSlippageTolerance();
+        const slippageTolerance = (0, index_8.getSlippageTolerance)();
         if (!slippageTolerance)
             return null;
         let fromAmount = new eth_wallet_5.BigNumber(0);
@@ -15457,8 +15435,8 @@ define("@scom/scom-swap/swap-utils/index.ts", ["require", "exports", "@ijstech/e
             priceSwap = new eth_wallet_5.BigNumber(1).div(routeObj.price).toNumber();
             priceImpact = Number(routeObj.priceImpact) * 100;
             tradeFee = parseFloat(routeObj.tradeFee);
-            const commissionAmount = exports.getCommissionAmount(commissions, fromAmount);
-            const contractAddress = commissionAmount.gt(0) ? index_8.getProxyAddress() : '';
+            const commissionAmount = (0, exports.getCommissionAmount)(commissions, fromAmount);
+            const contractAddress = commissionAmount.gt(0) ? (0, index_8.getProxyAddress)() : '';
             isApproveButtonShown = await checkIsApproveButtonShown(wallet, firstTokenObject, fromAmount.plus(commissionAmount), market, contractAddress);
         }
         catch (err) {
@@ -15477,7 +15455,7 @@ define("@scom/scom-swap/swap-utils/index.ts", ["require", "exports", "@ijstech/e
     }
     function getTradeFeeMap() {
         let tradeFeeMap = {};
-        const dexInfoList = index_8.getDexInfoList().filter(v => v.chainId == index_8.getChainId());
+        const dexInfoList = (0, index_8.getDexInfoList)().filter(v => v.chainId == (0, index_8.getChainId)());
         for (let dexInfo of dexInfoList) {
             tradeFeeMap[dexInfo.dexCode] = dexInfo.tradeFee;
         }
@@ -15485,12 +15463,12 @@ define("@scom/scom-swap/swap-utils/index.ts", ["require", "exports", "@ijstech/e
     }
     exports.getTradeFeeMap = getTradeFeeMap;
     async function getBestAmountInRouteFromAPI(wallet, tokenIn, tokenOut, amountOut, chainId) {
-        chainId = index_8.getChainId();
+        chainId = (0, index_8.getChainId)();
         let wrappedTokenAddress = getWETH();
         let tradeFeeMap = getTradeFeeMap();
-        let network = chainId ? index_8.getNetworkInfo(chainId) : null;
+        let network = chainId ? (0, index_8.getNetworkInfo)(chainId) : null;
         let api = (network === null || network === void 0 ? void 0 : network.isTestnet) || (network === null || network === void 0 ? void 0 : network.isDisabled) ? newRouteAPI : routeAPI;
-        let routeObjArr = await index_7.getAPI(api, {
+        let routeObjArr = await (0, index_7.getAPI)(api, {
             chainId,
             tokenIn: tokenIn.address ? tokenIn.address : wrappedTokenAddress,
             tokenOut: tokenOut.address ? tokenOut.address : wrappedTokenAddress,
@@ -15546,12 +15524,12 @@ define("@scom/scom-swap/swap-utils/index.ts", ["require", "exports", "@ijstech/e
         return bestRouteObjArr;
     }
     async function getBestAmountOutRouteFromAPI(wallet, tokenIn, tokenOut, amountIn, chainId) {
-        chainId = index_8.getChainId();
+        chainId = (0, index_8.getChainId)();
         let wrappedTokenAddress = getWETH();
         let tradeFeeMap = getTradeFeeMap();
-        let network = chainId ? index_8.getNetworkInfo(chainId) : null;
+        let network = chainId ? (0, index_8.getNetworkInfo)(chainId) : null;
         let api = (network === null || network === void 0 ? void 0 : network.isTestnet) || (network === null || network === void 0 ? void 0 : network.isDisabled) ? newRouteAPI : routeAPI;
-        let routeObjArr = await index_7.getAPI(api, {
+        let routeObjArr = await (0, index_7.getAPI)(api, {
             chainId,
             tokenIn: tokenIn.address ? tokenIn.address : wrappedTokenAddress,
             tokenOut: tokenOut.address ? tokenOut.address : wrappedTokenAddress,
@@ -15971,7 +15949,7 @@ define("@scom/scom-swap/swap-utils/index.ts", ["require", "exports", "@ijstech/e
             }
             if (isFromEstimated) {
                 if (routeDataArr.length == 0) {
-                    const providerKey = (_a = index_8.getProviderList()[0]) === null || _a === void 0 ? void 0 : _a.key;
+                    const providerKey = (_a = (0, index_8.getProviderList)()[0]) === null || _a === void 0 ? void 0 : _a.key;
                     let routeObj = await getBestAmountInRoute(providerKey ? [providerKey] : [], firstTokenObject, secondTokenObject, secondInput.toString(), []);
                     if (routeObj && routeObj.market.length == 1) {
                         let price = parseFloat(routeObj.price);
@@ -15991,7 +15969,7 @@ define("@scom/scom-swap/swap-utils/index.ts", ["require", "exports", "@ijstech/e
             }
             else {
                 if (routeDataArr.length == 0) {
-                    const providerKey = (_b = index_8.getProviderList()[0]) === null || _b === void 0 ? void 0 : _b.key;
+                    const providerKey = (_b = (0, index_8.getProviderList)()[0]) === null || _b === void 0 ? void 0 : _b.key;
                     let routeObj = await getBestAmountOutRoute(providerKey ? [providerKey] : [], firstTokenObject, secondTokenObject, firstInput.toString(), [], false);
                     if (routeObj && routeObj.market.length == 1) {
                         let price = parseFloat(routeObj.price);
@@ -16012,7 +15990,7 @@ define("@scom/scom-swap/swap-utils/index.ts", ["require", "exports", "@ijstech/e
             if (routeDataArr && routeDataArr.length > 0) {
                 for (let i = 0; i < routeDataArr.length; i++) {
                     let optionObj = routeDataArr[i];
-                    const provider = ((_c = index_8.getProviderList().find(item => item.key === optionObj.provider)) === null || _c === void 0 ? void 0 : _c.key) || '';
+                    const provider = ((_c = (0, index_8.getProviderList)().find(item => item.key === optionObj.provider)) === null || _c === void 0 ? void 0 : _c.key) || '';
                     let routeObj = await composeRouteObj(wallet, optionObj, provider, firstTokenObject, firstInput, secondInput, isFromEstimated, commissions);
                     if (!routeObj)
                         continue;
@@ -16024,11 +16002,11 @@ define("@scom/scom-swap/swap-utils/index.ts", ["require", "exports", "@ijstech/e
     }
     exports.getAllRoutesData = getAllRoutesData;
     const getCurrentCommissions = (commissions) => {
-        return (commissions || []).filter(v => v.chainId == index_8.getChainId());
+        return (commissions || []).filter(v => v.chainId == (0, index_8.getChainId)());
     };
     exports.getCurrentCommissions = getCurrentCommissions;
     const getCommissionAmount = (commissions, amount) => {
-        const _commissions = (commissions || []).filter(v => v.chainId == index_8.getChainId()).map(v => {
+        const _commissions = (commissions || []).filter(v => v.chainId == (0, index_8.getChainId)()).map(v => {
             return {
                 to: v.walletAddress,
                 amount: amount.times(v.share)
@@ -16051,11 +16029,11 @@ define("@scom/scom-swap/swap-utils/index.ts", ["require", "exports", "@ijstech/e
             addresses.push(routeTokens[i].address || wrappedTokenAddress);
         }
         let receipt;
-        const proxyAddress = index_8.getProxyAddress();
+        const proxyAddress = (0, index_8.getProxyAddress)();
         const proxy = new index_6.Contracts.Proxy(wallet, proxyAddress);
         const amount = tokenIn.address ? eth_wallet_5.Utils.toDecimals(amountIn, tokenIn.decimals).dp(0) : eth_wallet_5.Utils.toDecimals(amountIn).dp(0);
         const _amountOutMin = eth_wallet_5.Utils.toDecimals(amountOutMin, tokenOut.decimals).dp(0);
-        const _commissions = (commissions || []).filter(v => v.chainId == index_8.getChainId()).map(v => {
+        const _commissions = (commissions || []).filter(v => v.chainId == (0, index_8.getChainId)()).map(v => {
             return {
                 to: v.walletAddress,
                 amount: amount.times(v.share).dp(0)
@@ -16080,7 +16058,7 @@ define("@scom/scom-swap/swap-utils/index.ts", ["require", "exports", "@ijstech/e
                 }
             };
             if (_commissions.length) {
-                let txData = await scom_dex_list_1.getRouterSwapTxData(wallet.chainId, market, executeSwapOptions);
+                let txData = await (0, scom_dex_list_1.getRouterSwapTxData)(wallet.chainId, market, executeSwapOptions);
                 receipt = await proxy.proxyCall({
                     target: routerAddress,
                     tokensIn: [
@@ -16097,7 +16075,7 @@ define("@scom/scom-swap/swap-utils/index.ts", ["require", "exports", "@ijstech/e
                 });
             }
             else {
-                receipt = await scom_dex_list_1.executeRouterSwap(wallet.chainId, market, executeSwapOptions);
+                receipt = await (0, scom_dex_list_1.executeRouterSwap)(wallet.chainId, market, executeSwapOptions);
             }
         }
         else {
@@ -16122,7 +16100,7 @@ define("@scom/scom-swap/swap-utils/index.ts", ["require", "exports", "@ijstech/e
                 tokenOutType: !tokenOut.address ? 'ETH' : 'ERC20'
             };
             if (_commissions.length) {
-                let txData = await scom_dex_list_1.getRouterSwapTxData(wallet.chainId, market, executeSwapOptions);
+                let txData = await (0, scom_dex_list_1.getRouterSwapTxData)(wallet.chainId, market, executeSwapOptions);
                 receipt = await proxy.proxyCall({
                     target: routerAddress,
                     tokensIn: [
@@ -16134,7 +16112,7 @@ define("@scom/scom-swap/swap-utils/index.ts", ["require", "exports", "@ijstech/e
                 });
             }
             else {
-                receipt = await scom_dex_list_1.executeRouterSwap(wallet.chainId, market, executeSwapOptions);
+                receipt = await (0, scom_dex_list_1.executeRouterSwap)(wallet.chainId, market, executeSwapOptions);
             }
         }
         return receipt;
@@ -16152,11 +16130,11 @@ define("@scom/scom-swap/swap-utils/index.ts", ["require", "exports", "@ijstech/e
             addresses.push(routeTokens[i].address || wrappedTokenAddress);
         }
         let receipt;
-        const proxyAddress = index_8.getProxyAddress();
+        const proxyAddress = (0, index_8.getProxyAddress)();
         const proxy = new index_6.Contracts.Proxy(wallet, proxyAddress);
         const _amountInMax = eth_wallet_5.Utils.toDecimals(amountInMax, tokenIn.decimals).dp(0);
         const _amountOut = eth_wallet_5.Utils.toDecimals(amountOut, tokenOut.decimals).dp(0);
-        const _commissions = (commissions || []).filter(v => v.chainId == index_8.getChainId()).map(v => {
+        const _commissions = (commissions || []).filter(v => v.chainId == (0, index_8.getChainId)()).map(v => {
             return {
                 to: v.walletAddress,
                 amount: _amountInMax.times(v.share).dp(0)
@@ -16181,7 +16159,7 @@ define("@scom/scom-swap/swap-utils/index.ts", ["require", "exports", "@ijstech/e
                 }
             };
             if (_commissions.length) {
-                let txData = await scom_dex_list_1.getRouterSwapTxData(wallet.chainId, market, executeSwapOptions);
+                let txData = await (0, scom_dex_list_1.getRouterSwapTxData)(wallet.chainId, market, executeSwapOptions);
                 receipt = await proxy.proxyCall({
                     target: routerAddress,
                     tokensIn: [
@@ -16198,7 +16176,7 @@ define("@scom/scom-swap/swap-utils/index.ts", ["require", "exports", "@ijstech/e
                 });
             }
             else {
-                receipt = await scom_dex_list_1.executeRouterSwap(wallet.chainId, market, executeSwapOptions);
+                receipt = await (0, scom_dex_list_1.executeRouterSwap)(wallet.chainId, market, executeSwapOptions);
             }
         }
         else {
@@ -16223,7 +16201,7 @@ define("@scom/scom-swap/swap-utils/index.ts", ["require", "exports", "@ijstech/e
                 tokenOutType: !tokenOut.address ? 'ETH' : 'ERC20'
             };
             if (_commissions.length) {
-                let txData = await scom_dex_list_1.getRouterSwapTxData(wallet.chainId, market, executeSwapOptions);
+                let txData = await (0, scom_dex_list_1.getRouterSwapTxData)(wallet.chainId, market, executeSwapOptions);
                 receipt = await proxy.proxyCall({
                     target: routerAddress,
                     tokensIn: [
@@ -16237,7 +16215,7 @@ define("@scom/scom-swap/swap-utils/index.ts", ["require", "exports", "@ijstech/e
                 });
             }
             else {
-                receipt = await scom_dex_list_1.executeRouterSwap(wallet.chainId, market, executeSwapOptions);
+                receipt = await (0, scom_dex_list_1.executeRouterSwap)(wallet.chainId, market, executeSwapOptions);
             }
         }
         return receipt;
@@ -16248,10 +16226,10 @@ define("@scom/scom-swap/swap-utils/index.ts", ["require", "exports", "@ijstech/e
         const wallet = eth_wallet_5.Wallet.getClientInstance();
         try {
             const toAddress = wallet.account.address;
-            const slippageTolerance = index_8.getSlippageTolerance();
-            const transactionDeadlineInMinutes = index_8.getTransactionDeadline();
+            const slippageTolerance = (0, index_8.getSlippageTolerance)();
+            const transactionDeadlineInMinutes = (0, index_8.getTransactionDeadline)();
             const transactionDeadline = Math.floor(Date.now() / 1000 + transactionDeadlineInMinutes * 60);
-            const market = ((_a = index_8.getProviderList().find(item => item.key === swapData.provider)) === null || _a === void 0 ? void 0 : _a.key) || '';
+            const market = ((_a = (0, index_8.getProviderList)().find(item => item.key === swapData.provider)) === null || _a === void 0 ? void 0 : _a.key) || '';
             if (swapData.isFromEstimated) {
                 const amountInMax = swapData.fromAmount.times(1 + slippageTolerance / 100);
                 receipt = await AmmTradeExactOut(wallet, market, swapData.routeTokens, swapData.toAmount.toString(), amountInMax.toString(), toAddress, transactionDeadline, swapData.commissions);
@@ -16445,7 +16423,7 @@ define("@scom/scom-swap/price-info/index.tsx", ["require", "exports", "@ijstech/
         }
     };
     PriceInfo = __decorate([
-        components_6.customElements('i-scom-swap-price-info')
+        (0, components_6.customElements)('i-scom-swap-price-info')
     ], PriceInfo);
     exports.PriceInfo = PriceInfo;
 });
@@ -16786,10 +16764,10 @@ define("@scom/scom-swap/token-selection/importToken.tsx", ["require", "exports",
         async onImportToken(source, event) {
             event.stopPropagation();
             const tokenObj = this.token;
-            index_9.addUserTokens(tokenObj);
+            (0, index_9.addUserTokens)(tokenObj);
             scom_token_list_4.tokenStore.updateTokenMapData();
             await scom_token_list_4.tokenStore.updateAllTokenBalances();
-            this.$eventBus.dispatch("emitNewToken" /* EmitNewToken */, tokenObj);
+            this.$eventBus.dispatch("emitNewToken" /* EventId.EmitNewToken */, tokenObj);
             if (typeof this.onUpdate === 'function') {
                 this.onUpdate(tokenObj);
             }
@@ -16800,7 +16778,7 @@ define("@scom/scom-swap/token-selection/importToken.tsx", ["require", "exports",
         }
         viewContract() {
             const chainId = eth_wallet_6.Wallet.getClientInstance().chainId;
-            index_9.viewOnExplorerByAddress(chainId, this._state.address);
+            (0, index_9.viewOnExplorerByAddress)(chainId, this._state.address);
         }
         async init() {
             super.init();
@@ -16835,10 +16813,10 @@ define("@scom/scom-swap/token-selection/importToken.tsx", ["require", "exports",
         }
     };
     __decorate([
-        components_8.observable()
+        (0, components_8.observable)()
     ], ImportToken.prototype, "_state", void 0);
     ImportToken = __decorate([
-        components_8.customElements('i-scom-swap-import-token')
+        (0, components_8.customElements)('i-scom-swap-import-token')
     ], ImportToken);
     exports.ImportToken = ImportToken;
 });
@@ -16849,42 +16827,6 @@ define("@scom/scom-swap/token-selection/tokenSelection.tsx", ["require", "export
     const Theme = components_9.Styles.Theme.ThemeVars;
     ;
     let TokenSelection = class TokenSelection extends components_9.Module {
-        constructor(parent, options) {
-            super(parent, options);
-            this._isSortBalanceShown = true;
-            this._isBtnMaxShown = true;
-            this.sortToken = (a, b, asc) => {
-                if (a.balance != b.balance) {
-                    return asc ? (a.balance - b.balance) : (b.balance - a.balance);
-                }
-                if (a.symbol.toLowerCase() < b.symbol.toLowerCase()) {
-                    return -1;
-                }
-                if (a.symbol.toLowerCase() > b.symbol.toLowerCase()) {
-                    return 1;
-                }
-                return 0;
-            };
-            this.getTokenObject = async (address, showBalance) => {
-                const ERC20Contract = new index_12.Contracts.ERC20(eth_wallet_7.Wallet.getClientInstance(), address);
-                const symbol = await ERC20Contract.symbol();
-                const name = await ERC20Contract.name();
-                const decimals = (await ERC20Contract.decimals()).toFixed();
-                let balance;
-                if (showBalance && scom_token_list_5.isWalletConnected()) {
-                    balance = (await (ERC20Contract.balanceOf(eth_wallet_7.Wallet.getClientInstance().account.address))).shiftedBy(-decimals).toFixed();
-                }
-                return {
-                    address: address.toLowerCase(),
-                    decimals: +decimals,
-                    name,
-                    symbol,
-                    balance
-                };
-            };
-            this.$eventBus = components_9.application.EventBus;
-            this.registerEvent();
-        }
         get token() {
             return this._token;
         }
@@ -16956,7 +16898,7 @@ define("@scom/scom-swap/token-selection/tokenSelection.tsx", ["require", "export
             if (this.targetChainId) {
                 return this.targetChainId;
             }
-            return scom_token_list_5.isWalletConnected() ? this.currentChainId : scom_token_list_5.getChainId();
+            return (0, scom_token_list_5.isWalletConnected)() ? this.currentChainId : (0, scom_token_list_5.getChainId)();
         }
         get disableSelect() {
             return this._disableSelect;
@@ -16976,9 +16918,9 @@ define("@scom/scom-swap/token-selection/tokenSelection.tsx", ["require", "export
         }
         async initData() {
             if (!this.chainId) {
-                this.currentChainId = scom_token_list_5.getChainId();
+                this.currentChainId = (0, scom_token_list_5.getChainId)();
             }
-            if (scom_token_list_5.isWalletConnected()) {
+            if ((0, scom_token_list_5.isWalletConnected)()) {
                 this.tokenBalancesMap = scom_token_list_5.tokenStore.tokenBalances || {};
             }
             this.renderTokenItems();
@@ -16994,12 +16936,12 @@ define("@scom/scom-swap/token-selection/tokenSelection.tsx", ["require", "export
         }
         async onChainChange() {
             if (!this.targetChainId) {
-                this.currentChainId = scom_token_list_5.getChainId();
+                this.currentChainId = (0, scom_token_list_5.getChainId)();
                 this.updateDataByChain();
             }
         }
         async onWalletConnect() {
-            this.checkHasMetaMask = scom_token_list_5.hasMetaMask();
+            this.checkHasMetaMask = (0, scom_token_list_5.hasMetaMask)();
             await this.initData();
             this.updateStatusButton();
         }
@@ -17011,11 +16953,11 @@ define("@scom/scom-swap/token-selection/tokenSelection.tsx", ["require", "export
             await this.initData();
         }
         registerEvent() {
-            this.$eventBus.register(this, "isWalletConnected" /* IsWalletConnected */, this.onWalletConnect);
-            this.$eventBus.register(this, "IsWalletDisconnected" /* IsWalletDisconnected */, this.onWalletDisconnect);
-            this.$eventBus.register(this, "chainChanged" /* chainChanged */, this.onChainChange);
-            this.$eventBus.register(this, "Paid" /* Paid */, this.onPaid);
-            this.$eventBus.register(this, "emitNewToken" /* EmitNewToken */, this.updateDataByNewToken);
+            this.$eventBus.register(this, "isWalletConnected" /* EventId.IsWalletConnected */, this.onWalletConnect);
+            this.$eventBus.register(this, "IsWalletDisconnected" /* EventId.IsWalletDisconnected */, this.onWalletDisconnect);
+            this.$eventBus.register(this, "chainChanged" /* EventId.chainChanged */, this.onChainChange);
+            this.$eventBus.register(this, "Paid" /* EventId.Paid */, this.onPaid);
+            this.$eventBus.register(this, "emitNewToken" /* EventId.EmitNewToken */, this.updateDataByNewToken);
         }
         get tokenDataList() {
             let tokenList = [];
@@ -17035,7 +16977,7 @@ define("@scom/scom-swap/token-selection/tokenSelection.tsx", ["require", "export
                 if ((nativeToken === null || nativeToken === void 0 ? void 0 : nativeToken.symbol) && token.symbol === nativeToken.symbol) {
                     Object.assign(tokenObject, { isNative: true });
                 }
-                if (!scom_token_list_5.isWalletConnected()) {
+                if (!(0, scom_token_list_5.isWalletConnected)()) {
                     Object.assign(tokenObject, {
                         balance: 0,
                     });
@@ -17100,7 +17042,7 @@ define("@scom/scom-swap/token-selection/tokenSelection.tsx", ["require", "export
             if (this.isCommonShown && this.commonTokenDataList) {
                 this.commonTokenPanel.classList.remove('hidden');
                 this.commonTokenDataList.forEach((token) => {
-                    const logoAddress = token.address && !this.targetChainId ? index_10.getTokenIcon(token.address) : scom_token_list_6.assets.tokenPath(token, this.chainId);
+                    const logoAddress = token.address && !this.targetChainId ? (0, index_10.getTokenIcon)(token.address) : scom_token_list_6.assets.tokenPath(token, this.chainId);
                     this.commonTokenList.appendChild(this.$render("i-hstack", { background: { color: Theme.background.main }, onClick: () => this.onSelect(token), tooltip: { content: token.name }, verticalAlignment: "center", class: "grid-item" },
                         this.$render("i-image", { width: 24, height: 24, url: logoAddress, fallbackUrl: scom_token_list_6.assets.fallbackUrl }),
                         this.$render("i-label", { caption: token.symbol, onClick: () => this.onSelect(token) })));
@@ -17111,7 +17053,7 @@ define("@scom/scom-swap/token-selection/tokenSelection.tsx", ["require", "export
             }
         }
         renderToken(token) {
-            const logoAddress = token.address && !this.targetChainId ? index_10.getTokenIcon(token.address) : scom_token_list_6.assets.tokenPath(token, this.chainId);
+            const logoAddress = token.address && !this.targetChainId ? (0, index_10.getTokenIcon)(token.address) : scom_token_list_6.assets.tokenPath(token, this.chainId);
             return (this.$render("i-hstack", { width: "100%", verticalAlignment: "center", class: "token-item", padding: { top: '0.5rem', bottom: '0.5rem', left: '0.5rem', right: '0.5rem' }, onClick: () => this.onSelect(token) },
                 this.$render("i-vstack", { width: "100%" },
                     this.$render("i-hstack", null,
@@ -17127,7 +17069,7 @@ define("@scom/scom-swap/token-selection/tokenSelection.tsx", ["require", "export
                                     token.address && this.checkHasMetaMask ?
                                         this.$render("i-image", { width: 16, height: 16, url: assets_3.default.fullPath('img/swap/metamask.png'), tooltip: { content: 'Add to MetaMask' }, onClick: (target, event) => this.addToMetamask(event, token) })
                                         : []))),
-                        this.$render("i-label", { class: "ml-auto", caption: index_11.formatNumber(token.balance, 4), onClick: () => this.onSelect(token) })),
+                        this.$render("i-label", { class: "ml-auto", caption: (0, index_11.formatNumber)(token.balance, 4), onClick: () => this.onSelect(token) })),
                     token.isNew ? (this.$render("i-hstack", { horizontalAlignment: "center" },
                         this.$render("i-button", { caption: 'Import', class: "btn-import", margin: { top: 10 }, height: 34, onClick: (source, event) => this.showImportTokenModal(event, token) }))) : (this.$render("i-hstack", null)))));
         }
@@ -17140,7 +17082,7 @@ define("@scom/scom-swap/token-selection/tokenSelection.tsx", ["require", "export
                 const tokenItems = this.tokenDataListFiltered.map((token) => this.renderToken(token));
                 this.tokenList.append(...tokenItems);
             }
-            else if (this.targetChainId && this.targetChainId !== scom_token_list_5.getChainId()) {
+            else if (this.targetChainId && this.targetChainId !== (0, scom_token_list_5.getChainId)()) {
                 this.tokenList.innerHTML = '';
                 this.tokenList.append(this.$render("i-label", { class: "text-center mt-1 mb-1", caption: "No tokens found" }));
             }
@@ -17188,7 +17130,7 @@ define("@scom/scom-swap/token-selection/tokenSelection.tsx", ["require", "export
             this.tokenSelectionModal.visible = true;
         }
         updateStatusButton() {
-            const status = scom_token_list_5.isWalletConnected();
+            const status = (0, scom_token_list_5.isWalletConnected)();
             if (this.btnToken) {
                 this.btnToken.enabled = !this.disableSelect && status;
             }
@@ -17220,7 +17162,7 @@ define("@scom/scom-swap/token-selection/tokenSelection.tsx", ["require", "export
                     if (this.isBtnMaxShown) {
                         this.btnMax.classList.remove('hidden');
                     }
-                    const logoAddress = token.address && !this.targetChainId ? index_10.getTokenIcon(token.address) : scom_token_list_6.assets.tokenPath(token, this.chainId);
+                    const logoAddress = token.address && !this.targetChainId ? (0, index_10.getTokenIcon)(token.address) : scom_token_list_6.assets.tokenPath(token, this.chainId);
                     if (!image) {
                         image = new components_9.Image(btnToken, {
                             width: 20,
@@ -17237,15 +17179,51 @@ define("@scom/scom-swap/token-selection/tokenSelection.tsx", ["require", "export
         async onSelect(token, isNew = false) {
             this.token = token;
             // The token has been not imported
-            if (!isNew && token.isNew && !scom_token_list_5.hasUserToken(token.address || '', this.chainId)) {
-                scom_token_list_5.setUserTokens(token, this.chainId);
+            if (!isNew && token.isNew && !(0, scom_token_list_5.hasUserToken)(token.address || '', this.chainId)) {
+                (0, scom_token_list_5.setUserTokens)(token, this.chainId);
                 scom_token_list_5.tokenStore.updateTokenMapData();
                 await scom_token_list_5.tokenStore.updateAllTokenBalances();
-                this.$eventBus.dispatch("emitNewToken" /* EmitNewToken */, token);
+                this.$eventBus.dispatch("emitNewToken" /* EventId.EmitNewToken */, token);
                 isNew = true;
             }
             this.onSelectToken(Object.assign(Object.assign({}, token), { isNew }));
             this.tokenSelectionModal.visible = false;
+        }
+        constructor(parent, options) {
+            super(parent, options);
+            this._isSortBalanceShown = true;
+            this._isBtnMaxShown = true;
+            this.sortToken = (a, b, asc) => {
+                if (a.balance != b.balance) {
+                    return asc ? (a.balance - b.balance) : (b.balance - a.balance);
+                }
+                if (a.symbol.toLowerCase() < b.symbol.toLowerCase()) {
+                    return -1;
+                }
+                if (a.symbol.toLowerCase() > b.symbol.toLowerCase()) {
+                    return 1;
+                }
+                return 0;
+            };
+            this.getTokenObject = async (address, showBalance) => {
+                const ERC20Contract = new index_12.Contracts.ERC20(eth_wallet_7.Wallet.getClientInstance(), address);
+                const symbol = await ERC20Contract.symbol();
+                const name = await ERC20Contract.name();
+                const decimals = (await ERC20Contract.decimals()).toFixed();
+                let balance;
+                if (showBalance && (0, scom_token_list_5.isWalletConnected)()) {
+                    balance = (await (ERC20Contract.balanceOf(eth_wallet_7.Wallet.getClientInstance().account.address))).shiftedBy(-decimals).toFixed();
+                }
+                return {
+                    address: address.toLowerCase(),
+                    decimals: +decimals,
+                    name,
+                    symbol,
+                    balance
+                };
+            };
+            this.$eventBus = components_9.application.EventBus;
+            this.registerEvent();
         }
         ;
         async init() {
@@ -17293,13 +17271,13 @@ define("@scom/scom-swap/token-selection/tokenSelection.tsx", ["require", "export
         }
     };
     __decorate([
-        components_9.observable()
+        (0, components_9.observable)()
     ], TokenSelection.prototype, "sortValue", void 0);
     __decorate([
-        components_9.observable()
+        (0, components_9.observable)()
     ], TokenSelection.prototype, "filterValue", void 0);
     TokenSelection = __decorate([
-        components_9.customElements('i-scom-swap-token-selection')
+        (0, components_9.customElements)('i-scom-swap-token-selection')
     ], TokenSelection);
     exports.TokenSelection = TokenSelection;
     ;
@@ -17327,7 +17305,7 @@ define("@scom/scom-swap/result/result.css.ts", ["require", "exports", "@ijstech/
                 minWidth: '25%',
                 maxWidth: '100%',
                 width: 455,
-                background: '#252a48',
+                background: Theme.background.modal,
                 borderRadius: 12
             },
             '.i-modal-close svg': {
@@ -17383,17 +17361,18 @@ define("@scom/scom-swap/result/result.tsx", ["require", "exports", "@ijstech/com
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.Result = void 0;
+    const Theme = components_11.Styles.Theme.ThemeVars;
     ;
     let Result = class Result extends components_11.Module {
-        constructor(parent, options) {
-            super(parent, options);
-        }
         get message() {
             return this._message;
         }
         set message(value) {
             this._message = value;
             this.renderUI();
+        }
+        constructor(parent, options) {
+            super(parent, options);
         }
         ;
         async init() {
@@ -17429,7 +17408,7 @@ define("@scom/scom-swap/result/result.tsx", ["require", "exports", "@ijstech/com
         async buildLink() {
             if (this.message.txtHash) {
                 const chainId = await eth_wallet_8.Wallet.getClientInstance().getChainId();
-                index_14.viewOnExplorerByTxHash(chainId, this.message.txtHash);
+                (0, index_14.viewOnExplorerByTxHash)(chainId, this.message.txtHash);
             }
         }
         async renderUI() {
@@ -17464,7 +17443,7 @@ define("@scom/scom-swap/result/result.tsx", ["require", "exports", "@ijstech/com
             }
             else if (this.message.status === 'success') {
                 const chainId = await eth_wallet_8.Wallet.getClientInstance().getChainId();
-                const explorerName = index_14.getNetworkExplorerName(chainId);
+                const explorerName = (0, index_14.getNetworkExplorerName)(chainId);
                 const image = await components_11.Image.create({
                     width: '50px',
                     url: assets_4.default.fullPath('img/success-icon.svg')
@@ -17532,7 +17511,8 @@ define("@scom/scom-swap/result/result.tsx", ["require", "exports", "@ijstech/com
                 mainSection.appendChild(section);
                 const button = new components_11.Button(mainSection, {
                     width: '100%',
-                    caption: 'Cancel'
+                    caption: 'Cancel',
+                    font: { color: Theme.colors.primary.contrastText }
                 });
                 button.classList.add('btn-os');
                 button.classList.add('mt-1');
@@ -17548,7 +17528,7 @@ define("@scom/scom-swap/result/result.tsx", ["require", "exports", "@ijstech/com
             if (this.message.content.message && this.message.content.message.includes('Internal JSON-RPC error.')) {
                 this.message.content.message = JSON.parse(this.message.content.message.replace('Internal JSON-RPC error.\n', '')).message;
             }
-            return await index_13.parseContractError(this.message.content.message, this.message.obj);
+            return await (0, index_13.parseContractError)(this.message.content.message, this.message.obj);
         }
         render() {
             return (this.$render("i-modal", { id: "confirmModal", closeIcon: { name: 'times' }, class: "confirm-modal", minHeight: "280px" },
@@ -17556,7 +17536,7 @@ define("@scom/scom-swap/result/result.tsx", ["require", "exports", "@ijstech/com
         }
     };
     Result = __decorate([
-        components_11.customElements('i-scom-swap-result')
+        (0, components_11.customElements)('i-scom-swap-result')
     ], Result);
     exports.Result = Result;
     ;
@@ -17612,16 +17592,17 @@ define("@scom/scom-swap/expert-mode-settings/index.css.ts", ["require", "exports
                         borderRadius: '0.5rem',
                     },
                     '.warning-box i-label *': {
-                        // color: Theme.text.primary,
+                        color: Theme.colors.primary.contrastText,
                         fontSize: '1rem',
                     },
                     'i-label.warning-text *': {
-                        color: Theme.colors.secondary.main,
+                        color: Theme.colors.warning.light,
                         fontSize: '1.05rem',
                     },
                     'i-button': {
                         padding: '0.75rem',
                         margin: '1.25rem 0 0.5rem',
+                        color: Theme.colors.primary.contrastText,
                         background: 'transparent linear-gradient(255deg,#e75b66,#b52082) 0% 0% no-repeat padding-box',
                     }
                 }
@@ -17651,9 +17632,9 @@ define("@scom/scom-swap/expert-mode-settings/index.tsx", ["require", "exports", 
             this.expertModal.visible = true;
         }
         onToggle() {
-            index_15.toggleExpertMode();
+            (0, index_15.toggleExpertMode)();
             this.closeModal();
-            this.$eventBus.dispatch("ExpertModeChanged" /* ExpertModeChanged */);
+            this.$eventBus.dispatch("ExpertModeChanged" /* EventId.ExpertModeChanged */);
         }
         render() {
             return (this.$render("i-modal", { id: "expertModal", class: 'dark-modal', title: "Expert Mode", closeIcon: { name: 'times' } },
@@ -17666,7 +17647,7 @@ define("@scom/scom-swap/expert-mode-settings/index.tsx", ["require", "exports", 
     };
     ExpertModeSettings = __decorate([
         components_13.customModule,
-        components_13.customElements('i-scom-swap-expert-mode-settings')
+        (0, components_13.customElements)('i-scom-swap-expert-mode-settings')
     ], ExpertModeSettings);
     exports.ExpertModeSettings = ExpertModeSettings;
     ;
@@ -17723,11 +17704,11 @@ define("@scom/scom-swap/config/index.tsx", ["require", "exports", "@ijstech/comp
                     key: 'chainId',
                     textAlign: 'left',
                     onRenderCell: function (source, columnData, rowData) {
-                        const supportedNetworks = index_16.getSupportedNetworks();
+                        const supportedNetworks = (0, index_16.getSupportedNetworks)();
                         const network = supportedNetworks.find(net => net.chainId === columnData);
                         if (!network)
                             return this.$render("i-panel", null);
-                        const networkInfo = index_16.getNetworkInfo(network.chainId);
+                        const networkInfo = (0, index_16.getNetworkInfo)(network.chainId);
                         const imgUrl = networkInfo.image || '';
                         const hstack = new components_15.HStack(undefined, {
                             verticalAlignment: 'center',
@@ -17814,8 +17795,8 @@ define("@scom/scom-swap/config/index.tsx", ["require", "exports", "@ijstech/comp
         }
         async init() {
             super.init();
-            const embedderFee = index_16.getEmbedderCommissionFee();
-            this.lbCommissionShare.caption = `${index_17.formatNumber(new eth_wallet_9.BigNumber(embedderFee).times(100).toFixed(), 4)} %`;
+            const embedderFee = (0, index_16.getEmbedderCommissionFee)();
+            this.lbCommissionShare.caption = `${(0, index_17.formatNumber)(new eth_wallet_9.BigNumber(embedderFee).times(100).toFixed(), 4)} %`;
             const commissions = this.getAttribute('commissions', true, []);
             this.commissionInfoList = commissions;
             this.tableCommissions.data = commissions;
@@ -17837,7 +17818,7 @@ define("@scom/scom-swap/config/index.tsx", ["require", "exports", "@ijstech/comp
             this._onCustomCommissionsChanged = value;
         }
         getSupportedChainIds() {
-            return index_16.getSupportedNetworks().map(v => ({ chainId: v.chainId }));
+            return (0, index_16.getSupportedNetworks)().map(v => ({ chainId: v.chainId }));
         }
         onModalAddCommissionClosed() {
             this.networkPicker.clearNetwork();
@@ -17849,7 +17830,7 @@ define("@scom/scom-swap/config/index.tsx", ["require", "exports", "@ijstech/comp
         }
         async onConfirmCommissionClicked() {
             var _a;
-            const embedderFee = index_16.getEmbedderCommissionFee();
+            const embedderFee = (0, index_16.getEmbedderCommissionFee)();
             this.commissionInfoList.push({
                 chainId: (_a = this.networkPicker.selectedNetwork) === null || _a === void 0 ? void 0 : _a.chainId,
                 walletAddress: this.inputWalletAddress.value,
@@ -17874,7 +17855,7 @@ define("@scom/scom-swap/config/index.tsx", ["require", "exports", "@ijstech/comp
             else if (!this.inputWalletAddress.value) {
                 this.lbErrMsg.caption = 'Please enter wallet address';
             }
-            else if (!index_17.isWalletAddress(this.inputWalletAddress.value)) {
+            else if (!(0, index_17.isWalletAddress)(this.inputWalletAddress.value)) {
                 this.lbErrMsg.caption = 'Please enter valid wallet address';
             }
             else {
@@ -17937,7 +17918,7 @@ define("@scom/scom-swap/config/index.tsx", ["require", "exports", "@ijstech/comp
     };
     Config = __decorate([
         components_15.customModule,
-        components_15.customElements("i-scom-swap-config")
+        (0, components_15.customElements)("i-scom-swap-config")
     ], Config);
     exports.default = Config;
 });
@@ -18048,302 +18029,6 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
     const priceImpactTooHighMsg = 'Price Impact Too High. If you want to bypass this check, please turn on Expert Mode';
     const defaultInput = '1';
     let ScomSwap = class ScomSwap extends components_16.Module {
-        constructor(parent, options) {
-            super(parent, options);
-            this._data = {
-                category: 'fixed-pair',
-                providers: [],
-                tokens: [],
-                defaultChainId: 0,
-                wallets: [],
-                networks: []
-            };
-            this.tag = {};
-            this.defaultEdit = true;
-            this.isInited = false;
-            this.oldSupportedChainList = [];
-            this.supportedChainList = [];
-            this.onWalletConnect = async (connected) => {
-                var _a, _b;
-                if (connected && (this.currentChainId == null || this.currentChainId == undefined)) {
-                    this.onChainChange();
-                }
-                else {
-                    if ((_b = (_a = this.originalData) === null || _a === void 0 ? void 0 : _a.providers) === null || _b === void 0 ? void 0 : _b.length)
-                        await this.onSetupPage(connected);
-                }
-            };
-            this.onWalletDisconnect = async (connected) => {
-                if (!connected) {
-                    //await this.handleAddRoute();
-                    //await this.updateBalance();
-                    await this.onSetupPage(connected);
-                }
-            };
-            this.onChainChange = async () => {
-                var _a, _b;
-                this.currentChainId = index_18.getChainId();
-                if (this.currentChainId != null && this.currentChainId != undefined)
-                    this.swapBtn.visible = true;
-                // this.availableMarkets = getAvailableMarkets() || [];
-                this.updateContractAddress();
-                if ((_b = (_a = this.originalData) === null || _a === void 0 ? void 0 : _a.providers) === null || _b === void 0 ? void 0 : _b.length)
-                    await this.onSetupPage(true);
-                this.setSwapButtonText();
-            };
-            this.redirectToken = () => {
-                var _a, _b;
-                let queryRouter = {
-                    chainId: this.currentChainId,
-                    fromToken: ((_a = this.fromToken) === null || _a === void 0 ? void 0 : _a.symbol) || this.fromTokenSymbol,
-                    toToken: ((_b = this.toToken) === null || _b === void 0 ? void 0 : _b.symbol) || this.toTokenSymbol,
-                };
-                if (this.isFrom) {
-                    queryRouter = Object.assign(Object.assign({}, queryRouter), { toAmount: this.toInputValue.toFixed() });
-                }
-                else {
-                    queryRouter = Object.assign(Object.assign({}, queryRouter), { fromAmount: this.fromInputValue.toFixed() });
-                }
-                this.fromTokenSymbol = queryRouter.fromToken;
-                this.toTokenSymbol = queryRouter.toToken;
-                this.targetChainId = queryRouter.toChainId;
-            };
-            this.fixedNumber = (value) => {
-                const val = typeof value === 'object' ? value : new eth_wallet_10.BigNumber(value);
-                if (val.isNaN())
-                    return '0';
-                let formatted = '';
-                if (val.gte(1)) {
-                    formatted = val.toNumber().toLocaleString('en-US', { maximumFractionDigits: 4 });
-                }
-                else {
-                    formatted = val.toNumber().toLocaleString('en-US', { maximumSignificantDigits: 4 });
-                }
-                return formatted.replace(/,/g, '');
-            };
-            this.onSetupPage = async (connected, _chainId) => {
-                var _a;
-                const data = {
-                    defaultChainId: this.defaultChainId,
-                    wallets: this.wallets,
-                    networks: this.networks,
-                    showHeader: this.showHeader
-                };
-                if ((_a = this.dappContainer) === null || _a === void 0 ? void 0 : _a.setData)
-                    this.dappContainer.setData(data);
-                this.currentChainId = _chainId ? _chainId : index_18.getChainId();
-                scom_token_list_7.tokenStore.updateTokenMapData();
-                if (connected) {
-                    await scom_token_list_7.tokenStore.updateAllTokenBalances();
-                }
-                this.closeNetworkErrModal();
-                if (this.isFixedPair) {
-                    this.setFixedPairData();
-                }
-                this.toggleReverseImage.enabled = !this.isFixedPair;
-                this.firstTokenSelection.disableSelect = this.isFixedPair;
-                this.secondTokenSelection.disableSelect = this.isFixedPair;
-                this.setSwapButtonText();
-                await this.updateBalance();
-                const input = this.receiveCol.children[0];
-                if (input) {
-                    input.readOnly = false;
-                }
-                if (!this.isFixedPair) {
-                    this.toggleReverseImage.classList.remove('cursor-default');
-                }
-                if (this.fromInputValue.isGreaterThanOrEqualTo(0)) {
-                    this.onUpdateEstimatedPosition(false, true);
-                    const input = this.payCol.children[0];
-                    if (input) {
-                        input.value = this.fixedNumber(this.fromInputValue);
-                    }
-                }
-                else if (this.toInputValue.isGreaterThanOrEqualTo(0)) {
-                    this.onUpdateEstimatedPosition(true, true);
-                    const input = this.receiveCol.children[0];
-                    if (input) {
-                        input.value = this.fixedNumber(this.toInputValue);
-                    }
-                }
-                this.firstTokenSelection.tokenDataListProp = index_18.getSupportedTokens(this._data.tokens || [], this.currentChainId);
-                this.setTargetTokenList();
-                //if (connected) {
-                if (!this.record)
-                    this.swapBtn.enabled = false;
-                this.onRenderPriceInfo();
-                this.redirectToken();
-                await this.handleAddRoute();
-            };
-            this.totalAmount = () => {
-                const commissionAmount = index_19.getCommissionAmount(this.commissions, this.fromInputValue);
-                return this.fromInputValue.plus(commissionAmount);
-            };
-            this.getMinReceivedMaxSold = () => {
-                var _a, _b;
-                const slippageTolerance = index_18.getSlippageTolerance();
-                if (!slippageTolerance)
-                    return null;
-                if (this.isFrom) {
-                    const poolAmount = new eth_wallet_10.BigNumber((_a = this.record) === null || _a === void 0 ? void 0 : _a.amountIn);
-                    if (poolAmount.isZero())
-                        return null;
-                    const commissionAmount = index_19.getCommissionAmount(this.commissions, poolAmount);
-                    const minReceivedMaxSold = poolAmount.plus(commissionAmount).times(1 + slippageTolerance / 100).toNumber();
-                    return minReceivedMaxSold;
-                }
-                else {
-                    const poolAmount = new eth_wallet_10.BigNumber((_b = this.record) === null || _b === void 0 ? void 0 : _b.amountOut);
-                    if (poolAmount.isZero())
-                        return null;
-                    const minReceivedMaxSold = poolAmount.times(1 - slippageTolerance / 100).toNumber();
-                    return minReceivedMaxSold;
-                }
-            };
-            this.onUpdateEstimatedPosition = (isFrom, reverseRouting = false) => {
-                if (this.isFrom != isFrom) {
-                    this.isFrom = isFrom;
-                }
-            };
-            this.isEstimated = (tokenPosition, strict = false) => {
-                if (tokenPosition === 'from') {
-                    return strict ? this.isFrom && !this.fromInputValue.isZero() : this.isFrom;
-                }
-                else if (tokenPosition === 'to') {
-                    return strict ? !this.isFrom && !this.toInputValue.isZero() : !this.isFrom;
-                }
-                else {
-                    return false;
-                }
-            };
-            this.onSwapConfirming = (key) => {
-                this.setMapStatus('swap', key, index_20.ApprovalStatus.APPROVING);
-                if (!this.swapBtn.rightIcon.visible)
-                    this.swapBtn.rightIcon.visible = true;
-            };
-            this.onSwapConfirmed = async (data) => {
-                const { key } = data;
-                this.setMapStatus('swap', key, index_20.ApprovalStatus.TO_BE_APPROVED);
-                if (this.swapBtn.rightIcon.visible)
-                    this.swapBtn.rightIcon.visible = false;
-                await this.handleAddRoute();
-            };
-            this.onSubmit = async () => {
-                var _a, _b, _c;
-                try {
-                    this.swapModal.visible = false;
-                    this.showResultMessage(this.openswapResult, 'warning', `Swapping ${index_20.formatNumber(this.totalAmount(), 4)} ${(_a = this.fromToken) === null || _a === void 0 ? void 0 : _a.symbol} to ${index_20.formatNumber(this.toInputValue, 4)} ${(_b = this.toToken) === null || _b === void 0 ? void 0 : _b.symbol}`);
-                    const route = this.record.bestRoute ? this.record.bestRoute : [this.fromToken, this.toToken];
-                    const swapData = {
-                        provider: this.record.provider,
-                        queueType: this.record.queueType,
-                        routeTokens: this.record.bestRoute,
-                        bestSmartRoute: route,
-                        pairs: this.record.pairs,
-                        fromAmount: this.record.fromAmount,
-                        toAmount: this.record.toAmount,
-                        isFromEstimated: this.isFrom,
-                        providerList: ((_c = this.originalData) === null || _c === void 0 ? void 0 : _c.providers) || [],
-                        commissions: this.commissions
-                    };
-                    const { error } = await index_19.executeSwap(swapData);
-                    if (error) {
-                        this.showResultMessage(this.openswapResult, 'error', error);
-                    }
-                }
-                catch (error) {
-                    console.error(error);
-                }
-            };
-            this.onApproveRouterMax = () => {
-                this.showResultMessage(this.openswapResult, 'warning', 'Approving');
-                this.setApprovalSpenderAddress();
-                this.approvalModelAction.doApproveAction(this.fromToken, this.totalAmount().toString(), this.record);
-            };
-            this.onSetMaxBalance = async (value) => {
-                var _a, _b, _c, _d;
-                if (!((_a = this.fromToken) === null || _a === void 0 ? void 0 : _a.symbol))
-                    return;
-                this.isFrom = false;
-                const address = ((_b = this.fromToken) === null || _b === void 0 ? void 0 : _b.address) || ((_c = this.fromToken) === null || _c === void 0 ? void 0 : _c.symbol);
-                let balance = this.getBalance(this.fromToken);
-                let inputVal = new eth_wallet_10.BigNumber(balance);
-                if (!address) {
-                    inputVal = new eth_wallet_10.BigNumber(0);
-                }
-                else {
-                    const commissionAmount = index_19.getCommissionAmount(this.commissions, new eth_wallet_10.BigNumber(balance));
-                    if (commissionAmount.gt(0)) {
-                        const totalFee = new eth_wallet_10.BigNumber(balance).plus(commissionAmount).dividedBy(balance);
-                        inputVal = inputVal.dividedBy(totalFee);
-                    }
-                }
-                if (value == 0 || value) {
-                    inputVal = inputVal.multipliedBy(value).dividedBy(100);
-                }
-                if (inputVal.eq(this.fromInputValue))
-                    return;
-                this.fromInputValue = inputVal;
-                const input = this.payCol.children[0];
-                input.value = index_20.limitDecimals(this.fromInputValue.toFixed(), ((_d = this.fromToken) === null || _d === void 0 ? void 0 : _d.decimals) || 18);
-                this.redirectToken();
-                await this.handleAddRoute();
-            };
-            this.isMaxDisabled = () => {
-                var _a, _b;
-                const address = ((_a = this.fromToken) === null || _a === void 0 ? void 0 : _a.address) || ((_b = this.fromToken) === null || _b === void 0 ? void 0 : _b.symbol);
-                let balance = this.getBalance(this.fromToken);
-                return !address || balance <= 0;
-            };
-            this.setTargetTokenList = (isDisabled) => {
-                var _a;
-                const srcChainId = ((_a = this.srcChain) === null || _a === void 0 ? void 0 : _a.chainId) || this.currentChainId;
-                if (this.secondTokenSelection.targetChainId != srcChainId) {
-                    this.secondTokenSelection.targetChainId = srcChainId;
-                }
-                this.secondTokenSelection.tokenDataListProp = index_18.getSupportedTokens(this._data.tokens || [], srcChainId);
-            };
-            this.showModalFees = () => {
-                const fees = this.getFeeDetails();
-                this.feesInfo.clearInnerHTML();
-                fees.forEach((fee) => {
-                    var _a;
-                    this.feesInfo.appendChild(this.$render("i-hstack", { horizontalAlignment: "space-between", verticalAlignment: "center", margin: { top: 10 }, border: { bottom: { color: Theme.background.main, width: '2px', style: 'solid' } }, padding: { bottom: 16 } },
-                        this.$render("i-hstack", { verticalAlignment: "center" },
-                            this.$render("i-label", { caption: fee.title, margin: { right: 4 } }),
-                            this.$render("i-icon", { name: "question-circle", width: 15, height: 15, fill: Theme.text.primary, tooltip: { content: fee.description }, "data-placement": "right" })),
-                        this.$render("i-label", { class: "ml-auto", caption: `${index_20.formatNumber(fee.value)} ${(_a = this.fromToken) === null || _a === void 0 ? void 0 : _a.symbol}` })));
-                });
-                this.feesInfo.appendChild(this.$render("i-hstack", { horizontalAlignment: "space-between", verticalAlignment: "center", margin: { top: 16 } },
-                    this.$render("i-hstack", { verticalAlignment: "center" },
-                        this.$render("i-label", { caption: "Total Transaction Fee" })),
-                    this.$render("i-label", { class: "ml-auto", caption: this.getTradeFeeExactAmount() })));
-                this.modalFees.visible = true;
-            };
-            this.closeModalFees = () => {
-                this.modalFees.visible = false;
-            };
-            this.showResultMessage = (result, status, content) => {
-                if (!result)
-                    return;
-                let params = { status };
-                if (status === 'success') {
-                    params.txtHash = content;
-                }
-                else {
-                    params.content = content;
-                }
-                result.message = Object.assign({}, params);
-                result.showModal();
-            };
-            index_18.setDataFromConfig(data_json_1.default);
-            this.fromInputValue = new eth_wallet_10.BigNumber(0);
-            this.toInputValue = new eth_wallet_10.BigNumber(0);
-            this.swapButtonStatusMap = {};
-            this.approveButtonStatusMap = {};
-            this.$eventBus = components_16.application.EventBus;
-            this.registerEvent();
-        }
         static async create(options, parent) {
             let self = new this(parent, options);
             await self.ready();
@@ -18815,16 +18500,16 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
             var _a;
             const providers = ((_a = this.originalData) === null || _a === void 0 ? void 0 : _a.providers) || [];
             if (this.isFixedPair) {
-                index_18.setProviderList([providers[0]]);
+                (0, index_18.setProviderList)([providers[0]]);
             }
             else {
-                index_18.setProviderList(providers);
+                (0, index_18.setProviderList)(providers);
             }
         }
         updateContractAddress() {
             if (this.approvalModelAction) {
-                if (index_19.getCurrentCommissions(this.commissions).length) {
-                    this.contractAddress = index_18.getProxyAddress();
+                if ((0, index_19.getCurrentCommissions)(this.commissions).length) {
+                    this.contractAddress = (0, index_18.getProxyAddress)();
                 }
                 else {
                     this.contractAddress = '';
@@ -18876,18 +18561,314 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
             return { category, providers: _providers };
         }
         async refreshUI() {
-            const dexList = scom_dex_list_2.default();
-            index_18.setDexInfoList(dexList);
+            const dexList = (0, scom_dex_list_2.default)();
+            (0, index_18.setDexInfoList)(dexList);
             this.setProviders();
             await this.initData();
-            await this.onSetupPage(index_18.isWalletConnected());
+            await this.onSetupPage((0, index_18.isWalletConnected)());
+        }
+        constructor(parent, options) {
+            super(parent, options);
+            this._data = {
+                category: 'fixed-pair',
+                providers: [],
+                tokens: [],
+                defaultChainId: 0,
+                wallets: [],
+                networks: []
+            };
+            this.tag = {};
+            this.defaultEdit = true;
+            this.isInited = false;
+            this.oldSupportedChainList = [];
+            this.supportedChainList = [];
+            this.onWalletConnect = async (connected) => {
+                var _a, _b;
+                if (connected && (this.currentChainId == null || this.currentChainId == undefined)) {
+                    this.onChainChange();
+                }
+                else {
+                    if ((_b = (_a = this.originalData) === null || _a === void 0 ? void 0 : _a.providers) === null || _b === void 0 ? void 0 : _b.length)
+                        await this.onSetupPage(connected);
+                }
+            };
+            this.onWalletDisconnect = async (connected) => {
+                if (!connected) {
+                    //await this.handleAddRoute();
+                    //await this.updateBalance();
+                    await this.onSetupPage(connected);
+                }
+            };
+            this.onChainChange = async () => {
+                var _a, _b;
+                this.currentChainId = (0, index_18.getChainId)();
+                if (this.currentChainId != null && this.currentChainId != undefined)
+                    this.swapBtn.visible = true;
+                // this.availableMarkets = getAvailableMarkets() || [];
+                this.updateContractAddress();
+                if ((_b = (_a = this.originalData) === null || _a === void 0 ? void 0 : _a.providers) === null || _b === void 0 ? void 0 : _b.length)
+                    await this.onSetupPage(true);
+                this.setSwapButtonText();
+            };
+            this.redirectToken = () => {
+                var _a, _b;
+                let queryRouter = {
+                    chainId: this.currentChainId,
+                    fromToken: ((_a = this.fromToken) === null || _a === void 0 ? void 0 : _a.symbol) || this.fromTokenSymbol,
+                    toToken: ((_b = this.toToken) === null || _b === void 0 ? void 0 : _b.symbol) || this.toTokenSymbol,
+                };
+                if (this.isFrom) {
+                    queryRouter = Object.assign(Object.assign({}, queryRouter), { toAmount: this.toInputValue.toFixed() });
+                }
+                else {
+                    queryRouter = Object.assign(Object.assign({}, queryRouter), { fromAmount: this.fromInputValue.toFixed() });
+                }
+                this.fromTokenSymbol = queryRouter.fromToken;
+                this.toTokenSymbol = queryRouter.toToken;
+                this.targetChainId = queryRouter.toChainId;
+            };
+            this.fixedNumber = (value) => {
+                const val = typeof value === 'object' ? value : new eth_wallet_10.BigNumber(value);
+                if (val.isNaN())
+                    return '0';
+                let formatted = '';
+                if (val.gte(1)) {
+                    formatted = val.toNumber().toLocaleString('en-US', { maximumFractionDigits: 4 });
+                }
+                else {
+                    formatted = val.toNumber().toLocaleString('en-US', { maximumSignificantDigits: 4 });
+                }
+                return formatted.replace(/,/g, '');
+            };
+            this.onSetupPage = async (connected, _chainId) => {
+                var _a;
+                const data = {
+                    defaultChainId: this.defaultChainId,
+                    wallets: this.wallets,
+                    networks: this.networks,
+                    showHeader: this.showHeader
+                };
+                if ((_a = this.dappContainer) === null || _a === void 0 ? void 0 : _a.setData)
+                    this.dappContainer.setData(data);
+                this.currentChainId = _chainId ? _chainId : (0, index_18.getChainId)();
+                scom_token_list_7.tokenStore.updateTokenMapData();
+                if (connected) {
+                    await scom_token_list_7.tokenStore.updateAllTokenBalances();
+                }
+                this.closeNetworkErrModal();
+                if (this.isFixedPair) {
+                    this.setFixedPairData();
+                }
+                this.toggleReverseImage.enabled = !this.isFixedPair;
+                this.firstTokenSelection.disableSelect = this.isFixedPair;
+                this.secondTokenSelection.disableSelect = this.isFixedPair;
+                this.setSwapButtonText();
+                await this.updateBalance();
+                const input = this.receiveCol.children[0];
+                if (input) {
+                    input.readOnly = false;
+                }
+                if (!this.isFixedPair) {
+                    this.toggleReverseImage.classList.remove('cursor-default');
+                }
+                if (this.fromInputValue.isGreaterThanOrEqualTo(0)) {
+                    this.onUpdateEstimatedPosition(false, true);
+                    const input = this.payCol.children[0];
+                    if (input) {
+                        input.value = this.fixedNumber(this.fromInputValue);
+                    }
+                }
+                else if (this.toInputValue.isGreaterThanOrEqualTo(0)) {
+                    this.onUpdateEstimatedPosition(true, true);
+                    const input = this.receiveCol.children[0];
+                    if (input) {
+                        input.value = this.fixedNumber(this.toInputValue);
+                    }
+                }
+                this.firstTokenSelection.tokenDataListProp = (0, index_18.getSupportedTokens)(this._data.tokens || [], this.currentChainId);
+                this.setTargetTokenList();
+                //if (connected) {
+                if (!this.record)
+                    this.swapBtn.enabled = false;
+                this.onRenderPriceInfo();
+                this.redirectToken();
+                await this.handleAddRoute();
+            };
+            this.totalAmount = () => {
+                const commissionAmount = (0, index_19.getCommissionAmount)(this.commissions, this.fromInputValue);
+                return this.fromInputValue.plus(commissionAmount);
+            };
+            this.getMinReceivedMaxSold = () => {
+                var _a, _b;
+                const slippageTolerance = (0, index_18.getSlippageTolerance)();
+                if (!slippageTolerance)
+                    return null;
+                if (this.isFrom) {
+                    const poolAmount = new eth_wallet_10.BigNumber((_a = this.record) === null || _a === void 0 ? void 0 : _a.amountIn);
+                    if (poolAmount.isZero())
+                        return null;
+                    const commissionAmount = (0, index_19.getCommissionAmount)(this.commissions, poolAmount);
+                    const minReceivedMaxSold = poolAmount.plus(commissionAmount).times(1 + slippageTolerance / 100).toNumber();
+                    return minReceivedMaxSold;
+                }
+                else {
+                    const poolAmount = new eth_wallet_10.BigNumber((_b = this.record) === null || _b === void 0 ? void 0 : _b.amountOut);
+                    if (poolAmount.isZero())
+                        return null;
+                    const minReceivedMaxSold = poolAmount.times(1 - slippageTolerance / 100).toNumber();
+                    return minReceivedMaxSold;
+                }
+            };
+            this.onUpdateEstimatedPosition = (isFrom, reverseRouting = false) => {
+                if (this.isFrom != isFrom) {
+                    this.isFrom = isFrom;
+                }
+            };
+            this.isEstimated = (tokenPosition, strict = false) => {
+                if (tokenPosition === 'from') {
+                    return strict ? this.isFrom && !this.fromInputValue.isZero() : this.isFrom;
+                }
+                else if (tokenPosition === 'to') {
+                    return strict ? !this.isFrom && !this.toInputValue.isZero() : !this.isFrom;
+                }
+                else {
+                    return false;
+                }
+            };
+            this.onSwapConfirming = (key) => {
+                this.setMapStatus('swap', key, index_20.ApprovalStatus.APPROVING);
+                if (!this.swapBtn.rightIcon.visible)
+                    this.swapBtn.rightIcon.visible = true;
+            };
+            this.onSwapConfirmed = async (data) => {
+                const { key } = data;
+                this.setMapStatus('swap', key, index_20.ApprovalStatus.TO_BE_APPROVED);
+                if (this.swapBtn.rightIcon.visible)
+                    this.swapBtn.rightIcon.visible = false;
+                await this.handleAddRoute();
+            };
+            this.onSubmit = async () => {
+                var _a, _b, _c;
+                try {
+                    this.swapModal.visible = false;
+                    this.showResultMessage(this.openswapResult, 'warning', `Swapping ${(0, index_20.formatNumber)(this.totalAmount(), 4)} ${(_a = this.fromToken) === null || _a === void 0 ? void 0 : _a.symbol} to ${(0, index_20.formatNumber)(this.toInputValue, 4)} ${(_b = this.toToken) === null || _b === void 0 ? void 0 : _b.symbol}`);
+                    const route = this.record.bestRoute ? this.record.bestRoute : [this.fromToken, this.toToken];
+                    const swapData = {
+                        provider: this.record.provider,
+                        queueType: this.record.queueType,
+                        routeTokens: this.record.bestRoute,
+                        bestSmartRoute: route,
+                        pairs: this.record.pairs,
+                        fromAmount: this.record.fromAmount,
+                        toAmount: this.record.toAmount,
+                        isFromEstimated: this.isFrom,
+                        providerList: ((_c = this.originalData) === null || _c === void 0 ? void 0 : _c.providers) || [],
+                        commissions: this.commissions
+                    };
+                    const { error } = await (0, index_19.executeSwap)(swapData);
+                    if (error) {
+                        this.showResultMessage(this.openswapResult, 'error', error);
+                    }
+                }
+                catch (error) {
+                    console.error(error);
+                }
+            };
+            this.onApproveRouterMax = () => {
+                this.showResultMessage(this.openswapResult, 'warning', 'Approving');
+                this.setApprovalSpenderAddress();
+                this.approvalModelAction.doApproveAction(this.fromToken, this.totalAmount().toString(), this.record);
+            };
+            this.onSetMaxBalance = async (value) => {
+                var _a, _b, _c, _d;
+                if (!((_a = this.fromToken) === null || _a === void 0 ? void 0 : _a.symbol))
+                    return;
+                this.isFrom = false;
+                const address = ((_b = this.fromToken) === null || _b === void 0 ? void 0 : _b.address) || ((_c = this.fromToken) === null || _c === void 0 ? void 0 : _c.symbol);
+                let balance = this.getBalance(this.fromToken);
+                let inputVal = new eth_wallet_10.BigNumber(balance);
+                if (!address) {
+                    inputVal = new eth_wallet_10.BigNumber(0);
+                }
+                else {
+                    const commissionAmount = (0, index_19.getCommissionAmount)(this.commissions, new eth_wallet_10.BigNumber(balance));
+                    if (commissionAmount.gt(0)) {
+                        const totalFee = new eth_wallet_10.BigNumber(balance).plus(commissionAmount).dividedBy(balance);
+                        inputVal = inputVal.dividedBy(totalFee);
+                    }
+                }
+                if (value == 0 || value) {
+                    inputVal = inputVal.multipliedBy(value).dividedBy(100);
+                }
+                if (inputVal.eq(this.fromInputValue))
+                    return;
+                this.fromInputValue = inputVal;
+                const input = this.payCol.children[0];
+                input.value = (0, index_20.limitDecimals)(this.fromInputValue.toFixed(), ((_d = this.fromToken) === null || _d === void 0 ? void 0 : _d.decimals) || 18);
+                this.redirectToken();
+                await this.handleAddRoute();
+            };
+            this.isMaxDisabled = () => {
+                var _a, _b;
+                const address = ((_a = this.fromToken) === null || _a === void 0 ? void 0 : _a.address) || ((_b = this.fromToken) === null || _b === void 0 ? void 0 : _b.symbol);
+                let balance = this.getBalance(this.fromToken);
+                return !address || balance <= 0;
+            };
+            this.setTargetTokenList = (isDisabled) => {
+                var _a;
+                const srcChainId = ((_a = this.srcChain) === null || _a === void 0 ? void 0 : _a.chainId) || this.currentChainId;
+                if (this.secondTokenSelection.targetChainId != srcChainId) {
+                    this.secondTokenSelection.targetChainId = srcChainId;
+                }
+                this.secondTokenSelection.tokenDataListProp = (0, index_18.getSupportedTokens)(this._data.tokens || [], srcChainId);
+            };
+            this.showModalFees = () => {
+                const fees = this.getFeeDetails();
+                this.feesInfo.clearInnerHTML();
+                fees.forEach((fee) => {
+                    var _a;
+                    this.feesInfo.appendChild(this.$render("i-hstack", { horizontalAlignment: "space-between", verticalAlignment: "center", margin: { top: 10 }, border: { bottom: { color: Theme.background.main, width: '2px', style: 'solid' } }, padding: { bottom: 16 } },
+                        this.$render("i-hstack", { verticalAlignment: "center" },
+                            this.$render("i-label", { caption: fee.title, margin: { right: 4 } }),
+                            this.$render("i-icon", { name: "question-circle", width: 15, height: 15, fill: Theme.text.primary, tooltip: { content: fee.description }, "data-placement": "right" })),
+                        this.$render("i-label", { class: "ml-auto", caption: `${(0, index_20.formatNumber)(fee.value)} ${(_a = this.fromToken) === null || _a === void 0 ? void 0 : _a.symbol}` })));
+                });
+                this.feesInfo.appendChild(this.$render("i-hstack", { horizontalAlignment: "space-between", verticalAlignment: "center", margin: { top: 16 } },
+                    this.$render("i-hstack", { verticalAlignment: "center" },
+                        this.$render("i-label", { caption: "Total Transaction Fee" })),
+                    this.$render("i-label", { class: "ml-auto", caption: this.getTradeFeeExactAmount() })));
+                this.modalFees.visible = true;
+            };
+            this.closeModalFees = () => {
+                this.modalFees.visible = false;
+            };
+            this.showResultMessage = (result, status, content) => {
+                if (!result)
+                    return;
+                let params = { status };
+                if (status === 'success') {
+                    params.txtHash = content;
+                }
+                else {
+                    params.content = content;
+                }
+                result.message = Object.assign({}, params);
+                result.showModal();
+            };
+            (0, index_18.setDataFromConfig)(data_json_1.default);
+            this.fromInputValue = new eth_wallet_10.BigNumber(0);
+            this.toInputValue = new eth_wallet_10.BigNumber(0);
+            this.swapButtonStatusMap = {};
+            this.approveButtonStatusMap = {};
+            this.$eventBus = components_16.application.EventBus;
+            this.registerEvent();
         }
         registerEvent() {
-            this.$eventBus.register(this, "isWalletConnected" /* IsWalletConnected */, this.onWalletConnect);
-            this.$eventBus.register(this, "IsWalletDisconnected" /* IsWalletDisconnected */, this.onWalletDisconnect);
-            this.$eventBus.register(this, "chainChanged" /* chainChanged */, this.onChainChange);
-            this.$eventBus.register(this, "SlippageToleranceChanged" /* SlippageToleranceChanged */, () => { this.priceInfo.Items = this.getPriceInfo(); });
-            this.$eventBus.register(this, "ExpertModeChanged" /* ExpertModeChanged */, () => {
+            this.$eventBus.register(this, "isWalletConnected" /* EventId.IsWalletConnected */, this.onWalletConnect);
+            this.$eventBus.register(this, "IsWalletDisconnected" /* EventId.IsWalletDisconnected */, this.onWalletDisconnect);
+            this.$eventBus.register(this, "chainChanged" /* EventId.chainChanged */, this.onChainChange);
+            this.$eventBus.register(this, "SlippageToleranceChanged" /* EventId.SlippageToleranceChanged */, () => { this.priceInfo.Items = this.getPriceInfo(); });
+            this.$eventBus.register(this, "ExpertModeChanged" /* EventId.ExpertModeChanged */, () => {
                 this.setSwapButtonText();
             });
         }
@@ -18909,7 +18890,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
         get isPriceImpactTooHigh() {
             var _a;
             const warningMessageText = this.getWarningMessageText();
-            return ((_a = this.record) === null || _a === void 0 ? void 0 : _a.priceImpact) > 15 && !index_18.isExpertMode() && warningMessageText === priceImpactTooHighMsg;
+            return ((_a = this.record) === null || _a === void 0 ? void 0 : _a.priceImpact) > 15 && !(0, index_18.isExpertMode)() && warningMessageText === priceImpactTooHighMsg;
         }
         get isInsufficientBalance() {
             if (!this.fromToken || !this.record)
@@ -18920,7 +18901,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
         get maxSold() {
             if (!this.fromToken || !this.record)
                 return new eth_wallet_10.BigNumber(0);
-            const commissionAmount = index_19.getCommissionAmount(this.commissions, new eth_wallet_10.BigNumber(this.record.fromAmount));
+            const commissionAmount = (0, index_19.getCommissionAmount)(this.commissions, new eth_wallet_10.BigNumber(this.record.fromAmount));
             const amountWithCommission = this.record.fromAmount.plus(commissionAmount);
             if (!this.isFrom)
                 return new eth_wallet_10.BigNumber(amountWithCommission);
@@ -18982,7 +18963,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
             this.secondTokenSelection.isCommonShown = true;
         }
         async initApprovalModelAction() {
-            this.approvalModelAction = await index_19.getApprovalModelAction({
+            this.approvalModelAction = await (0, index_19.getApprovalModelAction)({
                 sender: this,
                 payAction: this.onSubmit,
                 onToBeApproved: async (token) => {
@@ -19012,7 +18993,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                     this.onSwapConfirming(data.key);
                 },
                 onPaid: async (data) => {
-                    components_16.application.EventBus.dispatch("Paid" /* Paid */);
+                    components_16.application.EventBus.dispatch("Paid" /* EventId.Paid */);
                     this.onSwapConfirmed({ key: data.key });
                     await this.updateBalance();
                 },
@@ -19051,16 +19032,16 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
             if (!this.record)
                 return;
             this.setupCrossChainPopup();
-            const slippageTolerance = index_18.getSlippageTolerance();
+            const slippageTolerance = (0, index_18.getSlippageTolerance)();
             this.fromTokenImage.url = scom_token_list_7.assets.tokenPath(this.fromToken, this.currentChainId);
             this.fromTokenLabel.caption = (_b = (_a = this.fromToken) === null || _a === void 0 ? void 0 : _a.symbol) !== null && _b !== void 0 ? _b : '';
-            this.fromTokenValue.caption = index_20.formatNumber(this.totalAmount(), 4);
+            this.fromTokenValue.caption = (0, index_20.formatNumber)(this.totalAmount(), 4);
             this.toTokenImage.url = scom_token_list_7.assets.tokenPath(this.toToken, this.currentChainId);
             this.toTokenLabel.caption = (_d = (_c = this.toToken) === null || _c === void 0 ? void 0 : _c.symbol) !== null && _d !== void 0 ? _d : '';
-            this.toTokenValue.caption = index_20.formatNumber(this.toInputValue, 4);
+            this.toTokenValue.caption = (0, index_20.formatNumber)(this.toInputValue, 4);
             const minimumReceived = this.getMinReceivedMaxSold();
             if (minimumReceived || minimumReceived == 0) {
-                this.payOrReceiveValue.caption = index_20.formatNumber(minimumReceived, 4);
+                this.payOrReceiveValue.caption = (0, index_20.formatNumber)(minimumReceived, 4);
             }
             else {
                 this.payOrReceiveValue.caption = ' - ';
@@ -19086,7 +19067,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                 if (this.fromInputValue.gt(0)) {
                     const fromInput = (_a = this.payCol.getElementsByTagName('I-INPUT')) === null || _a === void 0 ? void 0 : _a[0];
                     // const toInput = this.receiveCol.getElementsByTagName('I-INPUT')?.[0] as Input;
-                    const limit = index_20.limitDecimals(this.fromInputValue.toFixed(), token.decimals || 18);
+                    const limit = (0, index_20.limitDecimals)(this.fromInputValue.toFixed(), token.decimals || 18);
                     if (!this.fromInputValue.eq(limit)) {
                         if (fromInput) {
                             fromInput.value = limit;
@@ -19097,14 +19078,14 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                 else if (this.fromInputValue.isZero()) {
                     this.onUpdateEstimatedPosition(true);
                 }
-                this.payBalance.caption = `Balance: ${index_20.formatNumber(balance, 4)} ${token.symbol}`;
+                this.payBalance.caption = `Balance: ${(0, index_20.formatNumber)(balance, 4)} ${token.symbol}`;
                 this.updateTokenInput(true);
             }
             else {
                 this.toToken = token;
                 if (this.toInputValue.gt(0)) {
                     const toInput = (_b = this.receiveCol.getElementsByTagName('I-INPUT')) === null || _b === void 0 ? void 0 : _b[0];
-                    const limit = index_20.limitDecimals(this.toInputValue.toFixed(), token.decimals || 18);
+                    const limit = (0, index_20.limitDecimals)(this.toInputValue.toFixed(), token.decimals || 18);
                     if (!this.toInputValue.eq(limit)) {
                         if (toInput) {
                             toInput.value = limit;
@@ -19115,14 +19096,14 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                 else if (this.toInputValue.isZero()) {
                     this.onUpdateEstimatedPosition(false);
                 }
-                this.receiveBalance.caption = `Balance: ${index_20.formatNumber(balance, 4)} ${token.symbol}`;
+                this.receiveBalance.caption = `Balance: ${(0, index_20.formatNumber)(balance, 4)} ${token.symbol}`;
                 this.updateTokenInput(false);
             }
         }
         async onSelectToken(token, isFrom) {
             this.firstTokenSelection.enabled = false;
             this.secondTokenSelection.enabled = false;
-            if (token.isNew && index_18.isWalletConnected()) {
+            if (token.isNew && (0, index_18.isWalletConnected)()) {
                 await scom_token_list_7.tokenStore.updateAllTokenBalances();
                 this.allTokenBalancesMap = scom_token_list_7.tokenStore.tokenBalances;
             }
@@ -19137,14 +19118,14 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
             const item = this.record;
             if (!item)
                 return;
-            const market = ((_a = index_18.getProviderByKey(item.provider)) === null || _a === void 0 ? void 0 : _a.key) || '';
+            const market = ((_a = (0, index_18.getProviderByKey)(item.provider)) === null || _a === void 0 ? void 0 : _a.key) || '';
             if (this.approvalModelAction) {
-                if (index_19.getCurrentCommissions(this.commissions).length) {
-                    this.contractAddress = index_18.getProxyAddress();
-                    index_19.setApprovalModalSpenderAddress(market, this.contractAddress);
+                if ((0, index_19.getCurrentCommissions)(this.commissions).length) {
+                    this.contractAddress = (0, index_18.getProxyAddress)();
+                    (0, index_19.setApprovalModalSpenderAddress)(market, this.contractAddress);
                 }
                 else {
-                    index_19.setApprovalModalSpenderAddress(market);
+                    (0, index_19.setApprovalModalSpenderAddress)(market);
                 }
             }
         }
@@ -19153,7 +19134,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
             const value = isFrom ? this.fromInputValue : this.toInputValue;
             if (!value || value.isNaN())
                 return '';
-            return index_20.limitDecimals(value.toFixed(), (token === null || token === void 0 ? void 0 : token.decimals) || 18);
+            return (0, index_20.limitDecimals)(value.toFixed(), (token === null || token === void 0 ? void 0 : token.decimals) || 18);
         }
         async updateTokenInput(isFrom, init) {
             const _col = isFrom ? this.payCol : this.receiveCol;
@@ -19229,7 +19210,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                 const toInput = (_b = this.receiveCol.getElementsByTagName('I-INPUT')) === null || _b === void 0 ? void 0 : _b[0];
                 const isFrom = source.isSameNode(fromInput);
                 const amount = source.value;
-                if (index_20.isInvalidInput(amount)) {
+                if ((0, index_20.isInvalidInput)(amount)) {
                     this.resetValuesByInput();
                     if (fromInput)
                         fromInput.value = '0';
@@ -19238,7 +19219,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                     return;
                 }
                 const limit = isFrom ? (_c = this.fromToken) === null || _c === void 0 ? void 0 : _c.decimals : (_d = this.toToken) === null || _d === void 0 ? void 0 : _d.decimals;
-                const value = new eth_wallet_10.BigNumber(index_20.limitDecimals(amount, limit || 18));
+                const value = new eth_wallet_10.BigNumber((0, index_20.limitDecimals)(amount, limit || 18));
                 if (!value.gt(0)) {
                     this.resetValuesByInput();
                     if (isFrom && toInput) {
@@ -19295,7 +19276,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
             let listRouting = [];
             const useAPI = this._data.category === 'aggregator';
             this.updateContractAddress();
-            listRouting = await index_19.getAllRoutesData(this.fromToken, this.toToken, this.fromInputValue, this.toInputValue, this.isFrom, useAPI, this.commissions);
+            listRouting = await (0, index_19.getAllRoutesData)(this.fromToken, this.toToken, this.fromInputValue, this.toInputValue, this.isFrom, useAPI, this.commissions);
             listRouting = listRouting.map((v) => {
                 // const config = ProviderConfigMap[v.provider];
                 return Object.assign(Object.assign({}, v), { isHybrid: false // config.marketCode == Market.HYBRID,
@@ -19336,11 +19317,11 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
             }
             if (this.record) {
                 this.setApprovalSpenderAddress();
-                const commissionFee = index_18.getEmbedderCommissionFee();
-                const commissionAmount = index_19.getCommissionAmount(this.commissions, this.record.fromAmount);
+                const commissionFee = (0, index_18.getEmbedderCommissionFee)();
+                const commissionAmount = (0, index_19.getCommissionAmount)(this.commissions, this.record.fromAmount);
                 const total = ((_a = this.record) === null || _a === void 0 ? void 0 : _a.fromAmount) ? new eth_wallet_10.BigNumber(this.record.fromAmount).plus(commissionAmount) : new eth_wallet_10.BigNumber(0);
                 this.lbYouPayTitle.caption = commissionAmount.gt(0) ? `You Pay (incl. ${new eth_wallet_10.BigNumber(commissionFee).times(100)}% fee)` : `You Pay`;
-                this.lbYouPayValue.caption = `${index_20.formatNumber(total)} ${(_b = this.fromToken) === null || _b === void 0 ? void 0 : _b.symbol}`;
+                this.lbYouPayValue.caption = `${(0, index_20.formatNumber)(total)} ${(_b = this.fromToken) === null || _b === void 0 ? void 0 : _b.symbol}`;
             }
         }
         getPricePercent(routes, isFrom) {
@@ -19360,7 +19341,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                 }
                 percent = percent.multipliedBy(100);
                 if (percent.gte(0.01)) {
-                    return `Save ${index_20.formatNumber(percent.toNumber(), 2)}%`;
+                    return `Save ${(0, index_20.formatNumber)(percent.toNumber(), 2)}%`;
                 }
             }
             return 0;
@@ -19377,9 +19358,9 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
             let toSymbol = (_d = this.toToken) === null || _d === void 0 ? void 0 : _d.symbol;
             if (value || value == 0) {
                 if (this.isPriceToggled) {
-                    return `1 ${fromSymbol} ≈ ${index_20.formatNumber(value)} ${toSymbol}`;
+                    return `1 ${fromSymbol} ≈ ${(0, index_20.formatNumber)(value)} ${toSymbol}`;
                 }
-                return `1 ${toSymbol} ≈ ${index_20.formatNumber(value)} ${fromSymbol}`;
+                return `1 ${toSymbol} ≈ ${(0, index_20.formatNumber)(value)} ${fromSymbol}`;
             }
             return '-';
         }
@@ -19387,7 +19368,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
             var _a;
             const value = (_a = this.record) === null || _a === void 0 ? void 0 : _a.priceImpact;
             if (value || value == 0) {
-                return `${index_20.formatNumber(value)}%`;
+                return `${(0, index_20.formatNumber)(value)}%`;
             }
             return '-';
         }
@@ -19396,9 +19377,9 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
             const value = this.getMinReceivedMaxSold();
             if (value || value == 0) {
                 if (this.isFrom) {
-                    return `${index_20.formatNumber(value)} ${(_a = this.fromToken) === null || _a === void 0 ? void 0 : _a.symbol}`;
+                    return `${(0, index_20.formatNumber)(value)} ${(_a = this.fromToken) === null || _a === void 0 ? void 0 : _a.symbol}`;
                 }
-                return `${index_20.formatNumber(value)} ${(_b = this.toToken) === null || _b === void 0 ? void 0 : _b.symbol}`;
+                return `${(0, index_20.formatNumber)(value)} ${(_b = this.toToken) === null || _b === void 0 ? void 0 : _b.symbol}`;
             }
             return '-';
         }
@@ -19406,7 +19387,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
             var _a, _b, _c;
             const tradeFee = (_a = this.record) === null || _a === void 0 ? void 0 : _a.fromAmount.times((_b = this.record) === null || _b === void 0 ? void 0 : _b.tradeFee).toNumber();
             if (tradeFee || tradeFee == 0) {
-                return `${index_20.formatNumber(tradeFee)} ${(_c = this.fromToken) === null || _c === void 0 ? void 0 : _c.symbol}`;
+                return `${(0, index_20.formatNumber)(tradeFee)} ${(_c = this.fromToken) === null || _c === void 0 ? void 0 : _c.symbol}`;
             }
             return '-';
         }
@@ -19428,8 +19409,8 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
             const priceImpact = this.getPriceImpact();
             const minimumReceived = this.getMinimumReceived();
             const tradeFeeExactAmount = this.getTradeFeeExactAmount();
-            const commissionFee = index_18.getEmbedderCommissionFee();
-            const commissionAmount = this.record ? index_19.getCommissionAmount(this.commissions, new eth_wallet_10.BigNumber(this.record.fromAmount || 0)) : new eth_wallet_10.BigNumber(0);
+            const commissionFee = (0, index_18.getEmbedderCommissionFee)();
+            const commissionAmount = this.record ? (0, index_19.getCommissionAmount)(this.commissions, new eth_wallet_10.BigNumber(this.record.fromAmount || 0)) : new eth_wallet_10.BigNumber(0);
             const fees = this.getFeeDetails();
             const countFees = fees.length;
             let feeTooltip;
@@ -19468,8 +19449,8 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                 },
                 {
                     title: "Commission Fee",
-                    value: this.isValidToken ? `${new eth_wallet_10.BigNumber(commissionFee).times(100)}% (${index_20.formatNumber(commissionAmount)} ${(_a = this.fromToken) === null || _a === void 0 ? void 0 : _a.symbol})` : '-',
-                    isHidden: !index_19.getCurrentCommissions(this.commissions).length
+                    value: this.isValidToken ? `${new eth_wallet_10.BigNumber(commissionFee).times(100)}% (${(0, index_20.formatNumber)(commissionAmount)} ${(_a = this.fromToken) === null || _a === void 0 ? void 0 : _a.symbol})` : '-',
+                    isHidden: !(0, index_19.getCurrentCommissions)(this.commissions).length
                 }
             ];
             return info.filter((f) => !f.isHidden);
@@ -19484,16 +19465,16 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
             return 0;
         }
         async updateBalance() {
-            if (index_18.isWalletConnected())
+            if ((0, index_18.isWalletConnected)())
                 await scom_token_list_7.tokenStore.updateAllTokenBalances();
-            this.allTokenBalancesMap = index_18.isWalletConnected() ? scom_token_list_7.tokenStore.tokenBalances : [];
+            this.allTokenBalancesMap = (0, index_18.isWalletConnected)() ? scom_token_list_7.tokenStore.tokenBalances : [];
             if (this.fromToken) {
                 const balance = this.getBalance(this.fromToken);
-                this.payBalance.caption = `Balance: ${index_20.formatNumber(balance, 4)} ${this.fromToken.symbol}`;
+                this.payBalance.caption = `Balance: ${(0, index_20.formatNumber)(balance, 4)} ${this.fromToken.symbol}`;
             }
             if (this.toToken) {
                 const balance = this.getBalance(this.toToken);
-                this.receiveBalance.caption = `Balance: ${index_20.formatNumber(balance, 4)} ${this.toToken.symbol}`;
+                this.receiveBalance.caption = `Balance: ${(0, index_20.formatNumber)(balance, 4)} ${this.toToken.symbol}`;
             }
             const enabled = !this.isMaxDisabled();
             this.maxButton.enabled = enabled;
@@ -19506,7 +19487,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
         getSwapButtonText() {
             var _a;
             const isApproveButtonShown = this.isApproveButtonShown;
-            if (!index_18.isWalletConnected()) {
+            if (!(0, index_18.isWalletConnected)()) {
                 return "Connect Wallet";
             }
             if (isApproveButtonShown) {
@@ -19548,7 +19529,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
             if (this.maxSold.gt(balance)) {
                 return `Insufficient ${(_c = this.fromToken) === null || _c === void 0 ? void 0 : _c.symbol} balance`;
             }
-            if (this.record.priceImpact > 15 && !index_18.isExpertMode()) {
+            if (this.record.priceImpact > 15 && !(0, index_18.isExpertMode)()) {
                 return priceImpactTooHighMsg;
             }
             return '';
@@ -19575,10 +19556,10 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
         }
         isSwapButtonDisabled() {
             const warningMessageText = this.getWarningMessageText();
-            return (index_18.isWalletConnected() && (warningMessageText != '' && !this.isPriceImpactTooHigh));
+            return ((0, index_18.isWalletConnected)() && (warningMessageText != '' && !this.isPriceImpactTooHigh));
         }
         onClickSwapButton() {
-            if (!index_18.isWalletConnected()) {
+            if (!(0, index_18.isWalletConnected)()) {
                 // this.$eventBus.dispatch(EventId.ConnectWallet);
                 this.mdWallet.showModal();
                 return;
@@ -19591,7 +19572,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                 return;
             }
             if (this.isPriceImpactTooHigh) {
-                this.$eventBus.dispatch("ShowExpertModal" /* ShowExpertModal */);
+                this.$eventBus.dispatch("ShowExpertModal" /* EventId.ShowExpertModal */);
                 return;
             }
             this.handleSwapPopup();
@@ -19614,12 +19595,12 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
             this.priceInfoContainer.appendChild(this.priceInfo2);
         }
         get isMetaMask() {
-            return index_18.getWalletProvider() === index_18.WalletPlugin.MetaMask;
+            return (0, index_18.getWalletProvider)() === index_18.WalletPlugin.MetaMask;
         }
         initExpertModal() {
             this.expertModal = new index_23.ExpertModeSettings();
             this.swapComponent.appendChild(this.expertModal);
-            this.$eventBus.register(this, "ShowExpertModal" /* ShowExpertModal */, () => {
+            this.$eventBus.register(this, "ShowExpertModal" /* EventId.ShowExpertModal */, () => {
                 this.expertModal.showModal();
             });
         }
@@ -19648,7 +19629,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
         }
         resizeLayout() {
             var _a, _b;
-            if (this.offsetWidth < 550) {
+            if (this.offsetWidth !== 0 && this.offsetWidth < 550) {
                 (_a = this.wrapperSwap) === null || _a === void 0 ? void 0 : _a.classList.add('swap-flex--col');
             }
             else {
@@ -19664,7 +19645,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
         }
         async init() {
             this.isReadyCallbackQueued = true;
-            this.currentChainId = index_18.getChainId();
+            this.currentChainId = (0, index_18.getChainId)();
             super.init();
             this.setSwapButtonText();
             this.openswapResult = new index_22.Result();
@@ -19678,7 +19659,6 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
             const networks = this.getAttribute('networks', true);
             const wallets = this.getAttribute('wallets', true);
             const showHeader = this.getAttribute('showHeader', true);
-            this.updateContractAddress();
             await this.setData({ category, providers, commissions, tokens, defaultChainId, networks, wallets, showHeader });
             this.isReadyCallbackQueued = false;
             this.executeReadyCallback();
@@ -19740,17 +19720,17 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                                 this.$render("i-panel", { id: "srcChainFirstPanel", class: "row-chain" },
                                     this.$render("i-image", { id: "srcChainTokenImage", width: "30px", height: "30px", url: "#" }),
                                     this.$render("i-label", { id: "srcChainTokenLabel", class: "token-name", caption: "" }),
-                                    this.$render("i-icon", { name: "minus", fill: Theme.text.primary, width: 28, height: 10 })),
+                                    this.$render("i-icon", { name: "minus", class: "custom-icon--fill", width: 28, height: 10 })),
                                 this.$render("i-panel", { class: "row-chain" },
                                     this.$render("i-image", { id: "fromTokenImage", width: "30px", height: "30px", url: "#" }),
                                     this.$render("i-label", { id: "fromTokenLabel", class: "token-name", caption: "" })),
                                 this.$render("i-label", { id: "fromTokenValue", class: "token-value", caption: " - " })),
-                            this.$render("i-icon", { name: "arrow-down", class: "arrow-down", fill: Theme.text.primary, width: 28, height: 28 }),
+                            this.$render("i-icon", { name: "arrow-down", class: "arrow-down custom-icon--fill", width: 28, height: 28 }),
                             this.$render("i-hstack", { class: "mb-1", verticalAlignment: 'center', horizontalAlignment: 'start' },
                                 this.$render("i-panel", { id: "targetChainFirstPanel", class: "row-chain" },
                                     this.$render("i-image", { id: "targetChainTokenImage", width: "30px", height: "30px", url: "#" }),
                                     this.$render("i-label", { id: "targetChainTokenLabel", class: "token-name", caption: "" }),
-                                    this.$render("i-icon", { name: "minus", fill: Theme.text.primary, width: 28, height: 10 })),
+                                    this.$render("i-icon", { name: "minus", class: "custom-icon--fill", width: 28, height: 10 })),
                                 this.$render("i-panel", { class: "row-chain" },
                                     this.$render("i-image", { id: "toTokenImage", width: "30px", height: "30px", url: "#" }),
                                     this.$render("i-label", { id: "toTokenLabel", class: "token-name", caption: "" })),
@@ -19782,7 +19762,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
     };
     ScomSwap = __decorate([
         components_16.customModule,
-        components_16.customElements('i-scom-swap')
+        (0, components_16.customElements)('i-scom-swap')
     ], ScomSwap);
     exports.default = ScomSwap;
 });

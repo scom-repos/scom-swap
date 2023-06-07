@@ -154,7 +154,7 @@ Styles.cssRule('.pageblock-swap', {
         },
         '.custom-ic--swap': {
           bottom: '0 !important',
-          transform: 'none !importnat'
+          transform: 'none !important'
         }
       }
     },
@@ -487,7 +487,7 @@ Styles.cssRule('.pageblock-swap', {
       borderColor: Theme.divider
     },
     '.best-price': {
-      // color: Theme.text.primary,
+      color: Theme.colors.primary.contrastText,
       position: 'absolute',
       top: '-10px',
       left: '30px',
@@ -720,12 +720,20 @@ Styles.cssRule('.pageblock-swap', {
           display: 'flex',
           alignItems: 'center',
         },
+        'i-icon.custom-icon--fill': {
+          fill: Theme.colors.primary.contrastText,
+          $nest: {
+            'svg': {
+              fill: Theme.colors.primary.contrastText
+            }
+          }
+        }
       }
     },
     '#openswapResult': {
       $nest: {
         '.modal': {
-          background: '#252a48',
+          background: Theme.background.modal,
           width: '440px',
           maxWidth: '100%',
           padding: '0.5rem',
@@ -745,40 +753,6 @@ Styles.cssRule('.pageblock-swap', {
           width: '50px',
           height: '48px'
         }
-      }
-    },
-    '#modalViewOrder': {
-      $nest: {
-        'i-label > *': {
-          fontSize: '.875rem',
-          wordBreak: 'normal'
-        },
-        '.i-modal_content': {
-          padding: '0 1rem 1rem',
-        },
-        '.flex-col': {
-          flexDirection: 'column',
-        },
-        'i-button': {
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          width: '150px',
-          height: '50px !important',
-          fontWeight: 600,
-          borderRadius: 5,
-          margin: '0.5rem',
-        },
-        '.btn-cancel': {
-          background: '#eaecef',
-          color: Theme.background.main,
-        },
-        '.btn-submit': {
-          textAlign: 'center',
-        },
-        '.btn-submit > *': {
-          color: `#fff !important`,
-        },
       }
     },
     '#modalFees': {

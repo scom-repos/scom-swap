@@ -1770,7 +1770,7 @@ export default class ScomSwap extends Module {
   }
 
   private resizeLayout() {
-    if (this.offsetWidth < 550) {
+    if (this.offsetWidth !== 0 && this.offsetWidth < 550) {
       this.wrapperSwap?.classList.add('swap-flex--col');
     } else {
       this.wrapperSwap?.classList.remove('swap-flex--col');
@@ -1801,8 +1801,6 @@ export default class ScomSwap extends Module {
     const networks = this.getAttribute('networks', true);
     const wallets = this.getAttribute('wallets', true);
     const showHeader = this.getAttribute('showHeader', true);
-
-    this.updateContractAddress();
     await this.setData({category, providers, commissions, tokens, defaultChainId, networks, wallets, showHeader});
     this.isReadyCallbackQueued = false;
     this.executeReadyCallback();
@@ -1866,7 +1864,7 @@ export default class ScomSwap extends Module {
                         </i-vstack>
                         <i-panel id="pnlReceive" class="bg-box" background={{ color: Theme.background.modal }} width="100%" margin={{ top: 'auto'}}>
                           <i-hstack class="input--token-box" verticalAlignment="center" horizontalAlignment="space-between" width="100%">
-                          <i-label id="lbBestPrice" visible={false} caption="Best Price" class="best-price" />
+                            <i-label id="lbBestPrice" visible={false} caption="Best Price" class="best-price" />
                             <i-vstack>
                               <i-scom-swap-token-selection disableSelect={true} id="secondTokenSelection"></i-scom-swap-token-selection>
                             </i-vstack>
@@ -1901,7 +1899,7 @@ export default class ScomSwap extends Module {
                 <i-panel id="srcChainFirstPanel" class="row-chain">
                   <i-image id="srcChainTokenImage" width="30px" height="30px" url="#" />
                   <i-label id="srcChainTokenLabel" class="token-name" caption="" />
-                  <i-icon name="minus" fill={Theme.text.primary} width={28} height={10} />
+                  <i-icon name="minus" class="custom-icon--fill" width={28} height={10} />
                 </i-panel>
                 <i-panel class="row-chain">
                   <i-image id="fromTokenImage" width="30px" height="30px" url="#" />
@@ -1909,12 +1907,12 @@ export default class ScomSwap extends Module {
                 </i-panel>
                 <i-label id="fromTokenValue" class="token-value" caption=" - "></i-label>
               </i-hstack>
-              <i-icon name="arrow-down" class="arrow-down" fill={Theme.text.primary} width={28} height={28} />
+              <i-icon name="arrow-down" class="arrow-down custom-icon--fill" width={28} height={28} />
               <i-hstack class="mb-1" verticalAlignment='center' horizontalAlignment='start'>
                 <i-panel id="targetChainFirstPanel" class="row-chain">
                   <i-image id="targetChainTokenImage" width="30px" height="30px" url="#" />
                   <i-label id="targetChainTokenLabel" class="token-name" caption="" />
-                  <i-icon name="minus" fill={Theme.text.primary} width={28} height={10} />
+                  <i-icon name="minus" class="custom-icon--fill" width={28} height={10} />
                 </i-panel>
                 <i-panel class="row-chain">
                   <i-image id="toTokenImage" width="30px" height="30px" url="#" />
