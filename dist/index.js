@@ -19636,12 +19636,13 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
             this.networkErrModal.visible = false;
         }
         resizeLayout() {
-            var _a, _b;
-            if (this.offsetWidth !== 0 && this.offsetWidth < 550) {
-                (_a = this.wrapperSwap) === null || _a === void 0 ? void 0 : _a.classList.add('swap-flex--col');
+            var _a, _b, _c;
+            const tagWidth = Number((_a = this.tag) === null || _a === void 0 ? void 0 : _a.width);
+            if ((this.offsetWidth !== 0 && this.offsetWidth < 550) || window.innerWidth < 550 || (!isNaN(tagWidth) && tagWidth !== 0 && tagWidth < 550)) {
+                (_b = this.wrapperSwap) === null || _b === void 0 ? void 0 : _b.classList.add('swap-flex--col');
             }
             else {
-                (_b = this.wrapperSwap) === null || _b === void 0 ? void 0 : _b.classList.remove('swap-flex--col');
+                (_c = this.wrapperSwap) === null || _c === void 0 ? void 0 : _c.classList.remove('swap-flex--col');
             }
         }
         async initData() {

@@ -1771,7 +1771,8 @@ export default class ScomSwap extends Module {
   }
 
   private resizeLayout() {
-    if (this.offsetWidth !== 0 && this.offsetWidth < 550) {
+    const tagWidth = Number(this.tag?.width);
+    if ((this.offsetWidth !== 0 && this.offsetWidth < 550) || (window as any).innerWidth < 550 || (!isNaN(tagWidth) && tagWidth !== 0 && tagWidth < 550)) {
       this.wrapperSwap?.classList.add('swap-flex--col');
     } else {
       this.wrapperSwap?.classList.remove('swap-flex--col');
