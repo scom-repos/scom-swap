@@ -59,6 +59,7 @@ import getDexList from '@scom/scom-dex-list';
 
 
 const Theme = Styles.Theme.ThemeVars;
+const currentTheme = Styles.Theme.currentTheme;
 const priceImpactTooHighMsg = 'Price Impact Too High. If you want to bypass this check, please turn on Expert Mode';
 const defaultInput = '1';
 type StatusMapType = 'approve' | 'swap';
@@ -1791,6 +1792,16 @@ export default class ScomSwap extends Module {
     this.isReadyCallbackQueued = true;
     this.currentChainId = getChainId();
     super.init();
+    const defaultColors = {
+      fontColor: currentTheme.text.primary,
+      backgroundColor: currentTheme.background.main,
+      inputFontColor: currentTheme.input.fontColor,
+      inputBackgroundColor: currentTheme.input.background
+    }
+    this.setTag({
+      light: {...defaultColors},
+      dark: {...defaultColors}
+    })
     this.setSwapButtonText();
     this.openswapResult = new Result();
     this.swapComponent.appendChild(this.openswapResult);
