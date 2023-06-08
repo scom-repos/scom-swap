@@ -184,8 +184,8 @@ export class TokenSelection extends Module {
     this.renderTokenItems();
   }
 
-  private async updateDataByChain() {
-    this.tokenBalancesMap = await tokenStore.updateAllTokenBalances();
+  private async updateDataByChain(onPaid?: boolean) {
+    this.tokenBalancesMap = onPaid ? tokenStore.tokenBalances : await tokenStore.updateAllTokenBalances();
     this.renderTokenItems();
     this.updateButton();
   }
@@ -212,8 +212,8 @@ export class TokenSelection extends Module {
     await this.initData();
   }
 
-  private async onPaid() {
-    await this.updateDataByChain();
+  private async onPaid(data?: any) {
+    await this.updateDataByChain(data === 'onPaid');
     await this.initData();
   }
 
@@ -289,10 +289,10 @@ export class TokenSelection extends Module {
     if (a.balance != b.balance) {
       return asc ? (a.balance - b.balance) : (b.balance - a.balance);
     }
-    if (a.symbol.toLowerCase() < b.symbol.toLowerCase()) {
+    if (a.symbol?.toLowerCase() < b.symbol?.toLowerCase()) {
       return -1;
     }
-    if (a.symbol.toLowerCase() > b.symbol.toLowerCase()) {
+    if (a.symbol?.toLowerCase() > b.symbol?.toLowerCase()) {
       return 1;
     }
     return 0;

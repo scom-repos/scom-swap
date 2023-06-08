@@ -10929,6 +10929,7 @@ declare module "@scom/scom-swap" {
         get showHeader(): boolean;
         set showHeader(value: boolean);
         set width(value: string | number);
+        private get hasData();
         private getActions;
         private _getActions;
         getConfigurators(): ({

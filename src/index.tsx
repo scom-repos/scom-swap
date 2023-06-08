@@ -235,6 +235,11 @@ export default class ScomSwap extends Module {
     this.resizeLayout();
   }
 
+  private get hasData() {
+    const { providers, defaultChainId, networks, wallets } = this._data;
+    return !!(providers?.length || networks?.length || wallets?.length || !isNaN(Number(defaultChainId)));
+  }
+
   private getActions() {
     const propertiesSchema: any = {
       type: "object",
@@ -881,9 +886,6 @@ export default class ScomSwap extends Module {
     if (this.dappContainer?.setData) this.dappContainer.setData(data)
     this.currentChainId = _chainId ? _chainId : getChainId();
     tokenStore.updateTokenMapData();
-    if (connected) {
-      await tokenStore.updateAllTokenBalances();
-    }
     this.closeNetworkErrModal();
     if (this.isFixedPair) {
       this.setFixedPairData();
@@ -917,7 +919,6 @@ export default class ScomSwap extends Module {
     this.firstTokenSelection.tokenDataListProp = getSupportedTokens(this._data.tokens || [], this.currentChainId);
     this.setTargetTokenList();
 
-    //if (connected) {
     if (!this.record)
       this.swapBtn.enabled = false;
     this.onRenderPriceInfo();
@@ -968,9 +969,9 @@ export default class ScomSwap extends Module {
         this.onSwapConfirming(data.key);
       },
       onPaid: async (data?: any) => {
-        application.EventBus.dispatch(EventId.Paid);
         this.onSwapConfirmed({ key: data.key });
         await this.updateBalance();
+        application.EventBus.dispatch(EventId.Paid, 'onPaid');
       },
       onPayingError: async (err: Error) => {
         this.showResultMessage(this.openswapResult, 'error', err);
@@ -1465,7 +1466,7 @@ export default class ScomSwap extends Module {
     return 0;
   }
   private async updateBalance() {
-    if (isWalletConnected()) await tokenStore.updateAllTokenBalances();
+    if (isWalletConnected() && this.hasData) await tokenStore.updateAllTokenBalances();
     this.allTokenBalancesMap = isWalletConnected() ? tokenStore.tokenBalances : [];
     if (this.fromToken) {
       const balance = this.getBalance(this.fromToken);
@@ -1678,9 +1679,9 @@ export default class ScomSwap extends Module {
 
   private setTargetTokenList = (isDisabled?: boolean) => {
     const srcChainId = this.srcChain?.chainId || this.currentChainId;
-    if (this.secondTokenSelection.targetChainId != srcChainId) {
-      this.secondTokenSelection.targetChainId = srcChainId;
-    }
+    // if (this.secondTokenSelection.targetChainId != srcChainId) { //Cross chain
+    //   this.secondTokenSelection.targetChainId = srcChainId;
+    // }
     this.secondTokenSelection.tokenDataListProp = getSupportedTokens(this._data.tokens || [], srcChainId);
   }
 
@@ -1770,7 +1771,8 @@ export default class ScomSwap extends Module {
   }
 
   private resizeLayout() {
-    if (this.offsetWidth !== 0 && this.offsetWidth < 550) {
+    const tagWidth = Number(this.tag?.width);
+    if ((this.offsetWidth !== 0 && this.offsetWidth < 550) || (window as any).innerWidth < 550 || (!isNaN(tagWidth) && tagWidth !== 0 && tagWidth < 550)) {
       this.wrapperSwap?.classList.add('swap-flex--col');
     } else {
       this.wrapperSwap?.classList.remove('swap-flex--col');
@@ -1889,7 +1891,7 @@ export default class ScomSwap extends Module {
                   maxWidth={360}
                   height={60}
                   visible={false}
-                  rightIcon={{ spin: true, visible: false }}
+                  rightIcon={{ spin: true, visible: false, fill: Theme.colors.primary.contrastText }}
                   onClick={this.onClickSwapButton.bind(this)}
                 ></i-button>
               </i-vstack>
