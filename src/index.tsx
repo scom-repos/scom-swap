@@ -1791,24 +1791,24 @@ export default class ScomSwap extends Module {
 
   async init() {
     this.isReadyCallbackQueued = true;
-    this.currentChainId = getChainId();
     super.init();
-    const defaultColors = {
-      fontColor: currentTheme.text.primary,
-      backgroundColor: currentTheme.background.main,
-      inputFontColor: currentTheme.input.fontColor,
-      inputBackgroundColor: currentTheme.input.background
-    }
-    this.setTag({
-      light: {...defaultColors},
-      dark: {...defaultColors}
-    })
     this.setSwapButtonText();
     this.openswapResult = new Result();
     this.swapComponent.appendChild(this.openswapResult);
     this.initExpertModal();
-    const lazyLoad = this.getAttribute('lazyLoad', true, true);
+    const lazyLoad = this.getAttribute('lazyLoad', true, false);
     if (!lazyLoad) {
+      this.currentChainId = getChainId();
+      const defaultColors = {
+        fontColor: currentTheme.text.primary,
+        backgroundColor: currentTheme.background.main,
+        inputFontColor: currentTheme.input.fontColor,
+        inputBackgroundColor: currentTheme.input.background
+      }
+      this.setTag({
+        light: {...defaultColors},
+        dark: {...defaultColors}
+      })
       const category = this.getAttribute('category', true, "fixed-pair");
       const providers = this.getAttribute('providers', true, []);
       const commissions = this.getAttribute('commissions', true, []);
