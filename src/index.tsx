@@ -65,6 +65,7 @@ const defaultInput = '1';
 type StatusMapType = 'approve' | 'swap';
 
 interface ScomSwapElement extends ControlElement {
+  lazyLoad?: boolean;
   category: Category;
   providers: IProviderUI[];
   tokens?: ITokenObject[];
@@ -1806,15 +1807,18 @@ export default class ScomSwap extends Module {
     this.openswapResult = new Result();
     this.swapComponent.appendChild(this.openswapResult);
     this.initExpertModal();
-    const category = this.getAttribute('category', true, "fixed-pair");
-    const providers = this.getAttribute('providers', true, []);
-    const commissions = this.getAttribute('commissions', true, []);
-    const tokens = this.getAttribute('tokens', true, []);
-    const defaultChainId = this.getAttribute('defaultChainId', true);
-    const networks = this.getAttribute('networks', true);
-    const wallets = this.getAttribute('wallets', true);
-    const showHeader = this.getAttribute('showHeader', true);
-    await this.setData({category, providers, commissions, tokens, defaultChainId, networks, wallets, showHeader});
+    const lazyLoad = this.getAttribute('lazyLoad', true, true);
+    if (!lazyLoad) {
+      const category = this.getAttribute('category', true, "fixed-pair");
+      const providers = this.getAttribute('providers', true, []);
+      const commissions = this.getAttribute('commissions', true, []);
+      const tokens = this.getAttribute('tokens', true, []);
+      const defaultChainId = this.getAttribute('defaultChainId', true);
+      const networks = this.getAttribute('networks', true);
+      const wallets = this.getAttribute('wallets', true);
+      const showHeader = this.getAttribute('showHeader', true);
+      await this.setData({category, providers, commissions, tokens, defaultChainId, networks, wallets, showHeader});
+    }
     this.isReadyCallbackQueued = false;
     this.executeReadyCallback();
     window.addEventListener('resize', () => {

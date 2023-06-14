@@ -10824,6 +10824,7 @@ declare module "@scom/scom-swap" {
     import Config from "@scom/scom-swap/config/index.tsx";
     import { IWalletPlugin } from '@scom/scom-wallet-modal';
     interface ScomSwapElement extends ControlElement {
+        lazyLoad?: boolean;
         category: Category;
         providers: IProviderUI[];
         tokens?: ITokenObject[];
