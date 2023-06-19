@@ -13831,7 +13831,7 @@ define("@scom/scom-swap/index.css.ts", ["require", "exports", "@ijstech/componen
                         height: 'auto !important'
                     },
                     'i-button.custom-btn': {
-                        background: Theme.background.modal,
+                        // background: '#ffffff30',
                         padding: '0.5rem',
                         borderRadius: '8px',
                         fontSize: '1rem',
@@ -13840,10 +13840,11 @@ define("@scom/scom-swap/index.css.ts", ["require", "exports", "@ijstech/componen
                         alignSelf: 'center',
                         textAlign: 'center',
                         opacity: 1,
-                        color: Theme.text.primary,
+                        color: Theme.input.fontColor,
                         $nest: {
                             '&:not(.disabled):hover': {
-                                background: Theme.background.modal
+                                color: Theme.input.fontColor,
+                                // background: '#ffffff35'
                             },
                             '&> span': {
                                 verticalAlign: 'middle',
@@ -13853,7 +13854,12 @@ define("@scom/scom-swap/index.css.ts", ["require", "exports", "@ijstech/componen
                                 height: '16px !important',
                                 opacity: 0.5,
                                 marginRight: 'unset',
-                                fill: Theme.text.primary
+                                fill: Theme.input.fontColor,
+                                $nest: {
+                                    'svg': {
+                                        fill: `${Theme.input.fontColor} !important`
+                                    }
+                                }
                             },
                             '&> :not(:last-child)': {
                                 marginRight: '0.5rem'
@@ -13881,7 +13887,7 @@ define("@scom/scom-swap/index.css.ts", ["require", "exports", "@ijstech/componen
                         borderRadius: '0.25rem',
                         border: 'none',
                         background: 'transparent',
-                        color: Theme.text.primary,
+                        color: Theme.input.fontColor,
                         fontSize: '1.125rem',
                         textAlign: 'right'
                     }
@@ -13906,7 +13912,7 @@ define("@scom/scom-swap/index.css.ts", ["require", "exports", "@ijstech/componen
             '.rounded-icon': {
                 display: 'inline-flex',
                 padding: '3px',
-                background: '#252a48',
+                background: Theme.input.background,
                 border: '2px solid transparent',
                 borderRadius: '50%',
                 cursor: 'pointer'
@@ -14218,7 +14224,7 @@ define("@scom/scom-swap/index.css.ts", ["require", "exports", "@ijstech/componen
                             '& ~ i-icon': {
                                 display: 'inline-block',
                                 margin: '0.75rem 0',
-                                background: '#252a48',
+                                background: Theme.input.background,
                                 border: '2px solid transparent',
                                 borderRadius: '50%',
                                 padding: '0.25rem'
@@ -14279,7 +14285,7 @@ define("@scom/scom-swap/index.css.ts", ["require", "exports", "@ijstech/componen
                     '.arrow-down': {
                         display: 'inline-block',
                         margin: '0.75rem 0',
-                        background: '#252a48',
+                        background: Theme.input.background,
                         border: '2px solid transparent',
                         borderRadius: '50%',
                         padding: '0.25rem'
@@ -14298,10 +14304,10 @@ define("@scom/scom-swap/index.css.ts", ["require", "exports", "@ijstech/componen
                         alignItems: 'center',
                     },
                     'i-icon.custom-icon--fill': {
-                        fill: Theme.colors.primary.contrastText,
+                        fill: Theme.input.fontColor,
                         $nest: {
                             'svg': {
-                                fill: Theme.colors.primary.contrastText
+                                fill: `${Theme.input.fontColor} !important`
                             }
                         }
                     }
@@ -16279,6 +16285,7 @@ define("@scom/scom-swap/swap-utils/index.ts", ["require", "exports", "@ijstech/e
 define("@scom/scom-swap/price-info/priceInfo.css.ts", ["require", "exports", "@ijstech/components"], function (require, exports, components_5) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
+    const Theme = components_5.Styles.Theme.ThemeVars;
     components_5.Styles.cssRule('.price-info', {
         display: 'flex',
         flexDirection: 'column',
@@ -16290,7 +16297,13 @@ define("@scom/scom-swap/price-info/priceInfo.css.ts", ["require", "exports", "@i
                         opacity: 0.75
                     },
                     'i-icon.icon-tooltip': {
-                        opacity: 0.75
+                        opacity: 0.75,
+                        fill: Theme.text.primary,
+                        $nest: {
+                            'svg': {
+                                fill: `${Theme.text.primary} !important`
+                            }
+                        }
                     }
                 }
             },
@@ -16301,7 +16314,7 @@ define("@scom/scom-swap/price-info/priceInfo.css.ts", ["require", "exports", "@i
         }
     });
 });
-define("@scom/scom-swap/price-info/index.tsx", ["require", "exports", "@ijstech/components", "@scom/scom-swap/assets.ts", "@scom/scom-swap/price-info/priceInfo.css.ts"], function (require, exports, components_6, assets_2) {
+define("@scom/scom-swap/price-info/index.tsx", ["require", "exports", "@ijstech/components", "@scom/scom-swap/price-info/priceInfo.css.ts"], function (require, exports, components_6) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.PriceInfo = void 0;
@@ -16341,10 +16354,10 @@ define("@scom/scom-swap/price-info/index.tsx", ["require", "exports", "@ijstech/
                 }
             };
             this.onRenderToggleBtn = (parent) => {
-                const image = new components_6.Image(parent, {
+                const image = new components_6.Icon(parent, {
                     width: 18,
                     height: 18,
-                    url: assets_2.default.fullPath("img/swap/icon-swap.png")
+                    name: 'arrows-alt-v'
                 });
                 image.classList.add("rounded-icon");
                 image.style.marginLeft = "5px";
@@ -16362,7 +16375,6 @@ define("@scom/scom-swap/price-info/index.tsx", ["require", "exports", "@ijstech/
                 iconTooltip.name = 'question-circle';
                 iconTooltip.width = 15;
                 iconTooltip.height = 15;
-                iconTooltip.fill = '#fff';
                 if (item.onClick) {
                     iconTooltip.classList.add('pointer');
                     iconTooltip.tooltip.content = 'Click to view details';
@@ -16826,7 +16838,7 @@ define("@scom/scom-swap/token-selection/importToken.tsx", ["require", "exports",
     ], ImportToken);
     exports.ImportToken = ImportToken;
 });
-define("@scom/scom-swap/token-selection/tokenSelection.tsx", ["require", "exports", "@ijstech/components", "@scom/scom-token-list", "@scom/scom-swap/store/index.ts", "@scom/scom-token-list", "@scom/scom-swap/global/index.ts", "@scom/scom-swap/contracts/oswap-openswap-contract/index.ts", "@scom/scom-swap/assets.ts", "@ijstech/eth-wallet", "@scom/scom-swap/token-selection/tokenSelection.css.ts"], function (require, exports, components_9, scom_token_list_5, index_10, scom_token_list_6, index_11, index_12, assets_3, eth_wallet_7) {
+define("@scom/scom-swap/token-selection/tokenSelection.tsx", ["require", "exports", "@ijstech/components", "@scom/scom-token-list", "@scom/scom-swap/store/index.ts", "@scom/scom-token-list", "@scom/scom-swap/global/index.ts", "@scom/scom-swap/contracts/oswap-openswap-contract/index.ts", "@scom/scom-swap/assets.ts", "@ijstech/eth-wallet", "@scom/scom-swap/token-selection/tokenSelection.css.ts"], function (require, exports, components_9, scom_token_list_5, index_10, scom_token_list_6, index_11, index_12, assets_2, eth_wallet_7) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.TokenSelection = void 0;
@@ -17073,7 +17085,7 @@ define("@scom/scom-swap/token-selection/tokenSelection.tsx", ["require", "export
                                         this.$render("i-icon", { name: "copy", width: "14px", height: "14px", fill: Theme.text.primary, margin: { right: 8 }, tooltip: { content: `${token.symbol} has been copied`, trigger: 'click' }, onClick: () => components_9.application.copyToClipboard(token.address || ''), class: "inline-flex pointer" })
                                         : [],
                                     token.address && this.checkHasMetaMask ?
-                                        this.$render("i-image", { width: 16, height: 16, url: assets_3.default.fullPath('img/swap/metamask.png'), tooltip: { content: 'Add to MetaMask' }, onClick: (target, event) => this.addToMetamask(event, token) })
+                                        this.$render("i-image", { width: 16, height: 16, url: assets_2.default.fullPath('img/swap/metamask.png'), tooltip: { content: 'Add to MetaMask' }, onClick: (target, event) => this.addToMetamask(event, token) })
                                         : []))),
                         this.$render("i-label", { class: "ml-auto", caption: (0, index_11.formatNumber)(token.balance, 4), onClick: () => this.onSelect(token) })),
                     token.isNew ? (this.$render("i-hstack", { horizontalAlignment: "center" },
@@ -17364,7 +17376,7 @@ define("@scom/scom-swap/result/result.css.ts", ["require", "exports", "@ijstech/
         }
     });
 });
-define("@scom/scom-swap/result/result.tsx", ["require", "exports", "@ijstech/components", "@ijstech/eth-wallet", "@scom/scom-swap/global/index.ts", "@scom/scom-swap/store/index.ts", "@scom/scom-swap/result/result.css.ts", "@scom/scom-swap/assets.ts"], function (require, exports, components_11, eth_wallet_8, index_13, index_14, result_css_1, assets_4) {
+define("@scom/scom-swap/result/result.tsx", ["require", "exports", "@ijstech/components", "@ijstech/eth-wallet", "@scom/scom-swap/global/index.ts", "@scom/scom-swap/store/index.ts", "@scom/scom-swap/result/result.css.ts", "@scom/scom-swap/assets.ts"], function (require, exports, components_11, eth_wallet_8, index_13, index_14, result_css_1, assets_3) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.Result = void 0;
@@ -17428,7 +17440,7 @@ define("@scom/scom-swap/result/result.tsx", ["require", "exports", "@ijstech/com
                 const loading = (this.$render("i-panel", { height: 100 },
                     this.$render("i-vstack", { id: "loadingElm", class: "i-loading-overlay", height: "100%", background: { color: "transparent" } },
                         this.$render("i-vstack", { class: "i-loading-spinner", horizontalAlignment: "center", verticalAlignment: "center" },
-                            this.$render("i-icon", { class: "i-loading-spinner_icon", image: { url: assets_4.default.fullPath('img/loading.svg'), width: 24, height: 24 } }),
+                            this.$render("i-icon", { class: "i-loading-spinner_icon", image: { url: assets_3.default.fullPath('img/loading.svg'), width: 24, height: 24 } }),
                             this.$render("i-label", { caption: "Loading...", font: { color: '#FD4A4C' }, class: "i-loading-spinner_text" })))));
                 mainSection.appendChild(loading);
                 const section = new components_11.VStack();
@@ -17453,7 +17465,7 @@ define("@scom/scom-swap/result/result.tsx", ["require", "exports", "@ijstech/com
                 const explorerName = (0, index_14.getNetworkExplorerName)(chainId);
                 const image = await components_11.Image.create({
                     width: '50px',
-                    url: assets_4.default.fullPath('img/success-icon.svg')
+                    url: assets_3.default.fullPath('img/success-icon.svg')
                 });
                 image.classList.add("inline-block", "mb");
                 mainSection.appendChild(image);
@@ -17500,7 +17512,7 @@ define("@scom/scom-swap/result/result.tsx", ["require", "exports", "@ijstech/com
             else {
                 const image = await components_11.Image.create({
                     width: '50px',
-                    url: assets_4.default.fullPath('img/oswap_error.png')
+                    url: assets_3.default.fullPath('img/oswap_error.png')
                 });
                 image.classList.add("inline-block", "mb");
                 mainSection.appendChild(image);
@@ -18030,7 +18042,7 @@ define("@scom/scom-swap/data.json.ts", ["require", "exports"], function (require
         }
     };
 });
-define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstech/eth-wallet", "@scom/scom-swap/assets.ts", "@scom/scom-swap/store/index.ts", "@scom/scom-token-list", "@scom/scom-swap/swap-utils/index.ts", "@scom/scom-swap/global/index.ts", "@scom/scom-swap/price-info/index.tsx", "@scom/scom-swap/result/index.tsx", "@scom/scom-swap/expert-mode-settings/index.tsx", "@scom/scom-swap/config/index.tsx", "@scom/scom-swap/data.json.ts", "@scom/scom-dex-list", "@scom/scom-swap/index.css.ts"], function (require, exports, components_16, eth_wallet_10, assets_5, index_18, scom_token_list_7, index_19, index_20, index_21, index_22, index_23, index_24, data_json_1, scom_dex_list_2) {
+define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstech/eth-wallet", "@scom/scom-swap/store/index.ts", "@scom/scom-token-list", "@scom/scom-swap/swap-utils/index.ts", "@scom/scom-swap/global/index.ts", "@scom/scom-swap/price-info/index.tsx", "@scom/scom-swap/result/index.tsx", "@scom/scom-swap/expert-mode-settings/index.tsx", "@scom/scom-swap/config/index.tsx", "@scom/scom-swap/data.json.ts", "@scom/scom-dex-list", "@scom/scom-swap/index.css.ts"], function (require, exports, components_16, eth_wallet_10, index_18, scom_token_list_7, index_19, index_20, index_21, index_22, index_23, index_24, data_json_1, scom_dex_list_2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     const Theme = components_16.Styles.Theme.ThemeVars;
@@ -19707,7 +19719,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                                                     this.$render("i-hstack", { gap: 5, horizontalAlignment: "space-between", verticalAlignment: "center", width: "100%" },
                                                         this.$render("i-label", { id: "payBalance", class: "text--grey ml-auto", caption: "Balance: 0" }),
                                                         this.$render("i-button", { id: "maxButton", class: "btn-max", caption: "Max", enabled: false, onClick: () => this.onSetMaxBalance() }))),
-                                                this.$render("i-panel", { class: "bg-box", background: { color: Theme.background.modal }, width: "100%", margin: { top: 'auto' } },
+                                                this.$render("i-panel", { class: "bg-box", background: { color: Theme.input.background }, width: "100%", margin: { top: 'auto' } },
                                                     this.$render("i-hstack", { class: "input--token-box", verticalAlignment: "center", horizontalAlignment: "space-between", width: "100%" },
                                                         this.$render("i-vstack", null,
                                                             this.$render("i-scom-swap-token-selection", { disableSelect: true, id: "firstTokenSelection" })),
@@ -19717,7 +19729,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                                             this.$render("i-label", { id: "lbYouPayTitle", caption: "You Pay", font: { size: '1rem' } }),
                                             this.$render("i-label", { id: "lbYouPayValue", caption: "0", font: { size: '1rem' } }))),
                                     this.$render("i-panel", { class: "toggle-reverse" },
-                                        this.$render("i-image", { id: "toggleReverseImage", width: 32, height: 32, class: "icon-swap rounded-icon custom-ic--swap", url: assets_5.default.fullPath("img/swap/icon-swap.png"), onClick: this.onRevertSwap.bind(this) })),
+                                        this.$render("i-icon", { id: "toggleReverseImage", position: "relative", width: 32, height: 32, class: "icon-swap rounded-icon custom-ic--swap", name: "arrows-alt-v", onClick: this.onRevertSwap.bind(this) })),
                                     this.$render("i-vstack", { gap: 5, minWidth: 230, width: "calc(100% - 25px)" },
                                         this.$render("i-panel", { class: "token-box", height: "100%" },
                                             this.$render("i-vstack", { class: "input--token-container", height: "100%", gap: 8 },
@@ -19726,7 +19738,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                                                         this.$render("i-label", { caption: "You Receive", font: { size: '1.125rem' } })),
                                                     this.$render("i-vstack", { class: "text-right", width: "100%" },
                                                         this.$render("i-label", { id: "receiveBalance", class: "text--grey ml-auto", caption: "Balance: 0" }))),
-                                                this.$render("i-panel", { id: "pnlReceive", class: "bg-box", background: { color: Theme.background.modal }, width: "100%", margin: { top: 'auto' } },
+                                                this.$render("i-panel", { id: "pnlReceive", class: "bg-box", background: { color: Theme.input.background }, width: "100%", margin: { top: 'auto' } },
                                                     this.$render("i-hstack", { class: "input--token-box", verticalAlignment: "center", horizontalAlignment: "space-between", width: "100%" },
                                                         this.$render("i-label", { id: "lbBestPrice", visible: false, caption: "Best Price", class: "best-price" }),
                                                         this.$render("i-vstack", null,

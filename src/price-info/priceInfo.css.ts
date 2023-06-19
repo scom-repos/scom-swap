@@ -1,4 +1,5 @@
 import { Styles } from '@ijstech/components';
+const Theme = Styles.Theme.ThemeVars;
 
 Styles.cssRule('.price-info', {
   display: 'flex',
@@ -11,7 +12,13 @@ Styles.cssRule('.price-info', {
           opacity: 0.75
         },
         'i-icon.icon-tooltip': {
-          opacity: 0.75
+          opacity: 0.75,
+          fill: Theme.text.primary,
+          $nest: {
+            'svg': {
+              fill: `${Theme.text.primary} !important`
+            }
+          }
         }
       }
     },

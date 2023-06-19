@@ -255,7 +255,7 @@ Styles.cssRule('.pageblock-swap', {
           height: 'auto !important'
         },
         'i-button.custom-btn': {
-          background: Theme.background.modal,
+          // background: '#ffffff30',
           padding: '0.5rem',
           borderRadius: '8px',
           fontSize: '1rem',
@@ -264,10 +264,11 @@ Styles.cssRule('.pageblock-swap', {
           alignSelf: 'center',
           textAlign: 'center',
           opacity: 1,
-          color: Theme.text.primary,
+          color: Theme.input.fontColor,
           $nest: {
             '&:not(.disabled):hover': {
-              background: Theme.background.modal
+              color: Theme.input.fontColor,
+              // background: '#ffffff35'
             },
             '&> span': {
               verticalAlign: 'middle',
@@ -277,7 +278,12 @@ Styles.cssRule('.pageblock-swap', {
               height: '16px !important',
               opacity: 0.5,
               marginRight: 'unset',
-              fill: Theme.text.primary
+              fill: Theme.input.fontColor,
+              $nest: {
+                'svg': {
+                  fill: `${Theme.input.fontColor} !important`
+                }
+              }
             },
             '&> :not(:last-child)': {
               marginRight: '0.5rem'
@@ -305,7 +311,7 @@ Styles.cssRule('.pageblock-swap', {
           borderRadius: '0.25rem',
           border: 'none',
           background: 'transparent',
-          color: Theme.text.primary,
+          color: Theme.input.fontColor,
           fontSize: '1.125rem',
           textAlign: 'right'
         }
@@ -330,7 +336,7 @@ Styles.cssRule('.pageblock-swap', {
     '.rounded-icon': {
       display: 'inline-flex',
       padding: '3px',
-      background: '#252a48',
+      background: Theme.input.background,
       border: '2px solid transparent',
       borderRadius: '50%',
       cursor: 'pointer'
@@ -642,7 +648,7 @@ Styles.cssRule('.pageblock-swap', {
             '& ~ i-icon': {
               display: 'inline-block',
               margin: '0.75rem 0',
-              background: '#252a48',
+              background: Theme.input.background,
               border: '2px solid transparent',
               borderRadius: '50%',
               padding: '0.25rem'
@@ -703,7 +709,7 @@ Styles.cssRule('.pageblock-swap', {
         '.arrow-down': {
           display: 'inline-block',
           margin: '0.75rem 0',
-          background: '#252a48',
+          background: Theme.input.background,
           border: '2px solid transparent',
           borderRadius: '50%',
           padding: '0.25rem'
@@ -722,10 +728,10 @@ Styles.cssRule('.pageblock-swap', {
           alignItems: 'center',
         },
         'i-icon.custom-icon--fill': {
-          fill: Theme.colors.primary.contrastText,
+          fill: Theme.input.fontColor,
           $nest: {
             'svg': {
-              fill: Theme.colors.primary.contrastText
+              fill: `${Theme.input.fontColor} !important`
             }
           }
         }

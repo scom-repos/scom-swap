@@ -68,10 +68,10 @@ export class PriceInfo extends Module {
   }
 
   onRenderToggleBtn = (parent: Control) => {
-    const image = new Image(parent, {
+    const image = new Icon(parent, {
       width: 18,
       height: 18,
-      url: Assets.fullPath("img/swap/icon-swap.png")
+      name: 'arrows-alt-v'
     });
     image.classList.add("rounded-icon");
     image.style.marginLeft = "5px";
@@ -90,7 +90,6 @@ export class PriceInfo extends Module {
     iconTooltip.name = 'question-circle';
     iconTooltip.width = 15;
     iconTooltip.height = 15;
-    iconTooltip.fill = '#fff';
     if (item.onClick) {
       iconTooltip.classList.add('pointer');
       iconTooltip.tooltip.content = 'Click to view details';

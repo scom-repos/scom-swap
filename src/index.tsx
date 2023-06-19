@@ -1,4 +1,4 @@
-import { Module, Panel, Button, Label, VStack, Image, Container, IEventBus, application, customModule, Modal, Input, Control, customElements, ControlElement, IDataSchema, Styles, HStack } from '@ijstech/components';
+import { Module, Panel, Button, Label, VStack, Image, Container, IEventBus, application, customModule, Modal, Input, Control, customElements, ControlElement, IDataSchema, Styles, HStack, Icon } from '@ijstech/components';
 import { BigNumber } from '@ijstech/eth-wallet';
 import Assets from './assets';
 import './index.css';
@@ -158,7 +158,7 @@ export default class ScomSwap extends Module {
   private approvalModelAction: IERC20ApprovalAction;
 
   // Cross Chain
-  private toggleReverseImage: Image;
+  private toggleReverseImage: Icon;
   private oldSupportedChainList: IExtendedNetwork[] = [];
   private supportedChainList: IExtendedNetwork[] = [];
   private srcChain: IExtendedNetwork | undefined;
@@ -1848,7 +1848,7 @@ export default class ScomSwap extends Module {
                             <i-button id="maxButton" class="btn-max" caption="Max" enabled={false} onClick={() => this.onSetMaxBalance()}></i-button>
                           </i-hstack>
                         </i-vstack>
-                        <i-panel class="bg-box" background={{ color: Theme.background.modal }} width="100%" margin={{ top: 'auto'}}>
+                        <i-panel class="bg-box" background={{ color: Theme.input.background }} width="100%" margin={{ top: 'auto'}}>
                           <i-hstack class="input--token-box" verticalAlignment="center" horizontalAlignment="space-between" width="100%">
                             <i-vstack>
                               <i-scom-swap-token-selection disableSelect={true} id="firstTokenSelection"></i-scom-swap-token-selection>
@@ -1866,7 +1866,7 @@ export default class ScomSwap extends Module {
                     </i-hstack>
                   </i-vstack>
                   <i-panel class="toggle-reverse">
-                    <i-image id="toggleReverseImage" width={32} height={32} class="icon-swap rounded-icon custom-ic--swap" url={Assets.fullPath("img/swap/icon-swap.png")} onClick={this.onRevertSwap.bind(this)} />
+                    <i-icon id="toggleReverseImage" position="relative" width={32} height={32} class="icon-swap rounded-icon custom-ic--swap" name="arrows-alt-v" onClick={this.onRevertSwap.bind(this)} />
                   </i-panel>
                   <i-vstack gap={5} minWidth={230} width="calc(100% - 25px)">
                     <i-panel class="token-box" height="100%">
@@ -1879,7 +1879,7 @@ export default class ScomSwap extends Module {
                             <i-label id="receiveBalance" class="text--grey ml-auto" caption="Balance: 0"></i-label>
                           </i-vstack>
                         </i-vstack>
-                        <i-panel id="pnlReceive" class="bg-box" background={{ color: Theme.background.modal }} width="100%" margin={{ top: 'auto'}}>
+                        <i-panel id="pnlReceive" class="bg-box" background={{ color: Theme.input.background }} width="100%" margin={{ top: 'auto'}}>
                           <i-hstack class="input--token-box" verticalAlignment="center" horizontalAlignment="space-between" width="100%">
                             <i-label id="lbBestPrice" visible={false} caption="Best Price" class="best-price" />
                             <i-vstack>

@@ -10475,7 +10475,7 @@ declare module "@scom/scom-swap/swap-utils/index.ts" {
 declare module "@scom/scom-swap/price-info/priceInfo.css.ts" { }
 /// <amd-module name="@scom/scom-swap/price-info/index.tsx" />
 declare module "@scom/scom-swap/price-info/index.tsx" {
-    import { Module, Control, ControlElement, Image, Icon, Container } from '@ijstech/components';
+    import { Module, Control, ControlElement, Icon, Container } from '@ijstech/components';
     import "@scom/scom-swap/price-info/priceInfo.css.ts";
     global {
         namespace JSX {
@@ -10492,7 +10492,7 @@ declare module "@scom/scom-swap/price-info/index.tsx" {
         get Items(): any[];
         set Items(value: any[]);
         renderItems: () => Promise<void>;
-        onRenderToggleBtn: (parent: Control) => Image;
+        onRenderToggleBtn: (parent: Control) => Icon;
         renderIconTooltip: (parent: Control, item: any) => Promise<Icon>;
         updateItems: () => Promise<void>;
         init(): void;

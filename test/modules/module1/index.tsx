@@ -1,5 +1,11 @@
-import { Module, customModule, Container, VStack } from '@ijstech/components';
+import { Module, customModule, Container, VStack, Styles } from '@ijstech/components';
 import ScomSwap from '@scom/scom-swap'
+
+const Theme = Styles.Theme.currentTheme;
+Theme.background.main = '#2c2626';
+Theme.text.primary = '#d3c0c0 ';
+Theme.input.background = '#272F39';
+Theme.input.fontColor = '#ffffff4d';
 @customModule
 export default class Module1 extends Module {
     private swapEl: ScomSwap;
