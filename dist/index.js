@@ -18666,54 +18666,57 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                 return formatted.replace(/,/g, '');
             };
             this.onSetupPage = async (connected, _chainId) => {
-                var _a;
-                const data = {
-                    defaultChainId: this.defaultChainId,
-                    wallets: this.wallets,
-                    networks: this.networks,
-                    showHeader: this.showHeader
-                };
-                if ((_a = this.dappContainer) === null || _a === void 0 ? void 0 : _a.setData)
-                    this.dappContainer.setData(data);
-                this.currentChainId = _chainId ? _chainId : (0, index_18.getChainId)();
-                scom_token_list_7.tokenStore.updateTokenMapData();
-                this.closeNetworkErrModal();
-                if (this.isFixedPair) {
-                    this.setFixedPairData();
-                }
-                this.toggleReverseImage.enabled = !this.isFixedPair;
-                this.firstTokenSelection.disableSelect = this.isFixedPair;
-                this.secondTokenSelection.disableSelect = this.isFixedPair;
-                this.setSwapButtonText();
-                await this.updateBalance();
-                const input = this.receiveCol.children[0];
-                if (input) {
-                    input.readOnly = false;
-                }
-                if (!this.isFixedPair) {
-                    this.toggleReverseImage.classList.remove('cursor-default');
-                }
-                if (this.fromInputValue.isGreaterThanOrEqualTo(0)) {
-                    this.onUpdateEstimatedPosition(false, true);
-                    const input = this.payCol.children[0];
-                    if (input) {
-                        input.value = this.fixedNumber(this.fromInputValue);
+                setTimeout(async () => {
+                    var _a;
+                    const data = {
+                        defaultChainId: this.defaultChainId,
+                        wallets: this.wallets,
+                        networks: this.networks,
+                        showHeader: this.showHeader
+                    };
+                    if ((_a = this.dappContainer) === null || _a === void 0 ? void 0 : _a.setData)
+                        this.dappContainer.setData(data);
+                    this.currentChainId = _chainId ? _chainId : (0, index_18.getChainId)();
+                    scom_token_list_7.tokenStore.updateTokenMapData();
+                    this.closeNetworkErrModal();
+                    if (this.isFixedPair) {
+                        this.setFixedPairData();
                     }
-                }
-                else if (this.toInputValue.isGreaterThanOrEqualTo(0)) {
-                    this.onUpdateEstimatedPosition(true, true);
+                    this.toggleReverseImage.enabled = !this.isFixedPair;
+                    this.firstTokenSelection.disableSelect = this.isFixedPair;
+                    this.secondTokenSelection.disableSelect = this.isFixedPair;
+                    this.setSwapButtonText();
+                    await this.updateBalance();
                     const input = this.receiveCol.children[0];
                     if (input) {
-                        input.value = this.fixedNumber(this.toInputValue);
+                        input.readOnly = false;
                     }
-                }
-                this.firstTokenSelection.tokenDataListProp = (0, index_18.getSupportedTokens)(this._data.tokens || [], this.currentChainId);
-                this.setTargetTokenList();
-                if (!this.record)
-                    this.swapBtn.enabled = false;
-                this.onRenderPriceInfo();
-                this.redirectToken();
-                await this.handleAddRoute();
+                    if (!this.isFixedPair) {
+                        this.toggleReverseImage.classList.remove('cursor-default');
+                    }
+                    if (this.fromInputValue.isGreaterThanOrEqualTo(0)) {
+                        this.onUpdateEstimatedPosition(false, true);
+                        const input = this.payCol.children[0];
+                        if (input) {
+                            input.value = this.fixedNumber(this.fromInputValue);
+                        }
+                    }
+                    else if (this.toInputValue.isGreaterThanOrEqualTo(0)) {
+                        this.onUpdateEstimatedPosition(true, true);
+                        const input = this.receiveCol.children[0];
+                        if (input) {
+                            input.value = this.fixedNumber(this.toInputValue);
+                        }
+                    }
+                    this.firstTokenSelection.tokenDataListProp = (0, index_18.getSupportedTokens)(this._data.tokens || [], this.currentChainId);
+                    this.setTargetTokenList();
+                    if (!this.record)
+                        this.swapBtn.enabled = false;
+                    this.onRenderPriceInfo();
+                    this.redirectToken();
+                    await eth_wallet_10.Wallet.getClientInstance().init();
+                    await this.handleAddRoute();
+                });
             };
             this.totalAmount = () => {
                 const commissionAmount = (0, index_19.getCommissionAmount)(this.commissions, this.fromInputValue);

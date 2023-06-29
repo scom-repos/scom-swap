@@ -1,5 +1,5 @@
 import { Module, Panel, Button, Label, VStack, Image, Container, IEventBus, application, customModule, Modal, Input, Control, customElements, ControlElement, IDataSchema, Styles, HStack, Icon } from '@ijstech/components';
-import { BigNumber } from '@ijstech/eth-wallet';
+import { BigNumber, Wallet } from '@ijstech/eth-wallet';
 import Assets from './assets';
 import './index.css';
 import {
@@ -879,53 +879,56 @@ export default class ScomSwap extends Module {
   }
 
   private onSetupPage = async (connected: boolean, _chainId?: number) => {
-    const data: any = { 
-      defaultChainId: this.defaultChainId, 
-      wallets: this.wallets, 
-      networks: this.networks, 
-      showHeader: this.showHeader 
-    }
-    if (this.dappContainer?.setData) this.dappContainer.setData(data)
-    this.currentChainId = _chainId ? _chainId : getChainId();
-    tokenStore.updateTokenMapData();
-    this.closeNetworkErrModal();
-    if (this.isFixedPair) {
-      this.setFixedPairData();
-    }
-    this.toggleReverseImage.enabled = !this.isFixedPair;
-    this.firstTokenSelection.disableSelect = this.isFixedPair;
-    this.secondTokenSelection.disableSelect = this.isFixedPair;
-
-    this.setSwapButtonText();
-    await this.updateBalance();
-    const input = this.receiveCol.children[0] as Input;
-    if (input) {
-      input.readOnly = false;
-    }
-    if (!this.isFixedPair) {
-      this.toggleReverseImage.classList.remove('cursor-default');
-    }
-    if (this.fromInputValue.isGreaterThanOrEqualTo(0)) {
-      this.onUpdateEstimatedPosition(false, true);
-      const input = this.payCol.children[0] as Input;
-      if (input) {
-        input.value = this.fixedNumber(this.fromInputValue);
+    setTimeout(async () => {
+      const data: any = { 
+        defaultChainId: this.defaultChainId, 
+        wallets: this.wallets, 
+        networks: this.networks, 
+        showHeader: this.showHeader 
       }
-    } else if (this.toInputValue.isGreaterThanOrEqualTo(0)) {
-      this.onUpdateEstimatedPosition(true, true);
+      if (this.dappContainer?.setData) this.dappContainer.setData(data)
+      this.currentChainId = _chainId ? _chainId : getChainId();
+      tokenStore.updateTokenMapData();
+      this.closeNetworkErrModal();
+      if (this.isFixedPair) {
+        this.setFixedPairData();
+      }
+      this.toggleReverseImage.enabled = !this.isFixedPair;
+      this.firstTokenSelection.disableSelect = this.isFixedPair;
+      this.secondTokenSelection.disableSelect = this.isFixedPair;
+
+      this.setSwapButtonText();
+      await this.updateBalance();
       const input = this.receiveCol.children[0] as Input;
       if (input) {
-        input.value = this.fixedNumber(this.toInputValue);
+        input.readOnly = false;
       }
-    }
-    this.firstTokenSelection.tokenDataListProp = getSupportedTokens(this._data.tokens || [], this.currentChainId);
-    this.setTargetTokenList();
+      if (!this.isFixedPair) {
+        this.toggleReverseImage.classList.remove('cursor-default');
+      }
+      if (this.fromInputValue.isGreaterThanOrEqualTo(0)) {
+        this.onUpdateEstimatedPosition(false, true);
+        const input = this.payCol.children[0] as Input;
+        if (input) {
+          input.value = this.fixedNumber(this.fromInputValue);
+        }
+      } else if (this.toInputValue.isGreaterThanOrEqualTo(0)) {
+        this.onUpdateEstimatedPosition(true, true);
+        const input = this.receiveCol.children[0] as Input;
+        if (input) {
+          input.value = this.fixedNumber(this.toInputValue);
+        }
+      }
+      this.firstTokenSelection.tokenDataListProp = getSupportedTokens(this._data.tokens || [], this.currentChainId);
+      this.setTargetTokenList();
 
-    if (!this.record)
-      this.swapBtn.enabled = false;
-    this.onRenderPriceInfo();
-    this.redirectToken();
-    await this.handleAddRoute();
+      if (!this.record)
+        this.swapBtn.enabled = false;
+      this.onRenderPriceInfo();
+      this.redirectToken();
+      await Wallet.getClientInstance().init();
+      await this.handleAddRoute();
+    });
   }
 
   private async initTokenSelection() {
