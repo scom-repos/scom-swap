@@ -2,10 +2,9 @@ import { Wallet, BigNumber, Utils, Erc20, TransactionReceipt } from "@ijstech/et
 import { Contracts } from "../contracts/oswap-openswap-contract/index";
 import { Contracts as ProxyContracts } from '../contracts/scom-commission-proxy-contract/index';
 import { executeRouterSwap, getRouterSwapTxData, IExecuteSwapOptions } from '@scom/scom-dex-list';
-
+import { ITokenObject } from '@scom/scom-token-list';
 import {
   getAPI,
-  ITokenObject,
   IERC20ApprovalEventOptions,
   ERC20ApprovalModel,
   QueueType,
@@ -20,7 +19,8 @@ import {
   getNetworkInfo,
   getProviderList,
   getProxyAddress,
-  getDexInfoList
+  getDexInfoList,
+  getRpcWallet
 } from "../store/index";
 
 import {
@@ -287,7 +287,7 @@ async function getBestAmountOutRouteFromAPI(wallet: any, tokenIn: ITokenObject, 
 }
 
 const getAllAvailableRoutes = async (markets: string[], tokenList: ITokenObject[], tokenIn: ITokenObject, tokenOut: ITokenObject) => {
-  const wallet: any = Wallet.getClientInstance();
+  const wallet = getRpcWallet();
   let getPairPromises:Promise<void>[] = [];
   let availableRoutes: AvailableRoute[] = [];
 
@@ -581,7 +581,7 @@ const getBestAmountInRoute = async (markets: string[], tokenIn: ITokenObject, to
   let allAvailableRoutes = await getAllAvailableRoutes(markets, tokenList, tokenIn, tokenOut);
   if (allAvailableRoutes.length == 0) return null;
 
-  let wallet: any = Wallet.getClientInstance();
+  let wallet = getRpcWallet();
   let tradeFeeMap = getTradeFeeMap();
   let allPaths = await getAllExactAmountOutPaths(tradeFeeMap, allAvailableRoutes, tokenIn, tokenOut, amountOut);
   if (allPaths.length == 0) {
@@ -611,7 +611,7 @@ const getBestAmountOutRoute = async (markets: string[], tokenIn: ITokenObject, t
   if (allAvailableRoutes.length == 0) {
     return null;
   }
-  let wallet: any = Wallet.getClientInstance();
+  let wallet = getRpcWallet();
   let tradeFeeMap = getTradeFeeMap();
   let allPaths = await getAllExactAmountInPaths(tradeFeeMap, allAvailableRoutes, tokenIn, tokenOut, amountIn);
   if (allPaths.length == 0) {
@@ -663,7 +663,7 @@ async function getExtendedRouteObjData(wallet: any, bestRouteObj: any, tradeFeeM
 }
 
 async function getAllRoutesData(firstTokenObject: ITokenObject, secondTokenObject: ITokenObject, firstInput: BigNumber, secondInput: BigNumber, isFromEstimated: boolean, useAPI: boolean, commissions: ICommissionInfo[]) {
-  let wallet: any = Wallet.getClientInstance();
+  let wallet = getRpcWallet();
   let resultArr: any[] = [];
   if (firstTokenObject && secondTokenObject && (firstInput.gt(0) || secondInput.gt(0))) {
     let routeDataArr = [];

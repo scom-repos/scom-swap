@@ -1,5 +1,5 @@
 import { IWalletPlugin } from "@scom/scom-wallet-modal";
-import { ITokenObject } from "./common";
+import { ITokenObject } from '@scom/scom-token-list';
 
 export type Category = 'fixed-pair' | 'aggregator';
 

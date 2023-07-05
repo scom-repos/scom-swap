@@ -12,8 +12,9 @@ import {
   Checkbox
 } from '@ijstech/components'; 
 import { Wallet } from '@ijstech/eth-wallet';
-import { EventId, ITokenObject } from '../global/index';
-import { addUserTokens, viewOnExplorerByAddress } from '../store/index';
+import { EventId } from '../global/index';
+import { ITokenObject } from '@scom/scom-token-list';
+import { addUserTokens, getChainId, getRpcWallet, viewOnExplorerByAddress } from '../store/index';
 import { tokenStore } from '@scom/scom-token-list';
 
 declare global {
@@ -70,8 +71,10 @@ export class ImportToken extends Module {
     event.stopPropagation();
     const tokenObj = this.token;
     addUserTokens(tokenObj);
-    tokenStore.updateTokenMapData();
-    await tokenStore.updateAllTokenBalances();
+    const chainId = getChainId();
+    const rpcWallet = getRpcWallet();
+    tokenStore.updateTokenMapData(chainId);
+    await tokenStore.updateAllTokenBalances(rpcWallet);
     this.$eventBus.dispatch(EventId.EmitNewToken, tokenObj);
     if (typeof this.onUpdate === 'function') {
       this.onUpdate(tokenObj);

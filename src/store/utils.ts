@@ -1,6 +1,7 @@
 import { application } from '@ijstech/components';
-import { Wallet } from '@ijstech/eth-wallet';
-import { EventId, IProvider, ITokenObject, TokenMapType, IExtendedNetwork } from '../global/index';
+import { INetwork, Wallet } from '@ijstech/eth-wallet';
+import { ITokenObject } from '@scom/scom-token-list';
+import { EventId, IProvider, TokenMapType, IExtendedNetwork } from '../global/index';
 import { ChainNativeTokenByChainId } from '@scom/scom-token-list';
 import getNetworkList from '@scom/scom-network-list'
 import { IDexInfo } from '@scom/scom-dex-list';
@@ -28,7 +29,8 @@ export const state = {
   ipfsGatewayUrl: "",
   apiGatewayUrls: {} as Record<string, string>,
   embedderCommissionFee: "0",
-  tokens: []
+  tokens: [],
+  rpcWalletId: ""
 }
 
 export const setDataFromConfig = (options: any) => {
@@ -285,19 +287,6 @@ export function isWalletConnected() {
   return wallet.isConnected;
 }
 
-export async function switchNetwork(chainId: number) {
-  const wallet = Wallet.getClientInstance();
-  if (!isWalletConnected()) {
-    setCurrentChainId(chainId);
-    wallet.chainId = chainId;
-    application.EventBus.dispatch(EventId.chainChanged, chainId);
-    return;
-  }
-  if (wallet?.clientSideProvider?.name === WalletPlugin.MetaMask) {
-    await wallet.switchNetwork(chainId);
-  }
-}
-
 export const hasMetaMask = function () {
   const wallet = Wallet.getClientInstance();
   return wallet?.clientSideProvider?.name === WalletPlugin.MetaMask;
@@ -309,9 +298,36 @@ export const truncateAddress = (address: string) => {
 }
 
 export function getChainId() {
-  return Wallet.getInstance().chainId;
+  const rpcWallet = getRpcWallet();
+  return rpcWallet.chainId;
 }
 
 export const getChainNativeToken = (chainId: number): ITokenObject => {
   return ChainNativeTokenByChainId[chainId];
 };
+
+export function initRpcWallet(chainIds: number[], defaultChainId: number) {
+  if (state.rpcWalletId) {
+    return state.rpcWalletId;
+  }
+  const clientWallet = Wallet.getClientInstance();
+  const networkList: INetwork[] = Object.values(application.store.networkMap);
+  const instanceId = clientWallet.initRpcWallet({
+    networks: networkList.filter(item => chainIds.includes(item.chainId)),
+    defaultChainId,
+    infuraId: application.store.infuraId,
+    multicalls: application.store.multicalls
+  });
+  state.rpcWalletId = instanceId;
+  const rpcWallet = Wallet.getRpcWalletInstance(instanceId);
+  rpcWallet.address = clientWallet.address;
+  return instanceId;
+}
+
+export function getRpcWallet() {
+  return Wallet.getRpcWalletInstance(state.rpcWalletId);
+}
+
+export function getClientWallet() {
+  return Wallet.getClientInstance();
+}

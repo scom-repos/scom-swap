@@ -18,6 +18,878 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
+define("@scom/scom-swap/assets.ts", ["require", "exports", "@ijstech/components"], function (require, exports, components_1) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    const moduleDir = components_1.application.currentModuleDir;
+    function fullPath(path) {
+        return `${moduleDir}/${path}`;
+    }
+    ;
+    const TokenFolderName = {
+        1: "ethereum",
+        25: "cronos",
+        56: "bsc",
+        97: "bsc-testnet",
+        137: "polygon",
+        338: "cronos-testnet",
+        31337: "amino",
+        80001: "mumbai",
+        43113: "fuji",
+        43114: "avalanche",
+        250: "fantom",
+        4002: "fantom-testnet",
+        13370: "aminox-testnet"
+    };
+    function tokenPath(tokenObj, chainId) {
+        var _a;
+        const pathPrefix = 'img/tokens';
+        if (tokenObj && chainId && chainId >= 0) {
+            let folderName = TokenFolderName[chainId];
+            let fileName = (!tokenObj.isNative ? (_a = tokenObj === null || tokenObj === void 0 ? void 0 : tokenObj.address) === null || _a === void 0 ? void 0 : _a.toLowerCase() : tokenObj.symbol) + '.png';
+            return fullPath(`${pathPrefix}/${folderName}/${fileName}`);
+        }
+        else {
+            return fullPath(`${pathPrefix}/Custom.png`);
+        }
+    }
+    exports.default = {
+        logo: fullPath('img/logo.svg'),
+        fullPath,
+        tokenPath
+    };
+});
+define("@scom/scom-swap/index.css.ts", ["require", "exports", "@ijstech/components", "@scom/scom-swap/assets.ts"], function (require, exports, components_2, assets_1) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    const Theme = components_2.Styles.Theme.ThemeVars;
+    const colorVar = {
+        primaryButton: 'transparent linear-gradient(90deg, #AC1D78 0%, #E04862 100%) 0% 0% no-repeat padding-box',
+        primaryGradient: 'linear-gradient(255deg,#f15e61,#b52082)',
+        darkBg: '#181E3E 0% 0% no-repeat padding-box',
+        primaryDisabled: 'transparent linear-gradient(270deg,#351f52,#552a42) 0% 0% no-repeat padding-box !important'
+    };
+    components_2.Styles.fontFace({
+        fontFamily: "Montserrat Regular",
+        src: `url("${assets_1.default.fullPath('fonts/montserrat/Montserrat-Regular.ttf')}") format("truetype")`,
+        fontWeight: 'nomal',
+        fontStyle: 'normal'
+    });
+    components_2.Styles.fontFace({
+        fontFamily: "Montserrat Bold",
+        src: `url("${assets_1.default.fullPath('fonts/montserrat/Montserrat-Bold.ttf')}") format("truetype")`,
+        fontWeight: 'bold',
+        fontStyle: 'normal'
+    });
+    components_2.Styles.fontFace({
+        fontFamily: "Montserrat Light",
+        src: `url("${assets_1.default.fullPath('fonts/montserrat/Montserrat-Light.ttf')}") format("truetype")`,
+        fontStyle: 'normal'
+    });
+    components_2.Styles.fontFace({
+        fontFamily: "Montserrat Medium",
+        src: `url("${assets_1.default.fullPath('fonts/montserrat/Montserrat-Medium.ttf')}") format("truetype")`,
+        fontStyle: 'normal'
+    });
+    components_2.Styles.fontFace({
+        fontFamily: "Montserrat SemiBold",
+        src: `url("${assets_1.default.fullPath('fonts/montserrat/Montserrat-SemiBold.ttf')}") format("truetype")`,
+        fontStyle: 'normal'
+    });
+    components_2.Styles.fontFace({
+        fontFamily: "Raleway Regular",
+        src: `url("${assets_1.default.fullPath('fonts/raleway/Raleway-Regular.ttf')}") format("truetype")`,
+        fontWeight: 'nomal',
+        fontStyle: 'normal'
+    });
+    components_2.Styles.fontFace({
+        fontFamily: "Raleway Bold",
+        src: `url("${assets_1.default.fullPath('fonts/raleway/Raleway-Bold.ttf')}") format("truetype")`,
+        fontWeight: 'bold',
+        fontStyle: 'normal'
+    });
+    components_2.Styles.fontFace({
+        fontFamily: "Raleway Light",
+        src: `url("${assets_1.default.fullPath('fonts/raleway/Raleway-Light.ttf')}") format("truetype")`,
+        fontStyle: 'normal'
+    });
+    components_2.Styles.fontFace({
+        fontFamily: "Raleway Medium",
+        src: `url("${assets_1.default.fullPath('fonts/raleway/Raleway-Medium.ttf')}") format("truetype")`,
+        fontStyle: 'normal'
+    });
+    components_2.Styles.fontFace({
+        fontFamily: "Raleway SemiBold",
+        src: `url("${assets_1.default.fullPath('fonts/raleway/Raleway-SemiBold.ttf')}") format("truetype")`,
+        fontStyle: 'normal'
+    });
+    components_2.Styles.cssRule('.pageblock-swap', {
+        $nest: {
+            // 'i-label': {
+            //   color: Theme.text.primary
+            // },
+            '.btn-register': {
+                padding: '0.75rem',
+                display: 'flex',
+                alignItems: 'center',
+                opacity: 1,
+                color: Theme.colors.primary.contrastText,
+                $nest: {
+                    'i-icon': {
+                        marginInline: '0.25rem',
+                        display: 'flex',
+                        alignItems: 'center',
+                    }
+                }
+            },
+            'i-icon': {
+                display: 'inline-block'
+            },
+            '.register-panel': {
+                padding: '10px',
+                border: '2px solid #F15E61',
+                borderRadius: '12px'
+            },
+            '::-webkit-scrollbar': {
+                width: '3px',
+            },
+            '::-webkit-scrollbar-thumb': {
+                background: Theme.colors.primary.main,
+                borderRadius: '5px',
+            },
+            '*': {
+                boxSizing: 'border-box',
+                // margin: 0,
+                // padding: 0
+            },
+            '.flex-1': {
+                flex: '1 1 0%!important'
+            },
+            '.my-2': {
+                marginTop: '0.5rem!important',
+                marginBottom: '0.5rem!important',
+            },
+            '.ml-auto': {
+                marginLeft: 'auto'
+            },
+            '#swapContainer i-button': {
+                fontWeight: 600,
+                verticalAlign: 'middle',
+                lineHeight: 1.5,
+            },
+            '#swapContainer i-button.disabled': {
+                opacity: 0.4,
+            },
+            '#swapContainer i-button:not(.disabled):hover': {
+                transition: 'all .2s ease-out',
+                background: 'linear-gradient(255deg,#f15e61,#b52082)',
+                color: Theme.colors.primary.contrastText
+            },
+            '#swapContainer i-button:focus': {
+                outline: 0,
+                boxShadow: '0 0 0 0.2rem rgb(0 123 255 / 25%)'
+            },
+            '#swapContainer': {
+                width: 720,
+                maxWidth: '100%',
+                minHeight: 340,
+                padding: '1rem',
+                marginInline: 'auto'
+            },
+            '.swap-flex--col': {
+                flexDirection: 'column',
+                $nest: {
+                    '& > i-vstack': {
+                        width: '100% !important'
+                    },
+                    '.custom-ic--swap': {
+                        bottom: '0 !important',
+                        transform: 'none !important'
+                    }
+                }
+            },
+            '.visibility-hidden': {
+                visibility: 'hidden'
+            },
+            '.icon-list': {
+                display: 'flex',
+                flexWrap: 'wrap',
+                alignItems: 'center',
+                maxWidth: 'calc(100% - 4rem)',
+            },
+            '.icon-item': {
+                paddingBottom: 0,
+                paddingTop: '0.25rem',
+                marginRight: '0.25rem',
+                border: '2px solid transparent',
+                borderRadius: '50%',
+                padding: '0.25rem',
+                $nest: {
+                    '> img': {
+                        width: 30,
+                        height: 30
+                    }
+                }
+            },
+            '.content-swap': {
+                marginTop: '0.5rem',
+                marginBottom: '1rem',
+                borderRadius: '1rem',
+                $nest: {
+                    'i-label.custom-label *': {
+                        fontSize: '1.125rem',
+                        // color: Theme.text.primary,
+                    }
+                }
+            },
+            // '.input--token-container': {
+            //   padding: '0.5rem 1rem',
+            //   marginLeft: '-15px',
+            //   marginRight: '-15px',
+            // },
+            'i-label.text--grey *': {
+                color: Theme.text.primary,
+                opacity: 0.55, // 'hsla(0,0%,100%,0.55)'
+            },
+            '.btn-max': {
+                position: 'relative',
+                borderRadius: '0.5rem',
+                fontSize: '1rem',
+                padding: '0 0.5rem',
+                marginLeft: '0.5rem',
+                bottom: '1.5px',
+                background: 'transparent linear-gradient(255deg,#e75b66,#b52082) 0% 0% no-repeat padding-box',
+                color: Theme.colors.primary.contrastText
+            },
+            '.custom--slider': {
+                width: '100%',
+                margin: '0px 6px 22px',
+                display: 'flex',
+                alignItems: 'center',
+                $nest: {
+                    'i-range, i-range > .slider': {
+                        width: '100% !important'
+                    },
+                    'input[type="range"]': {
+                        background: Theme.background.main,
+                        backgroundImage: `linear-gradient(#f15e61, #f15e61)`,
+                        backgroundSize: '0% 100%',
+                    },
+                    'input[type="range"]::-webkit-slider-thumb': {
+                        backgroundColor: '#F15E61',
+                        border: '2px solid #e83e8c'
+                    },
+                    'input[type="range"]:focus::-webkit-slider-thumb': {
+                        outline: 0,
+                    },
+                    'input[type="range"]::-webkit-slider-runnable-track': {
+                        height: '4px'
+                    }
+                }
+            },
+            '.bg-box': {
+                margin: '0.5rem 0',
+                border: '2px solid transparent',
+                borderRadius: '1rem',
+                $nest: {
+                    '&.bg-box--active': {
+                        borderColor: '#E53780'
+                    }
+                }
+            },
+            '#swapContainer .input--token-box': {
+                padding: '0.5rem 0.25rem',
+                $nest: {
+                    '#btnToken': {
+                        height: 'auto !important'
+                    },
+                    'i-button.custom-btn': {
+                        // background: '#ffffff30',
+                        padding: '0.5rem',
+                        borderRadius: '8px',
+                        fontSize: '1rem',
+                        fontWeight: 700,
+                        lineHeight: 1.5,
+                        alignSelf: 'center',
+                        textAlign: 'center',
+                        opacity: 1,
+                        color: Theme.input.fontColor,
+                        $nest: {
+                            '&:not(.disabled):hover': {
+                                color: Theme.input.fontColor,
+                                // background: '#ffffff35'
+                            },
+                            '&> span': {
+                                verticalAlign: 'middle',
+                            },
+                            '&> i-icon': {
+                                maxWidth: 10,
+                                height: '16px !important',
+                                opacity: 0.5,
+                                marginRight: 'unset',
+                                fill: Theme.input.fontColor,
+                                $nest: {
+                                    'svg': {
+                                        fill: `${Theme.input.fontColor} !important`
+                                    }
+                                }
+                            },
+                            '&> :not(:last-child)': {
+                                marginRight: '0.5rem'
+                            }
+                        }
+                    },
+                    '.text-value': {
+                        display: 'block',
+                        $nest: {
+                            '> *': {
+                                fontSize: '1.25rem',
+                                paddingRight: '0.25rem'
+                            }
+                        }
+                    },
+                    '.token-input': {
+                        width: '100%'
+                    },
+                    '.token-input > input': {
+                        width: '100%',
+                        height: 'auto !important',
+                        padding: '.375rem .75rem',
+                        paddingRight: '0.25rem',
+                        paddingLeft: 0,
+                        borderRadius: '0.25rem',
+                        border: 'none',
+                        background: 'transparent',
+                        color: Theme.input.fontColor,
+                        fontSize: '1.125rem',
+                        textAlign: 'right'
+                    }
+                }
+            },
+            '.toggle-reverse': {
+                margin: '1rem 0 0.5rem',
+                fontSize: '20px',
+                textAlign: 'center',
+                $nest: {
+                    '> .icon-swap': {
+                        display: 'inline-flex',
+                        padding: '0.25rem',
+                    },
+                    '.custom-ic--swap': {
+                        bottom: -60,
+                        transform: 'rotate(90deg)',
+                        padding: '0.45rem !important'
+                    }
+                }
+            },
+            '.rounded-icon': {
+                display: 'inline-flex',
+                padding: '3px',
+                background: Theme.input.background,
+                border: '2px solid transparent',
+                borderRadius: '50%',
+                cursor: 'pointer'
+            },
+            '.total-routes': {
+                padding: '0.25rem 1rem 0.5rem'
+            },
+            '.swap-btn-container': {
+                marginTop: 10,
+                $nest: {
+                    '.btn-swap': {
+                        position: 'relative',
+                        width: '100%',
+                        borderRadius: '0.65rem',
+                        fontSize: '1.125rem',
+                        padding: '0.5rem 0.75rem',
+                        opacity: 1,
+                        color: Theme.colors.primary.contrastText
+                    }
+                }
+            },
+            '#payCol, #receiveCol': {
+                maxWidth: 'calc(100% - 9rem)',
+            },
+            '#tokenModal': {
+                $nest: {
+                    '.modal': {
+                        background: Theme.background.modal,
+                        width: 492,
+                        padding: '0.75rem 1rem',
+                        borderRadius: '1rem',
+                        // color: Theme.text.primary
+                    },
+                    '.i-modal_header': {
+                        marginBottom: '1.5rem',
+                        paddingBottom: '0.5rem',
+                        borderBottom: `2px soid ${Theme.background.main}`,
+                        color: Theme.colors.primary.main,
+                        fontSize: '1.25rem',
+                        fontWeight: 700,
+                    },
+                    '.i-modal_header > i-icon': {
+                        fill: `${Theme.colors.primary.main} !important`
+                    },
+                    '.search': {
+                        position: 'relative',
+                        marginBottom: '1.5rem',
+                        $nest: {
+                            'i-icon': {
+                                position: 'absolute',
+                                top: 'calc(50% - 8px)',
+                                left: '1rem',
+                                transform: 'rotate(90deg)',
+                                opacity: 0.7
+                            },
+                            'i-input': {
+                                width: '100%'
+                            },
+                            'i-input > input': {
+                                width: '100%',
+                                height: 'auto !important',
+                                padding: '1rem 1.5rem 1rem 2.25rem',
+                                borderRadius: '0.5rem',
+                                border: '2px solid #2a3675',
+                                background: 'transparent',
+                                color: 'inherit',
+                                fontSize: 'inherit',
+                            }
+                        }
+                    },
+                    '.common-token': {
+                        $nest: {
+                            '.common-list': {
+                                margin: '0.5rem -0.5rem 0'
+                            },
+                            '.grid-item': {
+                                padding: '0.35rem 0.5rem',
+                                borderRadius: '1rem',
+                                border: '2px solid transparent',
+                                $nest: {
+                                    '&:hover': {
+                                        borderColor: Theme.divider,
+                                        transform: 'none'
+                                    },
+                                    'i-image': {
+                                        marginRight: '0.5rem'
+                                    }
+                                }
+                            },
+                        }
+                    },
+                    '.token-list': {
+                        margin: '0.5rem -0.5rem',
+                        maxHeight: '45vh',
+                        overflowY: 'auto',
+                        $nest: {
+                            '.token-info': {
+                                display: 'flex',
+                                flexDirection: 'column',
+                                fontSize: '1rem',
+                                marginRight: '0.5rem',
+                            },
+                            '.token-item': {
+                                padding: '0.5rem',
+                                overflow: 'unset',
+                                animation: 'none',
+                                $nest: {
+                                    '&:hover': {
+                                        background: 'linear-gradient(254.8deg,rgba(231,91,102,.1) -8.08%,rgba(181,32,130,.1) 84.35%) !important',
+                                        transform: 'none !important'
+                                    },
+                                    'i-image': {
+                                        marginRight: '0.5rem'
+                                    },
+                                    '&:not(:first-child)': {
+                                        marginTop: 0
+                                    }
+                                }
+                            },
+                            '.token-name i-label > *': {
+                                fontSize: '0.75rem',
+                                // color: 'rgba(255,255,255,0.55)'
+                                color: Theme.text.primary,
+                                opacity: 0.55
+                            }
+                        }
+                    },
+                }
+            },
+            '.list-routing': {
+                maxHeight: '27.5rem',
+                overflowY: 'auto'
+            },
+            '.routing-item': {
+                position: 'relative',
+                // color: "#fff",
+                background: Theme.background.modal,
+                border: '2px solid #2a3675',
+                padding: '1.25rem 1rem 1rem',
+                borderRadius: '0.75rem',
+                margin: '1rem'
+            },
+            '#listRouting': {
+                maxHeight: '27.5rem',
+                overflowY: 'auto',
+            },
+            '#listRouting.active': {
+                $nest: {
+                    '.pnl-routing': {
+                        marginRight: 'calc(1rem - 3px)',
+                    }
+                }
+            },
+            '.routing-selected': {
+                borderColor: Theme.divider
+            },
+            '.best-price': {
+                color: Theme.colors.primary.contrastText,
+                position: 'absolute',
+                top: '-10px',
+                left: '30px',
+                background: 'linear-gradient(255deg,#f15e61,#b52082)',
+                borderRadius: ' 0.75rem',
+                padding: '0.15rem 1rem',
+                zIndex: 1,
+                $nest: {
+                    '&>*': {
+                        fontSize: 'inherit'
+                    }
+                }
+            },
+            '.toggle-routes': {
+                display: 'flex',
+                alignItems: 'center',
+                cursor: 'pointer',
+                $nest: {
+                    'i-label': {
+                        fontSize: '14px',
+                        // color: Theme.text.primary,
+                        marginRight: '8px'
+                    },
+                    'i-icon': {
+                        display: 'inline-block',
+                    }
+                }
+            },
+            '.toggle-routes.hidden': {
+                display: 'none',
+            },
+            '.pnl-routing': {
+                position: 'relative',
+                // color: Theme.text.primary,
+                background: Theme.background.modal,
+                border: '2px solid #2a3675',
+                padding: '1.25rem 1rem 1rem',
+                borderRadius: '0.75rem',
+                margin: '1rem',
+                lineHeight: 1.5,
+                $nest: {
+                    '.routing-name': {
+                        marginRight: '0.25rem',
+                        fontSize: '0.875rem',
+                    },
+                    '.routing-caption > *': {
+                        marginRight: '0.25rem',
+                        color: '#ffffff8c',
+                        fontSize: '0.875rem',
+                        whiteSpace: 'nowrap',
+                    },
+                    '.route-icon': {
+                        marginRight: '0.25rem',
+                        display: 'inline-block'
+                    },
+                    '&.routing-disabled': {
+                        opacity: 0.8,
+                    },
+                }
+            },
+            '.pnl-routing.routing-selected': {
+                borderColor: Theme.divider
+            },
+            '.balanceValue': {
+                textAlign: 'right',
+                display: 'block'
+            },
+            '.price-percent *': {
+                color: Theme.colors.secondary.main,
+                whiteSpace: 'nowrap',
+                textAlign: 'right'
+            },
+            '.w-100': {
+                width: '100%',
+            },
+            '.text-pink': {
+                color: Theme.colors.primary.main,
+                $nest: {
+                    '*': {
+                        color: Theme.colors.primary.main,
+                    },
+                },
+            },
+            '.hints': {
+                display: 'flex',
+                alignItems: 'start',
+                marginTop: '-0.5rem',
+                $nest: {
+                    '*': {
+                        fontSize: '0.8rem',
+                        opacity: 0.9,
+                    },
+                    'i-label *': {
+                        color: Theme.colors.secondary.main,
+                        marginLeft: '0.25rem',
+                    },
+                },
+            },
+            '.chain-icon': {
+                margin: '0.25rem 0.5rem 0 0',
+                borderRadius: '50%',
+                border: '2px solid transparent',
+                padding: '0.25rem',
+                cursor: 'pointer',
+                filter: 'grayscale(1)',
+                $nest: {
+                    '&.icon-disabled': {
+                        cursor: 'default',
+                    },
+                    '&.icon-selected': {
+                        borderColor: Theme.divider,
+                        cursor: 'default',
+                        filter: 'inherit',
+                    },
+                    'img': {
+                        width: '32px',
+                        height: '32px',
+                    },
+                },
+            },
+            '.cursor-default': {
+                cursor: 'default !important',
+            },
+            '.hidden': {
+                display: 'none !important'
+            },
+            '.custom-modal': {
+                $nest: {
+                    '.modal': {
+                        background: Theme.background.modal,
+                        width: 490,
+                        maxWidth: '100%',
+                        padding: '0.75rem 1rem',
+                        borderRadius: '1rem',
+                        color: Theme.text.primary
+                    },
+                    '.i-modal_header': {
+                        marginBottom: '1.5rem',
+                        paddingBottom: '0.5rem',
+                        borderBottom: `2px soid ${Theme.background.main}`,
+                        color: Theme.colors.primary.main,
+                        fontSize: '1.25rem',
+                        fontWeight: 700,
+                        $nest: {
+                            '&> span': {
+                                color: Theme.colors.primary.main,
+                            },
+                            '&> i-icon': {
+                                fill: `${Theme.colors.primary.main} !important`
+                            },
+                            '& ~ i-icon': {
+                                display: 'inline-block',
+                                margin: '0.75rem 0',
+                                background: Theme.input.background,
+                                border: '2px solid transparent',
+                                borderRadius: '50%',
+                                padding: '0.25rem'
+                            }
+                        }
+                    },
+                }
+            },
+            '#registerPairModal': {
+                $nest: {
+                    '.modal': {
+                        background: Theme.background.modal,
+                        width: 420,
+                        maxWidth: '100%',
+                        padding: '0.75rem 1rem 1.25rem 1rem',
+                        borderRadius: '1rem',
+                        color: Theme.text.primary
+                    },
+                    '.i-modal_header': {
+                        marginBottom: '1.5rem',
+                        paddingBottom: '0.5rem',
+                        borderBottom: `2px soid ${Theme.background.main}`,
+                        color: Theme.colors.primary.main,
+                        fontSize: '1.25rem',
+                        fontWeight: 700,
+                        $nest: {
+                            '&> span': {
+                                color: Theme.colors.primary.main,
+                            },
+                            '.i-modal-close': {
+                                fill: `${Theme.colors.primary.main} !important`,
+                            }
+                        }
+                    },
+                }
+            },
+            '#swapModal': {
+                $nest: {
+                    '.icon-swap': {
+                        margin: 0
+                    },
+                    'i-image:not(.rounded-icon)': {
+                        display: 'inline-block',
+                        marginRight: '0.5rem'
+                    },
+                    '#tokenReceiveValue': {
+                        margin: '0 5px'
+                    },
+                    '#payOrReceiveValue': {
+                        marginInline: '0.25rem',
+                    },
+                    '.text-primary *': {
+                        color: Theme.colors.primary.main,
+                    },
+                    '.price-info': {
+                        padding: '1rem'
+                    },
+                    '.arrow-down': {
+                        display: 'inline-block',
+                        margin: '0.75rem 0',
+                        background: Theme.input.background,
+                        border: '2px solid transparent',
+                        borderRadius: '50%',
+                        padding: '0.25rem'
+                    },
+                    '.arrow-down--chain': {
+                        margin: '0.75rem 6rem !important',
+                    },
+                    '.token-value': {
+                        marginLeft: 'auto',
+                    },
+                    '.token-value > *, #swapModal .token-name > *': {
+                        fontSize: '1.1rem'
+                    },
+                    '.row-chain': {
+                        display: 'flex',
+                        alignItems: 'center',
+                    },
+                    'i-icon.custom-icon--fill': {
+                        fill: Theme.input.fontColor,
+                        $nest: {
+                            'svg': {
+                                fill: `${Theme.input.fontColor} !important`
+                            }
+                        }
+                    }
+                }
+            },
+            '#openswapResult': {
+                $nest: {
+                    '.modal': {
+                        background: Theme.background.modal,
+                        width: '440px',
+                        maxWidth: '100%',
+                        padding: '0.5rem',
+                        borderRadius: '12px'
+                    },
+                    'i-label:nth-child(2)': {
+                        marginBottom: '0.25rem'
+                    },
+                    '.waiting-txt > *': {
+                        fontSize: '22px'
+                    },
+                    'i-loading': {
+                        marginTop: '3rem',
+                        marginBottom: '0.5rem'
+                    },
+                    'i-loading .i-loading-spinner_icon': {
+                        width: '50px',
+                        height: '48px'
+                    }
+                }
+            },
+            '#modalFees': {
+                $nest: {
+                    '.i-modal_header': {
+                        marginBottom: '0.5rem !important',
+                    },
+                    '.i-modal_content': {
+                        $nest: {
+                            'i-label *': {
+                                fontSize: '0.875rem',
+                            },
+                            'i-button': {
+                                width: '150px',
+                                paddingBlock: '0.25rem',
+                                textAlign: 'center',
+                            },
+                        },
+                    },
+                },
+            },
+            '.action-setting': {
+                margin: 'auto 0 0 auto',
+                $nest: {
+                    '> i-icon': {
+                        marginLeft: '0.5rem'
+                    },
+                    '> i-label': {
+                        opacity: 0.75
+                    }
+                }
+            },
+            '.btn-os': {
+                background: colorVar.primaryButton,
+                height: 'auto !important',
+                color: Theme.text.primary,
+                transition: 'background .3s ease',
+                fontSize: '1rem',
+                fontWeight: 'bold',
+                fontFamily: 'Raleway Bold',
+                $nest: {
+                    'i-icon.loading-icon': {
+                        marginInline: '0.25rem',
+                        width: '16px !important',
+                        height: '16px !important',
+                    },
+                    'i-icon.is-spin': {
+                        fill: Theme.colors.primary.contrastText,
+                        $nest: {
+                            'svg': {
+                                fill: Theme.colors.primary.contrastText
+                            }
+                        }
+                    }
+                },
+            },
+            '.btn-os:not(.disabled):not(.is-spinning):hover, .btn-os:not(.disabled):not(.is-spinning):focus': {
+                background: colorVar.primaryGradient,
+                backgroundColor: 'transparent',
+                boxShadow: 'none',
+                opacity: .9
+            },
+            '.btn-os:not(.disabled):not(.is-spinning):focus': {
+                boxShadow: '0 0 0 0.2rem rgb(0 123 255 / 25%)'
+            },
+            '.btn-os.disabled, .btn-os.is-spinning': {
+                background: colorVar.primaryDisabled,
+                opacity: 1
+            },
+            '.dark-bg, .dark-modal > div > div': {
+                background: colorVar.darkBg,
+                borderRadius: 5
+            },
+            '.btn-transparent, .btn-transparent:not(.disabled):focus, .btn-transparent:not(.disabled):hover': {
+                background: 'transparent',
+                boxShadow: 'none',
+                backgroundColor: 'transparent'
+            }
+        }
+    });
+});
 define("@scom/scom-swap/contracts/oswap-openswap-contract/contracts/OpenSwap.json.ts", ["require", "exports"], function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
@@ -12955,7 +13827,6 @@ define("@scom/scom-swap/global/utils/common.ts", ["require", "exports", "@ijstec
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.getERC20Allowance = exports.approveERC20Max = exports.getERC20Amount = exports.registerSendTxEvents = exports.isTransactionConfirmed = void 0;
-    ;
     const isTransactionConfirmed = async (txHash) => {
         const tx = await eth_wallet_1.Wallet.getClientInstance().getTransactionReceipt(txHash);
         return tx && !!tx.blockNumber;
@@ -13010,7 +13881,7 @@ define("@scom/scom-swap/global/utils/common.ts", ["require", "exports", "@ijstec
     };
     exports.getERC20Allowance = getERC20Allowance;
 });
-define("@scom/scom-swap/global/utils/helper.ts", ["require", "exports", "@ijstech/eth-wallet", "@ijstech/components"], function (require, exports, eth_wallet_2, components_1) {
+define("@scom/scom-swap/global/utils/helper.ts", ["require", "exports", "@ijstech/eth-wallet", "@ijstech/components"], function (require, exports, eth_wallet_2, components_3) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.isWalletAddress = exports.downloadJsonFile = exports.renderBalanceTooltip = exports.getWeekDays = exports.uniqWith = exports.formatNumberValue = exports.getParamsFromUrl = exports.numberToBytes32 = exports.padLeft = exports.toWeiInv = exports.getAPI = exports.limitDecimals = exports.limitInputNumber = exports.isInvalidInput = exports.isValidNumber = exports.formatNumberWithSeparators = exports.formatPercentNumber = exports.formatNumber = exports.compareDate = exports.formatUTCDate = exports.formatDate = exports.DefaultDateFormat = exports.DefaultDateTimeFormat = void 0;
@@ -13018,24 +13889,24 @@ define("@scom/scom-swap/global/utils/helper.ts", ["require", "exports", "@ijstec
     exports.DefaultDateFormat = 'DD/MM/YYYY';
     const formatDate = (date, customType, showTimezone) => {
         const formatType = customType || exports.DefaultDateFormat;
-        const formatted = (0, components_1.moment)(date).format(formatType);
+        const formatted = (0, components_3.moment)(date).format(formatType);
         if (showTimezone) {
-            return `${formatted} (UTC+${(0, components_1.moment)().utcOffset() / 60})`;
+            return `${formatted} (UTC+${(0, components_3.moment)().utcOffset() / 60})`;
         }
         return formatted;
     };
     exports.formatDate = formatDate;
     const formatUTCDate = (date, customType, showTimezone) => {
         const formatType = customType || exports.DefaultDateFormat;
-        const formatted = (0, components_1.moment)(date).utc().format(formatType);
+        const formatted = (0, components_3.moment)(date).utc().format(formatType);
         return showTimezone ? `${formatted} (UTC)` : formatted;
     };
     exports.formatUTCDate = formatUTCDate;
     const compareDate = (fromDate, toDate) => {
         if (!toDate) {
-            toDate = (0, components_1.moment)();
+            toDate = (0, components_3.moment)();
         }
-        return (0, components_1.moment)(fromDate).isSameOrBefore(toDate);
+        return (0, components_3.moment)(fromDate).isSameOrBefore(toDate);
     };
     exports.compareDate = compareDate;
     const formatNumber = (value, decimals) => {
@@ -13410,7 +14281,6 @@ define("@scom/scom-swap/global/utils/approvalModel.ts", ["require", "exports", "
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.ERC20ApprovalModel = exports.ApprovalStatus = void 0;
-    ;
     var ApprovalStatus;
     (function (ApprovalStatus) {
         ApprovalStatus[ApprovalStatus["TO_BE_APPROVED"] = 0] = "TO_BE_APPROVED";
@@ -13545,882 +14415,10 @@ define("@scom/scom-swap/global/index.ts", ["require", "exports", "@scom/scom-swa
     })(QueueType = exports.QueueType || (exports.QueueType = {}));
     __exportStar(index_4, exports);
 });
-define("@scom/scom-swap/assets.ts", ["require", "exports", "@ijstech/components"], function (require, exports, components_2) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    const moduleDir = components_2.application.currentModuleDir;
-    function fullPath(path) {
-        return `${moduleDir}/${path}`;
-    }
-    ;
-    const TokenFolderName = {
-        1: "ethereum",
-        25: "cronos",
-        56: "bsc",
-        97: "bsc-testnet",
-        137: "polygon",
-        338: "cronos-testnet",
-        31337: "amino",
-        80001: "mumbai",
-        43113: "fuji",
-        43114: "avalanche",
-        250: "fantom",
-        4002: "fantom-testnet",
-        13370: "aminox-testnet"
-    };
-    function tokenPath(tokenObj, chainId) {
-        var _a;
-        const pathPrefix = 'img/tokens';
-        if (tokenObj && chainId && chainId >= 0) {
-            let folderName = TokenFolderName[chainId];
-            let fileName = (!tokenObj.isNative ? (_a = tokenObj === null || tokenObj === void 0 ? void 0 : tokenObj.address) === null || _a === void 0 ? void 0 : _a.toLowerCase() : tokenObj.symbol) + '.png';
-            return fullPath(`${pathPrefix}/${folderName}/${fileName}`);
-        }
-        else {
-            return fullPath(`${pathPrefix}/Custom.png`);
-        }
-    }
-    exports.default = {
-        logo: fullPath('img/logo.svg'),
-        fullPath,
-        tokenPath
-    };
-});
-define("@scom/scom-swap/index.css.ts", ["require", "exports", "@ijstech/components", "@scom/scom-swap/assets.ts"], function (require, exports, components_3, assets_1) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    const Theme = components_3.Styles.Theme.ThemeVars;
-    const colorVar = {
-        primaryButton: 'transparent linear-gradient(90deg, #AC1D78 0%, #E04862 100%) 0% 0% no-repeat padding-box',
-        primaryGradient: 'linear-gradient(255deg,#f15e61,#b52082)',
-        darkBg: '#181E3E 0% 0% no-repeat padding-box',
-        primaryDisabled: 'transparent linear-gradient(270deg,#351f52,#552a42) 0% 0% no-repeat padding-box !important'
-    };
-    components_3.Styles.fontFace({
-        fontFamily: "Montserrat Regular",
-        src: `url("${assets_1.default.fullPath('fonts/montserrat/Montserrat-Regular.ttf')}") format("truetype")`,
-        fontWeight: 'nomal',
-        fontStyle: 'normal'
-    });
-    components_3.Styles.fontFace({
-        fontFamily: "Montserrat Bold",
-        src: `url("${assets_1.default.fullPath('fonts/montserrat/Montserrat-Bold.ttf')}") format("truetype")`,
-        fontWeight: 'bold',
-        fontStyle: 'normal'
-    });
-    components_3.Styles.fontFace({
-        fontFamily: "Montserrat Light",
-        src: `url("${assets_1.default.fullPath('fonts/montserrat/Montserrat-Light.ttf')}") format("truetype")`,
-        fontStyle: 'normal'
-    });
-    components_3.Styles.fontFace({
-        fontFamily: "Montserrat Medium",
-        src: `url("${assets_1.default.fullPath('fonts/montserrat/Montserrat-Medium.ttf')}") format("truetype")`,
-        fontStyle: 'normal'
-    });
-    components_3.Styles.fontFace({
-        fontFamily: "Montserrat SemiBold",
-        src: `url("${assets_1.default.fullPath('fonts/montserrat/Montserrat-SemiBold.ttf')}") format("truetype")`,
-        fontStyle: 'normal'
-    });
-    components_3.Styles.fontFace({
-        fontFamily: "Raleway Regular",
-        src: `url("${assets_1.default.fullPath('fonts/raleway/Raleway-Regular.ttf')}") format("truetype")`,
-        fontWeight: 'nomal',
-        fontStyle: 'normal'
-    });
-    components_3.Styles.fontFace({
-        fontFamily: "Raleway Bold",
-        src: `url("${assets_1.default.fullPath('fonts/raleway/Raleway-Bold.ttf')}") format("truetype")`,
-        fontWeight: 'bold',
-        fontStyle: 'normal'
-    });
-    components_3.Styles.fontFace({
-        fontFamily: "Raleway Light",
-        src: `url("${assets_1.default.fullPath('fonts/raleway/Raleway-Light.ttf')}") format("truetype")`,
-        fontStyle: 'normal'
-    });
-    components_3.Styles.fontFace({
-        fontFamily: "Raleway Medium",
-        src: `url("${assets_1.default.fullPath('fonts/raleway/Raleway-Medium.ttf')}") format("truetype")`,
-        fontStyle: 'normal'
-    });
-    components_3.Styles.fontFace({
-        fontFamily: "Raleway SemiBold",
-        src: `url("${assets_1.default.fullPath('fonts/raleway/Raleway-SemiBold.ttf')}") format("truetype")`,
-        fontStyle: 'normal'
-    });
-    components_3.Styles.cssRule('.pageblock-swap', {
-        $nest: {
-            // 'i-label': {
-            //   color: Theme.text.primary
-            // },
-            '.btn-register': {
-                padding: '0.75rem',
-                display: 'flex',
-                alignItems: 'center',
-                opacity: 1,
-                color: Theme.colors.primary.contrastText,
-                $nest: {
-                    'i-icon': {
-                        marginInline: '0.25rem',
-                        display: 'flex',
-                        alignItems: 'center',
-                    }
-                }
-            },
-            'i-icon': {
-                display: 'inline-block'
-            },
-            '.register-panel': {
-                padding: '10px',
-                border: '2px solid #F15E61',
-                borderRadius: '12px'
-            },
-            '::-webkit-scrollbar': {
-                width: '3px',
-            },
-            '::-webkit-scrollbar-thumb': {
-                background: Theme.colors.primary.main,
-                borderRadius: '5px',
-            },
-            '*': {
-                boxSizing: 'border-box',
-                // margin: 0,
-                // padding: 0
-            },
-            '.flex-1': {
-                flex: '1 1 0%!important'
-            },
-            '.my-2': {
-                marginTop: '0.5rem!important',
-                marginBottom: '0.5rem!important',
-            },
-            '.ml-auto': {
-                marginLeft: 'auto'
-            },
-            '#swapContainer i-button': {
-                fontWeight: 600,
-                verticalAlign: 'middle',
-                lineHeight: 1.5,
-            },
-            '#swapContainer i-button.disabled': {
-                opacity: 0.4,
-            },
-            '#swapContainer i-button:not(.disabled):hover': {
-                transition: 'all .2s ease-out',
-                background: 'linear-gradient(255deg,#f15e61,#b52082)',
-                color: Theme.colors.primary.contrastText
-            },
-            '#swapContainer i-button:focus': {
-                outline: 0,
-                boxShadow: '0 0 0 0.2rem rgb(0 123 255 / 25%)'
-            },
-            '#swapContainer': {
-                width: 720,
-                maxWidth: '100%',
-                minHeight: 340,
-                padding: '1rem',
-                marginInline: 'auto'
-            },
-            '.swap-flex--col': {
-                flexDirection: 'column',
-                $nest: {
-                    '& > i-vstack': {
-                        width: '100% !important'
-                    },
-                    '.custom-ic--swap': {
-                        bottom: '0 !important',
-                        transform: 'none !important'
-                    }
-                }
-            },
-            '.visibility-hidden': {
-                visibility: 'hidden'
-            },
-            '.icon-list': {
-                display: 'flex',
-                flexWrap: 'wrap',
-                alignItems: 'center',
-                maxWidth: 'calc(100% - 4rem)',
-            },
-            '.icon-item': {
-                paddingBottom: 0,
-                paddingTop: '0.25rem',
-                marginRight: '0.25rem',
-                border: '2px solid transparent',
-                borderRadius: '50%',
-                padding: '0.25rem',
-                $nest: {
-                    '> img': {
-                        width: 30,
-                        height: 30
-                    }
-                }
-            },
-            '.content-swap': {
-                marginTop: '0.5rem',
-                marginBottom: '1rem',
-                borderRadius: '1rem',
-                $nest: {
-                    'i-label.custom-label *': {
-                        fontSize: '1.125rem',
-                        // color: Theme.text.primary,
-                    }
-                }
-            },
-            // '.input--token-container': {
-            //   padding: '0.5rem 1rem',
-            //   marginLeft: '-15px',
-            //   marginRight: '-15px',
-            // },
-            'i-label.text--grey *': {
-                color: Theme.text.primary,
-                opacity: 0.55, // 'hsla(0,0%,100%,0.55)'
-            },
-            '.btn-max': {
-                position: 'relative',
-                borderRadius: '0.5rem',
-                fontSize: '1rem',
-                padding: '0 0.5rem',
-                marginLeft: '0.5rem',
-                bottom: '1.5px',
-                background: 'transparent linear-gradient(255deg,#e75b66,#b52082) 0% 0% no-repeat padding-box',
-                color: Theme.colors.primary.contrastText
-            },
-            '.custom--slider': {
-                width: '100%',
-                margin: '0px 6px 22px',
-                display: 'flex',
-                alignItems: 'center',
-                $nest: {
-                    'i-range, i-range > .slider': {
-                        width: '100% !important'
-                    },
-                    'input[type="range"]': {
-                        background: Theme.background.main,
-                        backgroundImage: `linear-gradient(#f15e61, #f15e61)`,
-                        backgroundSize: '0% 100%',
-                    },
-                    'input[type="range"]::-webkit-slider-thumb': {
-                        backgroundColor: '#F15E61',
-                        border: '2px solid #e83e8c'
-                    },
-                    'input[type="range"]:focus::-webkit-slider-thumb': {
-                        outline: 0,
-                    },
-                    'input[type="range"]::-webkit-slider-runnable-track': {
-                        height: '4px'
-                    }
-                }
-            },
-            '.bg-box': {
-                margin: '0.5rem 0',
-                border: '2px solid transparent',
-                borderRadius: '1rem',
-                $nest: {
-                    '&.bg-box--active': {
-                        borderColor: '#E53780'
-                    }
-                }
-            },
-            '#swapContainer .input--token-box': {
-                padding: '0.5rem 0.25rem',
-                $nest: {
-                    '#btnToken': {
-                        height: 'auto !important'
-                    },
-                    'i-button.custom-btn': {
-                        // background: '#ffffff30',
-                        padding: '0.5rem',
-                        borderRadius: '8px',
-                        fontSize: '1rem',
-                        fontWeight: 700,
-                        lineHeight: 1.5,
-                        alignSelf: 'center',
-                        textAlign: 'center',
-                        opacity: 1,
-                        color: Theme.input.fontColor,
-                        $nest: {
-                            '&:not(.disabled):hover': {
-                                color: Theme.input.fontColor,
-                                // background: '#ffffff35'
-                            },
-                            '&> span': {
-                                verticalAlign: 'middle',
-                            },
-                            '&> i-icon': {
-                                maxWidth: 10,
-                                height: '16px !important',
-                                opacity: 0.5,
-                                marginRight: 'unset',
-                                fill: Theme.input.fontColor,
-                                $nest: {
-                                    'svg': {
-                                        fill: `${Theme.input.fontColor} !important`
-                                    }
-                                }
-                            },
-                            '&> :not(:last-child)': {
-                                marginRight: '0.5rem'
-                            }
-                        }
-                    },
-                    '.text-value': {
-                        display: 'block',
-                        $nest: {
-                            '> *': {
-                                fontSize: '1.25rem',
-                                paddingRight: '0.25rem'
-                            }
-                        }
-                    },
-                    '.token-input': {
-                        width: '100%'
-                    },
-                    '.token-input > input': {
-                        width: '100%',
-                        height: 'auto !important',
-                        padding: '.375rem .75rem',
-                        paddingRight: '0.25rem',
-                        paddingLeft: 0,
-                        borderRadius: '0.25rem',
-                        border: 'none',
-                        background: 'transparent',
-                        color: Theme.input.fontColor,
-                        fontSize: '1.125rem',
-                        textAlign: 'right'
-                    }
-                }
-            },
-            '.toggle-reverse': {
-                margin: '1rem 0 0.5rem',
-                fontSize: '20px',
-                textAlign: 'center',
-                $nest: {
-                    '> .icon-swap': {
-                        display: 'inline-flex',
-                        padding: '0.25rem',
-                    },
-                    '.custom-ic--swap': {
-                        bottom: -60,
-                        transform: 'rotate(90deg)',
-                        padding: '0.45rem !important'
-                    }
-                }
-            },
-            '.rounded-icon': {
-                display: 'inline-flex',
-                padding: '3px',
-                background: Theme.input.background,
-                border: '2px solid transparent',
-                borderRadius: '50%',
-                cursor: 'pointer'
-            },
-            '.total-routes': {
-                padding: '0.25rem 1rem 0.5rem'
-            },
-            '.swap-btn-container': {
-                marginTop: 10,
-                $nest: {
-                    '.btn-swap': {
-                        position: 'relative',
-                        width: '100%',
-                        borderRadius: '0.65rem',
-                        fontSize: '1.125rem',
-                        padding: '0.5rem 0.75rem',
-                        opacity: 1,
-                        color: Theme.colors.primary.contrastText
-                    }
-                }
-            },
-            '#payCol, #receiveCol': {
-                maxWidth: 'calc(100% - 9rem)',
-            },
-            '#tokenModal': {
-                $nest: {
-                    '.modal': {
-                        background: Theme.background.modal,
-                        width: 492,
-                        padding: '0.75rem 1rem',
-                        borderRadius: '1rem',
-                        // color: Theme.text.primary
-                    },
-                    '.i-modal_header': {
-                        marginBottom: '1.5rem',
-                        paddingBottom: '0.5rem',
-                        borderBottom: `2px soid ${Theme.background.main}`,
-                        color: Theme.colors.primary.main,
-                        fontSize: '1.25rem',
-                        fontWeight: 700,
-                    },
-                    '.i-modal_header > i-icon': {
-                        fill: `${Theme.colors.primary.main} !important`
-                    },
-                    '.search': {
-                        position: 'relative',
-                        marginBottom: '1.5rem',
-                        $nest: {
-                            'i-icon': {
-                                position: 'absolute',
-                                top: 'calc(50% - 8px)',
-                                left: '1rem',
-                                transform: 'rotate(90deg)',
-                                opacity: 0.7
-                            },
-                            'i-input': {
-                                width: '100%'
-                            },
-                            'i-input > input': {
-                                width: '100%',
-                                height: 'auto !important',
-                                padding: '1rem 1.5rem 1rem 2.25rem',
-                                borderRadius: '0.5rem',
-                                border: '2px solid #2a3675',
-                                background: 'transparent',
-                                color: 'inherit',
-                                fontSize: 'inherit',
-                            }
-                        }
-                    },
-                    '.common-token': {
-                        $nest: {
-                            '.common-list': {
-                                margin: '0.5rem -0.5rem 0'
-                            },
-                            '.grid-item': {
-                                padding: '0.35rem 0.5rem',
-                                borderRadius: '1rem',
-                                border: '2px solid transparent',
-                                $nest: {
-                                    '&:hover': {
-                                        borderColor: Theme.divider,
-                                        transform: 'none'
-                                    },
-                                    'i-image': {
-                                        marginRight: '0.5rem'
-                                    }
-                                }
-                            },
-                        }
-                    },
-                    '.token-list': {
-                        margin: '0.5rem -0.5rem',
-                        maxHeight: '45vh',
-                        overflowY: 'auto',
-                        $nest: {
-                            '.token-info': {
-                                display: 'flex',
-                                flexDirection: 'column',
-                                fontSize: '1rem',
-                                marginRight: '0.5rem',
-                            },
-                            '.token-item': {
-                                padding: '0.5rem',
-                                overflow: 'unset',
-                                animation: 'none',
-                                $nest: {
-                                    '&:hover': {
-                                        background: 'linear-gradient(254.8deg,rgba(231,91,102,.1) -8.08%,rgba(181,32,130,.1) 84.35%) !important',
-                                        transform: 'none !important'
-                                    },
-                                    'i-image': {
-                                        marginRight: '0.5rem'
-                                    },
-                                    '&:not(:first-child)': {
-                                        marginTop: 0
-                                    }
-                                }
-                            },
-                            '.token-name i-label > *': {
-                                fontSize: '0.75rem',
-                                // color: 'rgba(255,255,255,0.55)'
-                                color: Theme.text.primary,
-                                opacity: 0.55
-                            }
-                        }
-                    },
-                }
-            },
-            '.list-routing': {
-                maxHeight: '27.5rem',
-                overflowY: 'auto'
-            },
-            '.routing-item': {
-                position: 'relative',
-                // color: "#fff",
-                background: Theme.background.modal,
-                border: '2px solid #2a3675',
-                padding: '1.25rem 1rem 1rem',
-                borderRadius: '0.75rem',
-                margin: '1rem'
-            },
-            '#listRouting': {
-                maxHeight: '27.5rem',
-                overflowY: 'auto',
-            },
-            '#listRouting.active': {
-                $nest: {
-                    '.pnl-routing': {
-                        marginRight: 'calc(1rem - 3px)',
-                    }
-                }
-            },
-            '.routing-selected': {
-                borderColor: Theme.divider
-            },
-            '.best-price': {
-                color: Theme.colors.primary.contrastText,
-                position: 'absolute',
-                top: '-10px',
-                left: '30px',
-                background: 'linear-gradient(255deg,#f15e61,#b52082)',
-                borderRadius: ' 0.75rem',
-                padding: '0.15rem 1rem',
-                zIndex: 1,
-                $nest: {
-                    '&>*': {
-                        fontSize: 'inherit'
-                    }
-                }
-            },
-            '.toggle-routes': {
-                display: 'flex',
-                alignItems: 'center',
-                cursor: 'pointer',
-                $nest: {
-                    'i-label': {
-                        fontSize: '14px',
-                        // color: Theme.text.primary,
-                        marginRight: '8px'
-                    },
-                    'i-icon': {
-                        display: 'inline-block',
-                    }
-                }
-            },
-            '.toggle-routes.hidden': {
-                display: 'none',
-            },
-            '.pnl-routing': {
-                position: 'relative',
-                // color: Theme.text.primary,
-                background: Theme.background.modal,
-                border: '2px solid #2a3675',
-                padding: '1.25rem 1rem 1rem',
-                borderRadius: '0.75rem',
-                margin: '1rem',
-                lineHeight: 1.5,
-                $nest: {
-                    '.routing-name': {
-                        marginRight: '0.25rem',
-                        fontSize: '0.875rem',
-                    },
-                    '.routing-caption > *': {
-                        marginRight: '0.25rem',
-                        color: '#ffffff8c',
-                        fontSize: '0.875rem',
-                        whiteSpace: 'nowrap',
-                    },
-                    '.route-icon': {
-                        marginRight: '0.25rem',
-                        display: 'inline-block'
-                    },
-                    '&.routing-disabled': {
-                        opacity: 0.8,
-                    },
-                }
-            },
-            '.pnl-routing.routing-selected': {
-                borderColor: Theme.divider
-            },
-            '.balanceValue': {
-                textAlign: 'right',
-                display: 'block'
-            },
-            '.price-percent *': {
-                color: Theme.colors.secondary.main,
-                whiteSpace: 'nowrap',
-                textAlign: 'right'
-            },
-            '.w-100': {
-                width: '100%',
-            },
-            '.text-pink': {
-                color: Theme.colors.primary.main,
-                $nest: {
-                    '*': {
-                        color: Theme.colors.primary.main,
-                    },
-                },
-            },
-            '.hints': {
-                display: 'flex',
-                alignItems: 'start',
-                marginTop: '-0.5rem',
-                $nest: {
-                    '*': {
-                        fontSize: '0.8rem',
-                        opacity: 0.9,
-                    },
-                    'i-label *': {
-                        color: Theme.colors.secondary.main,
-                        marginLeft: '0.25rem',
-                    },
-                },
-            },
-            '.chain-icon': {
-                margin: '0.25rem 0.5rem 0 0',
-                borderRadius: '50%',
-                border: '2px solid transparent',
-                padding: '0.25rem',
-                cursor: 'pointer',
-                filter: 'grayscale(1)',
-                $nest: {
-                    '&.icon-disabled': {
-                        cursor: 'default',
-                    },
-                    '&.icon-selected': {
-                        borderColor: Theme.divider,
-                        cursor: 'default',
-                        filter: 'inherit',
-                    },
-                    'img': {
-                        width: '32px',
-                        height: '32px',
-                    },
-                },
-            },
-            '.cursor-default': {
-                cursor: 'default !important',
-            },
-            '.hidden': {
-                display: 'none !important'
-            },
-            '.custom-modal': {
-                $nest: {
-                    '.modal': {
-                        background: Theme.background.modal,
-                        width: 490,
-                        maxWidth: '100%',
-                        padding: '0.75rem 1rem',
-                        borderRadius: '1rem',
-                        color: Theme.text.primary
-                    },
-                    '.i-modal_header': {
-                        marginBottom: '1.5rem',
-                        paddingBottom: '0.5rem',
-                        borderBottom: `2px soid ${Theme.background.main}`,
-                        color: Theme.colors.primary.main,
-                        fontSize: '1.25rem',
-                        fontWeight: 700,
-                        $nest: {
-                            '&> span': {
-                                color: Theme.colors.primary.main,
-                            },
-                            '&> i-icon': {
-                                fill: `${Theme.colors.primary.main} !important`
-                            },
-                            '& ~ i-icon': {
-                                display: 'inline-block',
-                                margin: '0.75rem 0',
-                                background: Theme.input.background,
-                                border: '2px solid transparent',
-                                borderRadius: '50%',
-                                padding: '0.25rem'
-                            }
-                        }
-                    },
-                }
-            },
-            '#registerPairModal': {
-                $nest: {
-                    '.modal': {
-                        background: Theme.background.modal,
-                        width: 420,
-                        maxWidth: '100%',
-                        padding: '0.75rem 1rem 1.25rem 1rem',
-                        borderRadius: '1rem',
-                        color: Theme.text.primary
-                    },
-                    '.i-modal_header': {
-                        marginBottom: '1.5rem',
-                        paddingBottom: '0.5rem',
-                        borderBottom: `2px soid ${Theme.background.main}`,
-                        color: Theme.colors.primary.main,
-                        fontSize: '1.25rem',
-                        fontWeight: 700,
-                        $nest: {
-                            '&> span': {
-                                color: Theme.colors.primary.main,
-                            },
-                            '.i-modal-close': {
-                                fill: `${Theme.colors.primary.main} !important`,
-                            }
-                        }
-                    },
-                }
-            },
-            '#swapModal': {
-                $nest: {
-                    '.icon-swap': {
-                        margin: 0
-                    },
-                    'i-image:not(.rounded-icon)': {
-                        display: 'inline-block',
-                        marginRight: '0.5rem'
-                    },
-                    '#tokenReceiveValue': {
-                        margin: '0 5px'
-                    },
-                    '#payOrReceiveValue': {
-                        marginInline: '0.25rem',
-                    },
-                    '.text-primary *': {
-                        color: Theme.colors.primary.main,
-                    },
-                    '.price-info': {
-                        padding: '1rem'
-                    },
-                    '.arrow-down': {
-                        display: 'inline-block',
-                        margin: '0.75rem 0',
-                        background: Theme.input.background,
-                        border: '2px solid transparent',
-                        borderRadius: '50%',
-                        padding: '0.25rem'
-                    },
-                    '.arrow-down--chain': {
-                        margin: '0.75rem 6rem !important',
-                    },
-                    '.token-value': {
-                        marginLeft: 'auto',
-                    },
-                    '.token-value > *, #swapModal .token-name > *': {
-                        fontSize: '1.1rem'
-                    },
-                    '.row-chain': {
-                        display: 'flex',
-                        alignItems: 'center',
-                    },
-                    'i-icon.custom-icon--fill': {
-                        fill: Theme.input.fontColor,
-                        $nest: {
-                            'svg': {
-                                fill: `${Theme.input.fontColor} !important`
-                            }
-                        }
-                    }
-                }
-            },
-            '#openswapResult': {
-                $nest: {
-                    '.modal': {
-                        background: Theme.background.modal,
-                        width: '440px',
-                        maxWidth: '100%',
-                        padding: '0.5rem',
-                        borderRadius: '12px'
-                    },
-                    'i-label:nth-child(2)': {
-                        marginBottom: '0.25rem'
-                    },
-                    '.waiting-txt > *': {
-                        fontSize: '22px'
-                    },
-                    'i-loading': {
-                        marginTop: '3rem',
-                        marginBottom: '0.5rem'
-                    },
-                    'i-loading .i-loading-spinner_icon': {
-                        width: '50px',
-                        height: '48px'
-                    }
-                }
-            },
-            '#modalFees': {
-                $nest: {
-                    '.i-modal_header': {
-                        marginBottom: '0.5rem !important',
-                    },
-                    '.i-modal_content': {
-                        $nest: {
-                            'i-label *': {
-                                fontSize: '0.875rem',
-                            },
-                            'i-button': {
-                                width: '150px',
-                                paddingBlock: '0.25rem',
-                                textAlign: 'center',
-                            },
-                        },
-                    },
-                },
-            },
-            '.action-setting': {
-                margin: 'auto 0 0 auto',
-                $nest: {
-                    '> i-icon': {
-                        marginLeft: '0.5rem'
-                    },
-                    '> i-label': {
-                        opacity: 0.75
-                    }
-                }
-            },
-            '.btn-os': {
-                background: colorVar.primaryButton,
-                height: 'auto !important',
-                color: Theme.text.primary,
-                transition: 'background .3s ease',
-                fontSize: '1rem',
-                fontWeight: 'bold',
-                fontFamily: 'Raleway Bold',
-                $nest: {
-                    'i-icon.loading-icon': {
-                        marginInline: '0.25rem',
-                        width: '16px !important',
-                        height: '16px !important',
-                    },
-                    'i-icon.is-spin': {
-                        fill: Theme.colors.primary.contrastText,
-                        $nest: {
-                            'svg': {
-                                fill: Theme.colors.primary.contrastText
-                            }
-                        }
-                    }
-                },
-            },
-            '.btn-os:not(.disabled):not(.is-spinning):hover, .btn-os:not(.disabled):not(.is-spinning):focus': {
-                background: colorVar.primaryGradient,
-                backgroundColor: 'transparent',
-                boxShadow: 'none',
-                opacity: .9
-            },
-            '.btn-os:not(.disabled):not(.is-spinning):focus': {
-                boxShadow: '0 0 0 0.2rem rgb(0 123 255 / 25%)'
-            },
-            '.btn-os.disabled, .btn-os.is-spinning': {
-                background: colorVar.primaryDisabled,
-                opacity: 1
-            },
-            '.dark-bg, .dark-modal > div > div': {
-                background: colorVar.darkBg,
-                borderRadius: 5
-            },
-            '.btn-transparent, .btn-transparent:not(.disabled):focus, .btn-transparent:not(.disabled):hover': {
-                background: 'transparent',
-                boxShadow: 'none',
-                backgroundColor: 'transparent'
-            }
-        }
-    });
-});
 define("@scom/scom-swap/store/utils.ts", ["require", "exports", "@ijstech/components", "@ijstech/eth-wallet", "@scom/scom-token-list", "@scom/scom-network-list"], function (require, exports, components_4, eth_wallet_4, scom_token_list_1, scom_network_list_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.getChainNativeToken = exports.getChainId = exports.truncateAddress = exports.hasMetaMask = exports.switchNetwork = exports.isWalletConnected = exports.getWalletProvider = exports.viewOnExplorerByAddress = exports.viewOnExplorerByTxHash = exports.getProviderByKey = exports.getProviderList = exports.setProviderList = exports.getDexInfoList = exports.setDexInfoList = exports.hasUserToken = exports.setUserTokens = exports.getNetworkExplorerName = exports.getMatchNetworks = exports.addUserTokens = exports.getUserTokens = exports.getNetworkInfo = exports.getSupportedNetworks = exports.getInfuraId = exports.setTransactionDeadline = exports.getTransactionDeadline = exports.setSlippageTolerance = exports.getSlippageTolerance = exports.toggleExpertMode = exports.isExpertMode = exports.getCurrentChainId = exports.setCurrentChainId = exports.getEmbedderCommissionFee = exports.setAPIGatewayUrls = exports.getIPFSGatewayUrl = exports.setIPFSGatewayUrl = exports.getProxyAddress = exports.setProxyAddresses = exports.setDataFromConfig = exports.state = exports.WalletPlugin = void 0;
+    exports.getClientWallet = exports.getRpcWallet = exports.initRpcWallet = exports.getChainNativeToken = exports.getChainId = exports.truncateAddress = exports.hasMetaMask = exports.isWalletConnected = exports.getWalletProvider = exports.viewOnExplorerByAddress = exports.viewOnExplorerByTxHash = exports.getProviderByKey = exports.getProviderList = exports.setProviderList = exports.getDexInfoList = exports.setDexInfoList = exports.hasUserToken = exports.setUserTokens = exports.getNetworkExplorerName = exports.getMatchNetworks = exports.addUserTokens = exports.getUserTokens = exports.getNetworkInfo = exports.getSupportedNetworks = exports.getInfuraId = exports.setTransactionDeadline = exports.getTransactionDeadline = exports.setSlippageTolerance = exports.getSlippageTolerance = exports.toggleExpertMode = exports.isExpertMode = exports.getCurrentChainId = exports.setCurrentChainId = exports.getEmbedderCommissionFee = exports.setAPIGatewayUrls = exports.getIPFSGatewayUrl = exports.setIPFSGatewayUrl = exports.getProxyAddress = exports.setProxyAddresses = exports.setDataFromConfig = exports.state = exports.WalletPlugin = void 0;
     var WalletPlugin;
     (function (WalletPlugin) {
         WalletPlugin["MetaMask"] = "metamask";
@@ -14441,7 +14439,8 @@ define("@scom/scom-swap/store/utils.ts", ["require", "exports", "@ijstech/compon
         ipfsGatewayUrl: "",
         apiGatewayUrls: {},
         embedderCommissionFee: "0",
-        tokens: []
+        tokens: [],
+        rpcWalletId: ""
     };
     const setDataFromConfig = (options) => {
         if (options.infuraId) {
@@ -14689,20 +14688,6 @@ define("@scom/scom-swap/store/utils.ts", ["require", "exports", "@ijstech/compon
         return wallet.isConnected;
     }
     exports.isWalletConnected = isWalletConnected;
-    async function switchNetwork(chainId) {
-        var _a;
-        const wallet = eth_wallet_4.Wallet.getClientInstance();
-        if (!isWalletConnected()) {
-            (0, exports.setCurrentChainId)(chainId);
-            wallet.chainId = chainId;
-            components_4.application.EventBus.dispatch("chainChanged" /* EventId.chainChanged */, chainId);
-            return;
-        }
-        if (((_a = wallet === null || wallet === void 0 ? void 0 : wallet.clientSideProvider) === null || _a === void 0 ? void 0 : _a.name) === WalletPlugin.MetaMask) {
-            await wallet.switchNetwork(chainId);
-        }
-    }
-    exports.switchNetwork = switchNetwork;
     const hasMetaMask = function () {
         var _a;
         const wallet = eth_wallet_4.Wallet.getClientInstance();
@@ -14716,13 +14701,40 @@ define("@scom/scom-swap/store/utils.ts", ["require", "exports", "@ijstech/compon
     };
     exports.truncateAddress = truncateAddress;
     function getChainId() {
-        return eth_wallet_4.Wallet.getInstance().chainId;
+        const rpcWallet = getRpcWallet();
+        return rpcWallet.chainId;
     }
     exports.getChainId = getChainId;
     const getChainNativeToken = (chainId) => {
         return scom_token_list_1.ChainNativeTokenByChainId[chainId];
     };
     exports.getChainNativeToken = getChainNativeToken;
+    function initRpcWallet(chainIds, defaultChainId) {
+        if (exports.state.rpcWalletId) {
+            return exports.state.rpcWalletId;
+        }
+        const clientWallet = eth_wallet_4.Wallet.getClientInstance();
+        const networkList = Object.values(components_4.application.store.networkMap);
+        const instanceId = clientWallet.initRpcWallet({
+            networks: networkList.filter(item => chainIds.includes(item.chainId)),
+            defaultChainId,
+            infuraId: components_4.application.store.infuraId,
+            multicalls: components_4.application.store.multicalls
+        });
+        exports.state.rpcWalletId = instanceId;
+        const rpcWallet = eth_wallet_4.Wallet.getRpcWalletInstance(instanceId);
+        rpcWallet.address = clientWallet.address;
+        return instanceId;
+    }
+    exports.initRpcWallet = initRpcWallet;
+    function getRpcWallet() {
+        return eth_wallet_4.Wallet.getRpcWalletInstance(exports.state.rpcWalletId);
+    }
+    exports.getRpcWallet = getRpcWallet;
+    function getClientWallet() {
+        return eth_wallet_4.Wallet.getClientInstance();
+    }
+    exports.getClientWallet = getClientWallet;
 });
 define("@scom/scom-swap/store/index.ts", ["require", "exports", "@scom/scom-swap/store/utils.ts", "@scom/scom-token-list", "@scom/scom-swap/store/utils.ts"], function (require, exports, utils_1, scom_token_list_2, utils_2) {
     "use strict";
@@ -15596,7 +15608,7 @@ define("@scom/scom-swap/swap-utils/index.ts", ["require", "exports", "@ijstech/e
         return bestRouteObjArr;
     }
     const getAllAvailableRoutes = async (markets, tokenList, tokenIn, tokenOut) => {
-        const wallet = eth_wallet_5.Wallet.getClientInstance();
+        const wallet = (0, index_8.getRpcWallet)();
         let getPairPromises = [];
         let availableRoutes = [];
         const getReservesByPair = async (pairAddress, tokenIn, tokenOut) => {
@@ -15880,7 +15892,7 @@ define("@scom/scom-swap/swap-utils/index.ts", ["require", "exports", "@ijstech/e
         let allAvailableRoutes = await getAllAvailableRoutes(markets, tokenList, tokenIn, tokenOut);
         if (allAvailableRoutes.length == 0)
             return null;
-        let wallet = eth_wallet_5.Wallet.getClientInstance();
+        let wallet = (0, index_8.getRpcWallet)();
         let tradeFeeMap = getTradeFeeMap();
         let allPaths = await getAllExactAmountOutPaths(tradeFeeMap, allAvailableRoutes, tokenIn, tokenOut, amountOut);
         if (allPaths.length == 0) {
@@ -15904,7 +15916,7 @@ define("@scom/scom-swap/swap-utils/index.ts", ["require", "exports", "@ijstech/e
         if (allAvailableRoutes.length == 0) {
             return null;
         }
-        let wallet = eth_wallet_5.Wallet.getClientInstance();
+        let wallet = (0, index_8.getRpcWallet)();
         let tradeFeeMap = getTradeFeeMap();
         let allPaths = await getAllExactAmountInPaths(tradeFeeMap, allAvailableRoutes, tokenIn, tokenOut, amountIn);
         if (allPaths.length == 0) {
@@ -15947,7 +15959,7 @@ define("@scom/scom-swap/swap-utils/index.ts", ["require", "exports", "@ijstech/e
     exports.getExtendedRouteObjData = getExtendedRouteObjData;
     async function getAllRoutesData(firstTokenObject, secondTokenObject, firstInput, secondInput, isFromEstimated, useAPI, commissions) {
         var _a, _b, _c;
-        let wallet = eth_wallet_5.Wallet.getClientInstance();
+        let wallet = (0, index_8.getRpcWallet)();
         let resultArr = [];
         if (firstTokenObject && secondTokenObject && (firstInput.gt(0) || secondInput.gt(0))) {
             let routeDataArr = [];
@@ -16783,8 +16795,10 @@ define("@scom/scom-swap/token-selection/importToken.tsx", ["require", "exports",
             event.stopPropagation();
             const tokenObj = this.token;
             (0, index_9.addUserTokens)(tokenObj);
-            scom_token_list_4.tokenStore.updateTokenMapData();
-            await scom_token_list_4.tokenStore.updateAllTokenBalances();
+            const chainId = (0, index_9.getChainId)();
+            const rpcWallet = (0, index_9.getRpcWallet)();
+            scom_token_list_4.tokenStore.updateTokenMapData(chainId);
+            await scom_token_list_4.tokenStore.updateAllTokenBalances(rpcWallet);
             this.$eventBus.dispatch("emitNewToken" /* EventId.EmitNewToken */, tokenObj);
             if (typeof this.onUpdate === 'function') {
                 this.onUpdate(tokenObj);
@@ -16852,13 +16866,6 @@ define("@scom/scom-swap/token-selection/tokenSelection.tsx", ["require", "export
             this._token = value;
             this.updateButton(value);
         }
-        get targetChainId() {
-            return this._targetChainId;
-        }
-        set targetChainId(value) {
-            this._targetChainId = value;
-            this.updateDataByChain();
-        }
         get tokenDataListProp() {
             return this._tokenDataListProp;
         }
@@ -16913,10 +16920,7 @@ define("@scom/scom-swap/token-selection/tokenSelection.tsx", ["require", "export
             this._onSetMaxBalance = callback;
         }
         get chainId() {
-            if (this.targetChainId) {
-                return this.targetChainId;
-            }
-            return (0, scom_token_list_5.isWalletConnected)() ? this.currentChainId : (0, scom_token_list_5.getChainId)();
+            return (0, index_10.getChainId)();
         }
         get disableSelect() {
             return this._disableSelect;
@@ -16935,28 +16939,20 @@ define("@scom/scom-swap/token-selection/tokenSelection.tsx", ["require", "export
             this.btnMax.enabled = !value;
         }
         async initData() {
-            if (!this.chainId) {
-                this.currentChainId = (0, scom_token_list_5.getChainId)();
-            }
             if ((0, scom_token_list_5.isWalletConnected)()) {
                 this.tokenBalancesMap = scom_token_list_5.tokenStore.tokenBalances || {};
             }
             this.renderTokenItems();
         }
         async updateDataByChain(onPaid) {
-            this.tokenBalancesMap = onPaid ? scom_token_list_5.tokenStore.tokenBalances : await scom_token_list_5.tokenStore.updateAllTokenBalances();
+            const rpcWallet = (0, index_10.getRpcWallet)();
+            this.tokenBalancesMap = onPaid ? scom_token_list_5.tokenStore.tokenBalances : await scom_token_list_5.tokenStore.updateAllTokenBalances(rpcWallet);
             this.renderTokenItems();
             this.updateButton();
         }
         async updateDataByNewToken() {
             this.tokenBalancesMap = scom_token_list_5.tokenStore.tokenBalances || {};
             this.renderTokenItems();
-        }
-        async onChainChange() {
-            if (!this.targetChainId) {
-                this.currentChainId = (0, scom_token_list_5.getChainId)();
-                this.updateDataByChain();
-            }
         }
         async onWalletConnect() {
             this.checkHasMetaMask = (0, scom_token_list_5.hasMetaMask)();
@@ -16973,7 +16969,6 @@ define("@scom/scom-swap/token-selection/tokenSelection.tsx", ["require", "export
         registerEvent() {
             this.$eventBus.register(this, "isWalletConnected" /* EventId.IsWalletConnected */, this.onWalletConnect);
             this.$eventBus.register(this, "IsWalletDisconnected" /* EventId.IsWalletDisconnected */, this.onWalletDisconnect);
-            this.$eventBus.register(this, "chainChanged" /* EventId.chainChanged */, this.onChainChange);
             this.$eventBus.register(this, "Paid" /* EventId.Paid */, this.onPaid);
             this.$eventBus.register(this, "emitNewToken" /* EventId.EmitNewToken */, this.updateDataByNewToken);
         }
@@ -16981,9 +16976,6 @@ define("@scom/scom-swap/token-selection/tokenSelection.tsx", ["require", "export
             let tokenList = [];
             if (this.tokenDataListProp && this.tokenDataListProp.length) {
                 tokenList = this.tokenDataListProp;
-            }
-            else {
-                tokenList = scom_token_list_5.tokenStore.getTokenList(this.chainId);
             }
             if (!this.tokenBalancesMap || !Object.keys(this.tokenBalancesMap).length) {
                 this.tokenBalancesMap = scom_token_list_5.tokenStore.tokenBalances || {};
@@ -17060,7 +17052,7 @@ define("@scom/scom-swap/token-selection/tokenSelection.tsx", ["require", "export
             if (this.isCommonShown && this.commonTokenDataList) {
                 this.commonTokenPanel.classList.remove('hidden');
                 this.commonTokenDataList.forEach((token) => {
-                    const logoAddress = token.address && !this.targetChainId ? (0, index_10.getTokenIcon)(token.address) : scom_token_list_6.assets.tokenPath(token, this.chainId);
+                    const logoAddress = scom_token_list_6.assets.tokenPath(token, this.chainId);
                     this.commonTokenList.appendChild(this.$render("i-hstack", { background: { color: Theme.background.main }, onClick: () => this.onSelect(token), tooltip: { content: token.name }, verticalAlignment: "center", class: "grid-item" },
                         this.$render("i-image", { width: 24, height: 24, url: logoAddress, fallbackUrl: scom_token_list_6.assets.fallbackUrl }),
                         this.$render("i-label", { caption: token.symbol, onClick: () => this.onSelect(token) })));
@@ -17071,7 +17063,7 @@ define("@scom/scom-swap/token-selection/tokenSelection.tsx", ["require", "export
             }
         }
         renderToken(token) {
-            const logoAddress = token.address && !this.targetChainId ? (0, index_10.getTokenIcon)(token.address) : scom_token_list_6.assets.tokenPath(token, this.chainId);
+            const logoAddress = scom_token_list_6.assets.tokenPath(token, this.chainId);
             return (this.$render("i-hstack", { width: "100%", verticalAlignment: "center", class: "token-item", padding: { top: '0.5rem', bottom: '0.5rem', left: '0.5rem', right: '0.5rem' }, onClick: () => this.onSelect(token) },
                 this.$render("i-vstack", { width: "100%" },
                     this.$render("i-hstack", null,
@@ -17100,17 +17092,13 @@ define("@scom/scom-swap/token-selection/tokenSelection.tsx", ["require", "export
                 const tokenItems = this.tokenDataListFiltered.map((token) => this.renderToken(token));
                 this.tokenList.append(...tokenItems);
             }
-            else if (this.targetChainId && this.targetChainId !== (0, scom_token_list_5.getChainId)()) {
-                this.tokenList.innerHTML = '';
-                this.tokenList.append(this.$render("i-label", { class: "text-center mt-1 mb-1", caption: "No tokens found" }));
-            }
             else {
                 try {
                     const tokenObj = await this.getTokenObject(this.filterValue, true);
                     if (!tokenObj)
                         throw new Error('Token is invalid');
                     this.tokenList.innerHTML = '';
-                    this.tokenList.appendChild(this.renderToken(Object.assign(Object.assign({}, tokenObj), { isNew: true })));
+                    this.tokenList.appendChild(this.renderToken(Object.assign(Object.assign({}, tokenObj), { isNew: true, chainId: this.chainId })));
                 }
                 catch (err) {
                     this.tokenList.innerHTML = '';
@@ -17180,7 +17168,7 @@ define("@scom/scom-swap/token-selection/tokenSelection.tsx", ["require", "export
                     if (this.isBtnMaxShown) {
                         this.btnMax.classList.remove('hidden');
                     }
-                    const logoAddress = token.address && !this.targetChainId ? (0, index_10.getTokenIcon)(token.address) : scom_token_list_6.assets.tokenPath(token, this.chainId);
+                    const logoAddress = scom_token_list_6.assets.tokenPath(token, this.chainId);
                     if (!image) {
                         image = new components_9.Image(btnToken, {
                             width: 20,
@@ -17199,8 +17187,9 @@ define("@scom/scom-swap/token-selection/tokenSelection.tsx", ["require", "export
             // The token has been not imported
             if (!isNew && token.isNew && !(0, scom_token_list_5.hasUserToken)(token.address || '', this.chainId)) {
                 (0, scom_token_list_5.setUserTokens)(token, this.chainId);
-                scom_token_list_5.tokenStore.updateTokenMapData();
-                await scom_token_list_5.tokenStore.updateAllTokenBalances();
+                const rpcWallet = (0, index_10.getRpcWallet)();
+                scom_token_list_5.tokenStore.updateTokenMapData(this.chainId);
+                await scom_token_list_5.tokenStore.updateAllTokenBalances(rpcWallet);
                 this.$eventBus.dispatch("emitNewToken" /* EventId.EmitNewToken */, token);
                 isNew = true;
             }
@@ -17246,7 +17235,6 @@ define("@scom/scom-swap/token-selection/tokenSelection.tsx", ["require", "export
         }
         ;
         async init() {
-            await this.onWalletConnect();
             super.init();
             this.disableSelect = !!this.getAttribute("disableSelect", true);
             this.disabledMaxBtn = this.getAttribute("disabledMaxBtn", true);
@@ -18650,7 +18638,6 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                 }
                 this.fromTokenSymbol = queryRouter.fromToken;
                 this.toTokenSymbol = queryRouter.toToken;
-                this.targetChainId = queryRouter.toChainId;
             };
             this.fixedNumber = (value) => {
                 const val = typeof value === 'object' ? value : new eth_wallet_10.BigNumber(value);
@@ -18668,16 +18655,19 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
             this.onSetupPage = async (connected, _chainId) => {
                 setTimeout(async () => {
                     var _a;
+                    let chainIds = this.networks.map((network) => network.chainId);
+                    const rpcWalletId = await (0, index_18.initRpcWallet)(chainIds, this.defaultChainId);
                     const data = {
                         defaultChainId: this.defaultChainId,
                         wallets: this.wallets,
                         networks: this.networks,
-                        showHeader: this.showHeader
+                        showHeader: this.showHeader,
+                        rpcWalletId
                     };
                     if ((_a = this.dappContainer) === null || _a === void 0 ? void 0 : _a.setData)
                         this.dappContainer.setData(data);
                     this.currentChainId = _chainId ? _chainId : (0, index_18.getChainId)();
-                    scom_token_list_7.tokenStore.updateTokenMapData();
+                    scom_token_list_7.tokenStore.updateTokenMapData(this.currentChainId);
                     this.closeNetworkErrModal();
                     if (this.isFixedPair) {
                         this.setFixedPairData();
@@ -18841,9 +18831,6 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
             this.setTargetTokenList = (isDisabled) => {
                 var _a;
                 const srcChainId = ((_a = this.srcChain) === null || _a === void 0 ? void 0 : _a.chainId) || this.currentChainId;
-                // if (this.secondTokenSelection.targetChainId != srcChainId) { //Cross chain
-                //   this.secondTokenSelection.targetChainId = srcChainId;
-                // }
                 this.secondTokenSelection.tokenDataListProp = (0, index_18.getSupportedTokens)(this._data.tokens || [], srcChainId);
             };
             this.showModalFees = () => {
@@ -19042,20 +19029,16 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
             await this.handleAddRoute();
         }
         setupCrossChainPopup() {
-            var _a;
             const arrows = this.swapModal.querySelectorAll('i-icon.arrow-down');
             arrows.forEach((arrow) => {
                 arrow.classList.remove('arrow-down--chain');
             });
-            (_a = this.lbReminderRejected) === null || _a === void 0 ? void 0 : _a.classList.add('hidden');
-            this.srcChainFirstPanel.classList.add('hidden');
-            this.targetChainFirstPanel.classList.add('hidden');
         }
         handleSwapPopup() {
             var _a, _b, _c, _d;
             if (!this.record)
                 return;
-            this.setupCrossChainPopup();
+            // this.setupCrossChainPopup();
             const slippageTolerance = (0, index_18.getSlippageTolerance)();
             this.fromTokenImage.url = scom_token_list_7.assets.tokenPath(this.fromToken, this.currentChainId);
             this.fromTokenLabel.caption = (_b = (_a = this.fromToken) === null || _a === void 0 ? void 0 : _a.symbol) !== null && _b !== void 0 ? _b : '';
@@ -19128,7 +19111,8 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
             this.firstTokenSelection.enabled = false;
             this.secondTokenSelection.enabled = false;
             if (token.isNew && (0, index_18.isWalletConnected)()) {
-                await scom_token_list_7.tokenStore.updateAllTokenBalances();
+                const rpcWallet = (0, index_18.getRpcWallet)();
+                await scom_token_list_7.tokenStore.updateAllTokenBalances(rpcWallet);
                 this.allTokenBalancesMap = scom_token_list_7.tokenStore.tokenBalances;
             }
             this.onUpdateToken(token, isFrom);
@@ -19489,8 +19473,9 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
             return 0;
         }
         async updateBalance() {
+            const rpcWallet = (0, index_18.getRpcWallet)();
             if ((0, index_18.isWalletConnected)() && this.hasData)
-                await scom_token_list_7.tokenStore.updateAllTokenBalances();
+                await scom_token_list_7.tokenStore.updateAllTokenBalances(rpcWallet);
             this.allTokenBalancesMap = (0, index_18.isWalletConnected)() ? scom_token_list_7.tokenStore.tokenBalances : [];
             if (this.fromToken) {
                 const balance = this.getBalance(this.fromToken);
@@ -19668,6 +19653,9 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                 this.isInited = true;
             }
         }
+        isEmptyData(value) {
+            return !value || !value.networks || value.networks.length === 0;
+        }
         async init() {
             this.isReadyCallbackQueued = true;
             super.init();
@@ -19677,7 +19665,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
             this.initExpertModal();
             const lazyLoad = this.getAttribute('lazyLoad', true, false);
             if (!lazyLoad) {
-                this.currentChainId = (0, index_18.getChainId)();
+                // this.currentChainId = getChainId();
                 const defaultColors = {
                     fontColor: currentTheme.text.primary,
                     backgroundColor: currentTheme.background.main,
@@ -19696,7 +19684,10 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                 const networks = this.getAttribute('networks', true);
                 const wallets = this.getAttribute('wallets', true);
                 const showHeader = this.getAttribute('showHeader', true);
-                await this.setData({ category, providers, commissions, tokens, defaultChainId, networks, wallets, showHeader });
+                let data = { category, providers, commissions, tokens, defaultChainId, networks, wallets, showHeader };
+                if (!this.isEmptyData(data)) {
+                    await this.setData(data);
+                }
             }
             this.isReadyCallbackQueued = false;
             this.executeReadyCallback();
@@ -19755,20 +19746,12 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                                 this.$render("i-button", { id: "swapBtn", class: "btn-swap btn-os", maxWidth: 360, height: 60, visible: false, rightIcon: { spin: true, visible: false, fill: Theme.colors.primary.contrastText }, onClick: this.onClickSwapButton.bind(this) }))),
                         this.$render("i-modal", { id: "swapModal", class: "custom-modal", title: "Confirm Swap", closeIcon: { name: 'times' } },
                             this.$render("i-hstack", { verticalAlignment: 'center', horizontalAlignment: 'start' },
-                                this.$render("i-panel", { id: "srcChainFirstPanel", class: "row-chain" },
-                                    this.$render("i-image", { id: "srcChainTokenImage", width: "30px", height: "30px", url: "#" }),
-                                    this.$render("i-label", { id: "srcChainTokenLabel", class: "token-name", caption: "" }),
-                                    this.$render("i-icon", { name: "minus", class: "custom-icon--fill", width: 28, height: 10 })),
                                 this.$render("i-panel", { class: "row-chain" },
                                     this.$render("i-image", { id: "fromTokenImage", width: "30px", height: "30px", url: "#" }),
                                     this.$render("i-label", { id: "fromTokenLabel", class: "token-name", caption: "" })),
                                 this.$render("i-label", { id: "fromTokenValue", class: "token-value", caption: " - " })),
                             this.$render("i-icon", { name: "arrow-down", class: "arrow-down custom-icon--fill", width: 28, height: 28 }),
                             this.$render("i-hstack", { class: "mb-1", verticalAlignment: 'center', horizontalAlignment: 'start' },
-                                this.$render("i-panel", { id: "targetChainFirstPanel", class: "row-chain" },
-                                    this.$render("i-image", { id: "targetChainTokenImage", width: "30px", height: "30px", url: "#" }),
-                                    this.$render("i-label", { id: "targetChainTokenLabel", class: "token-name", caption: "" }),
-                                    this.$render("i-icon", { name: "minus", class: "custom-icon--fill", width: 28, height: 10 })),
                                 this.$render("i-panel", { class: "row-chain" },
                                     this.$render("i-image", { id: "toTokenImage", width: "30px", height: "30px", url: "#" }),
                                     this.$render("i-label", { id: "toTokenLabel", class: "token-name", caption: "" })),
@@ -19780,7 +19763,6 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                                 this.$render("i-label", { id: "payOrReceiveValue", class: "text-primary bold", caption: "" }),
                                 this.$render("i-label", { id: "payOrReceiveToken", caption: "" })),
                             this.$render("i-panel", { id: "priceInfoContainer", class: "bg-box mt-1 mb-1", background: { color: Theme.background.main }, width: "100%" }),
-                            this.$render("i-label", { id: "lbReminderRejected", class: "flex", margin: { top: 8, bottom: 16 } }),
                             this.$render("i-panel", { class: "swap-btn-container", width: "100%" },
                                 this.$render("i-button", { id: "swapModalConfirmBtn", class: "btn-swap btn-os", height: "auto", caption: "Confirm Swap", onClick: this.doSwap }))),
                         this.$render("i-modal", { id: "modalFees", class: "bg-modal custom-modal", title: "Transaction Fee Details", closeIcon: { name: 'times' } },

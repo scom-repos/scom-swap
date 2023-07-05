@@ -16,7 +16,9 @@ import {
   getProxyAddress,
   WalletPlugin,
   getSupportedTokens,
-  setDexInfoList
+  setDexInfoList,
+  initRpcWallet,
+  getRpcWallet
 } from "./store/index";
 import { tokenStore, DefaultERC20Tokens, ChainNativeTokenByChainId, assets as tokenAssets } from '@scom/scom-token-list';
 
@@ -28,9 +30,8 @@ import {
   getCommissionAmount,
   getCurrentCommissions
 } from './swap-utils/index'
-
+import { ITokenObject } from '@scom/scom-token-list';
 import {
-  ITokenObject,
   formatNumber,
   ApprovalStatus,
   EventId,
@@ -163,13 +164,9 @@ export default class ScomSwap extends Module {
   private supportedChainList: IExtendedNetwork[] = [];
   private srcChain: IExtendedNetwork | undefined;
   private desChain: IExtendedNetwork | undefined;
-  private targetChainId: number | undefined;
-  private srcChainFirstPanel: Panel;
-  private targetChainFirstPanel: Panel;
   private swapModalConfirmBtn: Button;
   private modalFees: Modal;
   private feesInfo: VStack;
-  private lbReminderRejected: Label;
 
   private expertModal: ExpertModeSettings;
   private networkErrModal: Modal;
@@ -841,7 +838,6 @@ export default class ScomSwap extends Module {
     }
     this.fromTokenSymbol = queryRouter.fromToken;
     this.toTokenSymbol = queryRouter.toToken;
-    this.targetChainId = queryRouter.toChainId;
   };
 
   private fixedNumber = (value: BigNumber | string | number) => {
@@ -880,15 +876,18 @@ export default class ScomSwap extends Module {
 
   private onSetupPage = async (connected: boolean, _chainId?: number) => {
     setTimeout(async () => {
+      let chainIds = this.networks.map((network) => network.chainId);
+      const rpcWalletId = await initRpcWallet(chainIds, this.defaultChainId);
       const data: any = { 
         defaultChainId: this.defaultChainId, 
         wallets: this.wallets, 
         networks: this.networks, 
-        showHeader: this.showHeader 
+        showHeader: this.showHeader,
+        rpcWalletId 
       }
       if (this.dappContainer?.setData) this.dappContainer.setData(data)
       this.currentChainId = _chainId ? _chainId : getChainId();
-      tokenStore.updateTokenMapData();
+      tokenStore.updateTokenMapData(this.currentChainId);
       this.closeNetworkErrModal();
       if (this.isFixedPair) {
         this.setFixedPairData();
@@ -1012,14 +1011,11 @@ export default class ScomSwap extends Module {
     arrows.forEach((arrow: Element) => {
       arrow.classList.remove('arrow-down--chain');
     });
-    this.lbReminderRejected?.classList.add('hidden');
-    this.srcChainFirstPanel.classList.add('hidden');
-    this.targetChainFirstPanel.classList.add('hidden');
   }
 
   private handleSwapPopup() {
     if (!this.record) return;
-    this.setupCrossChainPopup();
+    // this.setupCrossChainPopup();
     const slippageTolerance = getSlippageTolerance();
     this.fromTokenImage.url = tokenAssets.tokenPath(this.fromToken, this.currentChainId);
     this.fromTokenLabel.caption = this.fromToken?.symbol ?? '';
@@ -1104,7 +1100,8 @@ export default class ScomSwap extends Module {
     this.firstTokenSelection.enabled = false;
     this.secondTokenSelection.enabled = false;
     if (token.isNew && isWalletConnected()) {
-      await tokenStore.updateAllTokenBalances();
+      const rpcWallet = getRpcWallet();
+      await tokenStore.updateAllTokenBalances(rpcWallet);
       this.allTokenBalancesMap = tokenStore.tokenBalances;
     }
     this.onUpdateToken(token, isFrom);
@@ -1471,7 +1468,8 @@ export default class ScomSwap extends Module {
     return 0;
   }
   private async updateBalance() {
-    if (isWalletConnected() && this.hasData) await tokenStore.updateAllTokenBalances();
+    const rpcWallet = getRpcWallet();
+    if (isWalletConnected() && this.hasData) await tokenStore.updateAllTokenBalances(rpcWallet);
     this.allTokenBalancesMap = isWalletConnected() ? tokenStore.tokenBalances : [];
     if (this.fromToken) {
       const balance = this.getBalance(this.fromToken);
@@ -1684,9 +1682,6 @@ export default class ScomSwap extends Module {
 
   private setTargetTokenList = (isDisabled?: boolean) => {
     const srcChainId = this.srcChain?.chainId || this.currentChainId;
-    // if (this.secondTokenSelection.targetChainId != srcChainId) { //Cross chain
-    //   this.secondTokenSelection.targetChainId = srcChainId;
-    // }
     this.secondTokenSelection.tokenDataListProp = getSupportedTokens(this._data.tokens || [], srcChainId);
   }
 
@@ -1792,6 +1787,10 @@ export default class ScomSwap extends Module {
     }
   }
 
+  isEmptyData(value: ISwapConfigUI) {
+    return !value || !value.networks || value.networks.length === 0;
+  }
+
   async init() {
     this.isReadyCallbackQueued = true;
     super.init();
@@ -1801,7 +1800,7 @@ export default class ScomSwap extends Module {
     this.initExpertModal();
     const lazyLoad = this.getAttribute('lazyLoad', true, false);
     if (!lazyLoad) {
-      this.currentChainId = getChainId();
+      // this.currentChainId = getChainId();
       const defaultColors = {
         fontColor: currentTheme.text.primary,
         backgroundColor: currentTheme.background.main,
@@ -1820,7 +1819,10 @@ export default class ScomSwap extends Module {
       const networks = this.getAttribute('networks', true);
       const wallets = this.getAttribute('wallets', true);
       const showHeader = this.getAttribute('showHeader', true);
-      await this.setData({category, providers, commissions, tokens, defaultChainId, networks, wallets, showHeader});
+      let data = {category, providers, commissions, tokens, defaultChainId, networks, wallets, showHeader};
+      if (!this.isEmptyData(data)) {
+        await this.setData(data);
+      }
     }
     this.isReadyCallbackQueued = false;
     this.executeReadyCallback();
@@ -1916,11 +1918,6 @@ export default class ScomSwap extends Module {
             </i-panel>
             <i-modal id="swapModal" class="custom-modal" title="Confirm Swap" closeIcon={{ name: 'times' }}>
               <i-hstack verticalAlignment='center' horizontalAlignment='start'>
-                <i-panel id="srcChainFirstPanel" class="row-chain">
-                  <i-image id="srcChainTokenImage" width="30px" height="30px" url="#" />
-                  <i-label id="srcChainTokenLabel" class="token-name" caption="" />
-                  <i-icon name="minus" class="custom-icon--fill" width={28} height={10} />
-                </i-panel>
                 <i-panel class="row-chain">
                   <i-image id="fromTokenImage" width="30px" height="30px" url="#" />
                   <i-label id="fromTokenLabel" class="token-name" caption=""></i-label>
@@ -1929,11 +1926,6 @@ export default class ScomSwap extends Module {
               </i-hstack>
               <i-icon name="arrow-down" class="arrow-down custom-icon--fill" width={28} height={28} />
               <i-hstack class="mb-1" verticalAlignment='center' horizontalAlignment='start'>
-                <i-panel id="targetChainFirstPanel" class="row-chain">
-                  <i-image id="targetChainTokenImage" width="30px" height="30px" url="#" />
-                  <i-label id="targetChainTokenLabel" class="token-name" caption="" />
-                  <i-icon name="minus" class="custom-icon--fill" width={28} height={10} />
-                </i-panel>
                 <i-panel class="row-chain">
                   <i-image id="toTokenImage" width="30px" height="30px" url="#" />
                   <i-label id="toTokenLabel" class="token-name" caption=""></i-label>
@@ -1950,7 +1942,6 @@ export default class ScomSwap extends Module {
               </i-panel>
               <i-panel id="priceInfoContainer" class="bg-box mt-1 mb-1" background={{ color: Theme.background.main }} width="100%">
               </i-panel>
-              <i-label id="lbReminderRejected" class="flex" margin={{ top: 8, bottom: 16 }} />
               <i-panel class="swap-btn-container" width="100%">
                 <i-button id="swapModalConfirmBtn" class="btn-swap btn-os" height="auto" caption="Confirm Swap" onClick={this.doSwap}></i-button>
               </i-panel>

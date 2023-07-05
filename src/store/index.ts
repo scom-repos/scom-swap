@@ -1,4 +1,4 @@
-import {ITokenObject } from '../global/index';
+import { ITokenObject } from '@scom/scom-token-list';
 import { getChainId, getChainNativeToken, isWalletConnected } from './utils';
 import { tokenStore, WETHByChainId, assets as tokenAssets } from '@scom/scom-token-list';
 
