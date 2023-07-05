@@ -9852,7 +9852,8 @@ declare module "@scom/scom-swap/store/utils.ts" {
     export const viewOnExplorerByTxHash: (chainId: number, txHash: string) => void;
     export const viewOnExplorerByAddress: (chainId: number, address: string) => void;
     export function getWalletProvider(): string;
-    export function isWalletConnected(): boolean;
+    export function isClientWalletConnected(): boolean;
+    export function isRpcWalletConnected(): boolean;
     export const hasMetaMask: () => boolean;
     export const truncateAddress: (address: string) => string;
     export function getChainId(): number;
@@ -9867,7 +9868,6 @@ declare module "@scom/scom-swap/store/index.ts" {
     export const nullAddress = "0x0000000000000000000000000000000000000000";
     export const getWETH: (chainId: number) => ITokenObject;
     export const getTokenDecimals: (address: string) => number;
-    export const getTokenIcon: (address: string) => string;
     export const tokenSymbol: (address: string) => string;
     export const tokenName: (address: string) => string;
     export * from "@scom/scom-swap/store/utils.ts";

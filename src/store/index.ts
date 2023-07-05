@@ -1,5 +1,5 @@
 import { ITokenObject } from '@scom/scom-token-list';
-import { getChainId, getChainNativeToken, isWalletConnected } from './utils';
+import { getChainId, getChainNativeToken } from './utils';
 import { tokenStore, WETHByChainId, assets as tokenAssets } from '@scom/scom-token-list';
 
 export const nullAddress = "0x0000000000000000000000000000000000000000";
@@ -15,20 +15,6 @@ export const getTokenDecimals = (address: string) => {
   const ChainNativeToken = getChainNativeToken(chainId);
   const tokenObject = (!address || address.toLowerCase() === WETHAddress.toLowerCase()) ? ChainNativeToken : tokenStore.tokenMap[address.toLowerCase()];
   return tokenObject ? tokenObject.decimals : 18;
-}
-
-export const getTokenIcon = (address: string) => {
-  if (!address) return '';
-  const tokenMap = tokenStore.tokenMap;
-  let ChainNativeToken;
-  let tokenObject;
-  if (isWalletConnected()){
-    ChainNativeToken = getChainNativeToken(getChainId());
-    tokenObject = address == ChainNativeToken.symbol ? ChainNativeToken : tokenMap[address.toLowerCase()];
-  } else {
-    tokenObject = tokenMap[address.toLowerCase()];
-  }
-  return tokenAssets.tokenPath(tokenObject, getChainId());
 }
 
 export const tokenSymbol = (address: string) => {

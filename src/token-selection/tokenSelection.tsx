@@ -9,8 +9,7 @@ import {
 } from '@scom/scom-token-list';
 import {
   getChainId,
-  getRpcWallet,
-  getTokenIcon
+  getRpcWallet
 } from '../store/index';
 import { ChainNativeTokenByChainId, assets as tokenAssets } from '@scom/scom-token-list';
 import { formatNumber, EventId } from '../global/index';

@@ -14418,7 +14418,7 @@ define("@scom/scom-swap/global/index.ts", ["require", "exports", "@scom/scom-swa
 define("@scom/scom-swap/store/utils.ts", ["require", "exports", "@ijstech/components", "@ijstech/eth-wallet", "@scom/scom-token-list", "@scom/scom-network-list"], function (require, exports, components_4, eth_wallet_4, scom_token_list_1, scom_network_list_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.getClientWallet = exports.getRpcWallet = exports.initRpcWallet = exports.getChainNativeToken = exports.getChainId = exports.truncateAddress = exports.hasMetaMask = exports.isWalletConnected = exports.getWalletProvider = exports.viewOnExplorerByAddress = exports.viewOnExplorerByTxHash = exports.getProviderByKey = exports.getProviderList = exports.setProviderList = exports.getDexInfoList = exports.setDexInfoList = exports.hasUserToken = exports.setUserTokens = exports.getNetworkExplorerName = exports.getMatchNetworks = exports.addUserTokens = exports.getUserTokens = exports.getNetworkInfo = exports.getSupportedNetworks = exports.getInfuraId = exports.setTransactionDeadline = exports.getTransactionDeadline = exports.setSlippageTolerance = exports.getSlippageTolerance = exports.toggleExpertMode = exports.isExpertMode = exports.getCurrentChainId = exports.setCurrentChainId = exports.getEmbedderCommissionFee = exports.setAPIGatewayUrls = exports.getIPFSGatewayUrl = exports.setIPFSGatewayUrl = exports.getProxyAddress = exports.setProxyAddresses = exports.setDataFromConfig = exports.state = exports.WalletPlugin = void 0;
+    exports.getClientWallet = exports.getRpcWallet = exports.initRpcWallet = exports.getChainNativeToken = exports.getChainId = exports.truncateAddress = exports.hasMetaMask = exports.isRpcWalletConnected = exports.isClientWalletConnected = exports.getWalletProvider = exports.viewOnExplorerByAddress = exports.viewOnExplorerByTxHash = exports.getProviderByKey = exports.getProviderList = exports.setProviderList = exports.getDexInfoList = exports.setDexInfoList = exports.hasUserToken = exports.setUserTokens = exports.getNetworkExplorerName = exports.getMatchNetworks = exports.addUserTokens = exports.getUserTokens = exports.getNetworkInfo = exports.getSupportedNetworks = exports.getInfuraId = exports.setTransactionDeadline = exports.getTransactionDeadline = exports.setSlippageTolerance = exports.getSlippageTolerance = exports.toggleExpertMode = exports.isExpertMode = exports.getCurrentChainId = exports.setCurrentChainId = exports.getEmbedderCommissionFee = exports.setAPIGatewayUrls = exports.getIPFSGatewayUrl = exports.setIPFSGatewayUrl = exports.getProxyAddress = exports.setProxyAddresses = exports.setDataFromConfig = exports.state = exports.WalletPlugin = void 0;
     var WalletPlugin;
     (function (WalletPlugin) {
         WalletPlugin["MetaMask"] = "metamask";
@@ -14683,11 +14683,16 @@ define("@scom/scom-swap/store/utils.ts", ["require", "exports", "@ijstech/compon
         return localStorage.getItem('walletProvider') || '';
     }
     exports.getWalletProvider = getWalletProvider;
-    function isWalletConnected() {
+    function isClientWalletConnected() {
         const wallet = eth_wallet_4.Wallet.getClientInstance();
         return wallet.isConnected;
     }
-    exports.isWalletConnected = isWalletConnected;
+    exports.isClientWalletConnected = isClientWalletConnected;
+    function isRpcWalletConnected() {
+        const wallet = getRpcWallet();
+        return wallet === null || wallet === void 0 ? void 0 : wallet.isConnected;
+    }
+    exports.isRpcWalletConnected = isRpcWalletConnected;
     const hasMetaMask = function () {
         var _a;
         const wallet = eth_wallet_4.Wallet.getClientInstance();
@@ -14739,7 +14744,7 @@ define("@scom/scom-swap/store/utils.ts", ["require", "exports", "@ijstech/compon
 define("@scom/scom-swap/store/index.ts", ["require", "exports", "@scom/scom-swap/store/utils.ts", "@scom/scom-token-list", "@scom/scom-swap/store/utils.ts"], function (require, exports, utils_1, scom_token_list_2, utils_2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.getSupportedTokens = exports.tokenName = exports.tokenSymbol = exports.getTokenIcon = exports.getTokenDecimals = exports.getWETH = exports.nullAddress = void 0;
+    exports.getSupportedTokens = exports.tokenName = exports.tokenSymbol = exports.getTokenDecimals = exports.getWETH = exports.nullAddress = void 0;
     exports.nullAddress = "0x0000000000000000000000000000000000000000";
     const getWETH = (chainId) => {
         let wrappedToken = scom_token_list_2.WETHByChainId[chainId];
@@ -14754,22 +14759,6 @@ define("@scom/scom-swap/store/index.ts", ["require", "exports", "@scom/scom-swap
         return tokenObject ? tokenObject.decimals : 18;
     };
     exports.getTokenDecimals = getTokenDecimals;
-    const getTokenIcon = (address) => {
-        if (!address)
-            return '';
-        const tokenMap = scom_token_list_2.tokenStore.tokenMap;
-        let ChainNativeToken;
-        let tokenObject;
-        if ((0, utils_1.isWalletConnected)()) {
-            ChainNativeToken = (0, utils_1.getChainNativeToken)((0, utils_1.getChainId)());
-            tokenObject = address == ChainNativeToken.symbol ? ChainNativeToken : tokenMap[address.toLowerCase()];
-        }
-        else {
-            tokenObject = tokenMap[address.toLowerCase()];
-        }
-        return scom_token_list_2.assets.tokenPath(tokenObject, (0, utils_1.getChainId)());
-    };
-    exports.getTokenIcon = getTokenIcon;
     const tokenSymbol = (address) => {
         const tokenMap = scom_token_list_2.tokenStore.tokenMap;
         if (!address || !tokenMap)
@@ -15405,7 +15394,7 @@ define("@scom/scom-swap/swap-utils/index.ts", ["require", "exports", "@ijstech/e
         return allowance;
     }
     async function checkIsApproveButtonShown(wallet, firstTokenObject, fromInput, market, contractAddress) {
-        if (!(0, index_8.isWalletConnected)())
+        if (!(0, index_8.isRpcWalletConnected)())
             return false;
         let isApproveButtonShown = false;
         const owner = wallet.account.address;
@@ -18409,14 +18398,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                     getData: this.getData.bind(this),
                     setData: async (value) => {
                         const defaultData = data_json_1.default.defaultBuilderData;
-                        this._data = Object.assign(Object.assign({}, defaultData), value);
-                        this.configDApp.data = this._data;
-                        this.updateContractAddress();
-                        await this.refreshUI();
-                        if (this.mdWallet) {
-                            this.mdWallet.networks = this._data.networks;
-                            this.mdWallet.wallets = this._data.wallets;
-                        }
+                        this.setData(Object.assign(Object.assign({}, defaultData), value));
                     },
                     getTag: this.getTag.bind(this),
                     setTag: this.setTag.bind(this)
@@ -18462,13 +18444,24 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
         }
         async setData(value) {
             this._data = value;
+            console.log('setData', value);
+            let chainIds = this.networks.map((network) => network.chainId);
+            const rpcWalletId = await (0, index_18.initRpcWallet)(chainIds, this.defaultChainId);
+            const rpcWallet = (0, index_18.getRpcWallet)();
+            const event = rpcWallet.registerWalletEvent(this, eth_wallet_10.Constants.RpcWalletEvent.Connected, async (connected) => {
+                var _a, _b;
+                console.log(`connected: ${connected}`);
+                this.currentChainId = (0, index_18.getChainId)();
+                if (this.currentChainId != null && this.currentChainId != undefined)
+                    this.swapBtn.visible = true;
+                this.updateContractAddress();
+                if ((_b = (_a = this.originalData) === null || _a === void 0 ? void 0 : _a.providers) === null || _b === void 0 ? void 0 : _b.length)
+                    await this.onSetupPage();
+                this.setSwapButtonText();
+            });
             this.configDApp.data = value;
             this.updateContractAddress();
             await this.refreshUI();
-            if (this.mdWallet) {
-                this.mdWallet.networks = value.networks;
-                this.mdWallet.wallets = value.wallets;
-            }
         }
         async getTag() {
             return this.tag;
@@ -18578,7 +18571,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
             (0, index_18.setDexInfoList)(dexList);
             this.setProviders();
             await this.initData();
-            await this.onSetupPage((0, index_18.isWalletConnected)());
+            await this.onSetupPage();
         }
         constructor(parent, options) {
             super(parent, options);
@@ -18602,14 +18595,14 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                 }
                 else {
                     if ((_b = (_a = this.originalData) === null || _a === void 0 ? void 0 : _a.providers) === null || _b === void 0 ? void 0 : _b.length)
-                        await this.onSetupPage(connected);
+                        await this.onSetupPage();
                 }
             };
             this.onWalletDisconnect = async (connected) => {
                 if (!connected) {
                     //await this.handleAddRoute();
                     //await this.updateBalance();
-                    await this.onSetupPage(connected);
+                    await this.onSetupPage();
                 }
             };
             this.onChainChange = async () => {
@@ -18620,7 +18613,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                 // this.availableMarkets = getAvailableMarkets() || [];
                 this.updateContractAddress();
                 if ((_b = (_a = this.originalData) === null || _a === void 0 ? void 0 : _a.providers) === null || _b === void 0 ? void 0 : _b.length)
-                    await this.onSetupPage(true);
+                    await this.onSetupPage();
                 this.setSwapButtonText();
             };
             this.redirectToken = () => {
@@ -18652,17 +18645,19 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                 }
                 return formatted.replace(/,/g, '');
             };
-            this.onSetupPage = async (connected, _chainId) => {
+            this.onSetupPage = async (_chainId) => {
                 setTimeout(async () => {
                     var _a;
-                    let chainIds = this.networks.map((network) => network.chainId);
-                    const rpcWalletId = await (0, index_18.initRpcWallet)(chainIds, this.defaultChainId);
+                    // let chainIds = this.networks.map((network) => network.chainId);
+                    // const rpcWalletId = await initRpcWallet(chainIds, this.defaultChainId);
+                    const rpcWallet = (0, index_18.getRpcWallet)();
+                    console.log('rpcWallet.instanceId', rpcWallet.instanceId);
                     const data = {
                         defaultChainId: this.defaultChainId,
                         wallets: this.wallets,
                         networks: this.networks,
                         showHeader: this.showHeader,
-                        rpcWalletId
+                        rpcWalletId: rpcWallet.instanceId
                     };
                     if ((_a = this.dappContainer) === null || _a === void 0 ? void 0 : _a.setData)
                         this.dappContainer.setData(data);
@@ -19110,7 +19105,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
         async onSelectToken(token, isFrom) {
             this.firstTokenSelection.enabled = false;
             this.secondTokenSelection.enabled = false;
-            if (token.isNew && (0, index_18.isWalletConnected)()) {
+            if (token.isNew && (0, index_18.isRpcWalletConnected)()) {
                 const rpcWallet = (0, index_18.getRpcWallet)();
                 await scom_token_list_7.tokenStore.updateAllTokenBalances(rpcWallet);
                 this.allTokenBalancesMap = scom_token_list_7.tokenStore.tokenBalances;
@@ -19474,9 +19469,9 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
         }
         async updateBalance() {
             const rpcWallet = (0, index_18.getRpcWallet)();
-            if ((0, index_18.isWalletConnected)() && this.hasData)
+            if (this.hasData)
                 await scom_token_list_7.tokenStore.updateAllTokenBalances(rpcWallet);
-            this.allTokenBalancesMap = (0, index_18.isWalletConnected)() ? scom_token_list_7.tokenStore.tokenBalances : [];
+            this.allTokenBalancesMap = scom_token_list_7.tokenStore.tokenBalances;
             if (this.fromToken) {
                 const balance = this.getBalance(this.fromToken);
                 this.payBalance.caption = `Balance: ${(0, index_20.formatNumber)(balance, 4)} ${this.fromToken.symbol}`;
@@ -19496,8 +19491,11 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
         getSwapButtonText() {
             var _a;
             const isApproveButtonShown = this.isApproveButtonShown;
-            if (!(0, index_18.isWalletConnected)()) {
+            if (!(0, index_18.isClientWalletConnected)()) {
                 return "Connect Wallet";
+            }
+            if (!(0, index_18.isRpcWalletConnected)()) {
+                return "Switch Network";
             }
             if (isApproveButtonShown) {
                 const status = this.approveButtonStatus;
@@ -19565,12 +19563,23 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
         }
         isSwapButtonDisabled() {
             const warningMessageText = this.getWarningMessageText();
-            return ((0, index_18.isWalletConnected)() && (warningMessageText != '' && !this.isPriceImpactTooHigh));
+            return ((0, index_18.isRpcWalletConnected)() && (warningMessageText != '' && !this.isPriceImpactTooHigh));
         }
-        onClickSwapButton() {
-            if (!(0, index_18.isWalletConnected)()) {
-                // this.$eventBus.dispatch(EventId.ConnectWallet);
-                this.mdWallet.showModal();
+        async onClickSwapButton() {
+            if (!(0, index_18.isClientWalletConnected)()) {
+                if (this.mdWallet) {
+                    await components_16.application.loadPackage('@scom/scom-wallet-modal', '*');
+                    this.mdWallet.networks = this.networks;
+                    this.mdWallet.wallets = this.wallets;
+                    // this.$eventBus.dispatch(EventId.ConnectWallet);
+                    this.mdWallet.showModal();
+                }
+                return;
+            }
+            else if (!(0, index_18.isRpcWalletConnected)()) {
+                const chainId = (0, index_18.getChainId)();
+                const clientWallet = eth_wallet_10.Wallet.getClientInstance();
+                await clientWallet.switchNetwork(chainId);
                 return;
             }
             if (!this.record || this.isSwapButtonDisabled())

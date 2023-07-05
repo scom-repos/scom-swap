@@ -14,7 +14,7 @@ import {
 import {
   getSlippageTolerance, 
   getTransactionDeadline,
-  isWalletConnected,
+  isRpcWalletConnected,
   getChainId,
   getNetworkInfo,
   getProviderList,
@@ -81,7 +81,7 @@ async function allowanceRouter(wallet: any, market: string, token: ITokenObject,
 }
 
 async function checkIsApproveButtonShown(wallet: any, firstTokenObject: any, fromInput: BigNumber, market: string, contractAddress?: string) {
-  if (!isWalletConnected()) return false;
+  if (!isRpcWalletConnected()) return false;
   let isApproveButtonShown = false;
   const owner = wallet.account.address;
   const nativeTokenObject = getChainNativeToken();

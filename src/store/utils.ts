@@ -282,9 +282,14 @@ export function getWalletProvider() {
   return localStorage.getItem('walletProvider') || '';
 }
 
-export function isWalletConnected() {
+export function isClientWalletConnected() {
   const wallet = Wallet.getClientInstance();
   return wallet.isConnected;
+}
+
+export function isRpcWalletConnected() {
+  const wallet = getRpcWallet();
+  return wallet?.isConnected;
 }
 
 export const hasMetaMask = function () {

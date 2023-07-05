@@ -1,12 +1,13 @@
 import { Module, Panel, Button, Label, VStack, Image, Container, IEventBus, application, customModule, Modal, Input, Control, customElements, ControlElement, IDataSchema, Styles, HStack, Icon } from '@ijstech/components';
-import { BigNumber, Wallet } from '@ijstech/eth-wallet';
+import { BigNumber, Constants, Wallet } from '@ijstech/eth-wallet';
 import Assets from './assets';
 import './index.css';
 import {
   getChainId,
   isExpertMode,
   getSlippageTolerance,
-  isWalletConnected,
+  isRpcWalletConnected,
+  isClientWalletConnected,
   getWalletProvider,
   setDataFromConfig,
   setProviderList,
@@ -540,14 +541,7 @@ export default class ScomSwap extends Module {
         getData: this.getData.bind(this),
         setData: async (value: any) => {
           const defaultData = configData.defaultBuilderData;
-          this._data = {...defaultData, ...value};
-          this.configDApp.data = this._data;
-          this.updateContractAddress();
-          await this.refreshUI();
-          if (this.mdWallet) {
-            this.mdWallet.networks = this._data.networks;
-            this.mdWallet.wallets = this._data.wallets;
-          }
+          this.setData({...defaultData, ...value});
         },
         getTag: this.getTag.bind(this),
         setTag: this.setTag.bind(this)
@@ -602,13 +596,23 @@ export default class ScomSwap extends Module {
 
   private async setData(value: ISwapConfigUI) {
     this._data = value;
+    console.log('setData', value)
+    let chainIds = this.networks.map((network) => network.chainId);
+    const rpcWalletId = await initRpcWallet(chainIds, this.defaultChainId);
+    const rpcWallet = getRpcWallet();
+    const event = rpcWallet.registerWalletEvent(this, Constants.RpcWalletEvent.Connected, async (connected: boolean) => {
+      console.log(`connected: ${connected}`);
+      this.currentChainId = getChainId();
+      if (this.currentChainId != null && this.currentChainId != undefined)
+        this.swapBtn.visible = true;
+      this.updateContractAddress();
+      if (this.originalData?.providers?.length) await this.onSetupPage();
+      this.setSwapButtonText();
+    });
+
     this.configDApp.data = value;
     this.updateContractAddress();
     await this.refreshUI();
-    if (this.mdWallet) {
-      this.mdWallet.networks = value.networks;
-      this.mdWallet.wallets = value.wallets;
-    }
   }
 
   private async getTag() {
@@ -719,7 +723,7 @@ export default class ScomSwap extends Module {
     setDexInfoList(dexList);
     this.setProviders();
     await this.initData();
-    await this.onSetupPage(isWalletConnected());
+    await this.onSetupPage();
   }
 
   constructor(parent?: Container, options?: any) {
@@ -747,7 +751,7 @@ export default class ScomSwap extends Module {
     if (connected && (this.currentChainId == null || this.currentChainId == undefined)) {
       this.onChainChange();
     } else {
-      if (this.originalData?.providers?.length) await this.onSetupPage(connected);
+      if (this.originalData?.providers?.length) await this.onSetupPage();
     }
   }
 
@@ -755,7 +759,7 @@ export default class ScomSwap extends Module {
     if (!connected) {
       //await this.handleAddRoute();
       //await this.updateBalance();
-      await this.onSetupPage(connected);
+      await this.onSetupPage();
     }
   }
 
@@ -765,7 +769,7 @@ export default class ScomSwap extends Module {
       this.swapBtn.visible = true;
     // this.availableMarkets = getAvailableMarkets() || [];
     this.updateContractAddress();
-    if (this.originalData?.providers?.length) await this.onSetupPage(true);
+    if (this.originalData?.providers?.length) await this.onSetupPage();
     this.setSwapButtonText();
   }
 
@@ -874,16 +878,16 @@ export default class ScomSwap extends Module {
     }
   }
 
-  private onSetupPage = async (connected: boolean, _chainId?: number) => {
+  private onSetupPage = async (_chainId?: number) => {
     setTimeout(async () => {
-      let chainIds = this.networks.map((network) => network.chainId);
-      const rpcWalletId = await initRpcWallet(chainIds, this.defaultChainId);
+      const rpcWallet = getRpcWallet();
+      console.log('rpcWallet.instanceId', rpcWallet.instanceId)
       const data: any = { 
         defaultChainId: this.defaultChainId, 
         wallets: this.wallets, 
         networks: this.networks, 
         showHeader: this.showHeader,
-        rpcWalletId 
+        rpcWalletId: rpcWallet.instanceId
       }
       if (this.dappContainer?.setData) this.dappContainer.setData(data)
       this.currentChainId = _chainId ? _chainId : getChainId();
@@ -1099,7 +1103,7 @@ export default class ScomSwap extends Module {
   private async onSelectToken(token: ITokenObject, isFrom: boolean) {
     this.firstTokenSelection.enabled = false;
     this.secondTokenSelection.enabled = false;
-    if (token.isNew && isWalletConnected()) {
+    if (token.isNew && isRpcWalletConnected()) {
       const rpcWallet = getRpcWallet();
       await tokenStore.updateAllTokenBalances(rpcWallet);
       this.allTokenBalancesMap = tokenStore.tokenBalances;
@@ -1469,8 +1473,8 @@ export default class ScomSwap extends Module {
   }
   private async updateBalance() {
     const rpcWallet = getRpcWallet();
-    if (isWalletConnected() && this.hasData) await tokenStore.updateAllTokenBalances(rpcWallet);
-    this.allTokenBalancesMap = isWalletConnected() ? tokenStore.tokenBalances : [];
+    if (this.hasData) await tokenStore.updateAllTokenBalances(rpcWallet);
+    this.allTokenBalancesMap = tokenStore.tokenBalances;
     if (this.fromToken) {
       const balance = this.getBalance(this.fromToken);
       this.payBalance.caption = `Balance: ${formatNumber(balance, 4)} ${this.fromToken.symbol}`;
@@ -1491,8 +1495,11 @@ export default class ScomSwap extends Module {
 
   private getSwapButtonText() {
     const isApproveButtonShown = this.isApproveButtonShown;
-    if (!isWalletConnected()) {
+    if (!isClientWalletConnected()) {
       return "Connect Wallet";
+    }
+    if (!isRpcWalletConnected()) {
+      return "Switch Network";
     }
     if (isApproveButtonShown) {
       const status = this.approveButtonStatus;
@@ -1573,13 +1580,24 @@ export default class ScomSwap extends Module {
   }
   private isSwapButtonDisabled() {
     const warningMessageText = this.getWarningMessageText();
-    return (isWalletConnected() && (warningMessageText != '' && !this.isPriceImpactTooHigh));
+    return (isRpcWalletConnected() && (warningMessageText != '' && !this.isPriceImpactTooHigh));
   }
 
-  private onClickSwapButton() {
-    if (!isWalletConnected()) {
-      // this.$eventBus.dispatch(EventId.ConnectWallet);
-      this.mdWallet.showModal();
+  private async onClickSwapButton() {
+    if (!isClientWalletConnected()) {
+      if (this.mdWallet) {
+        await application.loadPackage('@scom/scom-wallet-modal', '*');
+        this.mdWallet.networks = this.networks;
+        this.mdWallet.wallets = this.wallets;
+        // this.$eventBus.dispatch(EventId.ConnectWallet);
+        this.mdWallet.showModal();   
+      }
+      return;
+    }
+    else if (!isRpcWalletConnected()) {
+      const chainId = getChainId();
+      const clientWallet = Wallet.getClientInstance();
+      await clientWallet.switchNetwork(chainId);
       return;
     }
     if (!this.record || this.isSwapButtonDisabled()) return;
