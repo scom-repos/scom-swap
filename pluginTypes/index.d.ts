@@ -10737,25 +10737,9 @@ declare module "@scom/scom-swap/config/index.tsx" {
 declare module "@scom/scom-swap/data.json.ts" {
     const _default_54: {
         infuraId: string;
-        networks: ({
+        networks: {
             chainId: number;
-            isMainChain: boolean;
-            isCrossChainSupported: boolean;
-            explorerName: string;
-            explorerTxUrl: string;
-            explorerAddressUrl: string;
-            isTestnet: boolean;
-            shortName?: undefined;
-        } | {
-            chainId: number;
-            shortName: string;
-            isCrossChainSupported: boolean;
-            explorerName: string;
-            explorerTxUrl: string;
-            explorerAddressUrl: string;
-            isTestnet: boolean;
-            isMainChain?: undefined;
-        })[];
+        }[];
         proxyAddresses: {
             "97": string;
             "43113": string;
@@ -10865,7 +10849,6 @@ declare module "@scom/scom-swap" {
         private isPriceToggled;
         private record;
         private allTokenBalancesMap;
-        private currentChainId;
         private supportedChainIds;
         private swapButtonStatusMap;
         private approveButtonStatusMap;
@@ -10947,8 +10930,6 @@ declare module "@scom/scom-swap" {
         private refreshUI;
         constructor(parent?: Container, options?: any);
         private registerEvent;
-        private onWalletConnect;
-        private onWalletDisconnect;
         private onChainChange;
         get isApproveButtonShown(): boolean;
         get isPriceImpactTooHigh(): boolean;
@@ -10960,7 +10941,7 @@ declare module "@scom/scom-swap" {
         get isValidToken(): boolean;
         private redirectToken;
         private fixedNumber;
-        private setFixedPairData;
+        private setDefaultPair;
         private onSetupPage;
         private initTokenSelection;
         private initApprovalModelAction;

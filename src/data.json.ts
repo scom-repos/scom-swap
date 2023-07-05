@@ -4,23 +4,11 @@ export default {
   "infuraId": InfuraId,
   "networks": [  
     {
-      "chainId": 97,
-      "isMainChain": true,
-      "isCrossChainSupported": true,
-      "explorerName": "BSCScan",
-      "explorerTxUrl": "https://testnet.bscscan.com/tx/",
-      "explorerAddressUrl": "https://testnet.bscscan.com/address/",
-      "isTestnet": true
+      "chainId": 97
     },    
     {
-      "chainId": 43113,
-      "shortName": "AVAX Testnet",
-      "isCrossChainSupported": true,
-      "explorerName": "SnowTrace",
-      "explorerTxUrl": "https://testnet.snowtrace.io/tx/",
-      "explorerAddressUrl": "https://testnet.snowtrace.io/address/",
-      "isTestnet": true
-    }    
+      "chainId": 43113
+    }       
   ],
   "proxyAddresses": {
     "97": "0x9602cB9A782babc72b1b6C96E050273F631a6870",

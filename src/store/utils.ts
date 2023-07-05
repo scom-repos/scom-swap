@@ -318,7 +318,7 @@ export function initRpcWallet(chainIds: number[], defaultChainId: number) {
   const clientWallet = Wallet.getClientInstance();
   const networkList: INetwork[] = Object.values(application.store.networkMap);
   const instanceId = clientWallet.initRpcWallet({
-    networks: networkList.filter(item => chainIds.includes(item.chainId)),
+    networks: networkList,
     defaultChainId,
     infuraId: application.store.infuraId,
     multicalls: application.store.multicalls

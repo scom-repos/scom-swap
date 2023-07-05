@@ -14721,7 +14721,7 @@ define("@scom/scom-swap/store/utils.ts", ["require", "exports", "@ijstech/compon
         const clientWallet = eth_wallet_4.Wallet.getClientInstance();
         const networkList = Object.values(components_4.application.store.networkMap);
         const instanceId = clientWallet.initRpcWallet({
-            networks: networkList.filter(item => chainIds.includes(item.chainId)),
+            networks: networkList,
             defaultChainId,
             infuraId: components_4.application.store.infuraId,
             multicalls: components_4.application.store.multicalls
@@ -17928,22 +17928,10 @@ define("@scom/scom-swap/data.json.ts", ["require", "exports"], function (require
         "infuraId": InfuraId,
         "networks": [
             {
-                "chainId": 97,
-                "isMainChain": true,
-                "isCrossChainSupported": true,
-                "explorerName": "BSCScan",
-                "explorerTxUrl": "https://testnet.bscscan.com/tx/",
-                "explorerAddressUrl": "https://testnet.bscscan.com/address/",
-                "isTestnet": true
+                "chainId": 97
             },
             {
-                "chainId": 43113,
-                "shortName": "AVAX Testnet",
-                "isCrossChainSupported": true,
-                "explorerName": "SnowTrace",
-                "explorerTxUrl": "https://testnet.snowtrace.io/tx/",
-                "explorerAddressUrl": "https://testnet.snowtrace.io/address/",
-                "isTestnet": true
+                "chainId": 43113
             }
         ],
         "proxyAddresses": {
@@ -18096,6 +18084,20 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                             "fixed-pair",
                             "aggregator"
                         ]
+                    },
+                    networks: {
+                        type: "array",
+                        required: true,
+                        items: {
+                            type: "object",
+                            properties: {
+                                chainId: {
+                                    type: "number",
+                                    enum: [1, 56, 137, 250, 97, 80001, 43113, 43114],
+                                    required: true
+                                }
+                            }
+                        }
                     },
                     tokens: {
                         type: "array",
@@ -18263,6 +18265,8 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                         return {
                             execute: async () => {
                                 _oldData = Object.assign({}, this._data);
+                                this._data.networks = userInputData.networks;
+                                this._data.defaultChainId = this._data.networks[0].chainId;
                                 this._data.category = userInputData.category;
                                 this._data.providers = userInputData.providers;
                                 this._data.tokens = [];
@@ -18315,6 +18319,21 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                                     {
                                         "type": "Categorization",
                                         "elements": [
+                                            {
+                                                "type": "Category",
+                                                "label": "Networks",
+                                                "elements": [
+                                                    {
+                                                        "type": "Control",
+                                                        "scope": "#/properties/networks",
+                                                        "options": {
+                                                            "detail": {
+                                                                "type": "VerticalLayout"
+                                                            }
+                                                        }
+                                                    }
+                                                ]
+                                            },
                                             {
                                                 "type": "Category",
                                                 "label": "Providers",
@@ -18451,9 +18470,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
             const event = rpcWallet.registerWalletEvent(this, eth_wallet_10.Constants.RpcWalletEvent.Connected, async (connected) => {
                 var _a, _b;
                 console.log(`connected: ${connected}`);
-                this.currentChainId = (0, index_18.getChainId)();
-                if (this.currentChainId != null && this.currentChainId != undefined)
-                    this.swapBtn.visible = true;
+                this.swapBtn.visible = true;
                 this.updateContractAddress();
                 if ((_b = (_a = this.originalData) === null || _a === void 0 ? void 0 : _a.providers) === null || _b === void 0 ? void 0 : _b.length)
                     await this.onSetupPage();
@@ -18588,27 +18605,10 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
             this.isInited = false;
             this.oldSupportedChainList = [];
             this.supportedChainList = [];
-            this.onWalletConnect = async (connected) => {
-                var _a, _b;
-                if (connected && (this.currentChainId == null || this.currentChainId == undefined)) {
-                    this.onChainChange();
-                }
-                else {
-                    if ((_b = (_a = this.originalData) === null || _a === void 0 ? void 0 : _a.providers) === null || _b === void 0 ? void 0 : _b.length)
-                        await this.onSetupPage();
-                }
-            };
-            this.onWalletDisconnect = async (connected) => {
-                if (!connected) {
-                    //await this.handleAddRoute();
-                    //await this.updateBalance();
-                    await this.onSetupPage();
-                }
-            };
             this.onChainChange = async () => {
                 var _a, _b;
-                this.currentChainId = (0, index_18.getChainId)();
-                if (this.currentChainId != null && this.currentChainId != undefined)
+                const currentChainId = (0, index_18.getChainId)();
+                if (currentChainId != null && currentChainId != undefined)
                     this.swapBtn.visible = true;
                 // this.availableMarkets = getAvailableMarkets() || [];
                 this.updateContractAddress();
@@ -18618,8 +18618,9 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
             };
             this.redirectToken = () => {
                 var _a, _b;
+                const currentChainId = (0, index_18.getChainId)();
                 let queryRouter = {
-                    chainId: this.currentChainId,
+                    chainId: currentChainId,
                     fromToken: ((_a = this.fromToken) === null || _a === void 0 ? void 0 : _a.symbol) || this.fromTokenSymbol,
                     toToken: ((_b = this.toToken) === null || _b === void 0 ? void 0 : _b.symbol) || this.toTokenSymbol,
                 };
@@ -18648,8 +18649,6 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
             this.onSetupPage = async (_chainId) => {
                 setTimeout(async () => {
                     var _a;
-                    // let chainIds = this.networks.map((network) => network.chainId);
-                    // const rpcWalletId = await initRpcWallet(chainIds, this.defaultChainId);
                     const rpcWallet = (0, index_18.getRpcWallet)();
                     console.log('rpcWallet.instanceId', rpcWallet.instanceId);
                     const data = {
@@ -18661,12 +18660,10 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                     };
                     if ((_a = this.dappContainer) === null || _a === void 0 ? void 0 : _a.setData)
                         this.dappContainer.setData(data);
-                    this.currentChainId = _chainId ? _chainId : (0, index_18.getChainId)();
-                    scom_token_list_7.tokenStore.updateTokenMapData(this.currentChainId);
+                    const currentChainId = (0, index_18.getChainId)();
+                    scom_token_list_7.tokenStore.updateTokenMapData(currentChainId);
                     this.closeNetworkErrModal();
-                    if (this.isFixedPair) {
-                        this.setFixedPairData();
-                    }
+                    this.setDefaultPair();
                     this.toggleReverseImage.enabled = !this.isFixedPair;
                     this.firstTokenSelection.disableSelect = this.isFixedPair;
                     this.secondTokenSelection.disableSelect = this.isFixedPair;
@@ -18693,7 +18690,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                             input.value = this.fixedNumber(this.toInputValue);
                         }
                     }
-                    this.firstTokenSelection.tokenDataListProp = (0, index_18.getSupportedTokens)(this._data.tokens || [], this.currentChainId);
+                    this.firstTokenSelection.tokenDataListProp = (0, index_18.getSupportedTokens)(this._data.tokens || [], currentChainId);
                     this.setTargetTokenList();
                     if (!this.record)
                         this.swapBtn.enabled = false;
@@ -18825,7 +18822,8 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
             };
             this.setTargetTokenList = (isDisabled) => {
                 var _a;
-                const srcChainId = ((_a = this.srcChain) === null || _a === void 0 ? void 0 : _a.chainId) || this.currentChainId;
+                const currentChainId = (0, index_18.getChainId)();
+                const srcChainId = ((_a = this.srcChain) === null || _a === void 0 ? void 0 : _a.chainId) || currentChainId;
                 this.secondTokenSelection.tokenDataListProp = (0, index_18.getSupportedTokens)(this._data.tokens || [], srcChainId);
             };
             this.showModalFees = () => {
@@ -18870,13 +18868,20 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
             this.registerEvent();
         }
         registerEvent() {
-            this.$eventBus.register(this, "isWalletConnected" /* EventId.IsWalletConnected */, this.onWalletConnect);
-            this.$eventBus.register(this, "IsWalletDisconnected" /* EventId.IsWalletDisconnected */, this.onWalletDisconnect);
             this.$eventBus.register(this, "chainChanged" /* EventId.chainChanged */, this.onChainChange);
             this.$eventBus.register(this, "SlippageToleranceChanged" /* EventId.SlippageToleranceChanged */, () => { this.priceInfo.Items = this.getPriceInfo(); });
             this.$eventBus.register(this, "ExpertModeChanged" /* EventId.ExpertModeChanged */, () => {
                 this.setSwapButtonText();
             });
+            // const clientWallet = Wallet.getClientInstance();
+            // clientWallet.registerWalletEvent(this, Constants.ClientWalletEvent.AccountsChanged, async (payload: Record<string, any>) => {
+            //   const { userTriggeredConnect, account } = payload;
+            //   let connected = !!account;
+            //   const rpcWallet = getRpcWallet();
+            //   rpcWallet.address = account;
+            //   console.log('AccountsChanged', payload);
+            //   await this.onSetupPage();
+            // });
         }
         // get supportedNetworks() {
         //   let providers: IProvider[] = [];
@@ -18933,9 +18938,10 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
             }
             return false;
         }
-        setFixedPairData() {
+        setDefaultPair() {
             var _a, _b, _c;
-            let currentChainTokens = this._data.tokens.filter((token) => token.chainId === this.currentChainId);
+            const currentChainId = (0, index_18.getChainId)();
+            let currentChainTokens = this._data.tokens.filter((token) => token.chainId === currentChainId);
             if (currentChainTokens.length < 2)
                 return;
             const providers = (_a = this.originalData) === null || _a === void 0 ? void 0 : _a.providers;
@@ -19034,11 +19040,12 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
             if (!this.record)
                 return;
             // this.setupCrossChainPopup();
+            const currentChainId = (0, index_18.getChainId)();
             const slippageTolerance = (0, index_18.getSlippageTolerance)();
-            this.fromTokenImage.url = scom_token_list_7.assets.tokenPath(this.fromToken, this.currentChainId);
+            this.fromTokenImage.url = scom_token_list_7.assets.tokenPath(this.fromToken, currentChainId);
             this.fromTokenLabel.caption = (_b = (_a = this.fromToken) === null || _a === void 0 ? void 0 : _a.symbol) !== null && _b !== void 0 ? _b : '';
             this.fromTokenValue.caption = (0, index_20.formatNumber)(this.totalAmount(), 4);
-            this.toTokenImage.url = scom_token_list_7.assets.tokenPath(this.toToken, this.currentChainId);
+            this.toTokenImage.url = scom_token_list_7.assets.tokenPath(this.toToken, currentChainId);
             this.toTokenLabel.caption = (_d = (_c = this.toToken) === null || _c === void 0 ? void 0 : _c.symbol) !== null && _d !== void 0 ? _d : '';
             this.toTokenValue.caption = (0, index_20.formatNumber)(this.toInputValue, 4);
             const minimumReceived = this.getMinReceivedMaxSold();
@@ -19674,7 +19681,6 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
             this.initExpertModal();
             const lazyLoad = this.getAttribute('lazyLoad', true, false);
             if (!lazyLoad) {
-                // this.currentChainId = getChainId();
                 const defaultColors = {
                     fontColor: currentTheme.text.primary,
                     backgroundColor: currentTheme.background.main,

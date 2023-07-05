@@ -149,7 +149,6 @@ export default class ScomSwap extends Module {
   private allTokenBalancesMap: any;
   // private checkHasWallet: boolean;
   // private availableMarkets: any;
-  private currentChainId: number;
   private supportedChainIds: number[];
   private swapButtonStatusMap: any;
   private approveButtonStatusMap: any;
@@ -251,6 +250,20 @@ export default class ScomSwap extends Module {
             "fixed-pair",
             "aggregator"
           ]
+        },
+        networks: {
+          type: "array",
+          required: true,
+          items: {
+            type: "object",
+            properties: {
+              chainId: {
+                type: "number",
+                enum: [1, 56, 137, 250, 97, 80001, 43113, 43114],
+                required: true
+              }
+            }
+          }
         },
         tokens: {
           type: "array",
@@ -417,6 +430,8 @@ export default class ScomSwap extends Module {
           return {
             execute: async () => {
               _oldData = {...this._data};
+              this._data.networks = userInputData.networks;
+              this._data.defaultChainId = this._data.networks[0].chainId;
               this._data.category = userInputData.category;
               this._data.providers = userInputData.providers;
               this._data.tokens = [];
@@ -465,6 +480,21 @@ export default class ScomSwap extends Module {
                 {
                   "type": "Categorization",
                   "elements": [
+                    {
+                      "type": "Category",
+                      "label": "Networks",
+                      "elements": [
+                        {
+                          "type": "Control",
+                          "scope": "#/properties/networks",
+                          "options": {
+                            "detail": {
+                              "type": "VerticalLayout"
+                            }
+                          }
+                        }
+                      ]
+                    },                    
                     {
                       "type": "Category",
                       "label": "Providers",
@@ -602,9 +632,7 @@ export default class ScomSwap extends Module {
     const rpcWallet = getRpcWallet();
     const event = rpcWallet.registerWalletEvent(this, Constants.RpcWalletEvent.Connected, async (connected: boolean) => {
       console.log(`connected: ${connected}`);
-      this.currentChainId = getChainId();
-      if (this.currentChainId != null && this.currentChainId != undefined)
-        this.swapBtn.visible = true;
+      this.swapBtn.visible = true;
       this.updateContractAddress();
       if (this.originalData?.providers?.length) await this.onSetupPage();
       this.setSwapButtonText();
@@ -738,34 +766,25 @@ export default class ScomSwap extends Module {
   }
 
   private registerEvent() {
-    this.$eventBus.register(this, EventId.IsWalletConnected, this.onWalletConnect)
-    this.$eventBus.register(this, EventId.IsWalletDisconnected, this.onWalletDisconnect)
     this.$eventBus.register(this, EventId.chainChanged, this.onChainChange)
     this.$eventBus.register(this, EventId.SlippageToleranceChanged, () => { this.priceInfo.Items = this.getPriceInfo() })
     this.$eventBus.register(this, EventId.ExpertModeChanged, () => {
       this.setSwapButtonText();
     });
-  }
-
-  private onWalletConnect = async (connected: boolean) => {
-    if (connected && (this.currentChainId == null || this.currentChainId == undefined)) {
-      this.onChainChange();
-    } else {
-      if (this.originalData?.providers?.length) await this.onSetupPage();
-    }
-  }
-
-  private onWalletDisconnect = async (connected: boolean) => {
-    if (!connected) {
-      //await this.handleAddRoute();
-      //await this.updateBalance();
-      await this.onSetupPage();
-    }
+    // const clientWallet = Wallet.getClientInstance();
+    // clientWallet.registerWalletEvent(this, Constants.ClientWalletEvent.AccountsChanged, async (payload: Record<string, any>) => {
+    //   const { userTriggeredConnect, account } = payload;
+    //   let connected = !!account;
+    //   const rpcWallet = getRpcWallet();
+    //   rpcWallet.address = account;
+    //   console.log('AccountsChanged', payload);
+    //   await this.onSetupPage();
+    // });
   }
 
   private onChainChange = async () => {
-    this.currentChainId = getChainId();
-    if (this.currentChainId != null && this.currentChainId != undefined)
+    const currentChainId = getChainId();
+    if (currentChainId != null && currentChainId != undefined)
       this.swapBtn.visible = true;
     // this.availableMarkets = getAvailableMarkets() || [];
     this.updateContractAddress();
@@ -824,8 +843,9 @@ export default class ScomSwap extends Module {
   }
 
   private redirectToken = () => {
+    const currentChainId = getChainId();
     let queryRouter: any = {
-      chainId: this.currentChainId,
+      chainId: currentChainId,
       fromToken: this.fromToken?.symbol || this.fromTokenSymbol,
       toToken: this.toToken?.symbol || this.toTokenSymbol,
     };
@@ -856,8 +876,9 @@ export default class ScomSwap extends Module {
     return formatted.replace(/,/g, '');
   }
 
-  private setFixedPairData() {
-    let currentChainTokens = this._data.tokens.filter((token) => token.chainId === this.currentChainId);
+  private setDefaultPair() {
+    const currentChainId = getChainId();
+    let currentChainTokens = this._data.tokens.filter((token) => token.chainId === currentChainId);
     if (currentChainTokens.length < 2) return;
     const providers = this.originalData?.providers;
     if (providers && providers.length) {
@@ -890,12 +911,10 @@ export default class ScomSwap extends Module {
         rpcWalletId: rpcWallet.instanceId
       }
       if (this.dappContainer?.setData) this.dappContainer.setData(data)
-      this.currentChainId = _chainId ? _chainId : getChainId();
-      tokenStore.updateTokenMapData(this.currentChainId);
+      const currentChainId = getChainId();
+      tokenStore.updateTokenMapData(currentChainId);
       this.closeNetworkErrModal();
-      if (this.isFixedPair) {
-        this.setFixedPairData();
-      }
+      this.setDefaultPair();
       this.toggleReverseImage.enabled = !this.isFixedPair;
       this.firstTokenSelection.disableSelect = this.isFixedPair;
       this.secondTokenSelection.disableSelect = this.isFixedPair;
@@ -922,7 +941,7 @@ export default class ScomSwap extends Module {
           input.value = this.fixedNumber(this.toInputValue);
         }
       }
-      this.firstTokenSelection.tokenDataListProp = getSupportedTokens(this._data.tokens || [], this.currentChainId);
+      this.firstTokenSelection.tokenDataListProp = getSupportedTokens(this._data.tokens || [], currentChainId);
       this.setTargetTokenList();
 
       if (!this.record)
@@ -1020,11 +1039,12 @@ export default class ScomSwap extends Module {
   private handleSwapPopup() {
     if (!this.record) return;
     // this.setupCrossChainPopup();
+    const currentChainId = getChainId();
     const slippageTolerance = getSlippageTolerance();
-    this.fromTokenImage.url = tokenAssets.tokenPath(this.fromToken, this.currentChainId);
+    this.fromTokenImage.url = tokenAssets.tokenPath(this.fromToken, currentChainId);
     this.fromTokenLabel.caption = this.fromToken?.symbol ?? '';
     this.fromTokenValue.caption = formatNumber(this.totalAmount(), 4);
-    this.toTokenImage.url = tokenAssets.tokenPath(this.toToken, this.currentChainId);
+    this.toTokenImage.url = tokenAssets.tokenPath(this.toToken, currentChainId);
     this.toTokenLabel.caption = this.toToken?.symbol ?? '';
     this.toTokenValue.caption = formatNumber(this.toInputValue, 4);
     const minimumReceived = this.getMinReceivedMaxSold();
@@ -1699,7 +1719,8 @@ export default class ScomSwap extends Module {
   }
 
   private setTargetTokenList = (isDisabled?: boolean) => {
-    const srcChainId = this.srcChain?.chainId || this.currentChainId;
+    const currentChainId = getChainId();
+    const srcChainId = this.srcChain?.chainId || currentChainId;
     this.secondTokenSelection.tokenDataListProp = getSupportedTokens(this._data.tokens || [], srcChainId);
   }
 
@@ -1818,7 +1839,6 @@ export default class ScomSwap extends Module {
     this.initExpertModal();
     const lazyLoad = this.getAttribute('lazyLoad', true, false);
     if (!lazyLoad) {
-      // this.currentChainId = getChainId();
       const defaultColors = {
         fontColor: currentTheme.text.primary,
         backgroundColor: currentTheme.background.main,
