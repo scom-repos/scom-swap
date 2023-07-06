@@ -19,7 +19,8 @@ import {
   getSupportedTokens,
   setDexInfoList,
   initRpcWallet,
-  getRpcWallet
+  getRpcWallet,
+  getIPFSGatewayUrl
 } from "./store/index";
 import { tokenStore, DefaultERC20Tokens, ChainNativeTokenByChainId, assets as tokenAssets } from '@scom/scom-token-list';
 
@@ -55,6 +56,7 @@ import { Result } from './result/index';
 import { ExpertModeSettings } from './expert-mode-settings/index'
 import Config from './config/index';
 import configData from './data.json';
+import formSchema from './formSchema.json';
 import ScomWalletModal, {IWalletPlugin} from '@scom/scom-wallet-modal';
 import ScomDappContainer from '@scom/scom-dapp-container'
 import getDexList from '@scom/scom-dex-list';
@@ -75,6 +77,8 @@ interface ScomSwapElement extends ControlElement {
   networks: INetworkConfig[];
   wallets: IWalletPlugin[];
   showHeader?: boolean;
+  logo?: string;
+  title?: string;
 }
 
 declare global {
@@ -100,6 +104,8 @@ export default class ScomSwap extends Module {
   tag: any = {};
   defaultEdit: boolean = true
 
+  private imgLogo: Image;
+  private lbTitle: Label;
   private swapComponent: Panel;
   private swapContainer: Container;
   private pnlPriceInfo: Panel;
@@ -240,130 +246,7 @@ export default class ScomSwap extends Module {
   }
 
   private getActions() {
-    const propertiesSchema: any = {
-      type: "object",
-      properties: {      
-        category: {
-          type: "string",
-          required: true,
-          enum: [
-            "fixed-pair",
-            "aggregator"
-          ]
-        },
-        networks: {
-          type: "array",
-          required: true,
-          items: {
-            type: "object",
-            properties: {
-              chainId: {
-                type: "number",
-                enum: [1, 56, 137, 250, 97, 80001, 43113, 43114],
-                required: true
-              }
-            }
-          }
-        },
-        tokens: {
-          type: "array",
-          required: true,
-          items: {
-            type: "object",
-            properties: {
-              chainId: {
-                type: "number",
-                enum: [1, 56, 137, 250, 97, 80001, 43113, 43114],
-                required: true
-              },
-              address: {
-                type: "string",
-                required: true
-              }
-            }
-          }
-        }, 
-        providers: {
-          type: "array",
-          required: true,
-          items: {
-            type: "object",
-            properties: {
-              caption: {
-                type: "string",
-                required: true
-              },
-              image: {
-                type: "string",
-                required: true
-              },
-              key: {
-                type: "string",
-                required: true
-              },
-              dexId: {
-                type: "number"
-              },
-              chainId: {
-                type: "number",
-                enum: [1, 56, 137, 250, 97, 80001, 43113, 43114],
-                required: true
-              }
-            }
-          }
-        }
-      }
-    }
-
-    const themeSchema: IDataSchema = {
-      type: 'object',
-      properties: {
-        "dark": {
-          type: 'object',
-          properties: {
-            backgroundColor: {
-              type: 'string',
-              format: 'color'
-            },
-            fontColor: {
-              type: 'string',
-              format: 'color'
-            },
-            inputBackgroundColor: {
-              type: 'string',
-              format: 'color'
-            },
-            inputFontColor: {
-              type: 'string',
-              format: 'color'
-            }
-          }
-        },
-        "light": {
-          type: 'object',
-          properties: {
-            backgroundColor: {
-              type: 'string',
-              format: 'color'
-            },
-            fontColor: {
-              type: 'string',
-              format: 'color'
-            },
-            inputBackgroundColor: {
-              type: 'string',
-              format: 'color'
-            },
-            inputFontColor: {
-              type: 'string',
-              format: 'color'
-            }
-          }
-        }
-      }
-    }
-
-    return this._getActions(propertiesSchema, themeSchema);
+    return this._getActions(formSchema.general.dataSchema as any, formSchema.theme.dataSchema as any);
   }
 
   private _getActions(propertiesSchema: IDataSchema, themeSchema: IDataSchema) {
@@ -430,6 +313,8 @@ export default class ScomSwap extends Module {
           return {
             execute: async () => {
               _oldData = {...this._data};
+              this._data.logo = userInputData.logo;
+              this._data.title = userInputData.title;
               this._data.networks = userInputData.networks;
               this._data.defaultChainId = this._data.networks[0].chainId;
               this._data.category = userInputData.category;
@@ -462,75 +347,7 @@ export default class ScomSwap extends Module {
           }
         },
         userInputDataSchema: propertiesSchema,
-        userInputUISchema: {
-          "type": "VerticalLayout",
-          "elements": [
-            {
-              "type": "HorizontalLayout",
-              "elements": [
-                {
-                  "type": "Control",
-                  "scope": "#/properties/category"
-                }
-              ]
-            },
-            {
-              "type": "HorizontalLayout",
-              "elements": [
-                {
-                  "type": "Categorization",
-                  "elements": [
-                    {
-                      "type": "Category",
-                      "label": "Networks",
-                      "elements": [
-                        {
-                          "type": "Control",
-                          "scope": "#/properties/networks",
-                          "options": {
-                            "detail": {
-                              "type": "VerticalLayout"
-                            }
-                          }
-                        }
-                      ]
-                    },                    
-                    {
-                      "type": "Category",
-                      "label": "Providers",
-                      "elements": [
-                        {
-                          "type": "Control",
-                          "scope": "#/properties/providers",
-                          "options": {
-                            "detail": {
-                              "type": "VerticalLayout"
-                            }
-                          }
-                        }
-                      ]
-                    },
-                    {
-                      "type": "Category",
-                      "label": "Tokens",
-                      "elements": [
-                        {
-                          "type": "Control",
-                          "scope": "#/properties/tokens",
-                          "options": {
-                            "detail": {
-                              "type": "VerticalLayout"
-                            }
-                          }
-                        }
-                      ]
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        }
+        userInputUISchema: formSchema.general.uiSchema
       },
       {
         name: 'Theme Settings',
@@ -918,6 +735,14 @@ export default class ScomSwap extends Module {
       this.toggleReverseImage.enabled = !this.isFixedPair;
       this.firstTokenSelection.disableSelect = this.isFixedPair;
       this.secondTokenSelection.disableSelect = this.isFixedPair;
+      if (this._data.logo?.startsWith('ipfs://')) {
+        const ipfsGatewayUrl = getIPFSGatewayUrl();
+        this.imgLogo.url = this._data.logo.replace('ipfs://', ipfsGatewayUrl);
+      }
+      else {
+        this.imgLogo.url = this._data.logo;
+      }
+      this.lbTitle.caption = this._data.title
 
       this.setSwapButtonText();
       await this.updateBalance();
@@ -1877,6 +1702,10 @@ export default class ScomSwap extends Module {
         <i-panel id="swapComponent" background={{ color: Theme.background.main }}>
           <i-panel class="pageblock-swap">
             <i-panel id="swapContainer">
+              <i-vstack margin={{ bottom: '0.25rem' }} gap="0.5rem" horizontalAlignment="center">
+                <i-image id='imgLogo' height={100}></i-image>
+                <i-label id='lbTitle' font={{ bold: true, size: '1.5rem' }}></i-label>
+              </i-vstack>
               <i-panel class="content-swap">
                 <i-hstack id="wrapperSwap" gap={10}>
                   <i-vstack gap={5} minWidth={230} width="calc(100% - 25px)">

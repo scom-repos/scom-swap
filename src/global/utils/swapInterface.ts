@@ -54,6 +54,8 @@ export interface ISwapConfigUI {
   wallets: IWalletPlugin[];
   networks: INetworkConfig[];
   showHeader?: boolean;
+  logo?: string;
+  title?: string;
 }
 
 export interface IEmbedData {

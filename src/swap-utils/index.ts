@@ -1,7 +1,7 @@
 import { Wallet, BigNumber, Utils, Erc20, TransactionReceipt } from "@ijstech/eth-wallet";
 import { Contracts } from "../contracts/oswap-openswap-contract/index";
 import { Contracts as ProxyContracts } from '../contracts/scom-commission-proxy-contract/index';
-import { executeRouterSwap, getRouterSwapTxData, IExecuteSwapOptions } from '@scom/scom-dex-list';
+import { executeRouterSwap, getDexPairReserves, getRouterSwapTxData, IExecuteSwapOptions } from '@scom/scom-dex-list';
 import { ITokenObject } from '@scom/scom-token-list';
 import {
   getAPI,
@@ -291,23 +291,10 @@ const getAllAvailableRoutes = async (markets: string[], tokenList: ITokenObject[
   let getPairPromises:Promise<void>[] = [];
   let availableRoutes: AvailableRoute[] = [];
 
-  const getReservesByPair = async (pairAddress: string, tokenIn: ITokenObject, tokenOut: ITokenObject) => {
-    let reserveObj;
+  const getReservesByPair = async (market: string, pairAddress: string, tokenIn: ITokenObject, tokenOut: ITokenObject) => {
     if (!tokenIn.address) tokenIn = getWETH();
     if (!tokenOut.address) tokenOut = getWETH();
-    let pair = new Contracts.OSWAP_Pair(wallet, pairAddress);
-    let reserves = await pair.getReserves();
-    if (new BigNumber(tokenIn.address!.toLowerCase()).lt(tokenOut.address!.toLowerCase())) {
-      reserveObj = {
-        reserveA: reserves._reserve0,
-        reserveB: reserves._reserve1
-      };
-    } else {
-      reserveObj = {
-        reserveA: reserves._reserve1,
-        reserveB: reserves._reserve0
-      };
-    }
+    let reserveObj = await getDexPairReserves(wallet, wallet.chainId, market, pairAddress, tokenIn.address, tokenOut.address);
     return reserveObj;
   }
 
@@ -326,7 +313,7 @@ const getAllAvailableRoutes = async (markets: string[], tokenList: ITokenObject[
     try {
       let pair = await getPair(market, tokenIn, tokenOut);
       if (pair == Utils.nullAddress) return;
-      let reserveObj = await getReservesByPair(pair, tokenIn, tokenOut);
+      let reserveObj = await getReservesByPair(market, pair, tokenIn, tokenOut);
       availableRoutes.push({
         pair,
         market,

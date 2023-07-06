@@ -1,5 +1,7 @@
 /// <reference path="@ijstech/eth-contract/index.d.ts" />
+/// <reference path="@scom/scom-dex-list/@ijstech/eth-contract/index.d.ts" />
 /// <reference path="@ijstech/eth-wallet/index.d.ts" />
+/// <reference path="@scom/scom-dex-list/@ijstech/eth-wallet/index.d.ts" />
 /// <amd-module name="@scom/scom-swap/assets.ts" />
 declare module "@scom/scom-swap/assets.ts" {
     import { ITokenObject } from '@scom/scom-token-list';
@@ -9729,6 +9731,8 @@ declare module "@scom/scom-swap/global/utils/swapInterface.ts" {
         wallets: IWalletPlugin[];
         networks: INetworkConfig[];
         showHeader?: boolean;
+        logo?: string;
+        title?: string;
     }
     export interface IEmbedData {
         category?: Category;
@@ -10775,6 +10779,179 @@ declare module "@scom/scom-swap/data.json.ts" {
     };
     export default _default_54;
 }
+/// <amd-module name="@scom/scom-swap/formSchema.json.ts" />
+declare module "@scom/scom-swap/formSchema.json.ts" {
+    const _default_55: {
+        general: {
+            dataSchema: {
+                type: string;
+                properties: {
+                    title: {
+                        type: string;
+                    };
+                    logo: {
+                        type: string;
+                        format: string;
+                    };
+                    category: {
+                        type: string;
+                        required: boolean;
+                        enum: string[];
+                    };
+                    networks: {
+                        type: string;
+                        required: boolean;
+                        items: {
+                            type: string;
+                            properties: {
+                                chainId: {
+                                    type: string;
+                                    enum: number[];
+                                    required: boolean;
+                                };
+                            };
+                        };
+                    };
+                    tokens: {
+                        type: string;
+                        required: boolean;
+                        items: {
+                            type: string;
+                            properties: {
+                                chainId: {
+                                    type: string;
+                                    enum: number[];
+                                    required: boolean;
+                                };
+                                address: {
+                                    type: string;
+                                    required: boolean;
+                                };
+                            };
+                        };
+                    };
+                    providers: {
+                        type: string;
+                        required: boolean;
+                        items: {
+                            type: string;
+                            properties: {
+                                caption: {
+                                    type: string;
+                                    required: boolean;
+                                };
+                                image: {
+                                    type: string;
+                                    required: boolean;
+                                };
+                                key: {
+                                    type: string;
+                                    required: boolean;
+                                };
+                                dexId: {
+                                    type: string;
+                                };
+                                chainId: {
+                                    type: string;
+                                    enum: number[];
+                                    required: boolean;
+                                };
+                            };
+                        };
+                    };
+                };
+            };
+            uiSchema: {
+                type: string;
+                elements: ({
+                    type: string;
+                    elements: {
+                        type: string;
+                        scope: string;
+                    }[];
+                } | {
+                    type: string;
+                    elements: {
+                        type: string;
+                        elements: ({
+                            type: string;
+                            label: string;
+                            elements: {
+                                type: string;
+                                elements: {
+                                    type: string;
+                                    scope: string;
+                                }[];
+                            }[];
+                        } | {
+                            type: string;
+                            label: string;
+                            elements: {
+                                type: string;
+                                scope: string;
+                                options: {
+                                    detail: {
+                                        type: string;
+                                    };
+                                };
+                            }[];
+                        })[];
+                    }[];
+                })[];
+            };
+        };
+        theme: {
+            dataSchema: {
+                type: string;
+                properties: {
+                    dark: {
+                        type: string;
+                        properties: {
+                            backgroundColor: {
+                                type: string;
+                                format: string;
+                            };
+                            fontColor: {
+                                type: string;
+                                format: string;
+                            };
+                            inputBackgroundColor: {
+                                type: string;
+                                format: string;
+                            };
+                            inputFontColor: {
+                                type: string;
+                                format: string;
+                            };
+                        };
+                    };
+                    light: {
+                        type: string;
+                        properties: {
+                            backgroundColor: {
+                                type: string;
+                                format: string;
+                            };
+                            fontColor: {
+                                type: string;
+                                format: string;
+                            };
+                            inputBackgroundColor: {
+                                type: string;
+                                format: string;
+                            };
+                            inputFontColor: {
+                                type: string;
+                                format: string;
+                            };
+                        };
+                    };
+                };
+            };
+        };
+    };
+    export default _default_55;
+}
 /// <amd-module name="@scom/scom-swap" />
 declare module "@scom/scom-swap" {
     import { Module, Container, ControlElement } from '@ijstech/components';
@@ -10793,6 +10970,8 @@ declare module "@scom/scom-swap" {
         networks: INetworkConfig[];
         wallets: IWalletPlugin[];
         showHeader?: boolean;
+        logo?: string;
+        title?: string;
     }
     global {
         namespace JSX {
@@ -10805,6 +10984,8 @@ declare module "@scom/scom-swap" {
         private _data;
         tag: any;
         defaultEdit: boolean;
+        private imgLogo;
+        private lbTitle;
         private swapComponent;
         private swapContainer;
         private pnlPriceInfo;

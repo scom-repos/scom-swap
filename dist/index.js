@@ -15600,26 +15600,12 @@ define("@scom/scom-swap/swap-utils/index.ts", ["require", "exports", "@ijstech/e
         const wallet = (0, index_8.getRpcWallet)();
         let getPairPromises = [];
         let availableRoutes = [];
-        const getReservesByPair = async (pairAddress, tokenIn, tokenOut) => {
-            let reserveObj;
+        const getReservesByPair = async (market, pairAddress, tokenIn, tokenOut) => {
             if (!tokenIn.address)
                 tokenIn = getWETH();
             if (!tokenOut.address)
                 tokenOut = getWETH();
-            let pair = new index_5.Contracts.OSWAP_Pair(wallet, pairAddress);
-            let reserves = await pair.getReserves();
-            if (new eth_wallet_5.BigNumber(tokenIn.address.toLowerCase()).lt(tokenOut.address.toLowerCase())) {
-                reserveObj = {
-                    reserveA: reserves._reserve0,
-                    reserveB: reserves._reserve1
-                };
-            }
-            else {
-                reserveObj = {
-                    reserveA: reserves._reserve1,
-                    reserveB: reserves._reserve0
-                };
-            }
+            let reserveObj = await (0, scom_dex_list_1.getDexPairReserves)(wallet, wallet.chainId, market, pairAddress, tokenIn.address, tokenOut.address);
             return reserveObj;
         };
         const getPair = async (market, tokenA, tokenB) => {
@@ -15639,7 +15625,7 @@ define("@scom/scom-swap/swap-utils/index.ts", ["require", "exports", "@ijstech/e
                 let pair = await getPair(market, tokenIn, tokenOut);
                 if (pair == eth_wallet_5.Utils.nullAddress)
                     return;
-                let reserveObj = await getReservesByPair(pair, tokenIn, tokenOut);
+                let reserveObj = await getReservesByPair(market, pair, tokenIn, tokenOut);
                 availableRoutes.push(Object.assign({ pair,
                     market,
                     tokenIn,
@@ -18007,7 +17993,240 @@ define("@scom/scom-swap/data.json.ts", ["require", "exports"], function (require
         }
     };
 });
-define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstech/eth-wallet", "@scom/scom-swap/store/index.ts", "@scom/scom-token-list", "@scom/scom-swap/swap-utils/index.ts", "@scom/scom-swap/global/index.ts", "@scom/scom-swap/price-info/index.tsx", "@scom/scom-swap/result/index.tsx", "@scom/scom-swap/expert-mode-settings/index.tsx", "@scom/scom-swap/config/index.tsx", "@scom/scom-swap/data.json.ts", "@scom/scom-dex-list", "@scom/scom-swap/index.css.ts"], function (require, exports, components_16, eth_wallet_10, index_18, scom_token_list_7, index_19, index_20, index_21, index_22, index_23, index_24, data_json_1, scom_dex_list_2) {
+define("@scom/scom-swap/formSchema.json.ts", ["require", "exports"], function (require, exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    ///<amd-module name='@scom/scom-swap/formSchema.json.ts'/> 
+    exports.default = {
+        general: {
+            dataSchema: {
+                type: "object",
+                properties: {
+                    title: {
+                        type: 'string'
+                    },
+                    logo: {
+                        type: 'string',
+                        format: 'data-url'
+                    },
+                    category: {
+                        type: "string",
+                        required: true,
+                        enum: [
+                            "fixed-pair",
+                            "fixed-protocal",
+                            "aggregator"
+                        ]
+                    },
+                    networks: {
+                        type: "array",
+                        required: true,
+                        items: {
+                            type: "object",
+                            properties: {
+                                chainId: {
+                                    type: "number",
+                                    enum: [1, 56, 137, 250, 97, 80001, 43113, 43114],
+                                    required: true
+                                }
+                            }
+                        }
+                    },
+                    tokens: {
+                        type: "array",
+                        required: true,
+                        items: {
+                            type: "object",
+                            properties: {
+                                chainId: {
+                                    type: "number",
+                                    enum: [1, 56, 137, 250, 97, 80001, 43113, 43114],
+                                    required: true
+                                },
+                                address: {
+                                    type: "string",
+                                    required: true
+                                }
+                            }
+                        }
+                    },
+                    providers: {
+                        type: "array",
+                        required: true,
+                        items: {
+                            type: "object",
+                            properties: {
+                                caption: {
+                                    type: "string",
+                                    required: true
+                                },
+                                image: {
+                                    type: "string",
+                                    required: true
+                                },
+                                key: {
+                                    type: "string",
+                                    required: true
+                                },
+                                dexId: {
+                                    type: "number"
+                                },
+                                chainId: {
+                                    type: "number",
+                                    enum: [1, 56, 137, 250, 97, 80001, 43113, 43114],
+                                    required: true
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            uiSchema: {
+                "type": "VerticalLayout",
+                "elements": [
+                    {
+                        "type": "HorizontalLayout",
+                        "elements": [
+                            {
+                                "type": "Control",
+                                "scope": "#/properties/category"
+                            }
+                        ]
+                    },
+                    {
+                        "type": "HorizontalLayout",
+                        "elements": [
+                            {
+                                "type": "Categorization",
+                                "elements": [
+                                    {
+                                        "type": "Category",
+                                        "label": "Branding",
+                                        "elements": [
+                                            {
+                                                "type": "HorizontalLayout",
+                                                "elements": [
+                                                    {
+                                                        "type": "Control",
+                                                        "scope": "#/properties/title"
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "type": "HorizontalLayout",
+                                                "elements": [
+                                                    {
+                                                        "type": "Control",
+                                                        "scope": "#/properties/logo"
+                                                    }
+                                                ]
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "type": "Category",
+                                        "label": "Networks",
+                                        "elements": [
+                                            {
+                                                "type": "Control",
+                                                "scope": "#/properties/networks",
+                                                "options": {
+                                                    "detail": {
+                                                        "type": "VerticalLayout"
+                                                    }
+                                                }
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "type": "Category",
+                                        "label": "Providers",
+                                        "elements": [
+                                            {
+                                                "type": "Control",
+                                                "scope": "#/properties/providers",
+                                                "options": {
+                                                    "detail": {
+                                                        "type": "VerticalLayout"
+                                                    }
+                                                }
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "type": "Category",
+                                        "label": "Tokens",
+                                        "elements": [
+                                            {
+                                                "type": "Control",
+                                                "scope": "#/properties/tokens",
+                                                "options": {
+                                                    "detail": {
+                                                        "type": "VerticalLayout"
+                                                    }
+                                                }
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+        },
+        theme: {
+            dataSchema: {
+                type: 'object',
+                properties: {
+                    "dark": {
+                        type: 'object',
+                        properties: {
+                            backgroundColor: {
+                                type: 'string',
+                                format: 'color'
+                            },
+                            fontColor: {
+                                type: 'string',
+                                format: 'color'
+                            },
+                            inputBackgroundColor: {
+                                type: 'string',
+                                format: 'color'
+                            },
+                            inputFontColor: {
+                                type: 'string',
+                                format: 'color'
+                            }
+                        }
+                    },
+                    "light": {
+                        type: 'object',
+                        properties: {
+                            backgroundColor: {
+                                type: 'string',
+                                format: 'color'
+                            },
+                            fontColor: {
+                                type: 'string',
+                                format: 'color'
+                            },
+                            inputBackgroundColor: {
+                                type: 'string',
+                                format: 'color'
+                            },
+                            inputFontColor: {
+                                type: 'string',
+                                format: 'color'
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    };
+});
+define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstech/eth-wallet", "@scom/scom-swap/store/index.ts", "@scom/scom-token-list", "@scom/scom-swap/swap-utils/index.ts", "@scom/scom-swap/global/index.ts", "@scom/scom-swap/price-info/index.tsx", "@scom/scom-swap/result/index.tsx", "@scom/scom-swap/expert-mode-settings/index.tsx", "@scom/scom-swap/config/index.tsx", "@scom/scom-swap/data.json.ts", "@scom/scom-swap/formSchema.json.ts", "@scom/scom-dex-list", "@scom/scom-swap/index.css.ts"], function (require, exports, components_16, eth_wallet_10, index_18, scom_token_list_7, index_19, index_20, index_21, index_22, index_23, index_24, data_json_1, formSchema_json_1, scom_dex_list_2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     const Theme = components_16.Styles.Theme.ThemeVars;
@@ -18074,128 +18293,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
             return !!((providers === null || providers === void 0 ? void 0 : providers.length) || (networks === null || networks === void 0 ? void 0 : networks.length) || (wallets === null || wallets === void 0 ? void 0 : wallets.length) || !isNaN(Number(defaultChainId)));
         }
         getActions() {
-            const propertiesSchema = {
-                type: "object",
-                properties: {
-                    category: {
-                        type: "string",
-                        required: true,
-                        enum: [
-                            "fixed-pair",
-                            "aggregator"
-                        ]
-                    },
-                    networks: {
-                        type: "array",
-                        required: true,
-                        items: {
-                            type: "object",
-                            properties: {
-                                chainId: {
-                                    type: "number",
-                                    enum: [1, 56, 137, 250, 97, 80001, 43113, 43114],
-                                    required: true
-                                }
-                            }
-                        }
-                    },
-                    tokens: {
-                        type: "array",
-                        required: true,
-                        items: {
-                            type: "object",
-                            properties: {
-                                chainId: {
-                                    type: "number",
-                                    enum: [1, 56, 137, 250, 97, 80001, 43113, 43114],
-                                    required: true
-                                },
-                                address: {
-                                    type: "string",
-                                    required: true
-                                }
-                            }
-                        }
-                    },
-                    providers: {
-                        type: "array",
-                        required: true,
-                        items: {
-                            type: "object",
-                            properties: {
-                                caption: {
-                                    type: "string",
-                                    required: true
-                                },
-                                image: {
-                                    type: "string",
-                                    required: true
-                                },
-                                key: {
-                                    type: "string",
-                                    required: true
-                                },
-                                dexId: {
-                                    type: "number"
-                                },
-                                chainId: {
-                                    type: "number",
-                                    enum: [1, 56, 137, 250, 97, 80001, 43113, 43114],
-                                    required: true
-                                }
-                            }
-                        }
-                    }
-                }
-            };
-            const themeSchema = {
-                type: 'object',
-                properties: {
-                    "dark": {
-                        type: 'object',
-                        properties: {
-                            backgroundColor: {
-                                type: 'string',
-                                format: 'color'
-                            },
-                            fontColor: {
-                                type: 'string',
-                                format: 'color'
-                            },
-                            inputBackgroundColor: {
-                                type: 'string',
-                                format: 'color'
-                            },
-                            inputFontColor: {
-                                type: 'string',
-                                format: 'color'
-                            }
-                        }
-                    },
-                    "light": {
-                        type: 'object',
-                        properties: {
-                            backgroundColor: {
-                                type: 'string',
-                                format: 'color'
-                            },
-                            fontColor: {
-                                type: 'string',
-                                format: 'color'
-                            },
-                            inputBackgroundColor: {
-                                type: 'string',
-                                format: 'color'
-                            },
-                            inputFontColor: {
-                                type: 'string',
-                                format: 'color'
-                            }
-                        }
-                    }
-                }
-            };
-            return this._getActions(propertiesSchema, themeSchema);
+            return this._getActions(formSchema_json_1.default.general.dataSchema, formSchema_json_1.default.theme.dataSchema);
         }
         _getActions(propertiesSchema, themeSchema) {
             let self = this;
@@ -18265,6 +18363,8 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                         return {
                             execute: async () => {
                                 _oldData = Object.assign({}, this._data);
+                                this._data.logo = userInputData.logo;
+                                this._data.title = userInputData.title;
                                 this._data.networks = userInputData.networks;
                                 this._data.defaultChainId = this._data.networks[0].chainId;
                                 this._data.category = userInputData.category;
@@ -18301,75 +18401,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                         };
                     },
                     userInputDataSchema: propertiesSchema,
-                    userInputUISchema: {
-                        "type": "VerticalLayout",
-                        "elements": [
-                            {
-                                "type": "HorizontalLayout",
-                                "elements": [
-                                    {
-                                        "type": "Control",
-                                        "scope": "#/properties/category"
-                                    }
-                                ]
-                            },
-                            {
-                                "type": "HorizontalLayout",
-                                "elements": [
-                                    {
-                                        "type": "Categorization",
-                                        "elements": [
-                                            {
-                                                "type": "Category",
-                                                "label": "Networks",
-                                                "elements": [
-                                                    {
-                                                        "type": "Control",
-                                                        "scope": "#/properties/networks",
-                                                        "options": {
-                                                            "detail": {
-                                                                "type": "VerticalLayout"
-                                                            }
-                                                        }
-                                                    }
-                                                ]
-                                            },
-                                            {
-                                                "type": "Category",
-                                                "label": "Providers",
-                                                "elements": [
-                                                    {
-                                                        "type": "Control",
-                                                        "scope": "#/properties/providers",
-                                                        "options": {
-                                                            "detail": {
-                                                                "type": "VerticalLayout"
-                                                            }
-                                                        }
-                                                    }
-                                                ]
-                                            },
-                                            {
-                                                "type": "Category",
-                                                "label": "Tokens",
-                                                "elements": [
-                                                    {
-                                                        "type": "Control",
-                                                        "scope": "#/properties/tokens",
-                                                        "options": {
-                                                            "detail": {
-                                                                "type": "VerticalLayout"
-                                                            }
-                                                        }
-                                                    }
-                                                ]
-                                            }
-                                        ]
-                                    }
-                                ]
-                            }
-                        ]
-                    }
+                    userInputUISchema: formSchema_json_1.default.general.uiSchema
                 },
                 {
                     name: 'Theme Settings',
@@ -18648,7 +18680,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
             };
             this.onSetupPage = async (_chainId) => {
                 setTimeout(async () => {
-                    var _a;
+                    var _a, _b;
                     const rpcWallet = (0, index_18.getRpcWallet)();
                     console.log('rpcWallet.instanceId', rpcWallet.instanceId);
                     const data = {
@@ -18667,6 +18699,14 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                     this.toggleReverseImage.enabled = !this.isFixedPair;
                     this.firstTokenSelection.disableSelect = this.isFixedPair;
                     this.secondTokenSelection.disableSelect = this.isFixedPair;
+                    if ((_b = this._data.logo) === null || _b === void 0 ? void 0 : _b.startsWith('ipfs://')) {
+                        const ipfsGatewayUrl = (0, index_18.getIPFSGatewayUrl)();
+                        this.imgLogo.url = this._data.logo.replace('ipfs://', ipfsGatewayUrl);
+                    }
+                    else {
+                        this.imgLogo.url = this._data.logo;
+                    }
+                    this.lbTitle.caption = this._data.title;
                     this.setSwapButtonText();
                     await this.updateBalance();
                     const input = this.receiveCol.children[0];
@@ -19717,6 +19757,9 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                 this.$render("i-panel", { id: "swapComponent", background: { color: Theme.background.main } },
                     this.$render("i-panel", { class: "pageblock-swap" },
                         this.$render("i-panel", { id: "swapContainer" },
+                            this.$render("i-vstack", { margin: { bottom: '0.25rem' }, gap: "0.5rem", horizontalAlignment: "center" },
+                                this.$render("i-image", { id: 'imgLogo', height: 100 }),
+                                this.$render("i-label", { id: 'lbTitle', font: { bold: true, size: '1.5rem' } })),
                             this.$render("i-panel", { class: "content-swap" },
                                 this.$render("i-hstack", { id: "wrapperSwap", gap: 10 },
                                     this.$render("i-vstack", { gap: 5, minWidth: 230, width: "calc(100% - 25px)" },
