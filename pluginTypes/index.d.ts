@@ -9704,13 +9704,11 @@ declare module "@scom/scom-swap/global/utils/swapInterface.ts" {
         caption: string;
         image: string;
         key: string;
-        dexId?: number;
     }
     export interface IProviderUI {
         caption: string;
         image: string;
         key: string;
-        dexId?: number;
         chainId: string | number;
     }
     export interface ICommissionInfo {
@@ -10755,7 +10753,6 @@ declare module "@scom/scom-swap/data.json.ts" {
                 caption: string;
                 image: string;
                 key: string;
-                dexId: number;
                 chainId: number;
             }[];
             category: string;
@@ -10847,9 +10844,6 @@ declare module "@scom/scom-swap/formSchema.json.ts" {
                                 key: {
                                     type: string;
                                     required: boolean;
-                                };
-                                dexId: {
-                                    type: string;
                                 };
                                 chainId: {
                                     type: string;
@@ -10984,6 +10978,7 @@ declare module "@scom/scom-swap" {
         private _data;
         tag: any;
         defaultEdit: boolean;
+        private pnlBranding;
         private imgLogo;
         private lbTitle;
         private swapComponent;

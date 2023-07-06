@@ -179,50 +179,6 @@ async function getBestAmountInRouteFromAPI(wallet: any, tokenIn: ITokenObject, t
   })
   if (!routeObjArr) return [];
   let bestRouteObjArr: any[] = [];
-  // let providerConfigByDexId: any = {};
-  // getProviderList().filter(v => {!!v.contractInfo && Object.keys(v.contractInfo).includes((chainId!).toString())}).forEach((v, i) => {
-  //   if (v.dexId == undefined) return;
-  //   providerConfigByDexId[v.dexId] = v;
-  // });
-  // for (let i = 0; i < routeObjArr.length; i++) {
-  //   let routeObj = routeObjArr[i];
-  //   routeObj.tokens[0] = tokenIn;
-  //   routeObj.tokens[routeObj.tokens.length - 1] = tokenOut;
-  //   let dexId = [5, 6].includes(routeObj.dexId) ? 5 : routeObj.dexId;
-  //   if (!providerConfigByDexId[dexId]) continue;
-  //   let bestRouteObj = {
-  //     pairs: routeObj.route.map((v: any) => v.address),
-  //     isRegistered: routeObj.route.map((v: any) => v.isRegistered),
-  //     market: routeObj.route.map((v: any) => {
-  //       let dexId = [5, 6].includes(v.dexId) ? 5 : v.dexId;
-  //       return providerConfigByDexId[dexId].key
-  //     }),
-  //     route: routeObj.tokens,
-  //     customDataList: routeObj.route.map((v: any) => {
-  //       return {
-  //         queueType: v.queueType,
-  //         orderIds: v.orderIds,
-  //         reserveA: v.reserves.reserve0,
-  //         reserveB: v.reserves.reserve1
-  //       }
-  //     })
-  //   };
-
-  //   let amountIn = new BigNumber(routeObj.amountIn).shiftedBy(-tokenIn.decimals);
-  //   let swapPrice = new BigNumber(amountIn).div(amountOut);
-  //   // TODO: check later
-  //   // let isHybridOrQueue = providerConfigByDexId[dexId].key == Market.HYBRID || routeObj.queueType;
-  //   let extendedData = await getExtendedRouteObjData(wallet, bestRouteObj, tradeFeeMap, swapPrice, routeObj.queueType);
-  //   let provider = providerConfigByDexId[dexId].key
-  //   let key = provider + '|' + (routeObj.isDirectRoute ? '0' : '1');
-  //   bestRouteObjArr.push({
-  //     ...extendedData,
-  //     provider,
-  //     key,
-  //     amountIn,
-  //     queueType: routeObj.queueType
-  //   });
-  // }
   return bestRouteObjArr;
 }
 
@@ -241,48 +197,6 @@ async function getBestAmountOutRouteFromAPI(wallet: any, tokenIn: ITokenObject, 
   })
   if (!routeObjArr) return [];
   let bestRouteObjArr = [];
-  // let providerConfigByDexId: any = {};
-  // getProviderList().filter(v => {!!v.contractInfo && Object.keys(v.contractInfo).includes((chainId!).toString())}).forEach((v, i) => {
-  //   if (v.dexId == undefined) return;
-  //   providerConfigByDexId[v.dexId] = v;
-  // });
-  // for (let i = 0; i < routeObjArr.length; i++) {
-  //   let routeObj = routeObjArr[i];
-  //   routeObj.tokens[0] = tokenIn;
-  //   routeObj.tokens[routeObj.tokens.length - 1] = tokenOut;
-  //   let dexId = [5, 6].includes(routeObj.dexId) ? 5 : routeObj.dexId;
-  //   if (!providerConfigByDexId[dexId]) continue;
-  //   let bestRouteObj = {
-  //     pairs: routeObj.route.map((v: any) => v.address),
-  //     isRegistered: routeObj.route.map((v: any) => v.isRegistered),
-  //     market: routeObj.route.map((v: any) => {
-  //       let dexId = [5, 6].includes(v.dexId) ? 5 : v.dexId;
-  //       return providerConfigByDexId[dexId].key;
-  //     }),
-  //     route: routeObj.tokens,
-  //     customDataList: routeObj.route.map((v: any) => {
-  //       return {
-  //         queueType: v.queueType,
-  //         orderIds: v.orderIds,
-  //         reserveA: v.reserves.reserve0,
-  //         reserveB: v.reserves.reserve1
-  //       }
-  //     })
-  //   };
-  //   let amountOut = new BigNumber(routeObj.amountOut).shiftedBy(-tokenOut.decimals);
-  //   let swapPrice = new BigNumber(amountIn).div(amountOut);
-  //   // let isHybridOrQueue = providerConfigByDexId[dexId].key == Market.HYBRID || routeObj.queueType;
-  //   let extendedData = await getExtendedRouteObjData(wallet, bestRouteObj, tradeFeeMap, swapPrice, routeObj.queueType);
-  //   let provider = providerConfigByDexId[dexId].key;
-  //   let key = provider + '|' + (routeObj.isDirectRoute ? '0' : '1');
-  //   bestRouteObjArr.push({
-  //     ...extendedData,
-  //     provider,
-  //     key,
-  //     amountOut,
-  //     queueType: routeObj.queueType
-  //   });
-  // }
   return bestRouteObjArr;
 }
 

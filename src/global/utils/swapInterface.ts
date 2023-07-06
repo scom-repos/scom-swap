@@ -23,14 +23,12 @@ export interface IProvider {
   caption: string;
   image: string;
   key: string;
-  dexId?: number;
 }
 
 export interface IProviderUI {
   caption: string;
   image: string;
   key: string;
-  dexId?: number;
   chainId: string | number;
 }
 

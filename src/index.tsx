@@ -104,6 +104,7 @@ export default class ScomSwap extends Module {
   tag: any = {};
   defaultEdit: boolean = true
 
+  private pnlBranding: VStack;
   private imgLogo: Image;
   private lbTitle: Label;
   private swapComponent: Panel;
@@ -532,12 +533,11 @@ export default class ScomSwap extends Module {
     if (!providers.length) return undefined;
     let _providers: IProvider[] = [];
     if (this.isFixedPair) {
-      const { key, caption, image, dexId } = providers[0];
+      const { key, caption, image } = providers[0];
       let defaultProvider: IProvider = {
         caption,
         image,
-        key,
-        dexId
+        key
       };
       _providers.push(defaultProvider);
     } else {
@@ -550,12 +550,11 @@ export default class ScomSwap extends Module {
       });
       Object.keys(providersByKeys).forEach(k => {
         const arr = providersByKeys[k];
-        const { key, caption, image, dexId } = arr[0];
+        const { key, caption, image } = arr[0];
         let defaultProvider: IProvider = {
           caption,
           image,
-          key,
-          dexId
+          key
         }
         _providers.push(defaultProvider);
       })
@@ -735,6 +734,7 @@ export default class ScomSwap extends Module {
       this.toggleReverseImage.enabled = !this.isFixedPair;
       this.firstTokenSelection.disableSelect = this.isFixedPair;
       this.secondTokenSelection.disableSelect = this.isFixedPair;
+      this.pnlBranding.visible = !!this._data.logo || !!this._data.title;
       if (this._data.logo?.startsWith('ipfs://')) {
         const ipfsGatewayUrl = getIPFSGatewayUrl();
         this.imgLogo.url = this._data.logo.replace('ipfs://', ipfsGatewayUrl);
@@ -742,7 +742,7 @@ export default class ScomSwap extends Module {
       else {
         this.imgLogo.url = this._data.logo;
       }
-      this.lbTitle.caption = this._data.title
+      this.lbTitle.caption = this._data.title;
 
       this.setSwapButtonText();
       await this.updateBalance();
@@ -1702,7 +1702,7 @@ export default class ScomSwap extends Module {
         <i-panel id="swapComponent" background={{ color: Theme.background.main }}>
           <i-panel class="pageblock-swap">
             <i-panel id="swapContainer">
-              <i-vstack margin={{ bottom: '0.25rem' }} gap="0.5rem" horizontalAlignment="center">
+              <i-vstack id="pnlBranding" margin={{ bottom: '0.25rem' }} gap="0.5rem" horizontalAlignment="center">
                 <i-image id='imgLogo' height={100}></i-image>
                 <i-label id='lbTitle' font={{ bold: true, size: '1.5rem' }}></i-label>
               </i-vstack>

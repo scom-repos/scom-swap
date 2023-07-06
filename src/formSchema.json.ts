@@ -69,9 +69,6 @@ export default {
                                 type: "string",
                                 required: true
                             },
-                            dexId: {
-                                type: "number"
-                            },
                             chainId: {
                                 type: "number",
                                 enum: [1, 56, 137, 250, 97, 80001, 43113, 43114],

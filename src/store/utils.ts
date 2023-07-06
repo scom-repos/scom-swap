@@ -324,8 +324,10 @@ export function initRpcWallet(chainIds: number[], defaultChainId: number) {
     multicalls: application.store.multicalls
   });
   state.rpcWalletId = instanceId;
-  const rpcWallet = Wallet.getRpcWalletInstance(instanceId);
-  rpcWallet.address = clientWallet.address;
+  if (clientWallet.address) {
+    const rpcWallet = Wallet.getRpcWalletInstance(instanceId);
+    rpcWallet.address = clientWallet.address;
+  }
   return instanceId;
 }
 
