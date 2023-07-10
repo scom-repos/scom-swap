@@ -18142,7 +18142,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     const Theme = components_16.Styles.Theme.ThemeVars;
-    const currentTheme = components_16.Styles.Theme.currentTheme;
+    // const currentTheme = Styles.Theme.currentTheme;
     const priceImpactTooHighMsg = 'Price Impact Too High. If you want to bypass this check, please turn on Expert Mode';
     const defaultInput = '1';
     let ScomSwap = class ScomSwap extends components_16.Module {
@@ -19632,16 +19632,16 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
             this.initExpertModal();
             const lazyLoad = this.getAttribute('lazyLoad', true, false);
             if (!lazyLoad) {
-                const defaultColors = {
-                    fontColor: currentTheme.text.primary,
-                    backgroundColor: currentTheme.background.main,
-                    inputFontColor: currentTheme.input.fontColor,
-                    inputBackgroundColor: currentTheme.input.background
-                };
-                this.setTag({
-                    light: Object.assign({}, defaultColors),
-                    dark: Object.assign({}, defaultColors)
-                });
+                // const defaultColors = {
+                //   fontColor: currentTheme.text.primary,
+                //   backgroundColor: currentTheme.background.main,
+                //   inputFontColor: currentTheme.input.fontColor,
+                //   inputBackgroundColor: currentTheme.input.background
+                // }
+                // this.setTag({
+                //   light: {...defaultColors},
+                //   dark: {...defaultColors}
+                // })
                 const category = this.getAttribute('category', true, "fixed-pair");
                 const providers = this.getAttribute('providers', true, []);
                 const commissions = this.getAttribute('commissions', true, []);
