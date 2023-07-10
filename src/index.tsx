@@ -19,7 +19,8 @@ import {
   setDexInfoList,
   initRpcWallet,
   getRpcWallet,
-  getIPFSGatewayUrl
+  getIPFSGatewayUrl,
+  getClientWallet
 } from "./store/index";
 import { tokenStore, DefaultERC20Tokens, ChainNativeTokenByChainId, assets as tokenAssets } from '@scom/scom-token-list';
 
@@ -444,15 +445,17 @@ export default class ScomSwap extends Module {
   private async setData(value: ISwapConfigUI) {
     this._data = value;
     console.log('setData', value)
-    let chainIds = this.networks.map((network) => network.chainId);
-    const rpcWalletId = await initRpcWallet(chainIds, this.defaultChainId);
+    const rpcWalletId = await initRpcWallet(this.defaultChainId);
     const rpcWallet = getRpcWallet();
     const event = rpcWallet.registerWalletEvent(this, Constants.RpcWalletEvent.Connected, async (connected: boolean) => {
-      console.log(`connected: ${connected}`);
-      this.swapBtn.visible = true;
-      this.updateContractAddress();
-      if (this.originalData?.providers?.length) await this.onSetupPage();
-      this.setSwapButtonText();
+      const clientWallet = getClientWallet();
+      console.log(`clientWallet connected: ${clientWallet.isConnected}`);
+      if (clientWallet.isConnected) {
+        console.log(`rpcWallet connected: ${connected}`);
+        this.swapBtn.visible = true;
+        this.updateContractAddress();
+        if (this.originalData?.providers?.length) await this.initializeWidgetConfig();
+      }
     });
 
     this.configDApp.data = value;
@@ -566,7 +569,7 @@ export default class ScomSwap extends Module {
     setDexInfoList(dexList);
     this.setProviders();
     await this.initData();
-    await this.onSetupPage();
+    await this.initializeWidgetConfig();
   }
 
   constructor(parent?: Container, options?: any) {
@@ -584,7 +587,7 @@ export default class ScomSwap extends Module {
     this.$eventBus.register(this, EventId.chainChanged, this.onChainChange)
     this.$eventBus.register(this, EventId.SlippageToleranceChanged, () => { this.priceInfo.Items = this.getPriceInfo() })
     this.$eventBus.register(this, EventId.ExpertModeChanged, () => {
-      this.setSwapButtonText();
+      this.updateSwapButtonCaption();
     });
     // const clientWallet = Wallet.getClientInstance();
     // clientWallet.registerWalletEvent(this, Constants.ClientWalletEvent.AccountsChanged, async (payload: Record<string, any>) => {
@@ -593,7 +596,7 @@ export default class ScomSwap extends Module {
     //   const rpcWallet = getRpcWallet();
     //   rpcWallet.address = account;
     //   console.log('AccountsChanged', payload);
-    //   await this.onSetupPage();
+    //   await this.initializeWidgetConfig();
     // });
   }
 
@@ -603,8 +606,7 @@ export default class ScomSwap extends Module {
       this.swapBtn.visible = true;
     // this.availableMarkets = getAvailableMarkets() || [];
     this.updateContractAddress();
-    if (this.originalData?.providers?.length) await this.onSetupPage();
-    this.setSwapButtonText();
+    if (this.originalData?.providers?.length) await this.initializeWidgetConfig();
   }
 
   // get supportedNetworks() {
@@ -691,7 +693,7 @@ export default class ScomSwap extends Module {
     return formatted.replace(/,/g, '');
   }
 
-  private setDefaultPair() {
+  private initializeDefaultTokenPair() {
     const currentChainId = getChainId();
     let currentChainTokens = this._data.tokens.filter((token) => token.chainId === currentChainId);
     if (currentChainTokens.length < 2) return;
@@ -714,7 +716,7 @@ export default class ScomSwap extends Module {
     }
   }
 
-  private onSetupPage = async (_chainId?: number) => {
+  private initializeWidgetConfig = async (_chainId?: number) => {
     setTimeout(async () => {
       const rpcWallet = getRpcWallet();
       console.log('rpcWallet.instanceId', rpcWallet.instanceId)
@@ -729,7 +731,7 @@ export default class ScomSwap extends Module {
       const currentChainId = getChainId();
       tokenStore.updateTokenMapData(currentChainId);
       this.closeNetworkErrModal();
-      this.setDefaultPair();
+      this.initializeDefaultTokenPair();
       this.toggleReverseImage.enabled = !this.isFixedPair;
       this.firstTokenSelection.disableSelect = this.isFixedPair;
       this.secondTokenSelection.disableSelect = this.isFixedPair;
@@ -743,7 +745,7 @@ export default class ScomSwap extends Module {
       }
       this.lbTitle.caption = this._data.title;
 
-      this.setSwapButtonText();
+      this.updateSwapButtonCaption();
       await this.updateBalance();
       const input = this.receiveCol.children[0] as Input;
       if (input) {
@@ -766,7 +768,7 @@ export default class ScomSwap extends Module {
         }
       }
       this.firstTokenSelection.tokenDataListProp = getSupportedTokens(this._data.tokens || [], currentChainId);
-      this.setTargetTokenList();
+      this.secondTokenSelection.tokenDataListProp = getSupportedTokens(this._data.tokens || [], currentChainId);
 
       if (!this.record)
         this.swapBtn.enabled = false;
@@ -853,16 +855,8 @@ export default class ScomSwap extends Module {
     return this.fromInputValue.plus(commissionAmount);
   }
 
-  private setupCrossChainPopup() {
-    const arrows = this.swapModal.querySelectorAll('i-icon.arrow-down');
-    arrows.forEach((arrow: Element) => {
-      arrow.classList.remove('arrow-down--chain');
-    });
-  }
-
   private handleSwapPopup() {
     if (!this.record) return;
-    // this.setupCrossChainPopup();
     const currentChainId = getChainId();
     const slippageTolerance = getSlippageTolerance();
     this.fromTokenImage.url = tokenAssets.tokenPath(this.fromToken, currentChainId);
@@ -1004,22 +998,6 @@ export default class ScomSwap extends Module {
     }
   }
 
-  private addToMetamask(event: Event, token: ITokenObject) {
-    event.stopPropagation();
-    return window.ethereum.request({
-      method: 'wallet_watchAsset',
-      params: {
-        type: 'ERC20',
-        options: {
-          address: token.address,
-          symbol: token.symbol,
-          decimals: token.decimals,
-          image: token.logoURI
-        },
-      },
-    });
-  }
-
   private async onSelectRouteItem(item: any) {
     if (this.isFrom) {
       if (this.payCol.children) {
@@ -1039,7 +1017,7 @@ export default class ScomSwap extends Module {
 
     this.swapBtn.visible = true;
     this.record = item;
-    this.setSwapButtonText();
+    this.updateSwapButtonCaption();
     const enabled = !this.isSwapButtonDisabled();
     this.swapBtn.enabled = enabled;
     const isButtonLoading = this.isButtonLoading();
@@ -1331,13 +1309,13 @@ export default class ScomSwap extends Module {
     this.maxButton.enabled = enabled;
   }
 
-  private setSwapButtonText() {
+  private updateSwapButtonCaption() {
     if (this.swapBtn && this.swapBtn.hasChildNodes()) {
-      this.swapBtn.caption = this.getSwapButtonText();
+      this.swapBtn.caption = this.determineSwapButtonCaption();
     }
   }
 
-  private getSwapButtonText() {
+  private determineSwapButtonCaption() {
     const isApproveButtonShown = this.isApproveButtonShown;
     if (!isClientWalletConnected()) {
       return "Connect Wallet";
@@ -1402,7 +1380,7 @@ export default class ScomSwap extends Module {
         ...mapStatus
       };
     }
-    this.setSwapButtonText();
+    this.updateSwapButtonCaption();
   }
   private onSwapConfirming = (key: any) => {
     this.setMapStatus('swap', key, ApprovalStatus.APPROVING);
@@ -1542,12 +1520,6 @@ export default class ScomSwap extends Module {
     return getWalletProvider() === WalletPlugin.MetaMask;
   }
 
-  private setTargetTokenList = (isDisabled?: boolean) => {
-    const currentChainId = getChainId();
-    const srcChainId = this.srcChain?.chainId || currentChainId;
-    this.secondTokenSelection.tokenDataListProp = getSupportedTokens(this._data.tokens || [], srcChainId);
-  }
-
   private showModalFees = () => {
     const fees = this.getFeeDetails();
     this.feesInfo.clearInnerHTML();
@@ -1657,7 +1629,7 @@ export default class ScomSwap extends Module {
   async init() {
     this.isReadyCallbackQueued = true;
     super.init();
-    this.setSwapButtonText();
+    this.updateSwapButtonCaption();
     this.openswapResult = new Result();
     this.swapComponent.appendChild(this.openswapResult);
     this.initExpertModal();

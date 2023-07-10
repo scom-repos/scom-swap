@@ -196,8 +196,8 @@ export class TokenSelection extends Module {
   }
 
   private registerEvent() {
-    this.$eventBus.register(this, EventId.IsWalletConnected, this.onWalletConnect);
-    this.$eventBus.register(this, EventId.IsWalletDisconnected, this.onWalletDisconnect);
+    // this.$eventBus.register(this, EventId.IsWalletConnected, this.onWalletConnect);
+    // this.$eventBus.register(this, EventId.IsWalletDisconnected, this.onWalletDisconnect);
     this.$eventBus.register(this, EventId.Paid, this.onPaid);
     this.$eventBus.register(this, EventId.EmitNewToken, this.updateDataByNewToken);
   }
@@ -444,6 +444,9 @@ export class TokenSelection extends Module {
     // if (!this.tokenList.innerHTML) {
     //   await this.initData();
     // }
+    this.tokenBalancesMap = tokenStore.tokenBalances;
+    this.renderTokenItems();
+    this.updateButton();
     this.tokenSelectionModal.visible = true;
   }
 

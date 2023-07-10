@@ -311,7 +311,7 @@ export const getChainNativeToken = (chainId: number): ITokenObject => {
   return ChainNativeTokenByChainId[chainId];
 };
 
-export function initRpcWallet(chainIds: number[], defaultChainId: number) {
+export function initRpcWallet(defaultChainId: number) {
   if (state.rpcWalletId) {
     return state.rpcWalletId;
   }

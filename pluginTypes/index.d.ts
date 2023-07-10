@@ -9860,7 +9860,7 @@ declare module "@scom/scom-swap/store/utils.ts" {
     export const truncateAddress: (address: string) => string;
     export function getChainId(): number;
     export const getChainNativeToken: (chainId: number) => ITokenObject;
-    export function initRpcWallet(chainIds: number[], defaultChainId: number): string;
+    export function initRpcWallet(defaultChainId: number): string;
     export function getRpcWallet(): import("wallet").IRpcWallet;
     export function getClientWallet(): import("wallet").IClientWallet;
 }
@@ -11117,13 +11117,12 @@ declare module "@scom/scom-swap" {
         get isValidToken(): boolean;
         private redirectToken;
         private fixedNumber;
-        private setDefaultPair;
-        private onSetupPage;
+        private initializeDefaultTokenPair;
+        private initializeWidgetConfig;
         private initTokenSelection;
         private initApprovalModelAction;
         private onRevertSwap;
         private totalAmount;
-        private setupCrossChainPopup;
         private handleSwapPopup;
         private doSwap;
         private getMinReceivedMaxSold;
@@ -11132,7 +11131,6 @@ declare module "@scom/scom-swap" {
         private setApprovalSpenderAddress;
         private getInputValue;
         private updateTokenInput;
-        private addToMetamask;
         private onSelectRouteItem;
         private onTokenInputChange;
         private resetValuesByInput;
@@ -11150,8 +11148,8 @@ declare module "@scom/scom-swap" {
         private isEstimated;
         private getBalance;
         private updateBalance;
-        private setSwapButtonText;
-        private getSwapButtonText;
+        private updateSwapButtonCaption;
+        private determineSwapButtonCaption;
         private getWarningMessageText;
         private setMapStatus;
         private onSwapConfirming;
@@ -11165,7 +11163,6 @@ declare module "@scom/scom-swap" {
         private isMaxDisabled;
         private onRenderPriceInfo;
         get isMetaMask(): boolean;
-        private setTargetTokenList;
         private showModalFees;
         private closeModalFees;
         private showResultMessage;
