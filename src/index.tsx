@@ -1,6 +1,5 @@
 import { Module, Panel, Button, Label, VStack, Image, Container, IEventBus, application, customModule, Modal, Input, Control, customElements, ControlElement, IDataSchema, Styles, HStack, Icon } from '@ijstech/components';
 import { BigNumber, Constants, Wallet } from '@ijstech/eth-wallet';
-import Assets from './assets';
 import './index.css';
 import {
   getChainId,
@@ -63,7 +62,7 @@ import getDexList from '@scom/scom-dex-list';
 
 
 const Theme = Styles.Theme.ThemeVars;
-const currentTheme = Styles.Theme.currentTheme;
+// const currentTheme = Styles.Theme.currentTheme;
 const priceImpactTooHighMsg = 'Price Impact Too High. If you want to bypass this check, please turn on Expert Mode';
 const defaultInput = '1';
 type StatusMapType = 'approve' | 'swap';
@@ -1664,16 +1663,16 @@ export default class ScomSwap extends Module {
     this.initExpertModal();
     const lazyLoad = this.getAttribute('lazyLoad', true, false);
     if (!lazyLoad) {
-      const defaultColors = {
-        fontColor: currentTheme.text.primary,
-        backgroundColor: currentTheme.background.main,
-        inputFontColor: currentTheme.input.fontColor,
-        inputBackgroundColor: currentTheme.input.background
-      }
-      this.setTag({
-        light: {...defaultColors},
-        dark: {...defaultColors}
-      })
+      // const defaultColors = {
+      //   fontColor: currentTheme.text.primary,
+      //   backgroundColor: currentTheme.background.main,
+      //   inputFontColor: currentTheme.input.fontColor,
+      //   inputBackgroundColor: currentTheme.input.background
+      // }
+      // this.setTag({
+      //   light: {...defaultColors},
+      //   dark: {...defaultColors}
+      // })
       const category = this.getAttribute('category', true, "fixed-pair");
       const providers = this.getAttribute('providers', true, []);
       const commissions = this.getAttribute('commissions', true, []);
