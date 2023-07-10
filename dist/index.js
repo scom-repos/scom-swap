@@ -18415,15 +18415,11 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
             const rpcWallet = (0, index_18.getRpcWallet)();
             const event = rpcWallet.registerWalletEvent(this, eth_wallet_10.Constants.RpcWalletEvent.Connected, async (connected) => {
                 var _a, _b;
-                const clientWallet = (0, index_18.getClientWallet)();
-                console.log(`clientWallet connected: ${clientWallet.isConnected}`);
-                if (clientWallet.isConnected) {
-                    console.log(`rpcWallet connected: ${connected}`);
-                    this.swapBtn.visible = true;
-                    this.updateContractAddress();
-                    if ((_b = (_a = this.originalData) === null || _a === void 0 ? void 0 : _a.providers) === null || _b === void 0 ? void 0 : _b.length)
-                        await this.initializeWidgetConfig();
-                }
+                console.log(`rpcWallet connected: ${connected}`);
+                this.swapBtn.visible = true;
+                this.updateContractAddress();
+                if ((_b = (_a = this.originalData) === null || _a === void 0 ? void 0 : _a.providers) === null || _b === void 0 ? void 0 : _b.length)
+                    await this.initializeWidgetConfig();
             });
             this.configDApp.data = value;
             this.updateContractAddress();
@@ -19403,9 +19399,14 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
         }
         async updateBalance() {
             const rpcWallet = (0, index_18.getRpcWallet)();
-            if (this.hasData)
-                await scom_token_list_7.tokenStore.updateAllTokenBalances(rpcWallet);
-            this.allTokenBalancesMap = scom_token_list_7.tokenStore.tokenBalances;
+            if (rpcWallet.address) {
+                if (this.hasData)
+                    await scom_token_list_7.tokenStore.updateAllTokenBalances(rpcWallet);
+                this.allTokenBalancesMap = scom_token_list_7.tokenStore.tokenBalances;
+            }
+            else {
+                this.allTokenBalancesMap = {};
+            }
             if (this.fromToken) {
                 const balance = this.getBalance(this.fromToken);
                 this.payBalance.caption = `Balance: ${(0, index_20.formatNumber)(balance, 4)} ${this.fromToken.symbol}`;

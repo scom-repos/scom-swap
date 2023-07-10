@@ -448,14 +448,10 @@ export default class ScomSwap extends Module {
     const rpcWalletId = await initRpcWallet(this.defaultChainId);
     const rpcWallet = getRpcWallet();
     const event = rpcWallet.registerWalletEvent(this, Constants.RpcWalletEvent.Connected, async (connected: boolean) => {
-      const clientWallet = getClientWallet();
-      console.log(`clientWallet connected: ${clientWallet.isConnected}`);
-      if (clientWallet.isConnected) {
-        console.log(`rpcWallet connected: ${connected}`);
-        this.swapBtn.visible = true;
-        this.updateContractAddress();
-        if (this.originalData?.providers?.length) await this.initializeWidgetConfig();
-      }
+      console.log(`rpcWallet connected: ${connected}`);
+      this.swapBtn.visible = true;
+      this.updateContractAddress();
+      if (this.originalData?.providers?.length) await this.initializeWidgetConfig();
     });
 
     this.configDApp.data = value;
@@ -1295,8 +1291,13 @@ export default class ScomSwap extends Module {
   }
   private async updateBalance() {
     const rpcWallet = getRpcWallet();
-    if (this.hasData) await tokenStore.updateAllTokenBalances(rpcWallet);
-    this.allTokenBalancesMap = tokenStore.tokenBalances;
+    if (rpcWallet.address) {
+      if (this.hasData) await tokenStore.updateAllTokenBalances(rpcWallet);
+      this.allTokenBalancesMap = tokenStore.tokenBalances;
+    }
+    else {
+      this.allTokenBalancesMap = {};
+    }
     if (this.fromToken) {
       const balance = this.getBalance(this.fromToken);
       this.payBalance.caption = `Balance: ${formatNumber(balance, 4)} ${this.fromToken.symbol}`;
