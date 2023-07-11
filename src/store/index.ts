@@ -33,8 +33,8 @@ export const tokenName = (address: string) => {
   return tokenObject?.name || '';
 }
 
-export * from './utils';
-
 export const getSupportedTokens = (tokens: ITokenObject[], chainId: number) => {
   return tokens.filter(token => token.chainId === chainId) || []
 }
+
+export * from './utils';
