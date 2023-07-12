@@ -2,6 +2,7 @@
 /// <reference path="@scom/scom-dex-list/@ijstech/eth-contract/index.d.ts" />
 /// <reference path="@ijstech/eth-wallet/index.d.ts" />
 /// <reference path="@scom/scom-dex-list/@ijstech/eth-wallet/index.d.ts" />
+/// <reference path="@scom/scom-dapp-container/@ijstech/eth-wallet/index.d.ts" />
 /// <amd-module name="@scom/scom-swap/assets.ts" />
 declare module "@scom/scom-swap/assets.ts" {
     import { ITokenObject } from '@scom/scom-token-list';
@@ -9861,8 +9862,8 @@ declare module "@scom/scom-swap/store/utils.ts" {
     export function getChainId(): number;
     export const getChainNativeToken: (chainId: number) => ITokenObject;
     export function initRpcWallet(defaultChainId: number): string;
-    export function getRpcWallet(): import("wallet").IRpcWallet;
-    export function getClientWallet(): import("wallet").IClientWallet;
+    export function getRpcWallet(): import("@ijstech/eth-wallet").IRpcWallet;
+    export function getClientWallet(): import("@ijstech/eth-wallet").IClientWallet;
 }
 /// <amd-module name="@scom/scom-swap/store/index.ts" />
 declare module "@scom/scom-swap/store/index.ts" {
