@@ -18154,6 +18154,18 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
             await self.ready();
             return self;
         }
+        onHide() {
+            this.dappContainer.onHide();
+            const rpcWallet = (0, index_18.getRpcWallet)();
+            for (let event of this.rpcWalletEvents) {
+                rpcWallet.unregisterWalletEvent(event);
+            }
+            this.rpcWalletEvents = [];
+            for (let event of this.clientEvents) {
+                event.unregister();
+            }
+            this.clientEvents = [];
+        }
         get category() {
             return this._data.category;
         }
@@ -18410,7 +18422,6 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
         }
         async setData(value) {
             this._data = value;
-            console.log('setData', value);
             const rpcWalletId = await (0, index_18.initRpcWallet)(this.defaultChainId);
             const rpcWallet = (0, index_18.getRpcWallet)();
             const event = rpcWallet.registerWalletEvent(this, eth_wallet_10.Constants.RpcWalletEvent.Connected, async (connected) => {
@@ -18421,6 +18432,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                 if ((_b = (_a = this.originalData) === null || _a === void 0 ? void 0 : _a.providers) === null || _b === void 0 ? void 0 : _b.length)
                     await this.initializeWidgetConfig();
             });
+            this.rpcWalletEvents.push(event);
             this.configDApp.data = value;
             this.updateContractAddress();
             await this.refreshUI();
@@ -18548,6 +18560,8 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
             this.isInited = false;
             this.oldSupportedChainList = [];
             this.supportedChainList = [];
+            this.rpcWalletEvents = [];
+            this.clientEvents = [];
             this.onChainChange = async () => {
                 var _a, _b;
                 const currentChainId = (0, index_18.getChainId)();
@@ -18813,20 +18827,11 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
             this.registerEvent();
         }
         registerEvent() {
-            this.$eventBus.register(this, "chainChanged" /* EventId.chainChanged */, this.onChainChange);
-            this.$eventBus.register(this, "SlippageToleranceChanged" /* EventId.SlippageToleranceChanged */, () => { this.priceInfo.Items = this.getPriceInfo(); });
-            this.$eventBus.register(this, "ExpertModeChanged" /* EventId.ExpertModeChanged */, () => {
+            this.clientEvents.push(this.$eventBus.register(this, "chainChanged" /* EventId.chainChanged */, this.onChainChange));
+            this.clientEvents.push(this.$eventBus.register(this, "SlippageToleranceChanged" /* EventId.SlippageToleranceChanged */, () => { this.priceInfo.Items = this.getPriceInfo(); }));
+            this.clientEvents.push(this.$eventBus.register(this, "ExpertModeChanged" /* EventId.ExpertModeChanged */, () => {
                 this.updateSwapButtonCaption();
-            });
-            // const clientWallet = Wallet.getClientInstance();
-            // clientWallet.registerWalletEvent(this, Constants.ClientWalletEvent.AccountsChanged, async (payload: Record<string, any>) => {
-            //   const { userTriggeredConnect, account } = payload;
-            //   let connected = !!account;
-            //   const rpcWallet = getRpcWallet();
-            //   rpcWallet.address = account;
-            //   console.log('AccountsChanged', payload);
-            //   await this.initializeWidgetConfig();
-            // });
+            }));
         }
         // get supportedNetworks() {
         //   let providers: IProvider[] = [];
@@ -19223,7 +19228,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
             this.initRoutes();
             const pricePercent = this.getPricePercent(listRouting, false);
             if (listRouting.length) {
-                this.lbBestPrice.visible = true;
+                // this.lbBestPrice.visible = true;
                 this.pnlReceive.classList.add('bg-box--active');
                 this.lbRouting.classList.add('visibility-hidden');
                 const option = listRouting[0];
@@ -19233,7 +19238,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                 await this.onSelectRouteItem(option);
             }
             else {
-                this.lbBestPrice.visible = false;
+                // this.lbBestPrice.visible = false;
                 this.pnlReceive.classList.remove('bg-box--active');
                 this.lbRouting.classList.remove('visibility-hidden');
                 this.priceInfo.Items = this.getPriceInfo();

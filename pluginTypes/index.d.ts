@@ -11046,7 +11046,10 @@ declare module "@scom/scom-swap" {
         private supportedNetworksElm;
         private configDApp;
         private contractAddress;
+        private rpcWalletEvents;
+        private clientEvents;
         static create(options?: ScomSwapElement, parent?: Container): Promise<ScomSwap>;
+        onHide(): void;
         get category(): Category;
         set category(value: Category);
         get providers(): IProviderUI[];
