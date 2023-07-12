@@ -18421,6 +18421,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
             return this._data;
         }
         async setData(value) {
+            var _a;
             this._data = value;
             const rpcWalletId = await (0, index_18.initRpcWallet)(this.defaultChainId);
             const rpcWallet = (0, index_18.getRpcWallet)();
@@ -18435,6 +18436,16 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
             this.rpcWalletEvents.push(event);
             this.configDApp.data = value;
             this.updateContractAddress();
+            console.log('rpcWallet.instanceId', rpcWallet.instanceId);
+            const data = {
+                defaultChainId: this.defaultChainId,
+                wallets: this.wallets,
+                networks: this.networks,
+                showHeader: this.showHeader,
+                rpcWalletId: rpcWallet.instanceId
+            };
+            if ((_a = this.dappContainer) === null || _a === void 0 ? void 0 : _a.setData)
+                this.dappContainer.setData(data);
             await this.refreshUI();
         }
         async getTag() {
@@ -18604,18 +18615,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
             };
             this.initializeWidgetConfig = async (_chainId) => {
                 setTimeout(async () => {
-                    var _a, _b;
-                    const rpcWallet = (0, index_18.getRpcWallet)();
-                    console.log('rpcWallet.instanceId', rpcWallet.instanceId);
-                    const data = {
-                        defaultChainId: this.defaultChainId,
-                        wallets: this.wallets,
-                        networks: this.networks,
-                        showHeader: this.showHeader,
-                        rpcWalletId: rpcWallet.instanceId
-                    };
-                    if ((_a = this.dappContainer) === null || _a === void 0 ? void 0 : _a.setData)
-                        this.dappContainer.setData(data);
+                    var _a;
                     const currentChainId = (0, index_18.getChainId)();
                     scom_token_list_7.tokenStore.updateTokenMapData(currentChainId);
                     this.closeNetworkErrModal();
@@ -18624,7 +18624,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                     this.firstTokenSelection.disableSelect = this.isFixedPair;
                     this.secondTokenSelection.disableSelect = this.isFixedPair;
                     this.pnlBranding.visible = !!this._data.logo || !!this._data.title;
-                    if ((_b = this._data.logo) === null || _b === void 0 ? void 0 : _b.startsWith('ipfs://')) {
+                    if ((_a = this._data.logo) === null || _a === void 0 ? void 0 : _a.startsWith('ipfs://')) {
                         const ipfsGatewayUrl = (0, index_18.getIPFSGatewayUrl)();
                         this.imgLogo.url = this._data.logo.replace('ipfs://', ipfsGatewayUrl);
                     }

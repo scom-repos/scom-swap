@@ -470,6 +470,15 @@ export default class ScomSwap extends Module {
     this.rpcWalletEvents.push(event);
     this.configDApp.data = value;
     this.updateContractAddress();
+    console.log('rpcWallet.instanceId', rpcWallet.instanceId)
+    const data: any = { 
+      defaultChainId: this.defaultChainId, 
+      wallets: this.wallets, 
+      networks: this.networks, 
+      showHeader: this.showHeader,
+      rpcWalletId: rpcWallet.instanceId
+    }
+    if (this.dappContainer?.setData) this.dappContainer.setData(data)
     await this.refreshUI();
   }
 
@@ -719,16 +728,6 @@ export default class ScomSwap extends Module {
 
   private initializeWidgetConfig = async (_chainId?: number) => {
     setTimeout(async () => {
-      const rpcWallet = getRpcWallet();
-      console.log('rpcWallet.instanceId', rpcWallet.instanceId)
-      const data: any = { 
-        defaultChainId: this.defaultChainId, 
-        wallets: this.wallets, 
-        networks: this.networks, 
-        showHeader: this.showHeader,
-        rpcWalletId: rpcWallet.instanceId
-      }
-      if (this.dappContainer?.setData) this.dappContainer.setData(data)
       const currentChainId = getChainId();
       tokenStore.updateTokenMapData(currentChainId);
       this.closeNetworkErrModal();
