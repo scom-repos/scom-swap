@@ -1,7 +1,5 @@
 import { Module, Panel, Button, Label, VStack, Image, Container, IEventBus, application, customModule, Modal, Input, Control, customElements, ControlElement, IDataSchema, Styles, HStack, Icon } from '@ijstech/components';
-import { BigNumber, Constants, Wallet } from '@ijstech/eth-wallet';
-import ScomCommissionFeeSetup from '@scom/scom-commission-fee-setup';
-
+import { BigNumber, Constants, IEventBusRegistry, Wallet } from '@ijstech/eth-wallet';
 import './index.css';
 import {
   getChainId,
@@ -61,6 +59,7 @@ import formSchema from './formSchema.json';
 import ScomWalletModal, {IWalletPlugin} from '@scom/scom-wallet-modal';
 import ScomDappContainer from '@scom/scom-dapp-container'
 import getDexList from '@scom/scom-dex-list';
+import ScomCommissionFeeSetup from '@scom/scom-commission-fee-setup';
 
 
 
@@ -182,11 +181,26 @@ export default class ScomSwap extends Module {
   private supportedNetworksElm: VStack;
   // private configDApp: ScomCommissionFeeSetup;
   private contractAddress: string;
+  private rpcWalletEvents: IEventBusRegistry[] = [];
+  private clientEvents: any[] = [];
 
   static async create(options?: ScomSwapElement, parent?: Container){
     let self = new this(parent, options);
     await self.ready();
     return self;
+  }
+
+  onHide() {
+    this.dappContainer.onHide();
+    const rpcWallet = getRpcWallet();
+    for (let event of this.rpcWalletEvents) {
+      rpcWallet.unregisterWalletEvent(event);
+    }
+    this.rpcWalletEvents = [];
+    for (let event of this.clientEvents) {
+      event.unregister();
+    }
+    this.clientEvents = [];
   }
 
   get category() {
@@ -451,7 +465,6 @@ export default class ScomSwap extends Module {
 
   private async setData(value: ISwapConfigUI) {
     this._data = value;
-    console.log('setData', value)
     const rpcWalletId = await initRpcWallet(this.defaultChainId);
     const rpcWallet = getRpcWallet();
     const event = rpcWallet.registerWalletEvent(this, Constants.RpcWalletEvent.Connected, async (connected: boolean) => {
@@ -460,9 +473,18 @@ export default class ScomSwap extends Module {
       this.updateContractAddress();
       if (this.originalData?.providers?.length) await this.initializeWidgetConfig();
     });
-
+    this.rpcWalletEvents.push(event);
     // this.configDApp.data = value;
     this.updateContractAddress();
+    console.log('rpcWallet.instanceId', rpcWallet.instanceId)
+    const data: any = { 
+      defaultChainId: this.defaultChainId, 
+      wallets: this.wallets, 
+      networks: this.networks, 
+      showHeader: this.showHeader,
+      rpcWalletId: rpcWallet.instanceId
+    }
+    if (this.dappContainer?.setData) this.dappContainer.setData(data)
     await this.refreshUI();
   }
 
@@ -587,20 +609,11 @@ export default class ScomSwap extends Module {
   }
 
   private registerEvent() {
-    this.$eventBus.register(this, EventId.chainChanged, this.onChainChange)
-    this.$eventBus.register(this, EventId.SlippageToleranceChanged, () => { this.priceInfo.Items = this.getPriceInfo() })
-    this.$eventBus.register(this, EventId.ExpertModeChanged, () => {
+    this.clientEvents.push(this.$eventBus.register(this, EventId.chainChanged, this.onChainChange));
+    this.clientEvents.push(this.$eventBus.register(this, EventId.SlippageToleranceChanged, () => { this.priceInfo.Items = this.getPriceInfo() }));
+    this.clientEvents.push(this.$eventBus.register(this, EventId.ExpertModeChanged, () => {
       this.updateSwapButtonCaption();
-    });
-    // const clientWallet = Wallet.getClientInstance();
-    // clientWallet.registerWalletEvent(this, Constants.ClientWalletEvent.AccountsChanged, async (payload: Record<string, any>) => {
-    //   const { userTriggeredConnect, account } = payload;
-    //   let connected = !!account;
-    //   const rpcWallet = getRpcWallet();
-    //   rpcWallet.address = account;
-    //   console.log('AccountsChanged', payload);
-    //   await this.initializeWidgetConfig();
-    // });
+    }));
   }
 
   private onChainChange = async () => {
@@ -721,16 +734,6 @@ export default class ScomSwap extends Module {
 
   private initializeWidgetConfig = async (_chainId?: number) => {
     setTimeout(async () => {
-      const rpcWallet = getRpcWallet();
-      console.log('rpcWallet.instanceId', rpcWallet.instanceId)
-      const data: any = { 
-        defaultChainId: this.defaultChainId, 
-        wallets: this.wallets, 
-        networks: this.networks, 
-        showHeader: this.showHeader,
-        rpcWalletId: rpcWallet.instanceId
-      }
-      if (this.dappContainer?.setData) this.dappContainer.setData(data)
       const currentChainId = getChainId();
       tokenStore.updateTokenMapData(currentChainId);
       this.closeNetworkErrModal();
@@ -1115,7 +1118,7 @@ export default class ScomSwap extends Module {
     this.initRoutes();
     const pricePercent = this.getPricePercent(listRouting, false)
     if (listRouting.length) {
-      this.lbBestPrice.visible = true;
+      // this.lbBestPrice.visible = true;
       this.pnlReceive.classList.add('bg-box--active');
       this.lbRouting.classList.add('visibility-hidden');
       const option = listRouting[0];
@@ -1124,7 +1127,7 @@ export default class ScomSwap extends Module {
       this.swapButtonStatusMap[option.key] = ApprovalStatus.TO_BE_APPROVED;
       await this.onSelectRouteItem(option);
     } else {
-      this.lbBestPrice.visible = false;
+      // this.lbBestPrice.visible = false;
       this.pnlReceive.classList.remove('bg-box--active');
       this.lbRouting.classList.remove('visibility-hidden');
       this.priceInfo.Items = this.getPriceInfo();
