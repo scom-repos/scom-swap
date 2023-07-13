@@ -9873,8 +9873,8 @@ declare module "@scom/scom-swap/store/index.ts" {
     export const getTokenDecimals: (address: string) => number;
     export const tokenSymbol: (address: string) => string;
     export const tokenName: (address: string) => string;
-    export * from "@scom/scom-swap/store/utils.ts";
     export const getSupportedTokens: (tokens: ITokenObject[], chainId: number) => ITokenObject[];
+    export * from "@scom/scom-swap/store/utils.ts";
 }
 /// <amd-module name="@scom/scom-swap/contracts/scom-commission-proxy-contract/contracts/Proxy.json.ts" />
 declare module "@scom/scom-swap/contracts/scom-commission-proxy-contract/contracts/Proxy.json.ts" {
@@ -10683,59 +10683,6 @@ declare module "@scom/scom-swap/expert-mode-settings/index.tsx" {
         render(): any;
     }
 }
-/// <amd-module name="@scom/scom-swap/config/index.css.ts" />
-declare module "@scom/scom-swap/config/index.css.ts" {
-    export const customStyle: string;
-    export const tableStyle: string;
-}
-/// <amd-module name="@scom/scom-swap/config/index.tsx" />
-declare module "@scom/scom-swap/config/index.tsx" {
-    import { Module, ControlElement } from '@ijstech/components';
-    import { IExtendedNetwork, ICommissionInfo, IEmbedData } from "@scom/scom-swap/global/index.ts";
-    export interface ISupportedNetworks {
-        chainId: number;
-    }
-    interface ScomSwapConfigElement extends ControlElement {
-        commissions?: ICommissionInfo;
-    }
-    global {
-        namespace JSX {
-            interface IntrinsicElements {
-                ['i-scom-swap-config']: ScomSwapConfigElement;
-            }
-        }
-    }
-    export default class Config extends Module {
-        private tableCommissions;
-        private modalAddCommission;
-        private networkPicker;
-        private inputWalletAddress;
-        private lbCommissionShare;
-        private btnAddWallet;
-        private pnlEmptyWallet;
-        private commissionInfoList;
-        private commissionsTableColumns;
-        private btnConfirm;
-        private lbErrMsg;
-        private _onCustomCommissionsChanged;
-        init(): Promise<void>;
-        get data(): IEmbedData;
-        set data(config: IEmbedData);
-        get onCustomCommissionsChanged(): (data: any) => Promise<void>;
-        set onCustomCommissionsChanged(value: (data: any) => Promise<void>);
-        getSupportedChainIds(): {
-            chainId: number;
-        }[];
-        onModalAddCommissionClosed(): void;
-        onAddCommissionClicked(): void;
-        onConfirmCommissionClicked(): Promise<void>;
-        validateModalFields(): boolean;
-        onNetworkSelected(network: IExtendedNetwork): void;
-        onInputWalletAddressChanged(): void;
-        private toggleVisible;
-        render(): any;
-    }
-}
 /// <amd-module name="@scom/scom-swap/data.json.ts" />
 declare module "@scom/scom-swap/data.json.ts" {
     const _default_54: {
@@ -10954,8 +10901,8 @@ declare module "@scom/scom-swap" {
     import "@scom/scom-swap/index.css.ts";
     import { ITokenObject } from '@scom/scom-token-list';
     import { ISwapConfigUI, IProviderUI, Category, ICommissionInfo, INetworkConfig } from "@scom/scom-swap/global/index.ts";
-    import Config from "@scom/scom-swap/config/index.tsx";
     import { IWalletPlugin } from '@scom/scom-wallet-modal';
+    import ScomCommissionFeeSetup from '@scom/scom-commission-fee-setup';
     interface ScomSwapElement extends ControlElement {
         lazyLoad?: boolean;
         category: Category;
@@ -11045,7 +10992,6 @@ declare module "@scom/scom-swap" {
         private expertModal;
         private networkErrModal;
         private supportedNetworksElm;
-        private configDApp;
         private contractAddress;
         private rpcWalletEvents;
         private clientEvents;
@@ -11089,8 +11035,20 @@ declare module "@scom/scom-swap" {
                 data: any;
             };
             setLinkParams: (params: any) => Promise<void>;
-            bindOnChanged: (element: Config, callback: (data: any) => Promise<void>) => void;
-            getData: any;
+            bindOnChanged: (element: ScomCommissionFeeSetup, callback: (data: any) => Promise<void>) => void;
+            getData: () => {
+                fee: string;
+                category: Category;
+                providers: IProviderUI[];
+                commissions?: ICommissionInfo[];
+                tokens?: ITokenObject[];
+                defaultChainId: number;
+                wallets: IWalletPlugin[];
+                networks: INetworkConfig[];
+                showHeader?: boolean;
+                logo?: string;
+                title?: string;
+            };
             setData: any;
             getTag: any;
             setTag: any;

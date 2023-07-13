@@ -20,7 +20,8 @@ import {
   initRpcWallet,
   getRpcWallet,
   getIPFSGatewayUrl,
-  getClientWallet
+  getClientWallet,
+  getSupportedNetworks
 } from "./store/index";
 import { tokenStore, DefaultERC20Tokens, ChainNativeTokenByChainId, assets as tokenAssets } from '@scom/scom-token-list';
 
@@ -54,12 +55,13 @@ import { PriceInfo } from './price-info/index';
 import { TokenSelection } from './token-selection/index';
 import { Result } from './result/index';
 import { ExpertModeSettings } from './expert-mode-settings/index'
-import Config from './config/index';
 import configData from './data.json';
 import formSchema from './formSchema.json';
 import ScomWalletModal, {IWalletPlugin} from '@scom/scom-wallet-modal';
 import ScomDappContainer from '@scom/scom-dapp-container'
 import getDexList from '@scom/scom-dex-list';
+import ScomCommissionFeeSetup from '@scom/scom-commission-fee-setup';
+
 
 
 const Theme = Styles.Theme.ThemeVars;
@@ -178,7 +180,7 @@ export default class ScomSwap extends Module {
   private expertModal: ExpertModeSettings;
   private networkErrModal: Modal;
   private supportedNetworksElm: VStack;
-  private configDApp: Config;
+  // private configDApp: ScomCommissionFeeSetup;
   private contractAddress: string;
   private rpcWalletEvents: IEventBusRegistry[] = [];
   private clientEvents: any[] = [];
@@ -283,13 +285,13 @@ export default class ScomSwap extends Module {
             execute: async () => {
               _oldData = {...this._data};
               if (userInputData.commissions) this._data.commissions = userInputData.commissions;
-              this.configDApp.data = this._data;
+              // this.configDApp.data = this._data;
               this.refreshUI();
               if (builder?.setData) builder.setData(this._data);
             },
             undo: () => {
               this._data = {..._oldData};
-              this.configDApp.data = this._data;
+              // this.configDApp.data = this._data;
               this.refreshUI();
               if (builder?.setData) builder.setData(this._data);
             },
@@ -299,8 +301,10 @@ export default class ScomSwap extends Module {
         customUI: {
           render: (data?: any, onConfirm?: (result: boolean, data: any) => void) => {
             const vstack = new VStack();
-            const config = new Config(null, {
-              commissions: self._data.commissions
+            const config = new ScomCommissionFeeSetup(null, {
+              commissions: self._data.commissions || [],
+              fee: getEmbedderCommissionFee(),
+              networks: self._data.networks
             });
             const button = new Button(null, {
               caption: 'Confirm',
@@ -308,7 +312,7 @@ export default class ScomSwap extends Module {
             vstack.append(config);
             vstack.append(button);
             button.onClick = async () => {
-              const commissions = config.data.commissions;
+              const commissions = config.commissions;
               if (onConfirm) onConfirm(true, {commissions});
             }
             return vstack;
@@ -349,13 +353,13 @@ export default class ScomSwap extends Module {
                   }
                 }
               }
-              this.configDApp.data = this._data;
+              // this.configDApp.data = this._data;
               this.refreshUI();
               if (builder?.setData) builder.setData(this._data);
             },
             undo: () => {
               this._data = {..._oldData};
-              this.configDApp.data = this._data;
+              // this.configDApp.data = this._data;
               this.refreshUI();
               if (builder?.setData) builder.setData(this._data);
             },
@@ -412,7 +416,7 @@ export default class ScomSwap extends Module {
       {
         name: 'Embedder Configurator',
         target: 'Embedders',
-        elementName: 'i-scom-swap-config',
+        elementName: 'i-scom-commission-fee-setup',
         getLinkParams: () => {
           const commissions = this._data.commissions || [];
           return {
@@ -430,8 +434,8 @@ export default class ScomSwap extends Module {
             await this.setData(resultingData);
           }
         },
-        bindOnChanged: (element: Config, callback: (data: any) => Promise<void>) => {
-          element.onCustomCommissionsChanged = async (data: any) => {
+        bindOnChanged: (element: ScomCommissionFeeSetup, callback: (data: any) => Promise<void>) => {
+          element.onChanged = async (data: any) => {
             const commissions: ICommissionInfo[] = data.commissions;
             if (commissions) {
               this.supportedChainIds = commissions.map(v => v.chainId).filter((v, i, a) => a.indexOf(v) === i);
@@ -445,7 +449,10 @@ export default class ScomSwap extends Module {
             await callback(data);
           }
         },
-        getData: this.getData.bind(this),
+        getData: () => {
+          const fee = getEmbedderCommissionFee();
+          return {...this._data, fee}
+        },
         setData: this.setData.bind(this),
         getTag: this.getTag.bind(this),
         setTag: this.setTag.bind(this)
@@ -453,7 +460,7 @@ export default class ScomSwap extends Module {
     ]
   }
 
-  private async getData() {
+  private getData() {
     return this._data;
   }
 
@@ -468,7 +475,7 @@ export default class ScomSwap extends Module {
       if (this.originalData?.providers?.length) await this.initializeWidgetConfig();
     });
     this.rpcWalletEvents.push(event);
-    this.configDApp.data = value;
+    // this.configDApp.data = value;
     this.updateContractAddress();
     console.log('rpcWallet.instanceId', rpcWallet.instanceId)
     const data: any = { 
@@ -1830,7 +1837,7 @@ export default class ScomSwap extends Module {
               </i-panel>
             </i-modal>
           </i-panel>
-          <i-scom-swap-config id="configDApp" visible={false} />
+          {/* <i-scom-swap-config id="configDApp" visible={false} /> */}
           <i-scom-wallet-modal
             id="mdWallet"
             wallets={[]}
