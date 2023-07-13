@@ -20,7 +20,8 @@ import {
   initRpcWallet,
   getRpcWallet,
   getIPFSGatewayUrl,
-  getClientWallet
+  getClientWallet,
+  getSupportedNetworks
 } from "./store/index";
 import { tokenStore, DefaultERC20Tokens, ChainNativeTokenByChainId, assets as tokenAssets } from '@scom/scom-token-list';
 
@@ -450,7 +451,7 @@ export default class ScomSwap extends Module {
         },
         getData: () => {
           const fee = getEmbedderCommissionFee();
-          return {...this.getData(), fee}
+          return {...this._data, fee}
         },
         setData: this.setData.bind(this),
         getTag: this.getTag.bind(this),
@@ -459,7 +460,7 @@ export default class ScomSwap extends Module {
     ]
   }
 
-  private async getData() {
+  private getData() {
     return this._data;
   }
 
