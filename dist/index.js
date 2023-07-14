@@ -17949,10 +17949,10 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
             const { providers, defaultChainId, networks, wallets } = this._data;
             return !!((providers === null || providers === void 0 ? void 0 : providers.length) || (networks === null || networks === void 0 ? void 0 : networks.length) || (wallets === null || wallets === void 0 ? void 0 : wallets.length) || !isNaN(Number(defaultChainId)));
         }
-        getActions() {
-            return this._getActions(formSchema_json_1.default.general.dataSchema, formSchema_json_1.default.theme.dataSchema);
+        getActions(category) {
+            return this._getActions(formSchema_json_1.default.general.dataSchema, formSchema_json_1.default.theme.dataSchema, category);
         }
-        _getActions(propertiesSchema, themeSchema) {
+        _getActions(propertiesSchema, themeSchema, category) {
             let self = this;
             const actions = [
                 {
@@ -18007,8 +18007,10 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                             return vstack;
                         }
                     }
-                },
-                {
+                }
+            ];
+            if (category && category !== 'offers') {
+                actions.push({
                     name: 'Settings',
                     icon: 'cog',
                     command: (builder, userInputData) => {
@@ -18061,8 +18063,8 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                     },
                     userInputDataSchema: propertiesSchema,
                     userInputUISchema: formSchema_json_1.default.general.uiSchema
-                },
-                {
+                });
+                actions.push({
                     name: 'Theme Settings',
                     icon: 'palette',
                     command: (builder, userInputData) => {
@@ -18094,8 +18096,8 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                         };
                     },
                     userInputDataSchema: themeSchema
-                }
-            ];
+                });
+            }
             return actions;
         }
         getConfigurators() {

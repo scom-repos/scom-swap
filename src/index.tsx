@@ -263,13 +263,13 @@ export default class ScomSwap extends Module {
     return !!(providers?.length || networks?.length || wallets?.length || !isNaN(Number(defaultChainId)));
   }
 
-  private getActions() {
-    return this._getActions(formSchema.general.dataSchema as any, formSchema.theme.dataSchema as any);
+  private getActions(category?: string) {
+    return this._getActions(formSchema.general.dataSchema as any, formSchema.theme.dataSchema as any, category);
   }
 
-  private _getActions(propertiesSchema: IDataSchema, themeSchema: IDataSchema) {
+  private _getActions(propertiesSchema: IDataSchema, themeSchema: IDataSchema, category?: string) {
     let self = this;
-    const actions = [
+    const actions: any[] = [
       {
         name: 'Commissions',
         icon: 'dollar-sign',
@@ -318,8 +318,10 @@ export default class ScomSwap extends Module {
             return vstack;
           }
         }
-      },      
-      {
+      }
+    ]
+    if (category && category !== 'offers') {
+      actions.push({
         name: 'Settings',
         icon: 'cog',
         command: (builder: any, userInputData: any) => {
@@ -368,33 +370,35 @@ export default class ScomSwap extends Module {
         },
         userInputDataSchema: propertiesSchema,
         userInputUISchema: formSchema.general.uiSchema
-      },
-      {
-        name: 'Theme Settings',
-        icon: 'palette',
-        command: (builder: any, userInputData: any) => {
-          let oldTag = {};
-          return {
-            execute: async () => {
-              if (!userInputData) return;
-              oldTag = JSON.parse(JSON.stringify(this.tag));
-              if (builder) builder.setTag(userInputData);
-              else this.setTag(userInputData);
-              if (this.dappContainer) this.dappContainer.setTag(userInputData);
-            },
-            undo: () => {
-              if (!userInputData) return;
-              this.tag = JSON.parse(JSON.stringify(oldTag));
-              if (builder) builder.setTag(this.tag);
-              else this.setTag(this.tag);
-              if (this.dappContainer) this.dappContainer.setTag(this.tag);
-            },
-            redo: () => { }
-          }
-        },
-        userInputDataSchema: themeSchema
-      }
-    ]
+      });
+      actions.push(
+        {
+          name: 'Theme Settings',
+          icon: 'palette',
+          command: (builder: any, userInputData: any) => {
+            let oldTag = {};
+            return {
+              execute: async () => {
+                if (!userInputData) return;
+                oldTag = JSON.parse(JSON.stringify(this.tag));
+                if (builder) builder.setTag(userInputData);
+                else this.setTag(userInputData);
+                if (this.dappContainer) this.dappContainer.setTag(userInputData);
+              },
+              undo: () => {
+                if (!userInputData) return;
+                this.tag = JSON.parse(JSON.stringify(oldTag));
+                if (builder) builder.setTag(this.tag);
+                else this.setTag(this.tag);
+                if (this.dappContainer) this.dappContainer.setTag(this.tag);
+              },
+              redo: () => { }
+            }
+          },
+          userInputDataSchema: themeSchema
+        }
+      )
+    }
     return actions
   }
 
