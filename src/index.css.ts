@@ -145,7 +145,71 @@ Styles.cssRule('.pageblock-swap', {
       maxWidth: '100%',
       minHeight: 340,
       padding: '1rem',
-      marginInline: 'auto'
+      marginInline: 'auto',
+      $nest: {
+        '#btnToken': {
+          height: 'auto !important',
+          background: `${Theme.background.main} !important`,
+          padding: '0.5rem !important',
+          borderRadius: '8px',
+          fontSize: '1rem',
+          fontWeight: 700,
+          lineHeight: 1.5,
+          alignSelf: 'center',
+          textAlign: 'center',
+          opacity: 1,
+          color: Theme.input.fontColor,
+          $nest: {
+            '&:not(.disabled):hover': {
+              color: Theme.input.fontColor,
+              // background: '#ffffff35'
+            },
+            '&> span': {
+              verticalAlign: 'middle',
+            },
+            '&> i-icon': {
+              maxWidth: 10,
+              height: '16px !important',
+              opacity: 0.5,
+              marginRight: 'unset',
+              fill: Theme.input.fontColor,
+              $nest: {
+                'svg': {
+                  fill: `${Theme.input.fontColor} !important`
+                }
+              }
+            },
+            '&> :not(:last-child)': {
+              marginRight: '0.5rem'
+            }
+          }
+        },
+        '.text-value': {
+          display: 'block',
+          $nest: {
+            '> *': {
+              fontSize: '1.25rem',
+              paddingRight: '0.25rem'
+            }
+          }
+        },
+        '.token-input': {
+          width: '100%'
+        },
+        '.token-input > input': {
+          width: '100%',
+          height: 'auto !important',
+          padding: '.375rem .75rem',
+          paddingRight: '0.25rem',
+          paddingLeft: 0,
+          borderRadius: '0.25rem',
+          border: 'none',
+          background: 'transparent',
+          color: Theme.input.fontColor,
+          fontSize: '1.125rem',
+          textAlign: 'right'
+        }
+      }
     },
     '.swap-flex--col': {
       flexDirection: 'column',
@@ -248,75 +312,6 @@ Styles.cssRule('.pageblock-swap', {
         }
       }
     },
-    '#swapContainer .input--token-box': {
-      padding: '0.5rem 0.25rem',
-      $nest: {
-        '#btnToken': {
-          height: 'auto !important'
-        },
-        'i-button.custom-btn': {
-          // background: '#ffffff30',
-          padding: '0.5rem',
-          borderRadius: '8px',
-          fontSize: '1rem',
-          fontWeight: 700,
-          lineHeight: 1.5,
-          alignSelf: 'center',
-          textAlign: 'center',
-          opacity: 1,
-          color: Theme.input.fontColor,
-          $nest: {
-            '&:not(.disabled):hover': {
-              color: Theme.input.fontColor,
-              // background: '#ffffff35'
-            },
-            '&> span': {
-              verticalAlign: 'middle',
-            },
-            '&> i-icon': {
-              maxWidth: 10,
-              height: '16px !important',
-              opacity: 0.5,
-              marginRight: 'unset',
-              fill: Theme.input.fontColor,
-              $nest: {
-                'svg': {
-                  fill: `${Theme.input.fontColor} !important`
-                }
-              }
-            },
-            '&> :not(:last-child)': {
-              marginRight: '0.5rem'
-            }
-          }
-        },
-        '.text-value': {
-          display: 'block',
-          $nest: {
-            '> *': {
-              fontSize: '1.25rem',
-              paddingRight: '0.25rem'
-            }
-          }
-        },
-        '.token-input': {
-          width: '100%'
-        },
-        '.token-input > input': {
-          width: '100%',
-          height: 'auto !important',
-          padding: '.375rem .75rem',
-          paddingRight: '0.25rem',
-          paddingLeft: 0,
-          borderRadius: '0.25rem',
-          border: 'none',
-          background: 'transparent',
-          color: Theme.input.fontColor,
-          fontSize: '1.125rem',
-          textAlign: 'right'
-        }
-      }
-    },
     '.toggle-reverse': {
       margin: '1rem 0 0.5rem',
       fontSize: '20px',
@@ -358,9 +353,9 @@ Styles.cssRule('.pageblock-swap', {
         }
       }
     },
-    '#payCol, #receiveCol': {
-      maxWidth: 'calc(100% - 9rem)',
-    },
+    // '#receiveCol': {
+    //   maxWidth: 'calc(100% - 9rem)',
+    // },
     '#tokenModal': {
       $nest: {
         '.modal': {

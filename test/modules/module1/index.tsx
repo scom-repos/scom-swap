@@ -64,51 +64,52 @@ export default class Module1 extends Module {
               gap='2rem'
             >
               <i-scom-swap
-                category='aggregator'
-                providers={this._providers}
+                providers={[
+                  {
+                    "caption": "OpenSwap",
+                    "image": "ipfs://bafkreidoi5pywhyo4hqdltlosvrvefgqj4nuclmjl325exzmjgnyl2cc4y",
+                    "key": "OpenSwap",
+                    "chainId": 97
+                  },
+                  {
+                    "caption": "OpenSwap",
+                    "image": "ipfs://bafkreidoi5pywhyo4hqdltlosvrvefgqj4nuclmjl325exzmjgnyl2cc4y",
+                    "key": "OpenSwap",
+                    "chainId": 43113
+                  }
+                ]}
+                category="fixed-pair"
                 tokens={[
                   {
-                    name: 'Wrapped BNB',
-                    address: '0xae13d989dac2f0debff460ac112a837c89baa7cd',
-                    symbol: 'WBNB',
-                    decimals: 18,
-                    isCommon: true,
-                    isWETH: true,
-                    chainId: 97
+                    "name": "USDT",
+                    "address": "0x29386B60e0A9A1a30e1488ADA47256577ca2C385",
+                    "symbol": "USDT",
+                    "decimals": 6,
+                    "chainId": 97
                   },
                   {
-                    name: 'USDT',
-                    address: '0x29386B60e0A9A1a30e1488ADA47256577ca2C385',
-                    symbol: 'USDT',
-                    decimals: 6,
-                    isCommon: true,
-                    chainId: 97
-                  },
-                  {
-                    "name": "Wrapped AVAX",
-                    "address": "0xd00ae08403B9bbb9124bB305C09058E32C39A48c",
-                    "symbol": "WAVAX",
+                    "name": "OpenSwap",
+                    "address": "0x45eee762aaeA4e5ce317471BDa8782724972Ee19",
+                    "symbol": "OSWAP",
                     "decimals": 18,
-                    "isCommon": true,
-                    "isWETH": true,
-                    chainId: 43113
+                    "chainId": 97
                   },
                   {
-                    "name": "Pangolin",
-                    "address": "0x6d0A79756774c7cbac6Ce5c5e3b0f40b0ccCcB20",
-                    "symbol": "PNG",
-                    "decimals": 18,
-                    chainId: 43113
+                    "name": "Tether USD",
+                    "address": "0xb9C31Ea1D475c25E58a1bE1a46221db55E5A7C6e",
+                    "symbol": "USDT.e",
+                    "decimals": 6,
+                    "chainId": 43113
                   },
                   {
                     "name": "OpenSwap",
                     "address": "0x78d9D80E67bC80A11efbf84B7c8A65Da51a8EF3C",
                     "symbol": "OSWAP",
                     "decimals": 18,
-                    "isCommon": true,
-                    chainId: 43113
+                    "chainId": 43113
                   }
                 ]}
+                defaultChainId={43113}
                 networks={[
                   {
                     "chainId": 43113
@@ -122,7 +123,6 @@ export default class Module1 extends Module {
                     "name": "metamask"
                   }
                 ]}
-                defaultChainId={43113}
               ></i-scom-swap>
             </i-hstack>
           </i-panel>

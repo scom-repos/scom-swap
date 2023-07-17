@@ -496,6 +496,7 @@ export class TokenSelection extends Module {
   }
 
   private async onSelect(token: ITokenObject, isNew: boolean = false) {
+    if (!token) return;
     this.token = token;
     // The token has been not imported
     if (!isNew && token.isNew && !hasUserToken(token.address || '', this.chainId)) {

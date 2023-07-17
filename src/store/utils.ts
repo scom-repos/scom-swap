@@ -316,12 +316,12 @@ export function initRpcWallet(defaultChainId: number) {
     return state.rpcWalletId;
   }
   const clientWallet = Wallet.getClientInstance();
-  const networkList: INetwork[] = Object.values(application.store.networkMap);
+  const networkList: INetwork[] = Object.values(application.store?.networkMap || []);
   const instanceId = clientWallet.initRpcWallet({
     networks: networkList,
     defaultChainId,
-    infuraId: application.store.infuraId,
-    multicalls: application.store.multicalls
+    infuraId: application.store?.infuraId,
+    multicalls: application.store?.multicalls
   });
   state.rpcWalletId = instanceId;
   if (clientWallet.address) {
@@ -332,7 +332,7 @@ export function initRpcWallet(defaultChainId: number) {
 }
 
 export function getRpcWallet() {
-  return Wallet.getRpcWalletInstance(state.rpcWalletId);
+  return state.rpcWalletId ? Wallet.getRpcWalletInstance(state.rpcWalletId) : null;
 }
 
 export function getClientWallet() {
