@@ -61,6 +61,7 @@ import ScomWalletModal, {IWalletPlugin} from '@scom/scom-wallet-modal';
 import ScomDappContainer from '@scom/scom-dapp-container'
 import getDexList from '@scom/scom-dex-list';
 import ScomCommissionFeeSetup from '@scom/scom-commission-fee-setup';
+import ScomTokenInput from '@scom/scom-token-input';
 
 
 
@@ -119,6 +120,7 @@ export default class ScomSwap extends Module {
   private receiveBalance: Label;
   private firstTokenSelection: TokenSelection;
   private secondTokenSelection: TokenSelection;
+  private firstTokenInput: ScomTokenInput;
   private payCol: VStack;
   private receiveCol: VStack;
   private swapModal: Modal;
@@ -482,6 +484,7 @@ export default class ScomSwap extends Module {
     // this.configDApp.data = value;
     this.updateContractAddress();
     console.log('rpcWallet.instanceId', rpcWallet.instanceId)
+    if (this.firstTokenInput && rpcWallet.instanceId) this.firstTokenInput.rpcWalletId = rpcWallet.instanceId;
     const data: any = { 
       defaultChainId: this.defaultChainId, 
       wallets: this.wallets, 
@@ -731,7 +734,8 @@ export default class ScomSwap extends Module {
       this.fromInputValue = new BigNumber(defaultInput);
       this.onUpdateToken(this.fromToken, true);
       this.onUpdateToken(this.toToken, false);
-      this.firstTokenSelection.token = this.fromToken;
+      // this.firstTokenSelection.token = this.fromToken;
+      this.firstTokenInput.token = this.fromToken;
       this.secondTokenSelection.token = this.toToken;
       this.toggleReverseImage.classList.add('cursor-default');
     }
@@ -744,7 +748,8 @@ export default class ScomSwap extends Module {
       this.closeNetworkErrModal();
       this.initializeDefaultTokenPair();
       this.toggleReverseImage.enabled = !this.isFixedPair;
-      this.firstTokenSelection.disableSelect = this.isFixedPair;
+      // this.firstTokenSelection.disableSelect = this.isFixedPair;
+      this.firstTokenInput.tokenReadOnly = this.isFixedPair;
       this.secondTokenSelection.disableSelect = this.isFixedPair;
       this.pnlBranding.visible = !!this._data.logo || !!this._data.title;
       if (this._data.logo?.startsWith('ipfs://')) {
@@ -767,7 +772,7 @@ export default class ScomSwap extends Module {
       }
       if (this.fromInputValue.isGreaterThanOrEqualTo(0)) {
         this.onUpdateEstimatedPosition(false, true);
-        const input = this.payCol.children[0] as Input;
+        const input = this.payCol.querySelector('i-input') as Input;
         if (input) {
           input.value = this.fixedNumber(this.fromInputValue);
         }
@@ -778,7 +783,8 @@ export default class ScomSwap extends Module {
           input.value = this.fixedNumber(this.toInputValue);
         }
       }
-      this.firstTokenSelection.tokenDataListProp = getSupportedTokens(this._data.tokens || [], currentChainId);
+      // this.firstTokenSelection.tokenDataListProp = getSupportedTokens(this._data.tokens || [], currentChainId);
+      this.firstTokenInput.tokenDataListProp = getSupportedTokens(this._data.tokens || [], currentChainId);
       this.secondTokenSelection.tokenDataListProp = getSupportedTokens(this._data.tokens || [], currentChainId);
 
       if (!this.record)
@@ -791,12 +797,15 @@ export default class ScomSwap extends Module {
   }
 
   private async initTokenSelection() {
-    await this.firstTokenSelection.ready();
+    await this.firstTokenInput.ready();
+    // await this.firstTokenSelection.ready();
     await this.secondTokenSelection.ready();
-    this.firstTokenSelection.disableSelect = false;
-    this.firstTokenSelection.onSelectToken = (token: ITokenObject) => this.onSelectToken(token, true);
-    this.firstTokenSelection.isBtnMaxShown = false;
-    this.firstTokenSelection.isCommonShown = true;
+    this.firstTokenInput.tokenReadOnly = false;
+    this.firstTokenInput.isBalanceShown= false;
+    this.firstTokenInput.isBtnMaxShown = false;
+    // this.firstTokenInput.onSelectToken = (token: ITokenObject) => this.onSelectToken(token, true);
+    this.firstTokenInput.isBtnMaxShown = false;
+    this.firstTokenInput.isCommonShown = true;
     this.secondTokenSelection.disableSelect = false;
     this.secondTokenSelection.onSelectToken = (token: ITokenObject) => this.onSelectToken(token, false);
     this.secondTokenSelection.isBtnMaxShown = false;
@@ -849,12 +858,12 @@ export default class ScomSwap extends Module {
     [this.fromInputValue, this.toInputValue] = [this.toInputValue, this.fromInputValue];
     [this.payBalance.caption, this.receiveBalance.caption] = [this.receiveBalance.caption, this.payBalance.caption];
     [this.fromTokenSymbol, this.toTokenSymbol] = [this.toTokenSymbol, this.fromTokenSymbol];
-    this.firstTokenSelection.token = this.fromToken;
+    this.firstTokenInput.token = this.fromToken;
     this.secondTokenSelection.token = this.toToken;
 
-    this.payCol.clearInnerHTML();
+    // this.payCol.clearInnerHTML();
     this.receiveCol.clearInnerHTML();
-    this.payCol.appendChild(<i-input class="token-input" width="100%" placeholder="0.0" inputType="number" value={this.getInputValue(true)} onKeyUp={this.onTokenInputChange.bind(this)} />);
+    // this.payCol.appendChild(<i-input class="token-input" width="100%" placeholder="0.0" inputType="number" value={this.getInputValue(true)} onKeyUp={this.onTokenInputChange.bind(this)} />);
     this.receiveCol.appendChild(<i-input class="token-input" width="100%" placeholder="0.0" inputType="number" value={this.getInputValue(false)} onKeyUp={this.onTokenInputChange.bind(this)} />);
     this.redirectToken();
 
@@ -950,7 +959,8 @@ export default class ScomSwap extends Module {
     }
   }
   private async onSelectToken(token: ITokenObject, isFrom: boolean) {
-    this.firstTokenSelection.enabled = false;
+    if (!token) return
+    this.firstTokenInput.enabled = false;
     this.secondTokenSelection.enabled = false;
     if (token.isNew && isRpcWalletConnected()) {
       const rpcWallet = getRpcWallet();
@@ -960,7 +970,7 @@ export default class ScomSwap extends Module {
     this.onUpdateToken(token, isFrom);
     this.redirectToken();
     await this.handleAddRoute();
-    this.firstTokenSelection.enabled = true;
+    this.firstTokenInput.enabled = true;
     this.secondTokenSelection.enabled = true;
   }
 
@@ -986,34 +996,34 @@ export default class ScomSwap extends Module {
   }
 
   private async updateTokenInput(isFrom: boolean, init?: boolean) {
-    const _col = isFrom ? this.payCol : this.receiveCol;
-    const label = _col.querySelector('i-label') as Node;
-    if (init && !label) {
-      _col.innerHTML = '';
-      const label = await Label.create();
-      label.caption = " - ";
-      label.classList.add("text-value");
-      label.classList.add("text-right");
-      _col.appendChild(label);
-    }
-    else if (!init && label) {
-      _col.removeChild(label);
-      const input: Input = await Input.create();
-      input.width = '100%';
-      input.placeholder = '0.0';
-      input.inputType = 'number';
-      input.value = this.getInputValue(isFrom);
-      input.onKeyUp = this.onTokenInputChange.bind(this);
-      input.classList.add("token-input");
-      _col.appendChild(input);
-    }
+    // const _col = isFrom ? this.payCol : this.receiveCol;
+    // const label = _col.querySelector('i-label') as Node;
+    // if (init && !label) {
+    //   _col.innerHTML = '';
+    //   const label = await Label.create();
+    //   label.caption = " - ";
+    //   label.classList.add("text-value");
+    //   label.classList.add("text-right");
+    //   _col.appendChild(label);
+    // }
+    // else if (!init && label) {
+    //   _col.removeChild(label);
+    //   const input: Input = await Input.create();
+    //   input.width = '100%';
+    //   input.placeholder = '0.0';
+    //   input.inputType = 'number';
+    //   input.value = this.getInputValue(isFrom);
+    //   input.onKeyUp = this.onTokenInputChange.bind(this);
+    //   input.classList.add("token-input");
+    //   _col.appendChild(input);
+    // }
   }
 
   private async onSelectRouteItem(item: any) {
     if (this.isFrom) {
       if (this.payCol.children) {
         let balanceValue = item.amountIn;
-        const input = this.payCol.children[0] as Input;
+        const input = this.payCol.querySelector('i-input') as Input;
         input.value = this.fixedNumber(balanceValue);
         this.fromInputValue = typeof balanceValue !== 'object' ? new BigNumber(balanceValue) : balanceValue;
       }
@@ -1035,7 +1045,8 @@ export default class ScomSwap extends Module {
     if (this.swapBtn.rightIcon.visible != isButtonLoading) {
       this.swapBtn.rightIcon.visible = isButtonLoading;
     }
-    this.priceInfo.Items = this.getPriceInfo();
+    if (this.priceInfo)
+      this.priceInfo.Items = this.getPriceInfo();
   }
 
   private onTokenInputChange(source: Control) {
@@ -1090,7 +1101,7 @@ export default class ScomSwap extends Module {
   }
   private resetValuesByInput() {
     this.initRoutes();
-    this.priceInfo.Items = this.getPriceInfo();
+    if (this.priceInfo) this.priceInfo.Items = this.getPriceInfo();
     this.fromInputValue = new BigNumber(0);
     this.toInputValue = new BigNumber(0);
     this.redirectToken();
@@ -1135,13 +1146,14 @@ export default class ScomSwap extends Module {
       // this.lbBestPrice.visible = false;
       this.pnlReceive.classList.remove('bg-box--active');
       this.lbRouting.classList.remove('visibility-hidden');
-      this.priceInfo.Items = this.getPriceInfo();
+      if (this.priceInfo)
+        this.priceInfo.Items = this.getPriceInfo();
       if (this.isEstimated('to')) {
         const input = this.receiveCol.children[0] as Input;
         this.toInputValue = new BigNumber(0);
         input.value = '-';
       } else {
-        const input = this.payCol.children[0] as Input;
+        const input = this.payCol.querySelector('i-input') as Input;
         this.fromInputValue = new BigNumber(0);
         input.value = '-';
       }
@@ -1502,7 +1514,7 @@ export default class ScomSwap extends Module {
     }
     if (inputVal.eq(this.fromInputValue)) return;
     this.fromInputValue = inputVal;
-    const input = this.payCol.children[0] as Input;
+    const input = this.payCol.querySelector('i-input') as Input;
     input.value = limitDecimals(this.fromInputValue.toFixed(), this.fromToken?.decimals || 18);
     this.redirectToken();
     await this.handleAddRoute();
@@ -1707,15 +1719,16 @@ export default class ScomSwap extends Module {
                             <i-button id="maxButton" class="btn-max" caption="Max" enabled={false} onClick={() => this.onSetMaxBalance()}></i-button>
                           </i-hstack>
                         </i-vstack>
-                        <i-panel class="bg-box" background={{ color: Theme.input.background }} width="100%" margin={{ top: 'auto'}}>
-                          <i-hstack class="input--token-box" verticalAlignment="center" horizontalAlignment="space-between" width="100%">
+                        <i-panel id="payCol" class="bg-box" width="100%" margin={{ top: 'auto'}}>
+                          {/* <i-hstack class="input--token-box" verticalAlignment="center" horizontalAlignment="space-between" width="100%">
                             <i-vstack>
                               <i-scom-swap-token-selection disableSelect={true} id="firstTokenSelection"></i-scom-swap-token-selection>
                             </i-vstack>
                             <i-vstack id="payCol">
                               <i-label class="text-value text-right" caption=" - "></i-label>
                             </i-vstack>
-                          </i-hstack>
+                          </i-hstack> */}
+                          <i-scom-token-input id="firstTokenInput"></i-scom-token-input>
                         </i-panel>
                       </i-vstack>
                     </i-panel>

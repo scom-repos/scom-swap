@@ -358,7 +358,7 @@ Styles.cssRule('.pageblock-swap', {
         }
       }
     },
-    '#payCol, #receiveCol': {
+    '#receiveCol': {
       maxWidth: 'calc(100% - 9rem)',
     },
     '#tokenModal': {

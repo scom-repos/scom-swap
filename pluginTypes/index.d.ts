@@ -3,6 +3,8 @@
 /// <reference path="@ijstech/eth-wallet/index.d.ts" />
 /// <reference path="@scom/scom-dex-list/@ijstech/eth-wallet/index.d.ts" />
 /// <reference path="@scom/scom-dapp-container/@ijstech/eth-wallet/index.d.ts" />
+/// <reference path="@scom/scom-token-input/@ijstech/eth-wallet/index.d.ts" />
+/// <reference path="@scom/scom-token-input/@scom/scom-token-modal/@ijstech/eth-wallet/index.d.ts" />
 /// <amd-module name="@scom/scom-swap/assets.ts" />
 declare module "@scom/scom-swap/assets.ts" {
     import { ITokenObject } from '@scom/scom-token-list';
@@ -10938,6 +10940,7 @@ declare module "@scom/scom-swap" {
         private receiveBalance;
         private firstTokenSelection;
         private secondTokenSelection;
+        private firstTokenInput;
         private payCol;
         private receiveCol;
         private swapModal;

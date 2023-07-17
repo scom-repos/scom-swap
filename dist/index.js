@@ -407,7 +407,7 @@ define("@scom/scom-swap/index.css.ts", ["require", "exports", "@ijstech/componen
                     }
                 }
             },
-            '#payCol, #receiveCol': {
+            '#receiveCol': {
                 maxWidth: 'calc(100% - 9rem)',
             },
             '#tokenModal': {
@@ -17078,6 +17078,8 @@ define("@scom/scom-swap/token-selection/tokenSelection.tsx", ["require", "export
             catch (_b) { }
         }
         async onSelect(token, isNew = false) {
+            if (!token)
+                return;
             this.token = token;
             // The token has been not imported
             if (!isNew && token.isNew && !(0, scom_token_list_5.hasUserToken)(token.address || '', this.chainId)) {
@@ -18174,6 +18176,8 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
             // this.configDApp.data = value;
             this.updateContractAddress();
             console.log('rpcWallet.instanceId', rpcWallet.instanceId);
+            if (this.firstTokenInput && rpcWallet.instanceId)
+                this.firstTokenInput.rpcWalletId = rpcWallet.instanceId;
             const data = {
                 defaultChainId: this.defaultChainId,
                 wallets: this.wallets,
@@ -18358,7 +18362,8 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                     this.closeNetworkErrModal();
                     this.initializeDefaultTokenPair();
                     this.toggleReverseImage.enabled = !this.isFixedPair;
-                    this.firstTokenSelection.disableSelect = this.isFixedPair;
+                    // this.firstTokenSelection.disableSelect = this.isFixedPair;
+                    this.firstTokenInput.tokenReadOnly = this.isFixedPair;
                     this.secondTokenSelection.disableSelect = this.isFixedPair;
                     this.pnlBranding.visible = !!this._data.logo || !!this._data.title;
                     if ((_a = this._data.logo) === null || _a === void 0 ? void 0 : _a.startsWith('ipfs://')) {
@@ -18380,7 +18385,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                     }
                     if (this.fromInputValue.isGreaterThanOrEqualTo(0)) {
                         this.onUpdateEstimatedPosition(false, true);
-                        const input = this.payCol.children[0];
+                        const input = this.payCol.querySelector('i-input');
                         if (input) {
                             input.value = this.fixedNumber(this.fromInputValue);
                         }
@@ -18392,7 +18397,8 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                             input.value = this.fixedNumber(this.toInputValue);
                         }
                     }
-                    this.firstTokenSelection.tokenDataListProp = (0, index_16.getSupportedTokens)(this._data.tokens || [], currentChainId);
+                    // this.firstTokenSelection.tokenDataListProp = getSupportedTokens(this._data.tokens || [], currentChainId);
+                    this.firstTokenInput.tokenDataListProp = (0, index_16.getSupportedTokens)(this._data.tokens || [], currentChainId);
                     this.secondTokenSelection.tokenDataListProp = (0, index_16.getSupportedTokens)(this._data.tokens || [], currentChainId);
                     if (!this.record)
                         this.swapBtn.enabled = false;
@@ -18511,7 +18517,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                 if (inputVal.eq(this.fromInputValue))
                     return;
                 this.fromInputValue = inputVal;
-                const input = this.payCol.children[0];
+                const input = this.payCol.querySelector('i-input');
                 input.value = (0, index_18.limitDecimals)(this.fromInputValue.toFixed(), ((_d = this.fromToken) === null || _d === void 0 ? void 0 : _d.decimals) || 18);
                 this.redirectToken();
                 await this.handleAddRoute();
@@ -18644,18 +18650,22 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                 this.fromInputValue = new eth_wallet_9.BigNumber(defaultInput);
                 this.onUpdateToken(this.fromToken, true);
                 this.onUpdateToken(this.toToken, false);
-                this.firstTokenSelection.token = this.fromToken;
+                // this.firstTokenSelection.token = this.fromToken;
+                this.firstTokenInput.token = this.fromToken;
                 this.secondTokenSelection.token = this.toToken;
                 this.toggleReverseImage.classList.add('cursor-default');
             }
         }
         async initTokenSelection() {
-            await this.firstTokenSelection.ready();
+            await this.firstTokenInput.ready();
+            // await this.firstTokenSelection.ready();
             await this.secondTokenSelection.ready();
-            this.firstTokenSelection.disableSelect = false;
-            this.firstTokenSelection.onSelectToken = (token) => this.onSelectToken(token, true);
-            this.firstTokenSelection.isBtnMaxShown = false;
-            this.firstTokenSelection.isCommonShown = true;
+            this.firstTokenInput.tokenReadOnly = false;
+            this.firstTokenInput.isBalanceShown = false;
+            this.firstTokenInput.isBtnMaxShown = false;
+            // this.firstTokenInput.onSelectToken = (token: ITokenObject) => this.onSelectToken(token, true);
+            this.firstTokenInput.isBtnMaxShown = false;
+            this.firstTokenInput.isCommonShown = true;
             this.secondTokenSelection.disableSelect = false;
             this.secondTokenSelection.onSelectToken = (token) => this.onSelectToken(token, false);
             this.secondTokenSelection.isBtnMaxShown = false;
@@ -18707,11 +18717,11 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
             [this.fromInputValue, this.toInputValue] = [this.toInputValue, this.fromInputValue];
             [this.payBalance.caption, this.receiveBalance.caption] = [this.receiveBalance.caption, this.payBalance.caption];
             [this.fromTokenSymbol, this.toTokenSymbol] = [this.toTokenSymbol, this.fromTokenSymbol];
-            this.firstTokenSelection.token = this.fromToken;
+            this.firstTokenInput.token = this.fromToken;
             this.secondTokenSelection.token = this.toToken;
-            this.payCol.clearInnerHTML();
+            // this.payCol.clearInnerHTML();
             this.receiveCol.clearInnerHTML();
-            this.payCol.appendChild(this.$render("i-input", { class: "token-input", width: "100%", placeholder: "0.0", inputType: "number", value: this.getInputValue(true), onKeyUp: this.onTokenInputChange.bind(this) }));
+            // this.payCol.appendChild(<i-input class="token-input" width="100%" placeholder="0.0" inputType="number" value={this.getInputValue(true)} onKeyUp={this.onTokenInputChange.bind(this)} />);
             this.receiveCol.appendChild(this.$render("i-input", { class: "token-input", width: "100%", placeholder: "0.0", inputType: "number", value: this.getInputValue(false), onKeyUp: this.onTokenInputChange.bind(this) }));
             this.redirectToken();
             await this.handleAddRoute();
@@ -18790,7 +18800,9 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
             }
         }
         async onSelectToken(token, isFrom) {
-            this.firstTokenSelection.enabled = false;
+            if (!token)
+                return;
+            this.firstTokenInput.enabled = false;
             this.secondTokenSelection.enabled = false;
             if (token.isNew && (0, index_16.isRpcWalletConnected)()) {
                 const rpcWallet = (0, index_16.getRpcWallet)();
@@ -18800,7 +18812,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
             this.onUpdateToken(token, isFrom);
             this.redirectToken();
             await this.handleAddRoute();
-            this.firstTokenSelection.enabled = true;
+            this.firstTokenInput.enabled = true;
             this.secondTokenSelection.enabled = true;
         }
         setApprovalSpenderAddress() {
@@ -18827,33 +18839,33 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
             return (0, index_18.limitDecimals)(value.toFixed(), (token === null || token === void 0 ? void 0 : token.decimals) || 18);
         }
         async updateTokenInput(isFrom, init) {
-            const _col = isFrom ? this.payCol : this.receiveCol;
-            const label = _col.querySelector('i-label');
-            if (init && !label) {
-                _col.innerHTML = '';
-                const label = await components_14.Label.create();
-                label.caption = " - ";
-                label.classList.add("text-value");
-                label.classList.add("text-right");
-                _col.appendChild(label);
-            }
-            else if (!init && label) {
-                _col.removeChild(label);
-                const input = await components_14.Input.create();
-                input.width = '100%';
-                input.placeholder = '0.0';
-                input.inputType = 'number';
-                input.value = this.getInputValue(isFrom);
-                input.onKeyUp = this.onTokenInputChange.bind(this);
-                input.classList.add("token-input");
-                _col.appendChild(input);
-            }
+            // const _col = isFrom ? this.payCol : this.receiveCol;
+            // const label = _col.querySelector('i-label') as Node;
+            // if (init && !label) {
+            //   _col.innerHTML = '';
+            //   const label = await Label.create();
+            //   label.caption = " - ";
+            //   label.classList.add("text-value");
+            //   label.classList.add("text-right");
+            //   _col.appendChild(label);
+            // }
+            // else if (!init && label) {
+            //   _col.removeChild(label);
+            //   const input: Input = await Input.create();
+            //   input.width = '100%';
+            //   input.placeholder = '0.0';
+            //   input.inputType = 'number';
+            //   input.value = this.getInputValue(isFrom);
+            //   input.onKeyUp = this.onTokenInputChange.bind(this);
+            //   input.classList.add("token-input");
+            //   _col.appendChild(input);
+            // }
         }
         async onSelectRouteItem(item) {
             if (this.isFrom) {
                 if (this.payCol.children) {
                     let balanceValue = item.amountIn;
-                    const input = this.payCol.children[0];
+                    const input = this.payCol.querySelector('i-input');
                     input.value = this.fixedNumber(balanceValue);
                     this.fromInputValue = typeof balanceValue !== 'object' ? new eth_wallet_9.BigNumber(balanceValue) : balanceValue;
                 }
@@ -18875,7 +18887,8 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
             if (this.swapBtn.rightIcon.visible != isButtonLoading) {
                 this.swapBtn.rightIcon.visible = isButtonLoading;
             }
-            this.priceInfo.Items = this.getPriceInfo();
+            if (this.priceInfo)
+                this.priceInfo.Items = this.getPriceInfo();
         }
         onTokenInputChange(source) {
             clearTimeout(this.timeout);
@@ -18933,7 +18946,8 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
         }
         resetValuesByInput() {
             this.initRoutes();
-            this.priceInfo.Items = this.getPriceInfo();
+            if (this.priceInfo)
+                this.priceInfo.Items = this.getPriceInfo();
             this.fromInputValue = new eth_wallet_9.BigNumber(0);
             this.toInputValue = new eth_wallet_9.BigNumber(0);
             this.redirectToken();
@@ -18978,14 +18992,15 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                 // this.lbBestPrice.visible = false;
                 this.pnlReceive.classList.remove('bg-box--active');
                 this.lbRouting.classList.remove('visibility-hidden');
-                this.priceInfo.Items = this.getPriceInfo();
+                if (this.priceInfo)
+                    this.priceInfo.Items = this.getPriceInfo();
                 if (this.isEstimated('to')) {
                     const input = this.receiveCol.children[0];
                     this.toInputValue = new eth_wallet_9.BigNumber(0);
                     input.value = '-';
                 }
                 else {
-                    const input = this.payCol.children[0];
+                    const input = this.payCol.querySelector('i-input');
                     this.fromInputValue = new eth_wallet_9.BigNumber(0);
                     input.value = '-';
                 }
@@ -19401,12 +19416,8 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                                                     this.$render("i-hstack", { gap: 5, horizontalAlignment: "space-between", verticalAlignment: "center", width: "100%" },
                                                         this.$render("i-label", { id: "payBalance", class: "text--grey ml-auto", caption: "Balance: 0" }),
                                                         this.$render("i-button", { id: "maxButton", class: "btn-max", caption: "Max", enabled: false, onClick: () => this.onSetMaxBalance() }))),
-                                                this.$render("i-panel", { class: "bg-box", background: { color: Theme.input.background }, width: "100%", margin: { top: 'auto' } },
-                                                    this.$render("i-hstack", { class: "input--token-box", verticalAlignment: "center", horizontalAlignment: "space-between", width: "100%" },
-                                                        this.$render("i-vstack", null,
-                                                            this.$render("i-scom-swap-token-selection", { disableSelect: true, id: "firstTokenSelection" })),
-                                                        this.$render("i-vstack", { id: "payCol" },
-                                                            this.$render("i-label", { class: "text-value text-right", caption: " - " })))))),
+                                                this.$render("i-panel", { id: "payCol", class: "bg-box", width: "100%", margin: { top: 'auto' } },
+                                                    this.$render("i-scom-token-input", { id: "firstTokenInput" })))),
                                         this.$render("i-hstack", { horizontalAlignment: "space-between" },
                                             this.$render("i-label", { id: "lbYouPayTitle", caption: "You Pay", font: { size: '1rem' } }),
                                             this.$render("i-label", { id: "lbYouPayValue", caption: "0", font: { size: '1rem' } }))),
