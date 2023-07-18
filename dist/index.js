@@ -14413,7 +14413,7 @@ define("@scom/scom-swap/global/index.ts", ["require", "exports", "@scom/scom-swa
 define("@scom/scom-swap/store/utils.ts", ["require", "exports", "@ijstech/components", "@ijstech/eth-wallet", "@scom/scom-token-list", "@scom/scom-network-list"], function (require, exports, components_4, eth_wallet_4, scom_token_list_1, scom_network_list_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.getClientWallet = exports.getRpcWallet = exports.initRpcWallet = exports.getChainNativeToken = exports.getChainId = exports.truncateAddress = exports.hasMetaMask = exports.isRpcWalletConnected = exports.isClientWalletConnected = exports.getWalletProvider = exports.viewOnExplorerByAddress = exports.viewOnExplorerByTxHash = exports.getProviderByKey = exports.getProviderList = exports.setProviderList = exports.getDexInfoList = exports.setDexInfoList = exports.hasUserToken = exports.setUserTokens = exports.getNetworkExplorerName = exports.getMatchNetworks = exports.addUserTokens = exports.getUserTokens = exports.getNetworkInfo = exports.getSupportedNetworks = exports.getInfuraId = exports.setTransactionDeadline = exports.getTransactionDeadline = exports.setSlippageTolerance = exports.getSlippageTolerance = exports.toggleExpertMode = exports.isExpertMode = exports.getCurrentChainId = exports.setCurrentChainId = exports.getEmbedderCommissionFee = exports.setAPIGatewayUrls = exports.getIPFSGatewayUrl = exports.setIPFSGatewayUrl = exports.getProxyAddress = exports.setProxyAddresses = exports.setDataFromConfig = exports.state = exports.WalletPlugin = void 0;
+    exports.getClientWallet = exports.getRpcWallet = exports.initRpcWallet = exports.getChainNativeToken = exports.getChainId = exports.truncateAddress = exports.hasMetaMask = exports.isRpcWalletConnected = exports.isClientWalletConnected = exports.getWalletProvider = exports.viewOnExplorerByAddress = exports.viewOnExplorerByTxHash = exports.getProviderByKey = exports.getProviderList = exports.setProviderList = exports.getDexInfoList = exports.setDexInfoList = exports.hasUserToken = exports.setUserTokens = exports.getMatchNetworks = exports.addUserTokens = exports.getUserTokens = exports.getNetworkInfo = exports.getSupportedNetworks = exports.getInfuraId = exports.setTransactionDeadline = exports.getTransactionDeadline = exports.setSlippageTolerance = exports.getSlippageTolerance = exports.toggleExpertMode = exports.isExpertMode = exports.getCurrentChainId = exports.setCurrentChainId = exports.getEmbedderCommissionFee = exports.setAPIGatewayUrls = exports.getIPFSGatewayUrl = exports.setIPFSGatewayUrl = exports.getProxyAddress = exports.setProxyAddresses = exports.setDataFromConfig = exports.state = exports.WalletPlugin = void 0;
     var WalletPlugin;
     (function (WalletPlugin) {
         WalletPlugin["MetaMask"] = "metamask";
@@ -14555,7 +14555,8 @@ define("@scom/scom-swap/store/utils.ts", ["require", "exports", "@ijstech/compon
     };
     exports.getSupportedNetworks = getSupportedNetworks;
     const getNetworkInfo = (chainId) => {
-        return exports.state.networkMap[chainId];
+        const networkMap = components_4.application.store["networkMap"];
+        return networkMap[chainId];
     };
     exports.getNetworkInfo = getNetworkInfo;
     const getUserTokens = (chainId) => {
@@ -14615,13 +14616,6 @@ define("@scom/scom-swap/store/utils.ts", ["require", "exports", "@ijstech/compon
         return out;
     };
     exports.getMatchNetworks = getMatchNetworks;
-    const getNetworkExplorerName = (chainId) => {
-        if ((0, exports.getNetworkInfo)(chainId)) {
-            return (0, exports.getNetworkInfo)(chainId).explorerName;
-        }
-        return 'Unknown';
-    };
-    exports.getNetworkExplorerName = getNetworkExplorerName;
     const setUserTokens = (token, chainId) => {
         if (!exports.state.userTokens[chainId]) {
             exports.state.userTokens[chainId] = [token];
@@ -17343,7 +17337,6 @@ define("@scom/scom-swap/result/result.tsx", ["require", "exports", "@ijstech/com
             }
             else if (this.message.status === 'success') {
                 const chainId = await eth_wallet_8.Wallet.getClientInstance().getChainId();
-                const explorerName = (0, index_14.getNetworkExplorerName)(chainId);
                 const image = await components_11.Image.create({
                     width: '50px',
                     url: assets_3.default.fullPath('img/success-icon.svg')
@@ -17373,7 +17366,7 @@ define("@scom/scom-swap/result/result.tsx", ["require", "exports", "@ijstech/com
                     label2.classList.add("mb-1");
                     section.appendChild(label2);
                     const link = await components_11.Label.create({
-                        caption: `View on ${explorerName}`,
+                        caption: `View on block explorer`,
                     });
                     link.onClick = this.buildLink.bind(this);
                     link.classList.add("red-link", "block", "pointer");

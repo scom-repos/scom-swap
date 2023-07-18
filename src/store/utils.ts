@@ -156,7 +156,8 @@ export const getSupportedNetworks = () => {
 }
 
 export const getNetworkInfo = (chainId: number) => {
-  return state.networkMap[chainId];
+  const networkMap = application.store["networkMap"];
+  return networkMap[chainId];
 }
 
 export const getUserTokens: (chainId: number) => any[] | null = (chainId: number) => {
@@ -219,13 +220,6 @@ export const getMatchNetworks = (conditions: NetworkConditions): IExtendedNetwor
   let networkFullList = Object.values(state.networkMap);
   let out = matchFilter(networkFullList, conditions);
   return out;
-}
-
-export const getNetworkExplorerName = (chainId: number) => {
-  if (getNetworkInfo(chainId)) {
-    return getNetworkInfo(chainId).explorerName;
-  }
-  return 'Unknown';
 }
 
 export const setUserTokens = (token: ITokenObject, chainId: number) => {

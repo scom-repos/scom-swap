@@ -9837,7 +9837,7 @@ declare module "@scom/scom-swap/store/utils.ts" {
     export const setTransactionDeadline: (value: any) => void;
     export const getInfuraId: () => string;
     export const getSupportedNetworks: () => IExtendedNetwork[];
-    export const getNetworkInfo: (chainId: number) => IExtendedNetwork;
+    export const getNetworkInfo: (chainId: number) => any;
     export const getUserTokens: (chainId: number) => any[] | null;
     export const addUserTokens: (token: ITokenObject) => void;
     interface NetworkConditions {
@@ -9846,7 +9846,6 @@ declare module "@scom/scom-swap/store/utils.ts" {
         isMainChain?: boolean;
     }
     export const getMatchNetworks: (conditions: NetworkConditions) => IExtendedNetwork[];
-    export const getNetworkExplorerName: (chainId: number) => string;
     export const setUserTokens: (token: ITokenObject, chainId: number) => void;
     export const hasUserToken: (address: string, chainId: number) => boolean;
     export const setDexInfoList: (value: IDexInfo[]) => void;

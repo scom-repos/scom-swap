@@ -1,7 +1,7 @@
 import { customElements, Module, ControlElement, Modal, Panel, Label, Image, Button, Container, VStack, Styles } from '@ijstech/components';
 import { Wallet } from '@ijstech/eth-wallet';
 import { parseContractError } from '../global/index';
-import { getNetworkExplorerName, viewOnExplorerByTxHash } from '../store/index';
+import { viewOnExplorerByTxHash } from '../store/index';
 import styleClass from './result.css';
 import Assets from '../assets';
 const Theme = Styles.Theme.ThemeVars;
@@ -119,8 +119,7 @@ export class Result extends Module {
       mainSection.appendChild(section);
     } else if (this.message.status === 'success') {
       const chainId: number = await Wallet.getClientInstance().getChainId();
-      const explorerName = getNetworkExplorerName(chainId);
-      
+   
       const image = await Image.create({
         width: '50px',
         url: Assets.fullPath('img/success-icon.svg')
@@ -157,7 +156,7 @@ export class Result extends Module {
         section.appendChild(label2);
 
         const link = await Label.create({
-          caption: `View on ${explorerName}`,
+          caption: `View on block explorer`,
         });
 
         link.onClick = this.buildLink.bind(this);
