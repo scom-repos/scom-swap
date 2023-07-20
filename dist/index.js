@@ -17985,11 +17985,17 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                                 fee: (0, index_16.getEmbedderCommissionFee)(),
                                 networks: self._data.networks
                             });
-                            const button = new components_14.Button(null, {
+                            const hstack = new components_14.HStack(null, {
+                                verticalAlignment: 'center',
+                            });
+                            const button = new components_14.Button(hstack, {
                                 caption: 'Confirm',
+                                width: '100%',
+                                height: 40,
+                                font: { color: Theme.colors.primary.contrastText }
                             });
                             vstack.append(config);
-                            vstack.append(button);
+                            vstack.append(hstack);
                             button.onClick = async () => {
                                 const commissions = config.commissions;
                                 if (onConfirm)
