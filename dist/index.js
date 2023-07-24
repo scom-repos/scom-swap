@@ -18101,6 +18101,12 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
             let self = this;
             return [
                 {
+                    name: 'Project Owner Configurator',
+                    target: 'ProjectOwners',
+                    getSelectors: () => {
+                    }
+                },
+                {
                     name: 'Builder Configurator',
                     target: 'Builders',
                     getActions: this.getActions.bind(this),
@@ -18375,6 +18381,9 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                     }
                     this.lbTitle.caption = this._data.title;
                     this.updateSwapButtonCaption();
+                    await eth_wallet_9.Wallet.getClientInstance().init();
+                    const rpcWallet = (0, index_16.getRpcWallet)();
+                    await rpcWallet.init();
                     await this.updateBalance();
                     // const input = this.receiveCol.querySelector('i-input') as Input;
                     // if (input) {
@@ -18403,7 +18412,6 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                         this.swapBtn.enabled = false;
                     this.onRenderPriceInfo();
                     this.redirectToken();
-                    await eth_wallet_9.Wallet.getClientInstance().init();
                     await this.handleAddRoute();
                 });
             };

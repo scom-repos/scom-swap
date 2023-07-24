@@ -774,6 +774,10 @@ export default class ScomSwap extends Module {
       this.lbTitle.caption = this._data.title;
 
       this.updateSwapButtonCaption();
+
+      await Wallet.getClientInstance().init();
+      const rpcWallet = getRpcWallet();
+      await rpcWallet.init();
       await this.updateBalance();
       // const input = this.receiveCol.querySelector('i-input') as Input;
       // if (input) {
@@ -802,7 +806,6 @@ export default class ScomSwap extends Module {
         this.swapBtn.enabled = false;
       this.onRenderPriceInfo();
       this.redirectToken();
-      await Wallet.getClientInstance().init();
       await this.handleAddRoute();
     });
   }

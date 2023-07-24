@@ -11020,11 +11020,25 @@ declare module "@scom/scom-swap" {
         getConfigurators(): ({
             name: string;
             target: string;
+            getSelectors: () => void;
+            getActions?: undefined;
+            getData?: undefined;
+            setData?: undefined;
+            getTag?: undefined;
+            setTag?: undefined;
+            elementName?: undefined;
+            getLinkParams?: undefined;
+            setLinkParams?: undefined;
+            bindOnChanged?: undefined;
+        } | {
+            name: string;
+            target: string;
             getActions: any;
             getData: any;
             setData: (value: any) => Promise<void>;
             getTag: any;
             setTag: any;
+            getSelectors?: undefined;
             elementName?: undefined;
             getLinkParams?: undefined;
             setLinkParams?: undefined;
@@ -11054,6 +11068,7 @@ declare module "@scom/scom-swap" {
             setData: any;
             getTag: any;
             setTag: any;
+            getSelectors?: undefined;
             getActions?: undefined;
         })[];
         private getData;
