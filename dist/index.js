@@ -18101,12 +18101,6 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
             let self = this;
             return [
                 {
-                    name: 'Project Owner Configurator',
-                    target: 'ProjectOwners',
-                    getSelectors: () => {
-                    }
-                },
-                {
                     name: 'Builder Configurator',
                     target: 'Builders',
                     getActions: this.getActions.bind(this),
