@@ -18122,14 +18122,17 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                             data: window.btoa(JSON.stringify(commissions))
                         };
                     },
-                    setLinkParams: async (params) => {
-                        if (params.data) {
-                            const decodedString = window.atob(params.data);
-                            const commissions = JSON.parse(decodedString);
-                            let resultingData = Object.assign(Object.assign({}, self._data), { commissions });
-                            await this.setData(resultingData);
-                        }
-                    },
+                    // setLinkParams: async (params: any) => {
+                    //   if (params.data) {
+                    //     const decodedString = window.atob(params.data);
+                    //     const commissions = JSON.parse(decodedString);
+                    //     let resultingData = {
+                    //       ...self._data,
+                    //       commissions
+                    //     };
+                    //     await this.setData(resultingData);
+                    //   }
+                    // },
                     bindOnChanged: (element, callback) => {
                         element.onChanged = async (data) => {
                             const commissions = data.commissions;
@@ -18145,7 +18148,15 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                         const fee = (0, index_16.getEmbedderCommissionFee)();
                         return Object.assign(Object.assign({}, this._data), { fee });
                     },
-                    setData: this.setData.bind(this),
+                    setData: async (properties, linkParams) => {
+                        let resultingData = Object.assign({}, properties);
+                        if (linkParams === null || linkParams === void 0 ? void 0 : linkParams.data) {
+                            const decodedString = window.atob(linkParams.data);
+                            const commissions = JSON.parse(decodedString);
+                            resultingData.commissions = commissions;
+                        }
+                        await this.setData(resultingData);
+                    },
                     getTag: this.getTag.bind(this),
                     setTag: this.setTag.bind(this)
                 }

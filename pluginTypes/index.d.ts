@@ -11027,7 +11027,6 @@ declare module "@scom/scom-swap" {
             setTag: any;
             elementName?: undefined;
             getLinkParams?: undefined;
-            setLinkParams?: undefined;
             bindOnChanged?: undefined;
         } | {
             name: string;
@@ -11036,7 +11035,6 @@ declare module "@scom/scom-swap" {
             getLinkParams: () => {
                 data: any;
             };
-            setLinkParams: (params: any) => Promise<void>;
             bindOnChanged: (element: ScomCommissionFeeSetup, callback: (data: any) => Promise<void>) => void;
             getData: () => {
                 fee: string;
@@ -11051,7 +11049,7 @@ declare module "@scom/scom-swap" {
                 logo?: string;
                 title?: string;
             };
-            setData: any;
+            setData: (properties: ISwapConfigUI, linkParams?: Record<string, any>) => Promise<void>;
             getTag: any;
             setTag: any;
             getActions?: undefined;

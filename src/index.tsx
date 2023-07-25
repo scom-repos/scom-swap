@@ -436,17 +436,17 @@ export default class ScomSwap extends Module {
             data: window.btoa(JSON.stringify(commissions))
           }
         },
-        setLinkParams: async (params: any) => {
-          if (params.data) {
-            const decodedString = window.atob(params.data);
-            const commissions = JSON.parse(decodedString);
-            let resultingData = {
-              ...self._data,
-              commissions
-            };
-            await this.setData(resultingData);
-          }
-        },
+        // setLinkParams: async (params: any) => {
+        //   if (params.data) {
+        //     const decodedString = window.atob(params.data);
+        //     const commissions = JSON.parse(decodedString);
+        //     let resultingData = {
+        //       ...self._data,
+        //       commissions
+        //     };
+        //     await this.setData(resultingData);
+        //   }
+        // },
         bindOnChanged: (element: ScomCommissionFeeSetup, callback: (data: any) => Promise<void>) => {
           element.onChanged = async (data: any) => {
             const commissions: ICommissionInfo[] = data.commissions;
@@ -466,7 +466,18 @@ export default class ScomSwap extends Module {
           const fee = getEmbedderCommissionFee();
           return {...this._data, fee}
         },
-        setData: this.setData.bind(this),
+        setData: async (properties: ISwapConfigUI, linkParams?: Record<string, any>) => {
+          let resultingData = {
+            ...properties
+          }
+          if (linkParams?.data) {
+            const decodedString = window.atob(linkParams.data);
+            const commissions = JSON.parse(decodedString);
+            resultingData.commissions = commissions;
+
+          }
+          await this.setData(resultingData);
+        },
         getTag: this.getTag.bind(this),
         setTag: this.setTag.bind(this)
       }
