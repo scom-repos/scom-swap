@@ -16672,6 +16672,12 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
             }
             return false;
         }
+        getTokenKey(token) {
+            if (token.isNative) {
+                return token.symbol;
+            }
+            return token.address.toLowerCase();
+        }
         initializeDefaultTokenPair() {
             var _a, _b, _c;
             const currentChainId = (0, index_10.getChainId)();
@@ -16680,12 +16686,10 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                 return;
             const providers = (_a = this.originalData) === null || _a === void 0 ? void 0 : _a.providers;
             if (providers && providers.length) {
-                const fromTokenAddress = currentChainTokens[0].address;
-                const toTokenAddress = currentChainTokens[1].address;
-                const fromToken = fromTokenAddress.toLowerCase().startsWith('0x') ? fromTokenAddress.toLowerCase() : fromTokenAddress;
-                const toToken = toTokenAddress.toLowerCase().startsWith('0x') ? toTokenAddress.toLowerCase() : toTokenAddress;
-                this.fromToken = scom_token_list_4.tokenStore.tokenMap[fromToken];
-                this.toToken = scom_token_list_4.tokenStore.tokenMap[toToken];
+                let fromTokenKey = this.getTokenKey(currentChainTokens[0]);
+                let toTokenKey = this.getTokenKey(currentChainTokens[1]);
+                this.fromToken = scom_token_list_4.tokenStore.tokenMap[fromTokenKey];
+                this.toToken = scom_token_list_4.tokenStore.tokenMap[toTokenKey];
                 this.fromTokenSymbol = (_b = this.fromToken) === null || _b === void 0 ? void 0 : _b.symbol;
                 this.toTokenSymbol = (_c = this.toToken) === null || _c === void 0 ? void 0 : _c.symbol;
                 this.fromInputValue = new eth_wallet_6.BigNumber(defaultInput);

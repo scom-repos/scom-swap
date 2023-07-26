@@ -10809,6 +10809,7 @@ declare module "@scom/scom-swap" {
         get isValidToken(): boolean;
         private redirectToken;
         private fixedNumber;
+        private getTokenKey;
         private initializeDefaultTokenPair;
         private initWallet;
         private initializeWidgetConfig;

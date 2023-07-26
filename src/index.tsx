@@ -711,18 +711,23 @@ export default class ScomSwap extends Module {
     return formatted.replace(/,/g, '');
   }
 
+  private getTokenKey(token: ITokenObject) {
+    if (token.isNative) {
+      return token.symbol;
+    }
+    return token.address.toLowerCase();
+  }
+
   private initializeDefaultTokenPair() {
     const currentChainId = getChainId();
     let currentChainTokens = this._data.tokens.filter((token) => token.chainId === currentChainId);
     if (currentChainTokens.length < 2) return;
     const providers = this.originalData?.providers;
     if (providers && providers.length) {
-      const fromTokenAddress = currentChainTokens[0].address;
-      const toTokenAddress = currentChainTokens[1].address;
-      const fromToken = fromTokenAddress.toLowerCase().startsWith('0x') ? fromTokenAddress.toLowerCase() : fromTokenAddress;
-      const toToken = toTokenAddress.toLowerCase().startsWith('0x') ? toTokenAddress.toLowerCase() : toTokenAddress;
-      this.fromToken = tokenStore.tokenMap[fromToken];
-      this.toToken = tokenStore.tokenMap[toToken];
+      let fromTokenKey = this.getTokenKey(currentChainTokens[0]);
+      let toTokenKey = this.getTokenKey(currentChainTokens[1]);
+      this.fromToken = tokenStore.tokenMap[fromTokenKey];
+      this.toToken = tokenStore.tokenMap[toTokenKey];
       this.fromTokenSymbol = this.fromToken?.symbol;
       this.toTokenSymbol = this.toToken?.symbol;
       this.fromInputValue = new BigNumber(defaultInput);
