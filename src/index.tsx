@@ -1,5 +1,5 @@
 import { Module, Panel, Button, Label, VStack, Image, Container, IEventBus, application, customModule, Modal, Input, Control, customElements, ControlElement, IDataSchema, Styles, HStack, Icon } from '@ijstech/components';
-import { BigNumber, Constants, IEventBusRegistry, Wallet } from '@ijstech/eth-wallet';
+import { BigNumber, Constants, IEventBusRegistry, INetwork, Wallet } from '@ijstech/eth-wallet';
 import './index.css';
 import {
   getChainId,
@@ -7,21 +7,17 @@ import {
   getSlippageTolerance,
   isRpcWalletConnected,
   isClientWalletConnected,
-  getWalletProvider,
   setDataFromConfig,
   setProviderList,
   getProviderByKey,
   getNetworkInfo,
   getEmbedderCommissionFee,
   getProxyAddress,
-  WalletPlugin,
   getSupportedTokens,
   setDexInfoList,
   initRpcWallet,
   getRpcWallet,
   getIPFSGatewayUrl,
-  getClientWallet,
-  getSupportedNetworks
 } from "./store/index";
 import { tokenStore, DefaultERC20Tokens, ChainNativeTokenByChainId, assets as tokenAssets } from '@scom/scom-token-list';
 
@@ -39,11 +35,9 @@ import {
   ApprovalStatus,
   EventId,
   IERC20ApprovalAction,
-  IExtendedNetwork,
   limitDecimals,
   isInvalidInput,
   IProvider,
-  uniqWith,
   ISwapConfigUI,
   IProviderUI,
   Category,
@@ -52,18 +46,16 @@ import {
 } from './global/index';
 
 import { PriceInfo } from './price-info/index';
-import { TokenSelection } from './token-selection/index';
-import { Result } from './result/index';
 import { ExpertModeSettings } from './expert-mode-settings/index'
 import configData from './data.json';
 import formSchema from './formSchema.json';
-import ScomWalletModal, {IWalletPlugin} from '@scom/scom-wallet-modal';
+import ScomWalletModal, { IWalletPlugin } from '@scom/scom-wallet-modal';
 import ScomDappContainer from '@scom/scom-dapp-container'
 import getDexList from '@scom/scom-dex-list';
 import ScomCommissionFeeSetup from '@scom/scom-commission-fee-setup';
 import ScomTokenInput from '@scom/scom-token-input';
-
-
+import ScomTxStatusModal from '@scom/scom-tx-status-modal';
+import { swapStyle } from './index.css';
 
 const Theme = Styles.Theme.ThemeVars;
 // const currentTheme = Styles.Theme.currentTheme;
@@ -118,19 +110,14 @@ export default class ScomSwap extends Module {
 
   private payBalance: Label;
   private receiveBalance: Label;
-  private firstTokenSelection: TokenSelection;
-  private secondTokenSelection: TokenSelection;
   private firstTokenInput: ScomTokenInput;
   private secondTokenInput: ScomTokenInput;
   private payCol: Panel;
   private receiveCol: Panel;
   private swapModal: Modal;
-  // private pnlReceive: Panel;
-  private lbBestPrice: Label;
   private lbRouting: Label;
   private priceInfo: PriceInfo;
   private priceInfo2: PriceInfo;
-  // private detailsFeeInfo: PriceInfo
   private priceInfoContainer: Panel;
   private fromTokenImage: Image;
   private fromTokenLabel: Label;
@@ -140,7 +127,7 @@ export default class ScomSwap extends Module {
   private toTokenValue: Label;
   private payOrReceiveValue: Label;
   private payOrReceiveToken: Label;
-  private openswapResult: Result;
+  private txStatusModal: ScomTxStatusModal;
   private maxButton: Button;
   private swapBtn: Button;
   private lbYouPayTitle: Label;
@@ -159,23 +146,17 @@ export default class ScomSwap extends Module {
   private isPriceToggled: boolean;
   private record: any;
   private allTokenBalancesMap: any;
-  // private checkHasWallet: boolean;
   // private availableMarkets: any;
   private supportedChainIds: number[];
   private swapButtonStatusMap: any;
   private approveButtonStatusMap: any;
-  private timer: any;
   private $eventBus: IEventBus;
   private lbEstimate: Label;
   private lbPayOrReceive: Label;
   private approvalModelAction: IERC20ApprovalAction;
 
-  // Cross Chain
   private toggleReverseImage: Icon;
-  private oldSupportedChainList: IExtendedNetwork[] = [];
-  private supportedChainList: IExtendedNetwork[] = [];
-  private srcChain: IExtendedNetwork | undefined;
-  private desChain: IExtendedNetwork | undefined;
+  private supportedChainList: INetwork[] = [];
   private swapModalConfirmBtn: Button;
   private modalFees: Modal;
   private feesInfo: VStack;
@@ -183,12 +164,11 @@ export default class ScomSwap extends Module {
   private expertModal: ExpertModeSettings;
   private networkErrModal: Modal;
   private supportedNetworksElm: VStack;
-  // private configDApp: ScomCommissionFeeSetup;
   private contractAddress: string;
   private rpcWalletEvents: IEventBusRegistry[] = [];
   private clientEvents: any[] = [];
 
-  static async create(options?: ScomSwapElement, parent?: Container){
+  static async create(options?: ScomSwapElement, parent?: Container) {
     let self = new this(parent, options);
     await self.ready();
     return self;
@@ -286,15 +266,13 @@ export default class ScomSwap extends Module {
           }
           return {
             execute: async () => {
-              _oldData = {...this._data};
+              _oldData = { ...this._data };
               if (userInputData.commissions) this._data.commissions = userInputData.commissions;
-              // this.configDApp.data = this._data;
               this.refreshUI();
               if (builder?.setData) builder.setData(this._data);
             },
             undo: () => {
-              this._data = {..._oldData};
-              // this.configDApp.data = this._data;
+              this._data = { ..._oldData };
               this.refreshUI();
               if (builder?.setData) builder.setData(this._data);
             },
@@ -316,13 +294,13 @@ export default class ScomSwap extends Module {
               caption: 'Confirm',
               width: '100%',
               height: 40,
-              font: {color: Theme.colors.primary.contrastText}
+              font: { color: Theme.colors.primary.contrastText }
             });
             vstack.append(config);
             vstack.append(hstack);
             button.onClick = async () => {
               const commissions = config.commissions;
-              if (onConfirm) onConfirm(true, {commissions});
+              if (onConfirm) onConfirm(true, { commissions });
             }
             return vstack;
           }
@@ -343,7 +321,7 @@ export default class ScomSwap extends Module {
           }
           return {
             execute: async () => {
-              _oldData = {...this._data};
+              _oldData = { ...this._data };
               this._data.logo = userInputData.logo;
               this._data.title = userInputData.title;
               this._data.networks = userInputData.networks;
@@ -355,22 +333,20 @@ export default class ScomSwap extends Module {
                 for (let inputToken of userInputData.tokens) {
                   if (!inputToken.address) {
                     const nativeToken = ChainNativeTokenByChainId[inputToken.chainId];
-                    if (nativeToken) this._data.tokens.push({...nativeToken, chainId: inputToken.chainId});
+                    if (nativeToken) this._data.tokens.push({ ...nativeToken, chainId: inputToken.chainId });
                   }
                   else {
                     const tokens = DefaultERC20Tokens[inputToken.chainId]
                     const token = tokens.find(v => v.address === inputToken.address);
-                    if (token) this._data.tokens.push({...token, chainId: inputToken.chainId});
+                    if (token) this._data.tokens.push({ ...token, chainId: inputToken.chainId });
                   }
                 }
               }
-              // this.configDApp.data = this._data;
               this.refreshUI();
               if (builder?.setData) builder.setData(this._data);
             },
             undo: () => {
-              this._data = {..._oldData};
-              // this.configDApp.data = this._data;
+              this._data = { ..._oldData };
               this.refreshUI();
               if (builder?.setData) builder.setData(this._data);
             },
@@ -421,7 +397,7 @@ export default class ScomSwap extends Module {
         getData: this.getData.bind(this),
         setData: async (value: any) => {
           const defaultData = configData.defaultBuilderData;
-          this.setData({...defaultData, ...value});
+          this.setData({ ...defaultData, ...value });
         },
         getTag: this.getTag.bind(this),
         setTag: this.setTag.bind(this)
@@ -464,7 +440,7 @@ export default class ScomSwap extends Module {
         },
         getData: () => {
           const fee = getEmbedderCommissionFee();
-          return {...this._data, fee}
+          return { ...this._data, fee }
         },
         setData: async (properties: ISwapConfigUI, linkParams?: Record<string, any>) => {
           let resultingData = {
@@ -493,23 +469,20 @@ export default class ScomSwap extends Module {
     const rpcWalletId = await initRpcWallet(this.defaultChainId);
     const rpcWallet = getRpcWallet();
     const event = rpcWallet.registerWalletEvent(this, Constants.RpcWalletEvent.Connected, async (connected: boolean) => {
-      console.log(`rpcWallet connected: ${connected}`);
-      this.swapBtn.visible = true;
+      if (this.swapBtn) this.swapBtn.visible = true;
       this.updateContractAddress();
       if (this.originalData?.providers?.length) await this.initializeWidgetConfig();
     });
     this.rpcWalletEvents.push(event);
-    // this.configDApp.data = value;
     this.updateContractAddress();
-    console.log('rpcWallet.instanceId', rpcWallet.instanceId)
     if (rpcWallet.instanceId) {
       if (this.firstTokenInput) this.firstTokenInput.rpcWalletId = rpcWallet.instanceId;
       if (this.secondTokenInput) this.secondTokenInput.rpcWalletId = rpcWallet.instanceId;
     }
-    const data: any = { 
-      defaultChainId: this.defaultChainId, 
-      wallets: this.wallets, 
-      networks: this.networks, 
+    const data: any = {
+      defaultChainId: this.defaultChainId,
+      wallets: this.wallets,
+      networks: this.networks,
       showHeader: this.showHeader,
       rpcWalletId: rpcWallet.instanceId
     }
@@ -521,7 +494,7 @@ export default class ScomSwap extends Module {
     return this.tag;
   }
 
-  private updateTag(type: 'light'|'dark', value: any) {
+  private updateTag(type: 'light' | 'dark', value: any) {
     this.tag[type] = this.tag[type] ?? {};
     for (let prop in value) {
       if (value.hasOwnProperty(prop))
@@ -728,7 +701,7 @@ export default class ScomSwap extends Module {
 
   private fixedNumber = (value: BigNumber | string | number) => {
     const val = typeof value === 'object' ? value : new BigNumber(value);
-    if (val.isNaN()) return '0';
+    if (val.isNaN() || val.isZero()) return '';
     let formatted = '';
     if (val.gte(1)) {
       formatted = val.toNumber().toLocaleString('en-US', { maximumFractionDigits: 4 });
@@ -755,11 +728,19 @@ export default class ScomSwap extends Module {
       this.fromInputValue = new BigNumber(defaultInput);
       this.onUpdateToken(this.fromToken, true);
       this.onUpdateToken(this.toToken, false);
-      // this.firstTokenSelection.token = this.fromToken;
-      // this.secondTokenSelection.token = this.toToken;
       this.firstTokenInput.token = this.fromToken;
       this.secondTokenInput.token = this.toToken;
       this.toggleReverseImage.classList.add('cursor-default');
+    }
+  }
+
+  private initWallet = async () => {
+    try {
+      await Wallet.getClientInstance().init();
+      const rpcWallet = getRpcWallet();
+      await rpcWallet.init();
+    } catch (err) {
+      console.log(err);
     }
   }
 
@@ -770,8 +751,6 @@ export default class ScomSwap extends Module {
       this.closeNetworkErrModal();
       this.initializeDefaultTokenPair();
       this.toggleReverseImage.enabled = !this.isFixedPair;
-      // this.firstTokenSelection.disableSelect = this.isFixedPair;
-      // this.secondTokenSelection.disableSelect = this.isFixedPair;
       this.firstTokenInput.tokenReadOnly = this.isFixedPair;
       this.secondTokenInput.tokenReadOnly = this.isFixedPair;
       this.pnlBranding.visible = !!this._data.logo || !!this._data.title;
@@ -786,14 +765,8 @@ export default class ScomSwap extends Module {
 
       this.updateSwapButtonCaption();
 
-      await Wallet.getClientInstance().init();
-      const rpcWallet = getRpcWallet();
-      await rpcWallet.init();
+      await this.initWallet();
       await this.updateBalance();
-      // const input = this.receiveCol.querySelector('i-input') as Input;
-      // if (input) {
-      //   input.readOnly = false;
-      // }
       this.secondTokenInput.inputReadOnly = false;
       this.firstTokenInput.inputReadOnly = false;
       if (!this.isFixedPair) {
@@ -801,17 +774,14 @@ export default class ScomSwap extends Module {
       }
       if (this.fromInputValue.isGreaterThanOrEqualTo(0)) {
         this.onUpdateEstimatedPosition(false, true);
-        // const input = this.payCol.querySelector('i-input') as Input;
         this.firstTokenInput.value = this.fixedNumber(this.fromInputValue);
       } else if (this.toInputValue.isGreaterThanOrEqualTo(0)) {
         this.onUpdateEstimatedPosition(true, true);
-        // const input = this.receiveCol.querySelector('i-input') as Input;
         this.secondTokenInput.value = this.fixedNumber(this.toInputValue);
       }
-      // this.firstTokenSelection.tokenDataListProp = getSupportedTokens(this._data.tokens || [], currentChainId);
-      // this.secondTokenSelection.tokenDataListProp = getSupportedTokens(this._data.tokens || [], currentChainId);
-      this.firstTokenInput.tokenDataListProp = getSupportedTokens(this._data.tokens || [], currentChainId);
-      this.secondTokenInput.tokenDataListProp = getSupportedTokens(this._data.tokens || [], currentChainId);
+      const tokens = getSupportedTokens(this._data.tokens || [], currentChainId);
+      this.firstTokenInput.tokenDataListProp = tokens;
+      this.secondTokenInput.tokenDataListProp = tokens;
 
       if (!this.record)
         this.swapBtn.enabled = false;
@@ -821,20 +791,6 @@ export default class ScomSwap extends Module {
     });
   }
 
-  private async initTokenSelection() {
-    await this.firstTokenInput.ready();
-    await this.secondTokenInput.ready();
-    this.firstTokenInput.tokenReadOnly = false;
-    this.firstTokenInput.isBalanceShown= false;
-    this.firstTokenInput.isBtnMaxShown = false;
-    this.firstTokenInput.onSelectToken = (token: ITokenObject) => this.onSelectToken(token, true);
-    this.firstTokenInput.isCommonShown = true;
-    this.secondTokenInput.tokenReadOnly = false;
-    this.secondTokenInput.isBalanceShown= false;
-    this.secondTokenInput.isBtnMaxShown = false;
-    this.secondTokenInput.onSelectToken = (token: ITokenObject) => this.onSelectToken(token, false);
-    this.secondTokenInput.isCommonShown = true;
-  }
   private async initApprovalModelAction() {
     this.approvalModelAction = await getApprovalModelAction({
       sender: this,
@@ -846,7 +802,7 @@ export default class ScomSwap extends Module {
       },
       onApproving: async (token: ITokenObject, receipt?: string, data?: any) => {
         this.setMapStatus('approve', data.key, ApprovalStatus.APPROVING);
-        this.showResultMessage(this.openswapResult, 'success', receipt);
+        this.showResultMessage('success', receipt);
         if (this.isApprovingRouter && !this.swapBtn.rightIcon.visible)
           this.swapBtn.rightIcon.visible = true;
       },
@@ -857,12 +813,12 @@ export default class ScomSwap extends Module {
         await this.handleAddRoute();
       },
       onApprovingError: async (token: ITokenObject, err: Error) => {
-        this.showResultMessage(this.openswapResult, 'error', err);
+        this.showResultMessage('error', err);
         if (this.swapBtn.rightIcon.visible)
           this.swapBtn.rightIcon.visible = false;
       },
       onPaying: async (receipt?: string, data?: any) => {
-        this.showResultMessage(this.openswapResult, 'success', receipt);
+        this.showResultMessage('success', receipt);
         this.onSwapConfirming(data.key);
       },
       onPaid: async (data?: any) => {
@@ -871,7 +827,7 @@ export default class ScomSwap extends Module {
         application.EventBus.dispatch(EventId.Paid, 'onPaid');
       },
       onPayingError: async (err: Error) => {
-        this.showResultMessage(this.openswapResult, 'error', err);
+        this.showResultMessage('error', err);
       }
     })
   }
@@ -884,11 +840,8 @@ export default class ScomSwap extends Module {
     [this.fromTokenSymbol, this.toTokenSymbol] = [this.toTokenSymbol, this.fromTokenSymbol];
     this.firstTokenInput.token = this.fromToken;
     this.secondTokenInput.token = this.toToken;
-
-    // this.payCol.clearInnerHTML();
-    // this.receiveCol.clearInnerHTML();
-    // this.payCol.appendChild(<i-input class="token-input" width="100%" placeholder="0.0" inputType="number" value={this.getInputValue(true)} onKeyUp={this.onTokenInputChange.bind(this)} />);
-    // this.receiveCol.appendChild(<i-input class="token-input" width="100%" placeholder="0.0" inputType="number" value={this.getInputValue(false)} onKeyUp={this.onTokenInputChange.bind(this)} />);
+    this.firstTokenInput.value = this.getInputValue(true);
+    this.secondTokenInput.value = this.getInputValue(false);
     this.redirectToken();
 
     await this.handleAddRoute();
@@ -942,7 +895,7 @@ export default class ScomSwap extends Module {
     }
   }
 
-  private onUpdateToken(token: ITokenObject, isFrom: boolean) {
+  private async onUpdateToken(token: ITokenObject, isFrom: boolean) {
     if (!token) return;
     const balance = this.getBalance(token);
     if (isFrom) {
@@ -950,11 +903,10 @@ export default class ScomSwap extends Module {
       const enabled = !this.isMaxDisabled();
       this.maxButton.enabled = enabled;
       if (this.fromInputValue.gt(0)) {
-        // const fromInput = this.payCol.getElementsByTagName('I-INPUT')?.[0] as Input;
         const limit = limitDecimals(this.fromInputValue.toFixed(), token.decimals || 18);
         if (!this.fromInputValue.eq(limit)) {
           if (this.firstTokenInput) {
-            this.firstTokenInput.value = limit;
+            this.firstTokenInput = limit === '0' ? '' : limit;
           }
           this.fromInputValue = new BigNumber(limit);
         }
@@ -966,11 +918,10 @@ export default class ScomSwap extends Module {
     } else {
       this.toToken = token;
       if (this.toInputValue.gt(0)) {
-        // const toInput = this.receiveCol.getElementsByTagName('I-INPUT')?.[0] as Input;
         const limit = limitDecimals(this.toInputValue.toFixed(), token.decimals || 18);
         if (!this.toInputValue.eq(limit)) {
           if (this.secondTokenInput) {
-            this.secondTokenInput.value = limit;
+            this.secondTokenInput.value = limit === '0' ? '' : limit;;
           }
           this.toInputValue = new BigNumber(limit);
         }
@@ -978,7 +929,7 @@ export default class ScomSwap extends Module {
         this.onUpdateEstimatedPosition(false);
       }
       this.receiveBalance.caption = `Balance: ${formatNumber(balance, 4)} ${token.symbol}`;
-      this.updateTokenInput(false);
+      await this.updateTokenInput(false);
     }
   }
   private async onSelectToken(token: ITokenObject, isFrom: boolean) {
@@ -990,7 +941,7 @@ export default class ScomSwap extends Module {
       await tokenStore.updateAllTokenBalances(rpcWallet);
       this.allTokenBalancesMap = tokenStore.tokenBalances;
     }
-    this.onUpdateToken(token, isFrom);
+    await this.onUpdateToken(token, isFrom);
     this.redirectToken();
     await this.handleAddRoute();
     this.firstTokenInput.enabled = true;
@@ -1000,7 +951,7 @@ export default class ScomSwap extends Module {
   private setApprovalSpenderAddress() {
     const item = this.record;
     if (!item) return;
-    const market =  getProviderByKey(item.provider)?.key || '';
+    const market = getProviderByKey(item.provider)?.key || '';
     if (this.approvalModelAction) {
       if (getCurrentCommissions(this.commissions).length) {
         this.contractAddress = getProxyAddress();
@@ -1019,28 +970,6 @@ export default class ScomSwap extends Module {
   }
 
   private async updateTokenInput(isFrom: boolean, init?: boolean) {
-    // const _col = isFrom ? this.payCol : this.receiveCol;
-    // const label = _col.querySelector('i-label') as Node;
-    // if (init && !label) {
-    //   _col.innerHTML = '';
-    //   const label = await Label.create();
-    //   label.caption = " - ";
-    //   label.classList.add("text-value");
-    //   label.classList.add("text-right");
-    //   _col.appendChild(label);
-    // }
-    // else if (!init && label) {
-    //   _col.removeChild(label);
-    //   const input: Input = await Input.create();
-    //   input.width = '100%';
-    //   input.placeholder = '0.0';
-    //   input.inputType = 'number';
-    //   input.value = this.getInputValue(isFrom);
-    //   input.onKeyUp = this.onTokenInputChange.bind(this);
-    //   input.classList.add("token-input");
-    //   _col.appendChild(input);
-    // }
-
     const inputEl = isFrom ? this.firstTokenInput : this.secondTokenInput;
     if (inputEl) inputEl.value = this.getInputValue(isFrom);
   }
@@ -1049,14 +978,12 @@ export default class ScomSwap extends Module {
     if (this.isFrom) {
       if (this.payCol.children) {
         let balanceValue = item.amountIn;
-        // const input = this.payCol.querySelector('i-input') as Input;
         this.firstTokenInput.value = this.fixedNumber(balanceValue);
         this.fromInputValue = typeof balanceValue !== 'object' ? new BigNumber(balanceValue) : balanceValue;
       }
     } else {
       if (this.receiveCol.children) {
         let balanceValue = item.amountOut;
-        // const input = this.receiveCol.querySelector('i-input') as Input;
         this.secondTokenInput.value = this.fixedNumber(balanceValue);
         this.toInputValue = typeof balanceValue !== 'object' ? new BigNumber(balanceValue) : balanceValue;
       }
@@ -1160,8 +1087,7 @@ export default class ScomSwap extends Module {
     this.initRoutes();
     const pricePercent = this.getPricePercent(listRouting, false)
     if (listRouting.length) {
-      // this.lbBestPrice.visible = true;
-      this.receiveCol.classList.add('bg-box--active');
+      // this.receiveCol.classList.add('bg-box--active');
       this.lbRouting.classList.add('visibility-hidden');
       const option = listRouting[0];
       const approveButtonStatus = option.isApproveButtonShown ? ApprovalStatus.TO_BE_APPROVED : ApprovalStatus.NONE;
@@ -1169,23 +1095,20 @@ export default class ScomSwap extends Module {
       this.swapButtonStatusMap[option.key] = ApprovalStatus.TO_BE_APPROVED;
       await this.onSelectRouteItem(option);
     } else {
-      // this.lbBestPrice.visible = false;
-      this.receiveCol.classList.remove('bg-box--active');
+      // this.receiveCol.classList.remove('bg-box--active');
       this.lbRouting.classList.remove('visibility-hidden');
       if (this.priceInfo)
         this.priceInfo.Items = this.getPriceInfo();
       if (this.isEstimated('to')) {
-        // const input = this.receiveCol.querySelector('i-input') as Input;
         this.toInputValue = new BigNumber(0);
-        this.secondTokenInput.value = '-';
+        this.secondTokenInput.value = '';
       } else {
-        // const input = this.payCol.querySelector('i-input') as Input;
         this.fromInputValue = new BigNumber(0);
-        this.firstTokenInput.value = '-';
+        this.firstTokenInput.value = '';
       }
     }
     if (this.record) {
-      this.setApprovalSpenderAddress();    
+      this.setApprovalSpenderAddress();
       const commissionFee = getEmbedderCommissionFee();
       const commissionAmount = getCommissionAmount(this.commissions, this.record.fromAmount);
       const total = this.record?.fromAmount ? new BigNumber(this.record.fromAmount).plus(commissionAmount) : new BigNumber(0);
@@ -1466,7 +1389,7 @@ export default class ScomSwap extends Module {
         this.mdWallet.networks = this.networks;
         this.mdWallet.wallets = this.wallets;
         // this.$eventBus.dispatch(EventId.ConnectWallet);
-        this.mdWallet.showModal();   
+        this.mdWallet.showModal();
       }
       return;
     }
@@ -1492,7 +1415,7 @@ export default class ScomSwap extends Module {
   private onSubmit = async () => {
     try {
       this.swapModal.visible = false;
-      this.showResultMessage(this.openswapResult, 'warning', `Swapping ${formatNumber(this.totalAmount(), 4)} ${this.fromToken?.symbol} to ${formatNumber(this.toInputValue, 4)} ${this.toToken?.symbol}`);
+      this.showResultMessage('warning', `Swapping ${formatNumber(this.totalAmount(), 4)} ${this.fromToken?.symbol} to ${formatNumber(this.toInputValue, 4)} ${this.toToken?.symbol}`);
       const route = this.record.bestRoute ? this.record.bestRoute : [this.fromToken, this.toToken];
       const swapData = {
         provider: this.record.provider,
@@ -1509,14 +1432,14 @@ export default class ScomSwap extends Module {
 
       const { error } = await executeSwap(swapData);
       if (error) {
-        this.showResultMessage(this.openswapResult, 'error', error as any);
+        this.showResultMessage('error', error as any);
       }
     } catch (error) {
       console.error(error);
     }
   }
   private onApproveRouterMax = () => {
-    this.showResultMessage(this.openswapResult, 'warning', 'Approving');
+    this.showResultMessage('warning', 'Approving');
     this.setApprovalSpenderAddress();
     this.approvalModelAction.doApproveAction(this.fromToken as ITokenObject, this.totalAmount().toString(), this.record);
   }
@@ -1540,7 +1463,6 @@ export default class ScomSwap extends Module {
     }
     if (inputVal.eq(this.fromInputValue)) return;
     this.fromInputValue = inputVal;
-    // const input = this.payCol.querySelector('i-input') as Input;
     this.firstTokenInput.value = limitDecimals(this.fromInputValue.toFixed(), this.fromToken?.decimals || 18);
     this.redirectToken();
     await this.handleAddRoute();
@@ -1568,10 +1490,6 @@ export default class ScomSwap extends Module {
       this.priceInfo2.onTogglePrice = this.onTogglePrice.bind(this);
     }
     this.priceInfoContainer.appendChild(this.priceInfo2);
-  }
-
-  get isMetaMask() {
-    return getWalletProvider() === WalletPlugin.MetaMask;
   }
 
   private showModalFees = () => {
@@ -1614,16 +1532,16 @@ export default class ScomSwap extends Module {
     this.modalFees.visible = false;
   }
 
-  private showResultMessage = (result: Result, status: 'warning' | 'success' | 'error', content?: string | Error) => {
-    if (!result) return;
+  private showResultMessage = (status: 'warning' | 'success' | 'error', content?: string | Error) => {
+    if (!this.txStatusModal) return;
     let params: any = { status };
     if (status === 'success') {
       params.txtHash = content;
     } else {
       params.content = content;
     }
-    result.message = { ...params };
-    result.showModal();
+    this.txStatusModal.message = { ...params };
+    this.txStatusModal.showModal();
   }
 
   private initExpertModal() {
@@ -1684,8 +1602,6 @@ export default class ScomSwap extends Module {
     this.isReadyCallbackQueued = true;
     super.init();
     this.updateSwapButtonCaption();
-    this.openswapResult = new Result();
-    this.swapComponent.appendChild(this.openswapResult);
     this.initExpertModal();
     const lazyLoad = this.getAttribute('lazyLoad', true, false);
     if (!lazyLoad) {
@@ -1707,7 +1623,7 @@ export default class ScomSwap extends Module {
       const networks = this.getAttribute('networks', true);
       const wallets = this.getAttribute('wallets', true);
       const showHeader = this.getAttribute('showHeader', true);
-      let data = {category, providers, commissions, tokens, defaultChainId, networks, wallets, showHeader};
+      let data = { category, providers, commissions, tokens, defaultChainId, networks, wallets, showHeader };
       if (!this.isEmptyData(data)) {
         await this.setData(data);
       }
@@ -1725,7 +1641,7 @@ export default class ScomSwap extends Module {
     return (
       <i-scom-dapp-container id="dappContainer">
         <i-panel id="swapComponent" background={{ color: Theme.background.main }}>
-          <i-panel class="pageblock-swap">
+          <i-panel class={swapStyle}>
             <i-panel id="swapContainer">
               <i-vstack id="pnlBranding" margin={{ bottom: '0.25rem' }} gap="0.5rem" horizontalAlignment="center">
                 <i-image id='imgLogo' height={100}></i-image>
@@ -1745,15 +1661,7 @@ export default class ScomSwap extends Module {
                             <i-button id="maxButton" class="btn-max" caption="Max" enabled={false} onClick={() => this.onSetMaxBalance()}></i-button>
                           </i-hstack>
                         </i-vstack>
-                        <i-panel id="payCol" class="bg-box" width="100%" margin={{ top: 'auto'}}>
-                          {/* <i-hstack class="input--token-box" verticalAlignment="center" horizontalAlignment="space-between" width="100%">
-                            <i-vstack>
-                              <i-scom-swap-token-selection disableSelect={true} id="firstTokenSelection"></i-scom-swap-token-selection>
-                            </i-vstack>
-                            <i-vstack id="payCol">
-                              <i-label class="text-value text-right" caption=" - "></i-label>
-                            </i-vstack>
-                          </i-hstack> */}
+                        <i-panel id="payCol" class="bg-box" width="100%" margin={{ top: 'auto' }}>
                           <i-scom-token-input
                             id="firstTokenInput"
                             placeholder='0.0'
@@ -1763,11 +1671,11 @@ export default class ScomSwap extends Module {
                             isBtnMaxShown={false}
                             isCommonShown={true}
                             inputReadOnly={true}
-                            background={{color: Theme.input.background}}
-                            border={{radius: '1rem'}}
+                            background={{ color: Theme.input.background }}
+                            border={{ radius: '1rem' }}
                             height={56}
                             display='flex'
-                            font={{size: '1.25rem'}}
+                            font={{ size: '1.25rem' }}
                             onInputAmountChanged={this.onTokenInputChange}
                             onSelectToken={(token: ITokenObject) => this.onSelectToken(token, true)}
                             class="token-input"
@@ -1794,16 +1702,7 @@ export default class ScomSwap extends Module {
                             <i-label id="receiveBalance" class="text--grey ml-auto" caption="Balance: 0"></i-label>
                           </i-vstack>
                         </i-vstack>
-                        <i-panel id="receiveCol" class="bg-box" background={{ color: Theme.input.background }} width="100%" margin={{ top: 'auto'}}>
-                          {/* <i-hstack class="input--token-box" verticalAlignment="center" horizontalAlignment="space-between" width="100%">
-                            <i-label id="lbBestPrice" visible={false} caption="Best Price" class="best-price" />
-                            <i-vstack>
-                              <i-scom-swap-token-selection disableSelect={true} id="secondTokenSelection"></i-scom-swap-token-selection>
-                            </i-vstack>
-                            <i-vstack id="receiveCol">
-                              <i-label class="text-value text-right" caption=" - "></i-label>
-                            </i-vstack>
-                          </i-hstack> */}
+                        <i-panel id="receiveCol" class="bg-box" background={{ color: Theme.input.background }} width="100%" margin={{ top: 'auto' }}>
                           <i-scom-token-input
                             id="secondTokenInput"
                             value='-'
@@ -1813,11 +1712,11 @@ export default class ScomSwap extends Module {
                             isBalanceShown={false}
                             isBtnMaxShown={false}
                             isCommonShown={true}
-                            background={{color: Theme.input.background}}
-                            border={{radius: '1rem'}}
+                            background={{ color: Theme.input.background }}
+                            border={{ radius: '1rem' }}
                             height={56}
                             display='flex'
-                            font={{size: '1.25rem'}}
+                            font={{ size: '1.25rem' }}
                             onInputAmountChanged={this.onTokenInputChange}
                             onSelectToken={(token: ITokenObject) => this.onSelectToken(token, false)}
                             class="token-input"
@@ -1915,7 +1814,7 @@ export default class ScomSwap extends Module {
               </i-panel>
             </i-modal>
           </i-panel>
-          {/* <i-scom-swap-config id="configDApp" visible={false} /> */}
+          <i-scom-tx-status-modal id="txStatusModal" />
           <i-scom-wallet-modal
             id="mdWallet"
             wallets={[]}

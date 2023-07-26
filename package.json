@@ -24,7 +24,8 @@
     "@scom/scom-wallet-modal": "^0.1.0",
     "@scom/scom-dapp-container": "^0.1.3",
     "@scom/scom-dex-list": "^0.1.0",
-    "@scom/scom-token-input": "^0.1.1"
+    "@scom/scom-token-input": "^0.1.1",
+    "@scom/scom-tx-status-modal": "https://github.com/scom-repos/scom-tx-status-modal"
   },
   "devDependencies": {
     "@ijstech/cli": "^0.1.33",

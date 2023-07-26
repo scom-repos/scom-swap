@@ -18,7 +18,17 @@ declare module "@scom/scom-swap/assets.ts" {
     export default _default;
 }
 /// <amd-module name="@scom/scom-swap/index.css.ts" />
-declare module "@scom/scom-swap/index.css.ts" { }
+declare module "@scom/scom-swap/index.css.ts" {
+    export const swapStyle: string;
+}
+/// <amd-module name="@scom/scom-swap/global/utils/helper.ts" />
+declare module "@scom/scom-swap/global/utils/helper.ts" {
+    export const formatNumber: (value: any, decimals?: number) => string;
+    export const formatNumberWithSeparators: (value: number, precision?: number) => string;
+    export const isInvalidInput: (val: any) => boolean;
+    export const limitDecimals: (value: any, decimals: number) => any;
+    export function getAPI(url: string, paramsObj?: any): Promise<any>;
+}
 /// <amd-module name="@scom/scom-swap/contracts/oswap-openswap-contract/contracts/OpenSwap.json.ts" />
 declare module "@scom/scom-swap/contracts/oswap-openswap-contract/contracts/OpenSwap.json.ts" {
     const _default_1: {
@@ -9591,60 +9601,11 @@ declare module "@scom/scom-swap/contracts/oswap-openswap-contract/index.ts" {
 }
 /// <amd-module name="@scom/scom-swap/global/utils/common.ts" />
 declare module "@scom/scom-swap/global/utils/common.ts" {
-    import { Wallet, BigNumber, ISendTxEventsOptions } from "@ijstech/eth-wallet";
+    import { BigNumber, ISendTxEventsOptions } from "@ijstech/eth-wallet";
     import { ITokenObject } from "@scom/scom-token-list";
-    export type TokenMapType = {
-        [token: string]: ITokenObject;
-    };
-    export const isTransactionConfirmed: (txHash: string) => Promise<boolean>;
     export const registerSendTxEvents: (sendTxEventHandlers: ISendTxEventsOptions) => void;
-    export function getERC20Amount(wallet: Wallet, token: string, decimals: number): Promise<BigNumber>;
     export const approveERC20Max: (token: ITokenObject, spenderAddress: string, callback?: any, confirmationCallback?: any) => Promise<import("@ijstech/eth-contract").TransactionReceipt>;
     export const getERC20Allowance: (token: ITokenObject, spenderAddress: string) => Promise<BigNumber>;
-}
-/// <amd-module name="@scom/scom-swap/global/utils/helper.ts" />
-declare module "@scom/scom-swap/global/utils/helper.ts" {
-    import { BigNumber } from "@ijstech/eth-wallet";
-    import { TokenMapType } from "@scom/scom-swap/global/utils/common.ts";
-    export const DefaultDateTimeFormat = "DD/MM/YYYY HH:mm:ss";
-    export const DefaultDateFormat = "DD/MM/YYYY";
-    export const formatDate: (date: any, customType?: string, showTimezone?: boolean) => string;
-    export const formatUTCDate: (date: any, customType?: string, showTimezone?: boolean) => string;
-    export const compareDate: (fromDate: any, toDate?: any) => boolean;
-    export const formatNumber: (value: any, decimals?: number) => string;
-    export const formatPercentNumber: (value: any, decimals?: number) => string;
-    export const formatNumberWithSeparators: (value: number, precision?: number) => string;
-    export const isValidNumber: (value: string | number) => boolean;
-    export const isInvalidInput: (val: any) => boolean;
-    export const limitInputNumber: (input: any, decimals?: number) => void;
-    export const limitDecimals: (value: any, decimals: number) => any;
-    export function getAPI(url: string, paramsObj?: any): Promise<any>;
-    export const toWeiInv: (n: string, unit?: number) => BigNumber;
-    export const padLeft: (string: string, chars: number, sign?: string) => string;
-    export const numberToBytes32: (value: any, prefix?: string) => any;
-    export const getParamsFromUrl: () => URLSearchParams;
-    export const formatNumberValue: (data: any, tokenMap: TokenMapType) => any;
-    export const uniqWith: (array: any[], compareFn: (cur: any, oth: any) => boolean) => any;
-    export const getWeekDays: () => any[];
-    export const renderBalanceTooltip: (params: any, tokenMap: TokenMapType, isBold?: boolean) => any;
-    export const downloadJsonFile: (name: string, obj: any) => void;
-    export function isWalletAddress(address: string): boolean;
-}
-/// <amd-module name="@scom/scom-swap/global/utils/error.ts" />
-declare module "@scom/scom-swap/global/utils/error.ts" {
-    export function parseContractError(oMessage: string, tokens: string[]): Promise<string>;
-}
-/// <amd-module name="@scom/scom-swap/global/utils/pageBlock.ts" />
-declare module "@scom/scom-swap/global/utils/pageBlock.ts" {
-    export interface PageBlock {
-        getData: () => any;
-        setData: (data: any) => Promise<void>;
-        getTag: () => any;
-        setTag: (tag: any) => Promise<void>;
-        validate?: () => boolean;
-        defaultEdit?: boolean;
-        tag?: any;
-    }
 }
 /// <amd-module name="@scom/scom-swap/global/utils/approvalModel.ts" />
 declare module "@scom/scom-swap/global/utils/approvalModel.ts" {
@@ -9735,48 +9696,24 @@ declare module "@scom/scom-swap/global/utils/swapInterface.ts" {
         logo?: string;
         title?: string;
     }
-    export interface IEmbedData {
-        category?: Category;
-        providers?: IProviderUI[];
-        commissions?: ICommissionInfo[];
-    }
 }
 /// <amd-module name="@scom/scom-swap/global/utils/index.ts" />
 declare module "@scom/scom-swap/global/utils/index.ts" {
-    export { getAPI, formatNumber, formatNumberWithSeparators, DefaultDateTimeFormat, DefaultDateFormat, formatDate, formatUTCDate, limitDecimals, limitInputNumber, isInvalidInput, isValidNumber, toWeiInv, numberToBytes32, getParamsFromUrl, formatNumberValue, uniqWith, getWeekDays, compareDate, renderBalanceTooltip, formatPercentNumber, downloadJsonFile, isWalletAddress } from "@scom/scom-swap/global/utils/helper.ts";
-    export { parseContractError } from "@scom/scom-swap/global/utils/error.ts";
-    export { PageBlock } from "@scom/scom-swap/global/utils/pageBlock.ts";
-    export { isTransactionConfirmed, registerSendTxEvents, approveERC20Max, getERC20Allowance, getERC20Amount, TokenMapType } from "@scom/scom-swap/global/utils/common.ts";
+    export { getAPI, formatNumber, formatNumberWithSeparators, limitDecimals, isInvalidInput } from "@scom/scom-swap/global/utils/helper.ts";
+    export { registerSendTxEvents, approveERC20Max, getERC20Allowance } from "@scom/scom-swap/global/utils/common.ts";
     export { ApprovalStatus, IERC20ApprovalEventOptions, IERC20ApprovalOptions, IERC20ApprovalAction, ERC20ApprovalModel } from "@scom/scom-swap/global/utils/approvalModel.ts";
-    export { IContractInfo, IProvider, ISwapConfig, ISwapConfigUI, IProviderUI, Category, ICommissionInfo, IEmbedData, INetworkConfig } from "@scom/scom-swap/global/utils/swapInterface.ts";
+    export { IContractInfo, IProvider, ISwapConfig, ISwapConfigUI, IProviderUI, Category, ICommissionInfo, INetworkConfig } from "@scom/scom-swap/global/utils/swapInterface.ts";
 }
 /// <amd-module name="@scom/scom-swap/global/index.ts" />
 declare module "@scom/scom-swap/global/index.ts" {
-    import { INetwork } from '@ijstech/eth-wallet';
-    export interface IExtendedNetwork extends INetwork {
-        shortName?: string;
-        isDisabled?: boolean;
-        isMainChain?: boolean;
-        isCrossChainSupported?: boolean;
-        explorerName?: string;
-        explorerTxUrl?: string;
-        explorerAddressUrl?: string;
-        isTestnet?: boolean;
-        symbol?: string;
-        env?: string;
-    }
     export const enum EventId {
         ConnectWallet = "connectWallet",
         IsWalletConnected = "isWalletConnected",
         IsWalletDisconnected = "IsWalletDisconnected",
         Paid = "Paid",
         chainChanged = "chainChanged",
-        EmitButtonStatus = "emitButtonStatus",
-        EmitInput = "emitInput",
-        EmitNewToken = "emitNewToken",
         SlippageToleranceChanged = "SlippageToleranceChanged",
         ExpertModeChanged = "ExpertModeChanged",
-        ShowTransactionModal = "ShowTransactionModal",
         ShowExpertModal = "ShowExpertModal"
     }
     export enum QueueType {
@@ -9789,8 +9726,9 @@ declare module "@scom/scom-swap/global/index.ts" {
 }
 /// <amd-module name="@scom/scom-swap/store/utils.ts" />
 declare module "@scom/scom-swap/store/utils.ts" {
+    import { INetwork } from '@ijstech/eth-wallet';
     import { ITokenObject } from '@scom/scom-token-list';
-    import { IProvider, IExtendedNetwork } from "@scom/scom-swap/global/index.ts";
+    import { IProvider } from "@scom/scom-swap/global/index.ts";
     import { IDexInfo } from '@scom/scom-dex-list';
     export enum WalletPlugin {
         MetaMask = "metamask",
@@ -9804,12 +9742,9 @@ declare module "@scom/scom-swap/store/utils.ts" {
         isExpertMode: boolean;
         slippageTolerance: number;
         transactionDeadline: number;
-        userTokens: {
-            [key: string]: ITokenObject[];
-        };
         infuraId: string;
         networkMap: {
-            [key: number]: IExtendedNetwork;
+            [key: number]: INetwork;
         };
         dexInfoList: IDexInfo[];
         providerList: IProvider[];
@@ -9836,30 +9771,16 @@ declare module "@scom/scom-swap/store/utils.ts" {
     export const getTransactionDeadline: () => any;
     export const setTransactionDeadline: (value: any) => void;
     export const getInfuraId: () => string;
-    export const getSupportedNetworks: () => IExtendedNetwork[];
+    export const getSupportedNetworks: () => INetwork[];
     export const getNetworkInfo: (chainId: number) => any;
-    export const getUserTokens: (chainId: number) => any[] | null;
-    export const addUserTokens: (token: ITokenObject) => void;
-    interface NetworkConditions {
-        isDisabled?: boolean;
-        isTestnet?: boolean;
-        isMainChain?: boolean;
-    }
-    export const getMatchNetworks: (conditions: NetworkConditions) => IExtendedNetwork[];
-    export const setUserTokens: (token: ITokenObject, chainId: number) => void;
-    export const hasUserToken: (address: string, chainId: number) => boolean;
     export const setDexInfoList: (value: IDexInfo[]) => void;
     export const getDexInfoList: () => IDexInfo[];
     export const setProviderList: (value: IProvider[]) => void;
     export const getProviderList: () => IProvider[];
     export const getProviderByKey: (providerKey: string) => IProvider;
-    export const viewOnExplorerByTxHash: (chainId: number, txHash: string) => void;
-    export const viewOnExplorerByAddress: (chainId: number, address: string) => void;
-    export function getWalletProvider(): string;
     export function isClientWalletConnected(): boolean;
     export function isRpcWalletConnected(): boolean;
     export const hasMetaMask: () => boolean;
-    export const truncateAddress: (address: string) => string;
     export function getChainId(): number;
     export const getChainNativeToken: (chainId: number) => ITokenObject;
     export function initRpcWallet(defaultChainId: number): string;
@@ -9871,9 +9792,6 @@ declare module "@scom/scom-swap/store/index.ts" {
     import { ITokenObject } from '@scom/scom-token-list';
     export const nullAddress = "0x0000000000000000000000000000000000000000";
     export const getWETH: (chainId: number) => ITokenObject;
-    export const getTokenDecimals: (address: string) => number;
-    export const tokenSymbol: (address: string) => string;
-    export const tokenName: (address: string) => string;
     export const getSupportedTokens: (tokens: ITokenObject[], chainId: number) => ITokenObject[];
     export * from "@scom/scom-swap/store/utils.ts";
 }
@@ -10410,11 +10328,6 @@ declare module "@scom/scom-swap/contracts/scom-commission-proxy-contract/index.t
     };
     export default _default_51;
 }
-/// <amd-module name="@scom/scom-swap/swap-utils/helper.ts" />
-declare module "@scom/scom-swap/swap-utils/helper.ts" {
-    import { Control } from "@ijstech/components";
-    export function debounce(func: any, timeout: number, target: Control): (...args: any) => void;
-}
 /// <amd-module name="@scom/scom-swap/swap-utils/index.ts" />
 declare module "@scom/scom-swap/swap-utils/index.ts" {
     import { BigNumber, TransactionReceipt } from "@ijstech/eth-wallet";
@@ -10450,11 +10363,9 @@ declare module "@scom/scom-swap/swap-utils/index.ts" {
         receipt: TransactionReceipt | null;
         error: Record<string, string> | null;
     }>;
-    const setERC20AllowanceToZero: (token: ITokenObject, spenderAddress: string) => Promise<import("@ijstech/eth-contract").TransactionReceipt>;
     const getApprovalModelAction: (options: IERC20ApprovalEventOptions) => Promise<import("@scom/scom-swap/global/index.ts").IERC20ApprovalAction>;
     const setApprovalModalSpenderAddress: (market: string, contractAddress?: string) => void;
-    export { getExtendedRouteObjData, getTradeFeeMap, getAllRoutesData, SwapData, executeSwap, getChainNativeToken, getRouterAddress, setERC20AllowanceToZero, getApprovalModelAction, setApprovalModalSpenderAddress };
-    export * from "@scom/scom-swap/swap-utils/helper.ts";
+    export { getExtendedRouteObjData, getTradeFeeMap, getAllRoutesData, SwapData, executeSwap, getChainNativeToken, getRouterAddress, getApprovalModelAction, setApprovalModalSpenderAddress };
 }
 /// <amd-module name="@scom/scom-swap/price-info/priceInfo.css.ts" />
 declare module "@scom/scom-swap/price-info/priceInfo.css.ts" { }
@@ -10484,184 +10395,10 @@ declare module "@scom/scom-swap/price-info/index.tsx" {
         render(): any;
     }
 }
-/// <amd-module name="@scom/scom-swap/token-selection/tokenSelection.css.ts" />
-declare module "@scom/scom-swap/token-selection/tokenSelection.css.ts" { }
-/// <amd-module name="@scom/scom-swap/token-selection/importToken.tsx" />
-declare module "@scom/scom-swap/token-selection/importToken.tsx" {
-    import { Control, ControlElement, Module, Container } from '@ijstech/components';
-    import { ITokenObject } from '@scom/scom-token-list';
-    global {
-        namespace JSX {
-            interface IntrinsicElements {
-                ['i-scom-swap-import-token']: ControlElement;
-            }
-        }
-    }
-    export class ImportToken extends Module {
-        private importModal;
-        private importBtn;
-        private tokenAgreeCheckBox;
-        private _token;
-        private $eventBus;
-        onUpdate: any;
-        private _state;
-        constructor(parent?: Container, options?: any);
-        set token(value: ITokenObject);
-        get token(): ITokenObject;
-        updateState(): void;
-        closeModal(): void;
-        showModal(): void;
-        onImportToken(source: Control, event: Event): Promise<void>;
-        onHandleCheck(source: Control, event: Event): void;
-        viewContract(): void;
-        init(): Promise<void>;
-        render(): any;
-    }
-}
-/// <amd-module name="@scom/scom-swap/token-selection/tokenSelection.tsx" />
-declare module "@scom/scom-swap/token-selection/tokenSelection.tsx" {
-    import { Module, ControlElement, Container } from '@ijstech/components';
-    import { ITokenObject } from '@scom/scom-token-list';
-    import "@scom/scom-swap/token-selection/tokenSelection.css.ts";
-    interface TokenSelectionElement extends ControlElement {
-        disableSelect?: boolean;
-        disabledMaxBtn?: boolean;
-    }
-    global {
-        namespace JSX {
-            interface IntrinsicElements {
-                ['i-scom-swap-token-selection']: TokenSelectionElement;
-            }
-        }
-    }
-    export class TokenSelection extends Module {
-        private _token?;
-        private _tokenDataListProp;
-        private _onSelectToken;
-        private _isCommonShown;
-        private _isSortBalanceShown;
-        private _isBtnMaxShown;
-        private _onSetMaxBalance;
-        private tokenSelectionModal;
-        private tokenBalancesMap;
-        private btnToken;
-        private btnMax;
-        private tokenList;
-        private commonTokenList;
-        private commonTokenPanel;
-        private sortBalancePanel;
-        private importTokenModal;
-        private sortValue;
-        private iconSortUp;
-        private iconSortDown;
-        private tokenSearch;
-        private filterValue;
-        private checkHasMetaMask;
-        private $eventBus;
-        private _disableSelect;
-        private _disabledMaxBtn;
-        get token(): ITokenObject | undefined;
-        set token(value: ITokenObject | undefined);
-        get tokenDataListProp(): Array<ITokenObject>;
-        set tokenDataListProp(value: Array<ITokenObject>);
-        get onSelectToken(): any;
-        set onSelectToken(callback: any);
-        get isCommonShown(): boolean;
-        set isCommonShown(value: boolean);
-        get isSortBalanceShown(): boolean;
-        set isSortBalanceShown(value: boolean);
-        get isBtnMaxShown(): boolean;
-        set isBtnMaxShown(value: boolean);
-        get onSetMaxBalance(): any;
-        set onSetMaxBalance(callback: any);
-        get chainId(): number;
-        get disableSelect(): boolean;
-        set disableSelect(value: boolean);
-        get disabledMaxBtn(): boolean;
-        set disabledMaxBtn(value: boolean);
-        private initData;
-        private updateDataByChain;
-        private updateDataByNewToken;
-        private onWalletConnect;
-        private onWalletDisconnect;
-        private onPaid;
-        private registerEvent;
-        private get tokenDataList();
-        private get commonTokenDataList();
-        private get tokenDataListFiltered();
-        private sortToken;
-        private sortBalance;
-        private filterSearch;
-        private renderCommonItems;
-        private renderToken;
-        private getTokenObject;
-        private renderTokenItems;
-        private addToMetamask;
-        private showModal;
-        private updateStatusButton;
-        private updateButton;
-        private onSelect;
-        constructor(parent?: Container, options?: any);
-        init(): Promise<void>;
-        showImportTokenModal(event: Event, token: ITokenObject): void;
-        onImportToken(token: ITokenObject): void;
-        onCloseModal(): void;
-        render(): any;
-    }
-}
-/// <amd-module name="@scom/scom-swap/token-selection/index.tsx" />
-declare module "@scom/scom-swap/token-selection/index.tsx" {
-    export { TokenSelection } from "@scom/scom-swap/token-selection/tokenSelection.tsx";
-    export { ImportToken } from "@scom/scom-swap/token-selection/importToken.tsx";
-}
-/// <amd-module name="@scom/scom-swap/result/result.css.ts" />
-declare module "@scom/scom-swap/result/result.css.ts" {
-    const _default_52: string;
-    export default _default_52;
-}
-/// <amd-module name="@scom/scom-swap/result/result.tsx" />
-declare module "@scom/scom-swap/result/result.tsx" {
-    import { Module, ControlElement, Container } from '@ijstech/components';
-    global {
-        namespace JSX {
-            interface IntrinsicElements {
-                ['i-scom-swap-result']: ControlElement;
-            }
-        }
-    }
-    export interface IMessage {
-        status: 'warning' | 'success' | 'error';
-        content?: any;
-        txtHash?: string;
-        obj?: any;
-        customRedirect?: any;
-    }
-    export class Result extends Module {
-        private confirmModal;
-        private mainContent;
-        private _message;
-        onCustomClose: any;
-        get message(): IMessage;
-        set message(value: IMessage);
-        constructor(parent?: Container, options?: any);
-        init(): Promise<void>;
-        closeModal(): void;
-        showModal(): void;
-        onCloseRedirect(): void;
-        buildLink(): Promise<void>;
-        renderUI(): Promise<void>;
-        onErrMsgChanged(): Promise<any>;
-        render(): any;
-    }
-}
-/// <amd-module name="@scom/scom-swap/result/index.tsx" />
-declare module "@scom/scom-swap/result/index.tsx" {
-    export { Result } from "@scom/scom-swap/result/result.tsx";
-}
 /// <amd-module name="@scom/scom-swap/expert-mode-settings/index.css.ts" />
 declare module "@scom/scom-swap/expert-mode-settings/index.css.ts" {
-    const _default_53: string;
-    export default _default_53;
+    const _default_52: string;
+    export default _default_52;
 }
 /// <amd-module name="@scom/scom-swap/expert-mode-settings/index.tsx" />
 declare module "@scom/scom-swap/expert-mode-settings/index.tsx" {
@@ -10686,7 +10423,7 @@ declare module "@scom/scom-swap/expert-mode-settings/index.tsx" {
 }
 /// <amd-module name="@scom/scom-swap/data.json.ts" />
 declare module "@scom/scom-swap/data.json.ts" {
-    const _default_54: {
+    const _default_53: {
         infuraId: string;
         networks: {
             chainId: number;
@@ -10723,11 +10460,11 @@ declare module "@scom/scom-swap/data.json.ts" {
             showFooter: boolean;
         };
     };
-    export default _default_54;
+    export default _default_53;
 }
 /// <amd-module name="@scom/scom-swap/formSchema.json.ts" />
 declare module "@scom/scom-swap/formSchema.json.ts" {
-    const _default_55: {
+    const _default_54: {
         general: {
             dataSchema: {
                 type: string;
@@ -10893,7 +10630,7 @@ declare module "@scom/scom-swap/formSchema.json.ts" {
             };
         };
     };
-    export default _default_55;
+    export default _default_54;
 }
 /// <amd-module name="@scom/scom-swap" />
 declare module "@scom/scom-swap" {
@@ -10937,14 +10674,11 @@ declare module "@scom/scom-swap" {
         private isInited;
         private payBalance;
         private receiveBalance;
-        private firstTokenSelection;
-        private secondTokenSelection;
         private firstTokenInput;
         private secondTokenInput;
         private payCol;
         private receiveCol;
         private swapModal;
-        private lbBestPrice;
         private lbRouting;
         private priceInfo;
         private priceInfo2;
@@ -10957,7 +10691,7 @@ declare module "@scom/scom-swap" {
         private toTokenValue;
         private payOrReceiveValue;
         private payOrReceiveToken;
-        private openswapResult;
+        private txStatusModal;
         private maxButton;
         private swapBtn;
         private lbYouPayTitle;
@@ -10978,16 +10712,12 @@ declare module "@scom/scom-swap" {
         private supportedChainIds;
         private swapButtonStatusMap;
         private approveButtonStatusMap;
-        private timer;
         private $eventBus;
         private lbEstimate;
         private lbPayOrReceive;
         private approvalModelAction;
         private toggleReverseImage;
-        private oldSupportedChainList;
         private supportedChainList;
-        private srcChain;
-        private desChain;
         private swapModalConfirmBtn;
         private modalFees;
         private feesInfo;
@@ -11080,8 +10810,8 @@ declare module "@scom/scom-swap" {
         private redirectToken;
         private fixedNumber;
         private initializeDefaultTokenPair;
+        private initWallet;
         private initializeWidgetConfig;
-        private initTokenSelection;
         private initApprovalModelAction;
         private onRevertSwap;
         private totalAmount;
@@ -11124,7 +10854,6 @@ declare module "@scom/scom-swap" {
         private onSetMaxBalance;
         private isMaxDisabled;
         private onRenderPriceInfo;
-        get isMetaMask(): boolean;
         private showModalFees;
         private closeModalFees;
         private showResultMessage;

@@ -55,9 +55,3 @@ export interface ISwapConfigUI {
   logo?: string;
   title?: string;
 }
-
-export interface IEmbedData {
-  category?: Category;
-  providers?: IProviderUI[];
-  commissions?: ICommissionInfo[];
-}
