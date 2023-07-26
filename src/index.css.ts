@@ -73,11 +73,8 @@ Styles.fontFace({
   fontStyle: 'normal'
 })
 
-Styles.cssRule('.pageblock-swap', {
+export const swapStyle = Styles.style({
   $nest: {
-    // 'i-label': {
-    //   color: Theme.text.primary
-    // },
     '.btn-register': {
       padding: '0.75rem',
       display: 'flex',
@@ -95,14 +92,8 @@ Styles.cssRule('.pageblock-swap', {
     'i-icon': {
       display: 'inline-block'
     },
-    '.register-panel': {
-      padding: '10px',
-      border: '2px solid #F15E61',
-      borderRadius: '12px'
-    },
     '::-webkit-scrollbar': {
       width: '3px',
-
     },
     '::-webkit-scrollbar-thumb': {
       background: Theme.colors.primary.main,
@@ -110,15 +101,6 @@ Styles.cssRule('.pageblock-swap', {
     },
     '*': {
       boxSizing: 'border-box',
-      // margin: 0,
-      // padding: 0
-    },
-    '.flex-1': {
-      flex: '1 1 0%!important'
-    },
-    '.my-2': {
-      marginTop: '0.5rem!important',
-      marginBottom: '0.5rem!important',
     },
     '.ml-auto': {
       marginLeft: 'auto'
@@ -226,42 +208,11 @@ Styles.cssRule('.pageblock-swap', {
     '.visibility-hidden': {
       visibility: 'hidden'
     },
-    '.icon-list': {
-      display: 'flex',
-      flexWrap: 'wrap',
-      alignItems: 'center',
-      maxWidth: 'calc(100% - 4rem)',
-    },
-    '.icon-item': {
-      paddingBottom: 0,
-      paddingTop: '0.25rem',
-      marginRight: '0.25rem',
-      border: '2px solid transparent',
-      borderRadius: '50%',
-      padding: '0.25rem',
-      $nest: {
-        '> img': {
-          width: 30,
-          height: 30
-        }
-      }
-    },
     '.content-swap': {
       marginTop: '0.5rem',
       marginBottom: '1rem',
-      borderRadius: '1rem',
-      $nest: {
-        'i-label.custom-label *': {
-          fontSize: '1.125rem',
-          // color: Theme.text.primary,
-        }
-      }
+      borderRadius: '1rem'
     },
-    // '.input--token-container': {
-    //   padding: '0.5rem 1rem',
-    //   marginLeft: '-15px',
-    //   marginRight: '-15px',
-    // },
     'i-label.text--grey *': {
       color: Theme.text.primary,
       opacity: 0.55, // 'hsla(0,0%,100%,0.55)'
@@ -275,32 +226,6 @@ Styles.cssRule('.pageblock-swap', {
       bottom: '1.5px',
       background: 'transparent linear-gradient(255deg,#e75b66,#b52082) 0% 0% no-repeat padding-box',
       color: Theme.colors.primary.contrastText
-    },
-    '.custom--slider': {
-      width: '100%',
-      margin: '0px 6px 22px',
-      display: 'flex',
-      alignItems: 'center',
-      $nest: {
-        'i-range, i-range > .slider': {
-          width: '100% !important'
-        },
-        'input[type="range"]': {
-          background: Theme.background.main,
-          backgroundImage: `linear-gradient(#f15e61, #f15e61)`,
-          backgroundSize: '0% 100%',
-        },
-        'input[type="range"]::-webkit-slider-thumb': {
-          backgroundColor: '#F15E61',
-          border: '2px solid #e83e8c'
-        },
-        'input[type="range"]:focus::-webkit-slider-thumb': {
-          outline: 0,
-        },
-        'input[type="range"]::-webkit-slider-runnable-track': {
-          height: '4px'
-        }
-      }
     },
     '.bg-box': {
       margin: '0.5rem 0',
@@ -336,9 +261,6 @@ Styles.cssRule('.pageblock-swap', {
       borderRadius: '50%',
       cursor: 'pointer'
     },
-    '.total-routes': {
-      padding: '0.25rem 1rem 0.5rem'
-    },
     '.swap-btn-container': {
       marginTop: 10,
       $nest: {
@@ -356,260 +278,6 @@ Styles.cssRule('.pageblock-swap', {
     // '#receiveCol': {
     //   maxWidth: 'calc(100% - 9rem)',
     // },
-    '#tokenModal': {
-      $nest: {
-        '.modal': {
-          background: Theme.background.modal,
-          width: 492,
-          padding: '0.75rem 1rem',
-          borderRadius: '1rem',
-          // color: Theme.text.primary
-        },
-        '.i-modal_header': {
-          marginBottom: '1.5rem',
-          paddingBottom: '0.5rem',
-          borderBottom: `2px soid ${Theme.background.main}`,
-          color: Theme.colors.primary.main,
-          fontSize: '1.25rem',
-          fontWeight: 700,
-        },
-        '.i-modal_header > i-icon': {
-          fill: `${Theme.colors.primary.main} !important`
-        },
-        '.search': {
-          position: 'relative',
-          marginBottom: '1.5rem',
-          $nest: {
-            'i-icon': {
-              position: 'absolute',
-              top: 'calc(50% - 8px)',
-              left: '1rem',
-              transform: 'rotate(90deg)',
-              opacity: 0.7
-            },
-            'i-input': {
-              width: '100%'
-            },
-            'i-input > input': {
-              width: '100%',
-              height: 'auto !important',
-              padding: '1rem 1.5rem 1rem 2.25rem',
-              borderRadius: '0.5rem',
-              border: '2px solid #2a3675',
-              background: 'transparent',
-              color: 'inherit',
-              fontSize: 'inherit',
-            }
-          }
-        },
-        '.common-token': {
-          $nest: {
-            '.common-list': {
-              margin: '0.5rem -0.5rem 0'
-            },
-            '.grid-item': {
-              padding: '0.35rem 0.5rem',
-              borderRadius: '1rem',
-              border: '2px solid transparent',
-              $nest: {
-                '&:hover': {
-                  borderColor: Theme.divider,
-                  transform: 'none'
-                },
-                'i-image': {
-                  marginRight: '0.5rem'
-                }
-              }
-            },
-          }
-        },
-        '.token-list': {
-          margin: '0.5rem -0.5rem',
-          maxHeight: '45vh',
-          overflowY: 'auto',
-          $nest: {
-            '.token-info': {
-              display: 'flex',
-              flexDirection: 'column',
-              fontSize: '1rem',
-              marginRight: '0.5rem',
-            },
-            '.token-item': {
-              padding: '0.5rem',
-              overflow: 'unset',
-              animation: 'none',
-              $nest: {
-                '&:hover': {
-                  background: 'linear-gradient(254.8deg,rgba(231,91,102,.1) -8.08%,rgba(181,32,130,.1) 84.35%) !important',
-                  transform: 'none !important'
-                },
-                'i-image': {
-                  marginRight: '0.5rem'
-                },
-                '&:not(:first-child)': {
-                  marginTop: 0
-                }
-              }
-            },
-            '.token-name i-label > *': {
-              fontSize: '0.75rem',
-              // color: 'rgba(255,255,255,0.55)'
-              color: Theme.text.primary,
-              opacity: 0.55
-            }
-          }
-        },
-      }
-    },
-    '.list-routing': {
-      maxHeight: '27.5rem',
-      overflowY: 'auto'
-    },
-    '.routing-item': {
-      position: 'relative',
-      // color: "#fff",
-      background: Theme.background.modal,
-      border: '2px solid #2a3675',
-      padding: '1.25rem 1rem 1rem',
-      borderRadius: '0.75rem',
-      margin: '1rem'
-    },
-    '#listRouting': {
-      maxHeight: '27.5rem',
-      overflowY: 'auto',
-    },
-    '#listRouting.active': {
-      $nest: {
-        '.pnl-routing': {
-          marginRight: 'calc(1rem - 3px)',
-        }
-      }
-    },
-    '.routing-selected': {
-      borderColor: Theme.divider
-    },
-    '.best-price': {
-      color: Theme.colors.primary.contrastText,
-      position: 'absolute',
-      top: '-10px',
-      left: '30px',
-      background: 'linear-gradient(255deg,#f15e61,#b52082)',
-      borderRadius: ' 0.75rem',
-      padding: '0.15rem 1rem',
-      zIndex: 1,
-      $nest: {
-        '&>*': {
-          fontSize: 'inherit'
-        }
-      }
-    },
-    '.toggle-routes': {
-      display: 'flex',
-      alignItems: 'center',
-      cursor: 'pointer',
-      $nest: {
-        'i-label': {
-          fontSize: '14px',
-          // color: Theme.text.primary,
-          marginRight: '8px'
-        },
-        'i-icon': {
-          display: 'inline-block',
-        }
-      }
-    },
-    '.toggle-routes.hidden': {
-      display: 'none',
-    },
-    '.pnl-routing': {
-      position: 'relative',
-      // color: Theme.text.primary,
-      background: Theme.background.modal,
-      border: '2px solid #2a3675',
-      padding: '1.25rem 1rem 1rem',
-      borderRadius: '0.75rem',
-      margin: '1rem',
-      lineHeight: 1.5,
-      $nest: {
-        '.routing-name': {
-          marginRight: '0.25rem',
-          fontSize: '0.875rem',
-        },
-        '.routing-caption > *': {
-          marginRight: '0.25rem',
-          color: '#ffffff8c',
-          fontSize: '0.875rem',
-          whiteSpace: 'nowrap',
-        },
-        '.route-icon': {
-          marginRight: '0.25rem',
-          display: 'inline-block'
-        },
-        '&.routing-disabled': {
-          opacity: 0.8,
-        },
-      }
-    },
-    '.pnl-routing.routing-selected': {
-      borderColor: Theme.divider
-    },
-    '.balanceValue': {
-      textAlign: 'right',
-      display: 'block'
-    },
-    '.price-percent *': {
-      color: Theme.colors.secondary.main, // '#f7d063',
-      whiteSpace: 'nowrap',
-      textAlign: 'right'
-    },
-    '.w-100': {
-      width: '100%',
-    },
-    '.text-pink': {
-      color: Theme.colors.primary.main,
-      $nest: {
-        '*': {
-          color: Theme.colors.primary.main,
-        },
-      },
-    },
-    '.hints': {
-      display: 'flex',
-      alignItems: 'start',
-      marginTop: '-0.5rem',
-      $nest: {
-        '*': {
-          fontSize: '0.8rem',
-          opacity: 0.9,
-        },
-        'i-label *': {
-          color: Theme.colors.secondary.main,
-          marginLeft: '0.25rem',
-        },
-      },
-    },
-    '.chain-icon': {
-      margin: '0.25rem 0.5rem 0 0',
-      borderRadius: '50%',
-      border: '2px solid transparent',
-      padding: '0.25rem',
-      cursor: 'pointer',
-      filter: 'grayscale(1)',
-      $nest: {
-        '&.icon-disabled': {
-          cursor: 'default',
-        },
-        '&.icon-selected': {
-          borderColor: Theme.divider,
-          cursor: 'default',
-          filter: 'inherit',
-        },
-        'img': {
-          width: '32px',
-          height: '32px',
-        },
-      },
-    },
     '.cursor-default': {
       cursor: 'default !important',
     },
@@ -732,31 +400,6 @@ Styles.cssRule('.pageblock-swap', {
         }
       }
     },
-    '#openswapResult': {
-      $nest: {
-        '.modal': {
-          background: Theme.background.modal,
-          width: '440px',
-          maxWidth: '100%',
-          padding: '0.5rem',
-          borderRadius: '12px'
-        },
-        'i-label:nth-child(2)': {
-          marginBottom: '0.25rem'
-        },
-        '.waiting-txt > *': {
-          fontSize: '22px'
-        },
-        'i-loading': {
-          marginTop: '3rem',
-          marginBottom: '0.5rem'
-        },
-        'i-loading .i-loading-spinner_icon': {
-          width: '50px',
-          height: '48px'
-        }
-      }
-    },
     '#modalFees': {
       $nest: {
         '.i-modal_header': {
@@ -775,17 +418,6 @@ Styles.cssRule('.pageblock-swap', {
           },
         },
       },
-    },
-    '.action-setting': {
-      margin: 'auto 0 0 auto',
-      $nest: {
-        '> i-icon': {
-          marginLeft: '0.5rem'
-        },
-        '> i-label': {
-          opacity: 0.75
-        }
-      }
     },
     '.btn-os': {
       background: colorVar.primaryButton,
@@ -824,14 +456,9 @@ Styles.cssRule('.pageblock-swap', {
       background: colorVar.primaryDisabled,
       opacity: 1
     },
-    '.dark-bg, .dark-modal > div > div': {
+    '.dark-modal > div > div': {
       background: colorVar.darkBg,
       borderRadius: 5
-    },
-    '.btn-transparent, .btn-transparent:not(.disabled):focus, .btn-transparent:not(.disabled):hover': {
-      background: 'transparent',
-      boxShadow: 'none',
-      backgroundColor: 'transparent'
     }
   }
 })

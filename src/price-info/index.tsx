@@ -1,6 +1,5 @@
 import { customElements, Module, Control, ControlElement, Panel, Image, Label, Icon, HStack, Container } from '@ijstech/components';
 import './priceInfo.css';
-import Assets from '../assets';
 
 declare global {
   namespace JSX {

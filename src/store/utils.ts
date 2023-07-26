@@ -1,7 +1,7 @@
 import { application } from '@ijstech/components';
 import { INetwork, Wallet } from '@ijstech/eth-wallet';
 import { ITokenObject } from '@scom/scom-token-list';
-import { EventId, IProvider, TokenMapType, IExtendedNetwork } from '../global/index';
+import { IProvider } from '../global/index';
 import { ChainNativeTokenByChainId } from '@scom/scom-token-list';
 import getNetworkList from '@scom/scom-network-list'
 import { IDexInfo } from '@scom/scom-dex-list';
@@ -11,8 +11,6 @@ export enum WalletPlugin {
   WalletConnect = 'walletconnect',
 }
 
-const TOKENS = "oswap_user_tokens_";
-
 export type ProxyAddresses = { [key: number]: string };
 
 export const state = {
@@ -20,9 +18,8 @@ export const state = {
   isExpertMode: false,
   slippageTolerance: 0.5,
   transactionDeadline: 30,
-  userTokens: {} as { [key: string]: ITokenObject[] },
   infuraId: "",
-  networkMap: {} as { [key: number]: IExtendedNetwork },
+  networkMap: {} as { [key: number]: INetwork },
   dexInfoList: [] as IDexInfo[],
   providerList: [] as IProvider[],
   proxyAddresses: {} as ProxyAddresses,
@@ -127,7 +124,7 @@ export const getInfuraId = () => {
   return state.infuraId;
 }
 
-const setNetworkList = (networkList: IExtendedNetwork[], infuraId?: string) => {
+const setNetworkList = (networkList: INetwork[], infuraId?: string) => {
   const wallet = Wallet.getClientInstance();
   state.networkMap = {};
   const defaultNetworkList = getNetworkList();
@@ -160,80 +157,6 @@ export const getNetworkInfo = (chainId: number) => {
   return networkMap[chainId];
 }
 
-export const getUserTokens: (chainId: number) => any[] | null = (chainId: number) => {
-  let tokens = localStorage[TOKENS + chainId];
-  if (tokens) {
-    tokens = JSON.parse(tokens);
-  } else {
-    tokens = [];
-  }
-  const userTokens = state.userTokens[chainId];
-  if (userTokens && userTokens.length) {
-    tokens = tokens.concat(userTokens);
-  }
-  return tokens.length ? tokens : null;
-}
-
-export const addUserTokens = (token: ITokenObject) => {
-  const chainId = getChainId();
-  let tokens = localStorage[TOKENS + chainId];
-  let i = -1;
-  if (tokens) {
-    tokens = JSON.parse(tokens);
-    i = tokens.findIndex((item: ITokenObject) => item.address == token.address);
-  } else {
-    tokens = [];
-  }
-  if (i == -1) {
-    tokens.push(token);
-  }
-  localStorage[TOKENS + chainId] = JSON.stringify(tokens);
-}
-
-interface NetworkConditions {
-  isDisabled?: boolean,
-  isTestnet?: boolean,
-  isMainChain?: boolean
-}
-
-function matchFilter<O extends { [keys: string]: any }>(list: O[], filter: Partial<O>): O[] {
-  let filters = Object.keys(filter);
-  return list.filter(item => filters.every(f => {
-    switch (typeof filter[f]) {
-      case 'boolean':
-        if (filter[f] === false) {
-          return item[f] === undefined || item[f] === null;
-        }
-      // also case for filter[f] === true 
-      case 'string':
-      case 'number':
-        return filter[f] === item[f];
-      case 'object': // have not implemented yet
-      default:
-        console.log(`matchFilter do not support ${typeof filter[f]} yet!`)
-        return false;
-    }
-  }));
-}
-
-export const getMatchNetworks = (conditions: NetworkConditions): IExtendedNetwork[] => {
-  let networkFullList = Object.values(state.networkMap);
-  let out = matchFilter(networkFullList, conditions);
-  return out;
-}
-
-export const setUserTokens = (token: ITokenObject, chainId: number) => {
-  if (!state.userTokens[chainId]) {
-    state.userTokens[chainId] = [token];
-  } else {
-    state.userTokens[chainId].push(token);
-  }
-}
-
-export const hasUserToken = (address: string, chainId: number) => {
-  return state.userTokens[chainId]?.some((token: ITokenObject) => token.address?.toLocaleLowerCase() === address?.toLocaleLowerCase());
-}
-
 export const setDexInfoList = (value: IDexInfo[]) => {
   state.dexInfoList = value;
 }
@@ -255,27 +178,7 @@ export const getProviderByKey = (providerKey: string) => {
   return providers.find(item => item.key === providerKey) || null;
 }
 
-export const viewOnExplorerByTxHash = (chainId: number, txHash: string) => {
-  let network = getNetworkInfo(chainId);
-  if (network && network.explorerTxUrl) {
-    let url = `${network.explorerTxUrl}${txHash}`;
-    window.open(url);
-  }
-}
-
-export const viewOnExplorerByAddress = (chainId: number, address: string) => {
-  let network = getNetworkInfo(chainId);
-  if (network && network.explorerAddressUrl) {
-    let url = `${network.explorerAddressUrl}${address}`;
-    window.open(url);
-  }
-}
-
 // wallet
-export function getWalletProvider() {
-  return localStorage.getItem('walletProvider') || '';
-}
-
 export function isClientWalletConnected() {
   const wallet = Wallet.getClientInstance();
   return wallet.isConnected;
@@ -289,11 +192,6 @@ export function isRpcWalletConnected() {
 export const hasMetaMask = function () {
   const wallet = Wallet.getClientInstance();
   return wallet?.clientSideProvider?.name === WalletPlugin.MetaMask;
-}
-
-export const truncateAddress = (address: string) => {
-  if (address === undefined || address === null) return '';
-  return address.substr(0, 6) + '...' + address.substr(-4);
 }
 
 export function getChainId() {

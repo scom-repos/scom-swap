@@ -928,17 +928,6 @@ const executeSwap: (swapData: SwapData) => Promise<{
   return { receipt, error: null };
 };
 
-//For testing only
-const setERC20AllowanceToZero = async (token: ITokenObject, spenderAddress: string) => {
-  let wallet: any = Wallet.getClientInstance();
-  let erc20 = new Contracts.ERC20(wallet, token.address);
-  let receipt = await erc20.approve({
-    spender: spenderAddress,
-    amount: 0
-  });
-  return receipt;
-}
-
 var approvalModel: ERC20ApprovalModel;
 
 const getApprovalModelAction = async (options: IERC20ApprovalEventOptions) => {
@@ -963,9 +952,6 @@ export {
   executeSwap,
   getChainNativeToken,
   getRouterAddress,
-  setERC20AllowanceToZero,
   getApprovalModelAction,
   setApprovalModalSpenderAddress
 }
-
-export * from './helper';
