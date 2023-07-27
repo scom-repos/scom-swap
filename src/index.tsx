@@ -27,7 +27,8 @@ import {
   getApprovalModelAction,
   setApprovalModalSpenderAddress,
   getCommissionAmount,
-  getCurrentCommissions
+  getCurrentCommissions,
+  getProviderProxySelectors
 } from './swap-utils/index'
 import { ITokenObject } from '@scom/scom-token-list';
 import {
@@ -390,6 +391,22 @@ export default class ScomSwap extends Module {
   getConfigurators() {
     let self = this;
     return [
+      {
+        name: 'Project Owner Configurator',
+        target: 'Project Owners',
+        getProxySelectors: async () => {
+          const selectors = await getProviderProxySelectors(this._data.providers);
+          return selectors;
+        },
+        getActions: this.getActions.bind(this),
+        getData: this.getData.bind(this),
+        setData: async (value: any) => {
+          const defaultData = configData.defaultBuilderData;
+          this.setData({ ...defaultData, ...value });
+        },
+        getTag: this.getTag.bind(this),
+        setTag: this.setTag.bind(this)
+      },
       {
         name: 'Builder Configurator',
         target: 'Builders',

@@ -1,7 +1,7 @@
 import { Wallet, BigNumber, Utils, Erc20, TransactionReceipt } from "@ijstech/eth-wallet";
 import { Contracts } from "../contracts/oswap-openswap-contract/index";
 import { Contracts as ProxyContracts } from '../contracts/scom-commission-proxy-contract/index';
-import { executeRouterSwap, getDexPairReserves, getRouterSwapTxData, IExecuteSwapOptions } from '@scom/scom-dex-list';
+import { executeRouterSwap, getDexPairReserves, getRouterSwapTxData, IExecuteSwapOptions, getSwapProxySelectors } from '@scom/scom-dex-list';
 import { ITokenObject } from '@scom/scom-token-list';
 import {
   getAPI,
@@ -9,6 +9,7 @@ import {
   ERC20ApprovalModel,
   QueueType,
   ICommissionInfo,
+  IProviderUI,
 } from "../global/index";
 
 import {
@@ -198,6 +199,21 @@ async function getBestAmountOutRouteFromAPI(wallet: any, tokenIn: ITokenObject, 
   if (!routeObjArr) return [];
   let bestRouteObjArr = [];
   return bestRouteObjArr;
+}
+
+const getProviderProxySelectors = async (providers: IProviderUI[]) => {
+  const wallet = getRpcWallet();
+  await wallet.init();
+  const dexInfoList = getDexInfoList();
+  let selectorsSet: Set<string> = new Set();
+  for (let provider of providers) {
+    const dex = dexInfoList.find(v => v.chainId == provider.chainId && v.dexCode == provider.key);
+    if (dex) {
+      const selectors = await getSwapProxySelectors(wallet, dex);
+      selectors.forEach(v => selectorsSet.add(v));
+    }
+  }
+  return Array.from(selectorsSet);
 }
 
 const getAllAvailableRoutes = async (markets: string[], tokenList: ITokenObject[], tokenIn: ITokenObject, tokenOut: ITokenObject) => {
@@ -953,5 +969,6 @@ export {
   getChainNativeToken,
   getRouterAddress,
   getApprovalModelAction,
-  setApprovalModalSpenderAddress
+  setApprovalModalSpenderAddress,
+  getProviderProxySelectors
 }

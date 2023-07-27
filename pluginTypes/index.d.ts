@@ -9673,7 +9673,7 @@ declare module "@scom/scom-swap/global/utils/swapInterface.ts" {
         caption: string;
         image: string;
         key: string;
-        chainId: string | number;
+        chainId: number;
     }
     export interface ICommissionInfo {
         chainId: number;
@@ -10332,7 +10332,7 @@ declare module "@scom/scom-swap/contracts/scom-commission-proxy-contract/index.t
 declare module "@scom/scom-swap/swap-utils/index.ts" {
     import { BigNumber, TransactionReceipt } from "@ijstech/eth-wallet";
     import { ITokenObject } from '@scom/scom-token-list';
-    import { IERC20ApprovalEventOptions, QueueType, ICommissionInfo } from "@scom/scom-swap/global/index.ts";
+    import { IERC20ApprovalEventOptions, QueueType, ICommissionInfo, IProviderUI } from "@scom/scom-swap/global/index.ts";
     interface TradeFee {
         fee: string;
         base: string;
@@ -10343,6 +10343,7 @@ declare module "@scom/scom-swap/swap-utils/index.ts" {
     const getChainNativeToken: () => ITokenObject;
     function getRouterAddress(key: string): string;
     function getTradeFeeMap(): TradeFeeMap;
+    const getProviderProxySelectors: (providers: IProviderUI[]) => Promise<string[]>;
     function getExtendedRouteObjData(wallet: any, bestRouteObj: any, tradeFeeMap: TradeFeeMap, swapPrice: BigNumber, isHybridOrQueue: boolean): Promise<any>;
     function getAllRoutesData(firstTokenObject: ITokenObject, secondTokenObject: ITokenObject, firstInput: BigNumber, secondInput: BigNumber, isFromEstimated: boolean, useAPI: boolean, commissions: ICommissionInfo[]): Promise<any[]>;
     export const getCurrentCommissions: (commissions: ICommissionInfo[]) => ICommissionInfo[];
@@ -10365,7 +10366,7 @@ declare module "@scom/scom-swap/swap-utils/index.ts" {
     }>;
     const getApprovalModelAction: (options: IERC20ApprovalEventOptions) => Promise<import("@scom/scom-swap/global/index.ts").IERC20ApprovalAction>;
     const setApprovalModalSpenderAddress: (market: string, contractAddress?: string) => void;
-    export { getExtendedRouteObjData, getTradeFeeMap, getAllRoutesData, SwapData, executeSwap, getChainNativeToken, getRouterAddress, getApprovalModelAction, setApprovalModalSpenderAddress };
+    export { getExtendedRouteObjData, getTradeFeeMap, getAllRoutesData, SwapData, executeSwap, getChainNativeToken, getRouterAddress, getApprovalModelAction, setApprovalModalSpenderAddress, getProviderProxySelectors };
 }
 /// <amd-module name="@scom/scom-swap/price-info/priceInfo.css.ts" />
 declare module "@scom/scom-swap/price-info/priceInfo.css.ts" { }
@@ -10508,7 +10509,6 @@ declare module "@scom/scom-swap/formSchema.json.ts" {
                                 };
                                 address: {
                                     type: string;
-                                    required: boolean;
                                 };
                             };
                         };
@@ -10750,11 +10750,24 @@ declare module "@scom/scom-swap" {
         getConfigurators(): ({
             name: string;
             target: string;
+            getProxySelectors: () => Promise<string[]>;
             getActions: any;
             getData: any;
             setData: (value: any) => Promise<void>;
             getTag: any;
             setTag: any;
+            elementName?: undefined;
+            getLinkParams?: undefined;
+            bindOnChanged?: undefined;
+        } | {
+            name: string;
+            target: string;
+            getActions: any;
+            getData: any;
+            setData: (value: any) => Promise<void>;
+            getTag: any;
+            setTag: any;
+            getProxySelectors?: undefined;
             elementName?: undefined;
             getLinkParams?: undefined;
             bindOnChanged?: undefined;
@@ -10782,6 +10795,7 @@ declare module "@scom/scom-swap" {
             setData: (properties: ISwapConfigUI, linkParams?: Record<string, any>) => Promise<void>;
             getTag: any;
             setTag: any;
+            getProxySelectors?: undefined;
             getActions?: undefined;
         })[];
         private getData;

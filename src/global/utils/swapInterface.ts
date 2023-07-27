@@ -29,7 +29,7 @@ export interface IProviderUI {
   caption: string;
   image: string;
   key: string;
-  chainId: string | number;
+  chainId: number;
 }
 
 export interface ICommissionInfo {

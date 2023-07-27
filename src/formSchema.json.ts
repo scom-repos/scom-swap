@@ -45,8 +45,7 @@ export default {
                                 required: true
                             },
                             address: {
-                                type: "string",
-                                required: true
+                                type: "string"
                             }
                         }
                     }

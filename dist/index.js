@@ -14499,7 +14499,7 @@ define("@scom/scom-swap/contracts/scom-commission-proxy-contract/index.ts", ["re
 define("@scom/scom-swap/swap-utils/index.ts", ["require", "exports", "@ijstech/eth-wallet", "@scom/scom-swap/contracts/oswap-openswap-contract/index.ts", "@scom/scom-swap/contracts/scom-commission-proxy-contract/index.ts", "@scom/scom-dex-list", "@scom/scom-swap/global/index.ts", "@scom/scom-swap/store/index.ts", "@scom/scom-token-list"], function (require, exports, eth_wallet_5, index_5, index_6, scom_dex_list_1, index_7, index_8, scom_token_list_3) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.setApprovalModalSpenderAddress = exports.getApprovalModelAction = exports.getRouterAddress = exports.getChainNativeToken = exports.executeSwap = exports.getAllRoutesData = exports.getTradeFeeMap = exports.getExtendedRouteObjData = exports.getCommissionAmount = exports.getCurrentCommissions = void 0;
+    exports.getProviderProxySelectors = exports.setApprovalModalSpenderAddress = exports.getApprovalModelAction = exports.getRouterAddress = exports.getChainNativeToken = exports.executeSwap = exports.getAllRoutesData = exports.getTradeFeeMap = exports.getExtendedRouteObjData = exports.getCommissionAmount = exports.getCurrentCommissions = void 0;
     const routeAPI = 'https://route.openswap.xyz/trading/v1/route';
     const newRouteAPI = 'https://indexer.ijs.dev/trading/v1/route';
     const getChainNativeToken = () => {
@@ -14655,6 +14655,21 @@ define("@scom/scom-swap/swap-utils/index.ts", ["require", "exports", "@ijstech/e
         let bestRouteObjArr = [];
         return bestRouteObjArr;
     }
+    const getProviderProxySelectors = async (providers) => {
+        const wallet = (0, index_8.getRpcWallet)();
+        await wallet.init();
+        const dexInfoList = (0, index_8.getDexInfoList)();
+        let selectorsSet = new Set();
+        for (let provider of providers) {
+            const dex = dexInfoList.find(v => v.chainId == provider.chainId && v.dexCode == provider.key);
+            if (dex) {
+                const selectors = await (0, scom_dex_list_1.getSwapProxySelectors)(wallet, dex);
+                selectors.forEach(v => selectorsSet.add(v));
+            }
+        }
+        return Array.from(selectorsSet);
+    };
+    exports.getProviderProxySelectors = getProviderProxySelectors;
     const getAllAvailableRoutes = async (markets, tokenList, tokenIn, tokenOut) => {
         const wallet = (0, index_8.getRpcWallet)();
         let getPairPromises = [];
@@ -15721,8 +15736,7 @@ define("@scom/scom-swap/formSchema.json.ts", ["require", "exports"], function (r
                                     required: true
                                 },
                                 address: {
-                                    type: "string",
-                                    required: true
+                                    type: "string"
                                 }
                             }
                         }
@@ -16134,6 +16148,22 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
         getConfigurators() {
             let self = this;
             return [
+                {
+                    name: 'Project Owner Configurator',
+                    target: 'Project Owners',
+                    getProxySelectors: async () => {
+                        const selectors = await (0, index_11.getProviderProxySelectors)(this._data.providers);
+                        return selectors;
+                    },
+                    getActions: this.getActions.bind(this),
+                    getData: this.getData.bind(this),
+                    setData: async (value) => {
+                        const defaultData = data_json_1.default.defaultBuilderData;
+                        this.setData(Object.assign(Object.assign({}, defaultData), value));
+                    },
+                    getTag: this.getTag.bind(this),
+                    setTag: this.setTag.bind(this)
+                },
                 {
                     name: 'Builder Configurator',
                     target: 'Builders',
