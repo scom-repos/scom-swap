@@ -9,11 +9,4 @@ export const enum EventId {
   ShowExpertModal = 'ShowExpertModal'
 }
 
-export enum QueueType {
-  PRIORITY_QUEUE,
-  RANGE_QUEUE,
-  GROUP_QUEUE,
-  PEGGED_QUEUE
-}
-
 export * from './utils/index';

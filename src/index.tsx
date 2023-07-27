@@ -2,22 +2,9 @@ import { Module, Panel, Button, Label, VStack, Image, Container, IEventBus, appl
 import { BigNumber, Constants, IEventBusRegistry, INetwork, Wallet } from '@ijstech/eth-wallet';
 import './index.css';
 import {
-  getChainId,
-  isExpertMode,
-  getSlippageTolerance,
-  isRpcWalletConnected,
   isClientWalletConnected,
-  setDataFromConfig,
-  setProviderList,
-  getProviderByKey,
-  getNetworkInfo,
-  getEmbedderCommissionFee,
-  getProxyAddress,
   getSupportedTokens,
-  setDexInfoList,
-  initRpcWallet,
-  getRpcWallet,
-  getIPFSGatewayUrl,
+  State,
 } from "./store/index";
 import { tokenStore, DefaultERC20Tokens, ChainNativeTokenByChainId, assets as tokenAssets } from '@scom/scom-token-list';
 
@@ -89,6 +76,7 @@ declare const window: any;
 @customModule
 @customElements('i-scom-swap')
 export default class ScomSwap extends Module {
+  private state: State;
   private _data: ISwapConfigUI = {
     category: 'fixed-pair',
     providers: [],
@@ -175,13 +163,17 @@ export default class ScomSwap extends Module {
     return self;
   }
 
-  onHide() {
-    this.dappContainer.onHide();
-    const rpcWallet = getRpcWallet();
+  removeRpcWalletEvents() {
+    const rpcWallet = this.state.getRpcWallet();
     for (let event of this.rpcWalletEvents) {
       rpcWallet.unregisterWalletEvent(event);
     }
     this.rpcWalletEvents = [];
+  }
+
+  onHide() {
+    this.dappContainer.onHide();
+    this.removeRpcWalletEvents();
     for (let event of this.clientEvents) {
       event.unregister();
     }
@@ -285,7 +277,7 @@ export default class ScomSwap extends Module {
             const vstack = new VStack();
             const config = new ScomCommissionFeeSetup(null, {
               commissions: self._data.commissions || [],
-              fee: getEmbedderCommissionFee(),
+              fee: self.state.embedderCommissionFee,
               networks: self._data.networks
             });
             const hstack = new HStack(null, {
@@ -343,6 +335,8 @@ export default class ScomSwap extends Module {
                   }
                 }
               }
+              await this.resetRpcWallet();
+              this.updateContractAddress();
               this.refreshUI();
               if (builder?.setData) builder.setData(this._data);
             },
@@ -395,7 +389,7 @@ export default class ScomSwap extends Module {
         name: 'Project Owner Configurator',
         target: 'Project Owners',
         getProxySelectors: async () => {
-          const selectors = await getProviderProxySelectors(this._data.providers);
+          const selectors = await getProviderProxySelectors(this.state, this._data.providers);
           return selectors;
         },
         getActions: this.getActions.bind(this),
@@ -456,7 +450,7 @@ export default class ScomSwap extends Module {
           }
         },
         getData: () => {
-          const fee = getEmbedderCommissionFee();
+          const fee = this.state.embedderCommissionFee;
           return { ...this._data, fee }
         },
         setData: async (properties: ISwapConfigUI, linkParams?: Record<string, any>) => {
@@ -481,17 +475,16 @@ export default class ScomSwap extends Module {
     return this._data;
   }
 
-  private async setData(value: ISwapConfigUI) {
-    this._data = value;
-    const rpcWalletId = await initRpcWallet(this.defaultChainId);
-    const rpcWallet = getRpcWallet();
+  private async resetRpcWallet() {
+    this.removeRpcWalletEvents();
+    const rpcWalletId = await this.state.initRpcWallet(this.defaultChainId);
+    const rpcWallet = this.state.getRpcWallet();
     const event = rpcWallet.registerWalletEvent(this, Constants.RpcWalletEvent.Connected, async (connected: boolean) => {
       if (this.swapBtn) this.swapBtn.visible = true;
       this.updateContractAddress();
       if (this.originalData?.providers?.length) await this.initializeWidgetConfig();
     });
     this.rpcWalletEvents.push(event);
-    this.updateContractAddress();
     if (rpcWallet.instanceId) {
       if (this.firstTokenInput) this.firstTokenInput.rpcWalletId = rpcWallet.instanceId;
       if (this.secondTokenInput) this.secondTokenInput.rpcWalletId = rpcWallet.instanceId;
@@ -503,7 +496,13 @@ export default class ScomSwap extends Module {
       showHeader: this.showHeader,
       rpcWalletId: rpcWallet.instanceId
     }
-    if (this.dappContainer?.setData) this.dappContainer.setData(data)
+    if (this.dappContainer?.setData) this.dappContainer.setData(data);
+  }
+
+  private async setData(value: ISwapConfigUI) {
+    this._data = value;
+    await this.resetRpcWallet();
+    this.updateContractAddress();
     await this.refreshUI();
   }
 
@@ -552,16 +551,16 @@ export default class ScomSwap extends Module {
   private setProviders() {
     const providers = this.originalData?.providers || [];
     if (this.isFixedPair) {
-      setProviderList([providers[0]]);
+      this.state.setProviderList([providers[0]]);
     } else {
-      setProviderList(providers);
+      this.state.setProviderList(providers);
     }
   }
 
   private updateContractAddress() {
     if (this.approvalModelAction) {
-      if (getCurrentCommissions(this.commissions).length) {
-        this.contractAddress = getProxyAddress();
+      if (getCurrentCommissions(this.state, this.commissions).length) {
+        this.contractAddress = this.state.getProxyAddress();
       } else {
         this.contractAddress = '';
       }
@@ -610,7 +609,7 @@ export default class ScomSwap extends Module {
 
   private async refreshUI() {
     const dexList = getDexList();
-    setDexInfoList(dexList);
+    this.state.setDexInfoList(dexList);
     this.setProviders();
     await this.initData();
     await this.initializeWidgetConfig();
@@ -618,7 +617,7 @@ export default class ScomSwap extends Module {
 
   constructor(parent?: Container, options?: any) {
     super(parent, options);
-    setDataFromConfig(configData);
+    this.state = new State(configData);
     this.fromInputValue = new BigNumber(0);
     this.toInputValue = new BigNumber(0);
     this.swapButtonStatusMap = {};
@@ -636,7 +635,7 @@ export default class ScomSwap extends Module {
   }
 
   private onChainChange = async () => {
-    const currentChainId = getChainId();
+    const currentChainId = this.state.getChainId();
     if (currentChainId != null && currentChainId != undefined)
       this.swapBtn.visible = true;
     // this.availableMarkets = getAvailableMarkets() || [];
@@ -662,7 +661,7 @@ export default class ScomSwap extends Module {
   }
   get isPriceImpactTooHigh(): boolean {
     const warningMessageText = this.getWarningMessageText();
-    return this.record?.priceImpact > 15 && !isExpertMode() && warningMessageText === priceImpactTooHighMsg
+    return this.record?.priceImpact > 15 && !this.state.isExpertMode && warningMessageText === priceImpactTooHighMsg
   }
   get isInsufficientBalance(): boolean {
     if (!this.fromToken || !this.record) return false;
@@ -671,7 +670,7 @@ export default class ScomSwap extends Module {
   }
   get maxSold() {
     if (!this.fromToken || !this.record) return new BigNumber(0)
-    const commissionAmount = getCommissionAmount(this.commissions, new BigNumber(this.record.fromAmount));
+    const commissionAmount = getCommissionAmount(this.state, this.commissions, new BigNumber(this.record.fromAmount));
     const amountWithCommission = this.record.fromAmount.plus(commissionAmount);
     if (!this.isFrom) return new BigNumber(amountWithCommission);
     return new BigNumber(this.getMinReceivedMaxSold() || amountWithCommission);
@@ -695,7 +694,7 @@ export default class ScomSwap extends Module {
   }
 
   private redirectToken = () => {
-    const currentChainId = getChainId();
+    const currentChainId = this.state.getChainId();
     let queryRouter: any = {
       chainId: currentChainId,
       fromToken: this.fromToken?.symbol || this.fromTokenSymbol,
@@ -736,7 +735,7 @@ export default class ScomSwap extends Module {
   }
 
   private initializeDefaultTokenPair() {
-    const currentChainId = getChainId();
+    const currentChainId = this.state.getChainId();
     let currentChainTokens = this._data.tokens.filter((token) => token.chainId === currentChainId);
     if (currentChainTokens.length < 2) return;
     const providers = this.originalData?.providers;
@@ -759,7 +758,7 @@ export default class ScomSwap extends Module {
   private initWallet = async () => {
     try {
       await Wallet.getClientInstance().init();
-      const rpcWallet = getRpcWallet();
+      const rpcWallet = this.state.getRpcWallet();
       await rpcWallet.init();
     } catch (err) {
       console.log(err);
@@ -768,7 +767,7 @@ export default class ScomSwap extends Module {
 
   private initializeWidgetConfig = async (_chainId?: number) => {
     setTimeout(async () => {
-      const currentChainId = getChainId();
+      const currentChainId = this.state.getChainId();
       tokenStore.updateTokenMapData(currentChainId);
       this.closeNetworkErrModal();
       this.initializeDefaultTokenPair();
@@ -777,7 +776,7 @@ export default class ScomSwap extends Module {
       this.secondTokenInput.tokenReadOnly = this.isFixedPair;
       this.pnlBranding.visible = !!this._data.logo || !!this._data.title;
       if (this._data.logo?.startsWith('ipfs://')) {
-        const ipfsGatewayUrl = getIPFSGatewayUrl();
+        const ipfsGatewayUrl = this.state.ipfsGatewayUrl;
         this.imgLogo.url = this._data.logo.replace('ipfs://', ipfsGatewayUrl);
       }
       else {
@@ -870,14 +869,14 @@ export default class ScomSwap extends Module {
   }
 
   private totalAmount = () => {
-    const commissionAmount = getCommissionAmount(this.commissions, this.fromInputValue);
+    const commissionAmount = getCommissionAmount(this.state, this.commissions, this.fromInputValue);
     return this.fromInputValue.plus(commissionAmount);
   }
 
   private handleSwapPopup() {
     if (!this.record) return;
-    const currentChainId = getChainId();
-    const slippageTolerance = getSlippageTolerance();
+    const currentChainId = this.state.getChainId();
+    const slippageTolerance = this.state.slippageTolerance;
     this.fromTokenImage.url = tokenAssets.tokenPath(this.fromToken, currentChainId);
     this.fromTokenLabel.caption = this.fromToken?.symbol ?? '';
     this.fromTokenValue.caption = formatNumber(this.totalAmount(), 4);
@@ -901,12 +900,12 @@ export default class ScomSwap extends Module {
     this.approvalModelAction.doPayAction(this.record);
   }
   private getMinReceivedMaxSold = (): number | null => {
-    const slippageTolerance = getSlippageTolerance();
+    const slippageTolerance = this.state.slippageTolerance;
     if (!slippageTolerance) return null;
     if (this.isFrom) {
       const poolAmount = new BigNumber(this.record?.amountIn);
       if (poolAmount.isZero()) return null;
-      const commissionAmount = getCommissionAmount(this.commissions, poolAmount);
+      const commissionAmount = getCommissionAmount(this.state, this.commissions, poolAmount);
       const minReceivedMaxSold = poolAmount.plus(commissionAmount).times(1 + slippageTolerance / 100).toNumber();
       return minReceivedMaxSold;
     } else {
@@ -958,8 +957,8 @@ export default class ScomSwap extends Module {
     if (!token) return
     this.firstTokenInput.enabled = false;
     this.secondTokenInput.enabled = false;
-    if (token.isNew && isRpcWalletConnected()) {
-      const rpcWallet = getRpcWallet();
+    if (token.isNew && this.state.isRpcWalletConnected()) {
+      const rpcWallet = this.state.getRpcWallet();
       await tokenStore.updateAllTokenBalances(rpcWallet);
       this.allTokenBalancesMap = tokenStore.tokenBalances;
     }
@@ -973,13 +972,13 @@ export default class ScomSwap extends Module {
   private setApprovalSpenderAddress() {
     const item = this.record;
     if (!item) return;
-    const market = getProviderByKey(item.provider)?.key || '';
+    const market = this.state.getProviderByKey(item.provider)?.key || '';
     if (this.approvalModelAction) {
-      if (getCurrentCommissions(this.commissions).length) {
-        this.contractAddress = getProxyAddress();
-        setApprovalModalSpenderAddress(market, this.contractAddress);
+      if (getCurrentCommissions(this.state, this.commissions).length) {
+        this.contractAddress = this.state.getProxyAddress();
+        setApprovalModalSpenderAddress(this.state, market, this.contractAddress);
       } else {
-        setApprovalModalSpenderAddress(market);
+        setApprovalModalSpenderAddress(this.state, market);
       }
     }
   }
@@ -1092,7 +1091,7 @@ export default class ScomSwap extends Module {
     let listRouting: any[] = [];
     const useAPI = this._data.category === 'aggregator';
     this.updateContractAddress();
-    listRouting = await getAllRoutesData(this.fromToken, this.toToken, this.fromInputValue, this.toInputValue, this.isFrom, useAPI, this.commissions);
+    listRouting = await getAllRoutesData(this.state, this.fromToken, this.toToken, this.fromInputValue, this.toInputValue, this.isFrom, useAPI, this.commissions);
     listRouting = listRouting.map((v: any) => {
       // const config = ProviderConfigMap[v.provider];
       return {
@@ -1131,8 +1130,8 @@ export default class ScomSwap extends Module {
     }
     if (this.record) {
       this.setApprovalSpenderAddress();
-      const commissionFee = getEmbedderCommissionFee();
-      const commissionAmount = getCommissionAmount(this.commissions, this.record.fromAmount);
+      const commissionFee = this.state.embedderCommissionFee;
+      const commissionAmount = getCommissionAmount(this.state, this.commissions, this.record.fromAmount);
       const total = this.record?.fromAmount ? new BigNumber(this.record.fromAmount).plus(commissionAmount) : new BigNumber(0);
       this.lbYouPayTitle.caption = commissionAmount.gt(0) ? `You Pay (incl. ${new BigNumber(commissionFee).times(100)}% fee)` : `You Pay`;
       this.lbYouPayValue.caption = `${formatNumber(total)} ${this.fromToken?.symbol}`;
@@ -1218,8 +1217,8 @@ export default class ScomSwap extends Module {
     const priceImpact = this.getPriceImpact();
     const minimumReceived = this.getMinimumReceived();
     const tradeFeeExactAmount = this.getTradeFeeExactAmount();
-    const commissionFee = getEmbedderCommissionFee();
-    const commissionAmount = this.record ? getCommissionAmount(this.commissions, new BigNumber(this.record.fromAmount || 0)) : new BigNumber(0);
+    const commissionFee = this.state.embedderCommissionFee;
+    const commissionAmount = this.record ? getCommissionAmount(this.state, this.commissions, new BigNumber(this.record.fromAmount || 0)) : new BigNumber(0);
 
     const fees = this.getFeeDetails();
     const countFees = fees.length;
@@ -1260,7 +1259,7 @@ export default class ScomSwap extends Module {
       {
         title: "Commission Fee",
         value: this.isValidToken ? `${new BigNumber(commissionFee).times(100)}% (${formatNumber(commissionAmount)} ${this.fromToken?.symbol})` : '-',
-        isHidden: !getCurrentCommissions(this.commissions).length
+        isHidden: !getCurrentCommissions(this.state, this.commissions).length
       }
     ];
     return info.filter((f: any) => !f.isHidden);
@@ -1288,7 +1287,7 @@ export default class ScomSwap extends Module {
     return 0;
   }
   private async updateBalance() {
-    const rpcWallet = getRpcWallet();
+    const rpcWallet = this.state.getRpcWallet();
     if (rpcWallet.address) {
       if (this.hasData) await tokenStore.updateAllTokenBalances(rpcWallet);
       this.allTokenBalancesMap = tokenStore.tokenBalances;
@@ -1319,7 +1318,7 @@ export default class ScomSwap extends Module {
     if (!isClientWalletConnected()) {
       return "Connect Wallet";
     }
-    if (!isRpcWalletConnected()) {
+    if (!this.state.isRpcWalletConnected()) {
       return "Switch Network";
     }
     if (isApproveButtonShown) {
@@ -1359,7 +1358,7 @@ export default class ScomSwap extends Module {
     if (this.maxSold.gt(balance)) {
       return `Insufficient ${this.fromToken?.symbol} balance`;
     }
-    if (this.record.priceImpact > 15 && !isExpertMode()) {
+    if (this.record.priceImpact > 15 && !this.state.isExpertMode) {
       return priceImpactTooHighMsg;
     }
     return '';
@@ -1401,7 +1400,7 @@ export default class ScomSwap extends Module {
   }
   private isSwapButtonDisabled() {
     const warningMessageText = this.getWarningMessageText();
-    return (isRpcWalletConnected() && (warningMessageText != '' && !this.isPriceImpactTooHigh));
+    return (this.state.isRpcWalletConnected() && (warningMessageText != '' && !this.isPriceImpactTooHigh));
   }
 
   private async onClickSwapButton() {
@@ -1415,8 +1414,8 @@ export default class ScomSwap extends Module {
       }
       return;
     }
-    else if (!isRpcWalletConnected()) {
-      const chainId = getChainId();
+    else if (!this.state.isRpcWalletConnected()) {
+      const chainId = this.state.getChainId();
       const clientWallet = Wallet.getClientInstance();
       await clientWallet.switchNetwork(chainId);
       return;
@@ -1452,7 +1451,7 @@ export default class ScomSwap extends Module {
         commissions: this.commissions
       }
 
-      const { error } = await executeSwap(swapData);
+      const { error } = await executeSwap(this.state, swapData);
       if (error) {
         this.showResultMessage('error', error as any);
       }
@@ -1474,7 +1473,7 @@ export default class ScomSwap extends Module {
     if (!address) {
       inputVal = new BigNumber(0);
     } else {
-      const commissionAmount = getCommissionAmount(this.commissions, new BigNumber(balance));
+      const commissionAmount = getCommissionAmount(this.state, this.commissions, new BigNumber(balance));
       if (commissionAmount.gt(0)) {
         const totalFee = new BigNumber(balance).plus(commissionAmount).dividedBy(balance);
         inputVal = inputVal.dividedBy(totalFee);
@@ -1567,7 +1566,7 @@ export default class ScomSwap extends Module {
   }
 
   private initExpertModal() {
-    this.expertModal = new ExpertModeSettings();
+    this.expertModal = new ExpertModeSettings(this.state);
     this.swapComponent.appendChild(this.expertModal);
     this.$eventBus.register(this, EventId.ShowExpertModal, () => {
       this.expertModal.showModal();

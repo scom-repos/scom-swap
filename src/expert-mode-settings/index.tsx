@@ -1,6 +1,6 @@
 import { customElements, customModule, Module, Container, ControlElement, Modal, application, IEventBus } from '@ijstech/components';
+import { State } from '../store/index';
 import { EventId } from '../global/index';
-import { toggleExpertMode } from '../store/index'
 import styleClass from './index.css';
 
 declare global {
@@ -16,9 +16,11 @@ declare global {
 export class ExpertModeSettings extends Module {
   private expertModal: Modal;
   private $eventBus: IEventBus;
+  private state: State;
 
-	constructor(parent?: Container, options?: any) {
+	constructor(state: State, parent?: Container, options?: any) {
 		super(parent, options);
+    this.state = state;
     this.$eventBus = application.EventBus;
 	};
 
@@ -36,7 +38,7 @@ export class ExpertModeSettings extends Module {
   }
 
   onToggle() {
-    toggleExpertMode();
+    this.state.toggleExpertMode();
     this.closeModal();
     this.$eventBus.dispatch(EventId.ExpertModeChanged)
   }

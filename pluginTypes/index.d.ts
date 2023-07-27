@@ -9716,12 +9716,6 @@ declare module "@scom/scom-swap/global/index.ts" {
         ExpertModeChanged = "ExpertModeChanged",
         ShowExpertModal = "ShowExpertModal"
     }
-    export enum QueueType {
-        PRIORITY_QUEUE = 0,
-        RANGE_QUEUE = 1,
-        GROUP_QUEUE = 2,
-        PEGGED_QUEUE = 3
-    }
     export * from "@scom/scom-swap/global/utils/index.ts";
 }
 /// <amd-module name="@scom/scom-swap/store/utils.ts" />
@@ -9737,8 +9731,7 @@ declare module "@scom/scom-swap/store/utils.ts" {
     export type ProxyAddresses = {
         [key: number]: string;
     };
-    export const state: {
-        currentChainId: number;
+    export class State {
         isExpertMode: boolean;
         slippageTolerance: number;
         transactionDeadline: number;
@@ -9752,39 +9745,24 @@ declare module "@scom/scom-swap/store/utils.ts" {
         ipfsGatewayUrl: string;
         apiGatewayUrls: Record<string, string>;
         embedderCommissionFee: string;
-        tokens: any[];
         rpcWalletId: string;
-    };
-    export const setDataFromConfig: (options: any) => void;
-    export const setProxyAddresses: (data: ProxyAddresses) => void;
-    export const getProxyAddress: (chainId?: number) => string;
-    export const setIPFSGatewayUrl: (url: string) => void;
-    export const getIPFSGatewayUrl: () => string;
-    export const setAPIGatewayUrls: (urls: Record<string, string>) => void;
-    export const getEmbedderCommissionFee: () => string;
-    export const setCurrentChainId: (value: number) => void;
-    export const getCurrentChainId: () => number;
-    export const isExpertMode: () => boolean;
-    export function toggleExpertMode(): void;
-    export const getSlippageTolerance: () => any;
-    export const setSlippageTolerance: (value: any) => void;
-    export const getTransactionDeadline: () => any;
-    export const setTransactionDeadline: (value: any) => void;
-    export const getInfuraId: () => string;
-    export const getSupportedNetworks: () => INetwork[];
+        constructor(options: any);
+        initRpcWallet(defaultChainId: number): string;
+        setProviderList(value: IProvider[]): void;
+        setDexInfoList(value: IDexInfo[]): void;
+        getProxyAddress(chainId?: number): string;
+        getProviderByKey(providerKey: string): IProvider;
+        getRpcWallet(): import("@ijstech/eth-wallet").IRpcWallet;
+        isRpcWalletConnected(): boolean;
+        getChainId(): number;
+        toggleExpertMode(): void;
+        private initData;
+        private setNetworkList;
+    }
     export const getNetworkInfo: (chainId: number) => any;
-    export const setDexInfoList: (value: IDexInfo[]) => void;
-    export const getDexInfoList: () => IDexInfo[];
-    export const setProviderList: (value: IProvider[]) => void;
-    export const getProviderList: () => IProvider[];
-    export const getProviderByKey: (providerKey: string) => IProvider;
     export function isClientWalletConnected(): boolean;
-    export function isRpcWalletConnected(): boolean;
     export const hasMetaMask: () => boolean;
-    export function getChainId(): number;
     export const getChainNativeToken: (chainId: number) => ITokenObject;
-    export function initRpcWallet(defaultChainId: number): string;
-    export function getRpcWallet(): import("@ijstech/eth-wallet").IRpcWallet;
     export function getClientWallet(): import("@ijstech/eth-wallet").IClientWallet;
 }
 /// <amd-module name="@scom/scom-swap/store/index.ts" />
@@ -10332,7 +10310,8 @@ declare module "@scom/scom-swap/contracts/scom-commission-proxy-contract/index.t
 declare module "@scom/scom-swap/swap-utils/index.ts" {
     import { BigNumber, TransactionReceipt } from "@ijstech/eth-wallet";
     import { ITokenObject } from '@scom/scom-token-list';
-    import { IERC20ApprovalEventOptions, QueueType, ICommissionInfo, IProviderUI } from "@scom/scom-swap/global/index.ts";
+    import { IERC20ApprovalEventOptions, ICommissionInfo, IProviderUI } from "@scom/scom-swap/global/index.ts";
+    import { State } from "@scom/scom-swap/store/index.ts";
     interface TradeFee {
         fee: string;
         base: string;
@@ -10340,17 +10319,16 @@ declare module "@scom/scom-swap/swap-utils/index.ts" {
     interface TradeFeeMap {
         [key: string]: TradeFee;
     }
-    const getChainNativeToken: () => ITokenObject;
-    function getRouterAddress(key: string): string;
-    function getTradeFeeMap(): TradeFeeMap;
-    const getProviderProxySelectors: (providers: IProviderUI[]) => Promise<string[]>;
+    const getChainNativeToken: (chainId: number) => ITokenObject;
+    function getRouterAddress(state: State, key: string): string;
+    function getTradeFeeMap(state: State): TradeFeeMap;
+    const getProviderProxySelectors: (state: State, providers: IProviderUI[]) => Promise<string[]>;
     function getExtendedRouteObjData(wallet: any, bestRouteObj: any, tradeFeeMap: TradeFeeMap, swapPrice: BigNumber, isHybridOrQueue: boolean): Promise<any>;
-    function getAllRoutesData(firstTokenObject: ITokenObject, secondTokenObject: ITokenObject, firstInput: BigNumber, secondInput: BigNumber, isFromEstimated: boolean, useAPI: boolean, commissions: ICommissionInfo[]): Promise<any[]>;
-    export const getCurrentCommissions: (commissions: ICommissionInfo[]) => ICommissionInfo[];
-    export const getCommissionAmount: (commissions: ICommissionInfo[], amount: BigNumber) => BigNumber;
+    function getAllRoutesData(state: State, firstTokenObject: ITokenObject, secondTokenObject: ITokenObject, firstInput: BigNumber, secondInput: BigNumber, isFromEstimated: boolean, useAPI: boolean, commissions: ICommissionInfo[]): Promise<any[]>;
+    export const getCurrentCommissions: (state: State, commissions: ICommissionInfo[]) => ICommissionInfo[];
+    export const getCommissionAmount: (state: State, commissions: ICommissionInfo[], amount: BigNumber) => BigNumber;
     interface SwapData {
         provider: string;
-        queueType?: QueueType;
         routeTokens: any[];
         bestSmartRoute: any[];
         pairs: string[];
@@ -10360,12 +10338,12 @@ declare module "@scom/scom-swap/swap-utils/index.ts" {
         groupQueueOfferIndex?: number;
         commissions?: ICommissionInfo[];
     }
-    const executeSwap: (swapData: SwapData) => Promise<{
+    const executeSwap: (state: State, swapData: SwapData) => Promise<{
         receipt: TransactionReceipt | null;
         error: Record<string, string> | null;
     }>;
     const getApprovalModelAction: (options: IERC20ApprovalEventOptions) => Promise<import("@scom/scom-swap/global/index.ts").IERC20ApprovalAction>;
-    const setApprovalModalSpenderAddress: (market: string, contractAddress?: string) => void;
+    const setApprovalModalSpenderAddress: (state: State, market: string, contractAddress?: string) => void;
     export { getExtendedRouteObjData, getTradeFeeMap, getAllRoutesData, SwapData, executeSwap, getChainNativeToken, getRouterAddress, getApprovalModelAction, setApprovalModalSpenderAddress, getProviderProxySelectors };
 }
 /// <amd-module name="@scom/scom-swap/price-info/priceInfo.css.ts" />
@@ -10404,6 +10382,7 @@ declare module "@scom/scom-swap/expert-mode-settings/index.css.ts" {
 /// <amd-module name="@scom/scom-swap/expert-mode-settings/index.tsx" />
 declare module "@scom/scom-swap/expert-mode-settings/index.tsx" {
     import { Module, Container, ControlElement } from '@ijstech/components';
+    import { State } from "@scom/scom-swap/store/index.ts";
     global {
         namespace JSX {
             interface IntrinsicElements {
@@ -10414,7 +10393,8 @@ declare module "@scom/scom-swap/expert-mode-settings/index.tsx" {
     export class ExpertModeSettings extends Module {
         private expertModal;
         private $eventBus;
-        constructor(parent?: Container, options?: any);
+        private state;
+        constructor(state: State, parent?: Container, options?: any);
         init(): Promise<void>;
         closeModal(): void;
         showModal(): void;
@@ -10661,6 +10641,7 @@ declare module "@scom/scom-swap" {
         }
     }
     export default class ScomSwap extends Module {
+        private state;
         private _data;
         tag: any;
         defaultEdit: boolean;
@@ -10728,6 +10709,7 @@ declare module "@scom/scom-swap" {
         private rpcWalletEvents;
         private clientEvents;
         static create(options?: ScomSwapElement, parent?: Container): Promise<ScomSwap>;
+        removeRpcWalletEvents(): void;
         onHide(): void;
         get category(): Category;
         set category(value: Category);
@@ -10799,6 +10781,7 @@ declare module "@scom/scom-swap" {
             getActions?: undefined;
         })[];
         private getData;
+        private resetRpcWallet;
         private setData;
         private getTag;
         private updateTag;

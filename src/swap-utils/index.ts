@@ -7,21 +7,13 @@ import {
   getAPI,
   IERC20ApprovalEventOptions,
   ERC20ApprovalModel,
-  QueueType,
   ICommissionInfo,
   IProviderUI,
 } from "../global/index";
 
 import {
-  getSlippageTolerance, 
-  getTransactionDeadline,
-  isRpcWalletConnected,
-  getChainId,
   getNetworkInfo,
-  getProviderList,
-  getProxyAddress,
-  getDexInfoList,
-  getRpcWallet
+  State
 } from "../store/index";
 
 import {
@@ -47,30 +39,30 @@ interface AvailableRoute {
 const routeAPI = 'https://route.openswap.xyz/trading/v1/route';
 const newRouteAPI = 'https://indexer.ijs.dev/trading/v1/route'
 
-const getChainNativeToken = (): ITokenObject => {
-  return ChainNativeTokenByChainId[getChainId()]
+const getChainNativeToken = (chainId: number): ITokenObject => {
+  return ChainNativeTokenByChainId[chainId]
 };
-const getWETH = (): ITokenObject => {
-  return WETHByChainId[getChainId()];
+const getWETH = (chainId: number): ITokenObject => {
+  return WETHByChainId[chainId];
 };
-const getWrappedTokenAddress = (): string => {
-  return getWETH().address!;
+const getWrappedTokenAddress = (chainId: number): string => {
+  return getWETH(chainId).address!;
 };
 
-const getFactoryAddress = (key: string): string => {
-  const dexInfoList = getDexInfoList();
-  const factoryAddress = dexInfoList.find(v => v.chainId == getChainId() && v.dexCode == key)?.factoryAddress || '';
+const getFactoryAddress = (state: State, key: string): string => {
+  const dexInfoList = state.dexInfoList;
+  const factoryAddress = dexInfoList.find(v => v.chainId == state.getChainId() && v.dexCode == key)?.factoryAddress || '';
   return factoryAddress;
 }
-function getRouterAddress(key: string): string {
-  const dexInfoList = getDexInfoList();
-  const routerAddress = dexInfoList.find(v => v.chainId == getChainId() && v.dexCode == key)?.routerAddress || '';
+function getRouterAddress(state: State, key: string): string {
+  const dexInfoList = state.dexInfoList;
+  const routerAddress = dexInfoList.find(v => v.chainId == state.getChainId() && v.dexCode == key)?.routerAddress || '';
   return routerAddress;
 }
 
-async function allowanceRouter(wallet: any, market: string, token: ITokenObject, owner: string, contractAddress: string, callback?: any) {
+async function allowanceRouter(state: State, wallet: any, market: string, token: ITokenObject, owner: string, contractAddress: string, callback?: any) {
   let erc20 = new Contracts.ERC20(wallet, token.address);
-  let spender = contractAddress ? contractAddress : getRouterAddress(market);
+  let spender = contractAddress ? contractAddress : getRouterAddress(state, market);
   let allowance = await erc20.allowance({
     owner,
     spender
@@ -81,11 +73,12 @@ async function allowanceRouter(wallet: any, market: string, token: ITokenObject,
   return allowance;
 }
 
-async function checkIsApproveButtonShown(wallet: any, firstTokenObject: any, fromInput: BigNumber, market: string, contractAddress?: string) {
-  if (!isRpcWalletConnected()) return false;
+async function checkIsApproveButtonShown(state: State, wallet: any, firstTokenObject: any, fromInput: BigNumber, market: string, contractAddress?: string) {
+  if (!state.isRpcWalletConnected()) return false;
   let isApproveButtonShown = false;
   const owner = wallet.account.address;
-  const nativeTokenObject = getChainNativeToken();
+  const chainId = state.getChainId();
+  const nativeTokenObject = getChainNativeToken(chainId);
   if (!nativeTokenObject) return false;
 
   const firstTokenAddress = firstTokenObject.address;
@@ -93,14 +86,14 @@ async function checkIsApproveButtonShown(wallet: any, firstTokenObject: any, fro
     isApproveButtonShown = false;
   } else {
     isApproveButtonShown = false;
-    const allowance = await allowanceRouter(wallet, market, firstTokenObject, owner, contractAddress);
+    const allowance = await allowanceRouter(state, wallet, market, firstTokenObject, owner, contractAddress);
     isApproveButtonShown = fromInput.gt(allowance);
   }
   return isApproveButtonShown;
 }
 
-async function composeRouteObj(wallet: any, routeObj: any, market: string, firstTokenObject: any, firstInput: BigNumber, secondInput: BigNumber, isFromEstimated: boolean, commissions: ICommissionInfo[]) {
-  const slippageTolerance = getSlippageTolerance();
+async function composeRouteObj(state: State, wallet: any, routeObj: any, market: string, firstTokenObject: any, firstInput: BigNumber, secondInput: BigNumber, isFromEstimated: boolean, commissions: ICommissionInfo[]) {
+  const slippageTolerance = state.slippageTolerance;
   if (!slippageTolerance) return null;
   let fromAmount = new BigNumber(0);
   let toAmount = new BigNumber(0);
@@ -134,9 +127,9 @@ async function composeRouteObj(wallet: any, routeObj: any, market: string, first
     priceImpact = Number(routeObj.priceImpact) * 100;
     tradeFee = parseFloat(routeObj.tradeFee);
 
-    const commissionAmount = getCommissionAmount(commissions, fromAmount);
-    const contractAddress = commissionAmount.gt(0) ? getProxyAddress() : '';
-    isApproveButtonShown = await checkIsApproveButtonShown(wallet, firstTokenObject, fromAmount.plus(commissionAmount), market, contractAddress);
+    const commissionAmount = getCommissionAmount(state, commissions, fromAmount);
+    const contractAddress = commissionAmount.gt(0) ? state.getProxyAddress() : '';
+    isApproveButtonShown = await checkIsApproveButtonShown(state, wallet, firstTokenObject, fromAmount.plus(commissionAmount), market, contractAddress);
   } catch (err) {
     console.log('err', err)
     return null;
@@ -156,19 +149,19 @@ async function composeRouteObj(wallet: any, routeObj: any, market: string, first
   };
 }
 
-function getTradeFeeMap() {
+function getTradeFeeMap(state: State) {
   let tradeFeeMap: TradeFeeMap = {};
-  const dexInfoList = getDexInfoList().filter(v => v.chainId == getChainId());
+  const dexInfoList = state.dexInfoList.filter(v => v.chainId == state.getChainId());
   for (let dexInfo of dexInfoList) {
     tradeFeeMap[dexInfo.dexCode] = dexInfo.tradeFee;
   }
   return tradeFeeMap;
 }
 
-async function getBestAmountInRouteFromAPI(wallet: any, tokenIn: ITokenObject, tokenOut: ITokenObject, amountOut: string, chainId?: number) {
-  chainId = getChainId();
-  let wrappedTokenAddress = getWETH();
-  let tradeFeeMap = getTradeFeeMap();
+async function getBestAmountInRouteFromAPI(state: State, wallet: any, tokenIn: ITokenObject, tokenOut: ITokenObject, amountOut: string, chainId?: number) {
+  chainId = state.getChainId();
+  let wrappedTokenAddress = getWETH(chainId);
+  let tradeFeeMap = getTradeFeeMap(state);
   let network = chainId ? getNetworkInfo(chainId) : null;
   let api = network?.isTestnet || network?.isDisabled ? newRouteAPI : routeAPI;
   let routeObjArr = await getAPI(api, {
@@ -183,10 +176,10 @@ async function getBestAmountInRouteFromAPI(wallet: any, tokenIn: ITokenObject, t
   return bestRouteObjArr;
 }
 
-async function getBestAmountOutRouteFromAPI(wallet: any, tokenIn: ITokenObject, tokenOut: ITokenObject, amountIn: string, chainId?: number) {
-  chainId = getChainId();
-  let wrappedTokenAddress = getWETH();
-  let tradeFeeMap = getTradeFeeMap();
+async function getBestAmountOutRouteFromAPI(state: State, wallet: any, tokenIn: ITokenObject, tokenOut: ITokenObject, amountIn: string, chainId?: number) {
+  chainId = state.getChainId();
+  let wrappedTokenAddress = getWETH(chainId);
+  let tradeFeeMap = getTradeFeeMap(state);
   let network = chainId ? getNetworkInfo(chainId) : null;
   let api = network?.isTestnet || network?.isDisabled ? newRouteAPI : routeAPI;
   let routeObjArr = await getAPI(api, {
@@ -201,10 +194,10 @@ async function getBestAmountOutRouteFromAPI(wallet: any, tokenIn: ITokenObject, 
   return bestRouteObjArr;
 }
 
-const getProviderProxySelectors = async (providers: IProviderUI[]) => {
-  const wallet = getRpcWallet();
+const getProviderProxySelectors = async (state: State, providers: IProviderUI[]) => {
+  const wallet = state.getRpcWallet();
   await wallet.init();
-  const dexInfoList = getDexInfoList();
+  const dexInfoList = state.dexInfoList;
   let selectorsSet: Set<string> = new Set();
   for (let provider of providers) {
     const dex = dexInfoList.find(v => v.chainId == provider.chainId && v.dexCode == provider.key);
@@ -216,22 +209,24 @@ const getProviderProxySelectors = async (providers: IProviderUI[]) => {
   return Array.from(selectorsSet);
 }
 
-const getAllAvailableRoutes = async (markets: string[], tokenList: ITokenObject[], tokenIn: ITokenObject, tokenOut: ITokenObject) => {
-  const wallet = getRpcWallet();
+const getAllAvailableRoutes = async (state: State, markets: string[], tokenList: ITokenObject[], tokenIn: ITokenObject, tokenOut: ITokenObject) => {
+  const wallet = state.getRpcWallet();
   let getPairPromises:Promise<void>[] = [];
   let availableRoutes: AvailableRoute[] = [];
 
   const getReservesByPair = async (market: string, pairAddress: string, tokenIn: ITokenObject, tokenOut: ITokenObject) => {
-    if (!tokenIn.address) tokenIn = getWETH();
-    if (!tokenOut.address) tokenOut = getWETH();
+    let chainId = state.getChainId();
+    if (!tokenIn.address) tokenIn = getWETH(chainId);
+    if (!tokenOut.address) tokenOut = getWETH(chainId);
     let reserveObj = await getDexPairReserves(wallet, wallet.chainId, market, pairAddress, tokenIn.address, tokenOut.address);
     return reserveObj;
   }
 
-  const getPair = async (market: string, tokenA: ITokenObject, tokenB: ITokenObject) => {
-    if (!tokenA.address) tokenA = getWETH();
-    if (!tokenB.address) tokenB = getWETH();
-    let factory = new Contracts.OSWAP_Factory(wallet, getFactoryAddress(market));
+  const getPair = async (state: State, market: string, tokenA: ITokenObject, tokenB: ITokenObject) => {
+    let chainId = state.getChainId();
+    if (!tokenA.address) tokenA = getWETH(chainId);
+    if (!tokenB.address) tokenB = getWETH(chainId);
+    let factory = new Contracts.OSWAP_Factory(wallet, getFactoryAddress(state, market));
     let pair = await factory.getPair({
       param1: tokenA.address!,
       param2: tokenB.address!
@@ -239,9 +234,9 @@ const getAllAvailableRoutes = async (markets: string[], tokenList: ITokenObject[
     return pair;
   }
 
-  let composeAvailableRoutePromise = async (market: string, tokenIn: ITokenObject, tokenOut: ITokenObject) => {
+  let composeAvailableRoutePromise = async (state: State, market: string, tokenIn: ITokenObject, tokenOut: ITokenObject) => {
     try {
-      let pair = await getPair(market, tokenIn, tokenOut);
+      let pair = await getPair(state, market, tokenIn, tokenOut);
       if (pair == Utils.nullAddress) return;
       let reserveObj = await getReservesByPair(market, pair, tokenIn, tokenOut);
       availableRoutes.push({
@@ -256,15 +251,15 @@ const getAllAvailableRoutes = async (markets: string[], tokenList: ITokenObject[
     }
   }
 
-  getPairPromises.push(...markets.map(market => composeAvailableRoutePromise(market, tokenIn, tokenOut)));
+  getPairPromises.push(...markets.map(market => composeAvailableRoutePromise(state, market, tokenIn, tokenOut)));
 
   for (let i = 0; i < tokenList.length; i++) {
     let hop1 = tokenList[i];
     if (tokenIn.address != hop1.address) {
-      getPairPromises.push(...markets.map(market => composeAvailableRoutePromise(market, tokenIn, hop1)));
+      getPairPromises.push(...markets.map(market => composeAvailableRoutePromise(state, market, tokenIn, hop1)));
     }
     if (hop1.address != tokenOut.address) {
-      getPairPromises.push(...markets.map(market => composeAvailableRoutePromise(market, hop1, tokenOut)));
+      getPairPromises.push(...markets.map(market => composeAvailableRoutePromise(state, market, hop1, tokenOut)));
     }
 
     for (let j = 0; j < tokenList.length; j++) {
@@ -274,7 +269,7 @@ const getAllAvailableRoutes = async (markets: string[], tokenList: ITokenObject[
         hop2.address == tokenOut.address) {
         continue;
       }
-      getPairPromises.push(...markets.map(market => composeAvailableRoutePromise(market, hop1, hop2)));
+      getPairPromises.push(...markets.map(market => composeAvailableRoutePromise(state, market, hop1, hop2)));
     }
   }
 
@@ -494,12 +489,12 @@ const getAllExactAmountInPaths = async (tradeFeeMap: any, availableRoutes: any[]
   return sortedAllPaths;
 }
 
-const getBestAmountInRoute = async (markets: string[], tokenIn: ITokenObject, tokenOut: ITokenObject, amountOut: string, tokenList: ITokenObject[]) => {
-  let allAvailableRoutes = await getAllAvailableRoutes(markets, tokenList, tokenIn, tokenOut);
+const getBestAmountInRoute = async (state: State, markets: string[], tokenIn: ITokenObject, tokenOut: ITokenObject, amountOut: string, tokenList: ITokenObject[]) => {
+  let allAvailableRoutes = await getAllAvailableRoutes(state, markets, tokenList, tokenIn, tokenOut);
   if (allAvailableRoutes.length == 0) return null;
 
-  let wallet = getRpcWallet();
-  let tradeFeeMap = getTradeFeeMap();
+  let wallet = state.getRpcWallet();
+  let tradeFeeMap = getTradeFeeMap(state);
   let allPaths = await getAllExactAmountOutPaths(tradeFeeMap, allAvailableRoutes, tokenIn, tokenOut, amountOut);
   if (allPaths.length == 0) {
     return null;
@@ -523,13 +518,13 @@ const getBestAmountInRoute = async (markets: string[], tokenIn: ITokenObject, to
   };
 }
 
-const getBestAmountOutRoute = async (markets: string[], tokenIn: ITokenObject, tokenOut: ITokenObject, amountIn: string, tokenList: ITokenObject[], isHybrid: boolean) => {
-  let allAvailableRoutes = await getAllAvailableRoutes(markets, tokenList, tokenIn, tokenOut);
+const getBestAmountOutRoute = async (state: State, markets: string[], tokenIn: ITokenObject, tokenOut: ITokenObject, amountIn: string, tokenList: ITokenObject[], isHybrid: boolean) => {
+  let allAvailableRoutes = await getAllAvailableRoutes(state, markets, tokenList, tokenIn, tokenOut);
   if (allAvailableRoutes.length == 0) {
     return null;
   }
-  let wallet = getRpcWallet();
-  let tradeFeeMap = getTradeFeeMap();
+  let wallet = state.getRpcWallet();
+  let tradeFeeMap = getTradeFeeMap(state);
   let allPaths = await getAllExactAmountInPaths(tradeFeeMap, allAvailableRoutes, tokenIn, tokenOut, amountIn);
   if (allPaths.length == 0) {
     return null;
@@ -579,24 +574,25 @@ async function getExtendedRouteObjData(wallet: any, bestRouteObj: any, tradeFeeM
   return extendedRouteObj;
 }
 
-async function getAllRoutesData(firstTokenObject: ITokenObject, secondTokenObject: ITokenObject, firstInput: BigNumber, secondInput: BigNumber, isFromEstimated: boolean, useAPI: boolean, commissions: ICommissionInfo[]) {
-  let wallet = getRpcWallet();
+async function getAllRoutesData(state: State, firstTokenObject: ITokenObject, secondTokenObject: ITokenObject, firstInput: BigNumber, secondInput: BigNumber, isFromEstimated: boolean, useAPI: boolean, commissions: ICommissionInfo[]) {
+  let wallet = state.getRpcWallet();
   let resultArr: any[] = [];
   if (firstTokenObject && secondTokenObject && (firstInput.gt(0) || secondInput.gt(0))) {
     let routeDataArr = [];
     if (useAPI) {
       if (isFromEstimated) {
-        routeDataArr = await getBestAmountInRouteFromAPI(wallet, firstTokenObject, secondTokenObject, secondInput.toString());
+        routeDataArr = await getBestAmountInRouteFromAPI(state, wallet, firstTokenObject, secondTokenObject, secondInput.toString());
       }
       else {
-        routeDataArr = await getBestAmountOutRouteFromAPI(wallet, firstTokenObject, secondTokenObject, firstInput.toString());
+        routeDataArr = await getBestAmountOutRouteFromAPI(state, wallet, firstTokenObject, secondTokenObject, firstInput.toString());
       }
     }
 
     if (isFromEstimated) {
       if (routeDataArr.length == 0) {
-        const providerKey = getProviderList()[0]?.key;
-        let routeObj = await getBestAmountInRoute(providerKey ? [providerKey] : [], firstTokenObject, secondTokenObject, secondInput.toString(), []);
+        const providerList = state.providerList;
+        const providerKey = providerList[0]?.key;
+        let routeObj = await getBestAmountInRoute(state, providerKey ? [providerKey] : [], firstTokenObject, secondTokenObject, secondInput.toString(), []);
         if (routeObj && routeObj.market.length == 1) {
           let price = parseFloat(routeObj.price);
           let priceSwap = new BigNumber(1).div(routeObj.price).toNumber();
@@ -618,8 +614,9 @@ async function getAllRoutesData(firstTokenObject: ITokenObject, secondTokenObjec
     }
     else {
       if (routeDataArr.length == 0) {
-        const providerKey = getProviderList()[0]?.key;
-        let routeObj = await getBestAmountOutRoute(providerKey ? [providerKey] : [], firstTokenObject, secondTokenObject, firstInput.toString(), [], false);
+        const providerList = state.providerList;
+        const providerKey = providerList[0]?.key;
+        let routeObj = await getBestAmountOutRoute(state, providerKey ? [providerKey] : [], firstTokenObject, secondTokenObject, firstInput.toString(), [], false);
         if (routeObj && routeObj.market.length == 1) {
           let price = parseFloat(routeObj.price);
           let priceSwap = new BigNumber(1).div(routeObj.price).toNumber();
@@ -643,8 +640,9 @@ async function getAllRoutesData(firstTokenObject: ITokenObject, secondTokenObjec
     if (routeDataArr && routeDataArr.length > 0) {
       for (let i = 0; i < routeDataArr.length; i++) {
         let optionObj = routeDataArr[i];
-        const provider = getProviderList().find(item => item.key === optionObj.provider)?.key || '';
-        let routeObj = await composeRouteObj(wallet, optionObj, provider, firstTokenObject, firstInput, secondInput, isFromEstimated, commissions);
+        const providerList = state.providerList;
+        const provider = providerList.find(item => item.key === optionObj.provider)?.key || '';
+        let routeObj = await composeRouteObj(state, wallet, optionObj, provider, firstTokenObject, firstInput, secondInput, isFromEstimated, commissions);
         if (!routeObj) continue;
         resultArr.push(routeObj);
       }
@@ -654,12 +652,12 @@ async function getAllRoutesData(firstTokenObject: ITokenObject, secondTokenObjec
   return resultArr;
 }
 
-export const getCurrentCommissions = (commissions: ICommissionInfo[]) => {
-  return (commissions || []).filter(v => v.chainId == getChainId());
+export const getCurrentCommissions = (state: State, commissions: ICommissionInfo[]) => {
+  return (commissions || []).filter(v => v.chainId == state.getChainId());
 }
 
-export const getCommissionAmount = (commissions: ICommissionInfo[], amount: BigNumber) => {
-  const _commissions = (commissions || []).filter(v => v.chainId == getChainId()).map(v => {
+export const getCommissionAmount = (state: State, commissions: ICommissionInfo[], amount: BigNumber) => {
+  const _commissions = (commissions || []).filter(v => v.chainId == state.getChainId()).map(v => {
     return {
       to: v.walletAddress,
       amount: amount.times(v.share)
@@ -669,26 +667,27 @@ export const getCommissionAmount = (commissions: ICommissionInfo[], amount: BigN
   return commissionsAmount;
 }
 
-const AmmTradeExactIn = async function (wallet: any, market: string, routeTokens: ITokenObject[], amountIn: string, amountOutMin: string, toAddress: string, deadline: number, feeOnTransfer: boolean, commissions: ICommissionInfo[]) {
+const AmmTradeExactIn = async function (state: State, wallet: any, market: string, routeTokens: ITokenObject[], amountIn: string, amountOutMin: string, toAddress: string, deadline: number, feeOnTransfer: boolean, commissions: ICommissionInfo[]) {
   if (routeTokens.length < 2) {
     return null;
   }
   let tokenIn = routeTokens[0];
   let tokenOut = routeTokens[routeTokens.length - 1];
 
-  let routerAddress = getRouterAddress(market);
+  let routerAddress = getRouterAddress(state, market);
   let addresses = [];
-  let wrappedTokenAddress = getWrappedTokenAddress();
+  let chainId = state.getChainId();
+  let wrappedTokenAddress = getWrappedTokenAddress(chainId);
   for (let i = 0; i < routeTokens.length; i++) {
     addresses.push(routeTokens[i].address || wrappedTokenAddress);
   }
   let receipt;
 
-  const proxyAddress = getProxyAddress();
+  const proxyAddress = state.getProxyAddress();
   const proxy = new ProxyContracts.Proxy(wallet, proxyAddress);
   const amount = tokenIn.address ? Utils.toDecimals(amountIn, tokenIn.decimals).dp(0) : Utils.toDecimals(amountIn).dp(0);
   const _amountOutMin = Utils.toDecimals(amountOutMin, tokenOut.decimals).dp(0);
-  const _commissions = (commissions || []).filter(v => v.chainId == getChainId()).map(v => {
+  const _commissions = (commissions || []).filter(v => v.chainId == chainId).map(v => {
     return {
       to: v.walletAddress,
       amount: amount.times(v.share).dp(0)
@@ -774,25 +773,26 @@ const AmmTradeExactIn = async function (wallet: any, market: string, routeTokens
   return receipt;
 }
 
-const AmmTradeExactOut = async function (wallet: any, market: string, routeTokens: ITokenObject[], amountOut: string, amountInMax: string, toAddress: string, deadline: number, commissions: ICommissionInfo[]) {
+const AmmTradeExactOut = async function (state: State, wallet: any, market: string, routeTokens: ITokenObject[], amountOut: string, amountInMax: string, toAddress: string, deadline: number, commissions: ICommissionInfo[]) {
   if (routeTokens.length < 2) {
     return null;
   }
   let tokenIn = routeTokens[0];
   let tokenOut = routeTokens[routeTokens.length - 1];
 
-  let routerAddress = getRouterAddress(market);
+  let routerAddress = getRouterAddress(state, market);
   let addresses = [];
-  let wrappedTokenAddress = getWrappedTokenAddress();
+  let chainId = state.getChainId();
+  let wrappedTokenAddress = getWrappedTokenAddress(chainId);
   for (let i = 0; i < routeTokens.length; i++) {
     addresses.push(routeTokens[i].address || wrappedTokenAddress);
   }
   let receipt;
-  const proxyAddress = getProxyAddress();
+  const proxyAddress = state.getProxyAddress();
   const proxy = new ProxyContracts.Proxy(wallet, proxyAddress);
   const _amountInMax = Utils.toDecimals(amountInMax, tokenIn.decimals).dp(0);
   const _amountOut = Utils.toDecimals(amountOut, tokenOut.decimals).dp(0);
-  const _commissions = (commissions || []).filter(v => v.chainId == getChainId()).map(v => {
+  const _commissions = (commissions || []).filter(v => v.chainId == chainId).map(v => {
     return {
       to: v.walletAddress,
       amount: _amountInMax.times(v.share).dp(0)
@@ -881,7 +881,6 @@ const AmmTradeExactOut = async function (wallet: any, market: string, routeToken
 
 interface SwapData {
   provider: string;
-  queueType?: QueueType;
   routeTokens: any[];
   bestSmartRoute: any[];
   pairs: string[];
@@ -893,26 +892,28 @@ interface SwapData {
 }
 
 
-const executeSwap: (swapData: SwapData) => Promise<{
+const executeSwap: (state: State, swapData: SwapData) => Promise<{
   receipt: TransactionReceipt | null;
   error: Record<string, string> | null;
-}> = async (swapData: SwapData) => {
+}> = async (state, swapData) => {
   let receipt: TransactionReceipt | null = null;
   const wallet: any = Wallet.getClientInstance();
   try {
     const toAddress = wallet.account.address;
-    const slippageTolerance = getSlippageTolerance();
-    const transactionDeadlineInMinutes = getTransactionDeadline();
+    const slippageTolerance = state.slippageTolerance;
+    const transactionDeadlineInMinutes = state.transactionDeadline;
     const transactionDeadline = Math.floor(
       Date.now() / 1000 + transactionDeadlineInMinutes * 60
     );
 
-    const market = getProviderList().find(item => item.key === swapData.provider)?.key || '';
+    const providerList = state.providerList;
+    const market = providerList.find(item => item.key === swapData.provider)?.key || '';
     if (swapData.isFromEstimated) {
       const amountInMax = swapData.fromAmount.times(
         1 + slippageTolerance / 100
       );
       receipt = await AmmTradeExactOut(
+        state,
         wallet,
         market,
         swapData.routeTokens,
@@ -927,6 +928,7 @@ const executeSwap: (swapData: SwapData) => Promise<{
         1 - slippageTolerance / 100
       );
       receipt = await AmmTradeExactIn(
+        state,
         wallet,
         market,
         swapData.routeTokens,
@@ -956,8 +958,8 @@ const getApprovalModelAction = async (options: IERC20ApprovalEventOptions) => {
   return approvalModelAction;
 }
 
-const setApprovalModalSpenderAddress = (market: string, contractAddress?: string) => {
-  approvalModel.spenderAddress = contractAddress || getRouterAddress(market);
+const setApprovalModalSpenderAddress = (state: State, market: string, contractAddress?: string) => {
+  approvalModel.spenderAddress = contractAddress || getRouterAddress(state, market);
 }
 
 export {
