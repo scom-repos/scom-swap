@@ -1,0 +1,18 @@
+{
+    "name": "@scom/scom-swap",
+    "type": "widget",
+    "version": "0.1.14",
+    "dependencies": [
+        "@ijstech/components",
+        "@ijstech/eth-wallet",
+        "@scom/scom-token-list",
+        "@ijstech/eth-contract",
+        "@scom/scom-wallet-modal",
+        "@scom/scom-network-list",
+        "@scom/scom-dex-list",
+        "@scom/scom-dapp-container",
+        "@scom/scom-commission-fee-setup",
+        "@scom/scom-token-input",
+        "@scom/scom-tx-status-modal"
+    ]
+}
