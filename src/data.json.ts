@@ -11,22 +11,17 @@ export default {
     }       
   ],
   "proxyAddresses": {
-    "97": "0x9602cB9A782babc72b1b6C96E050273F631a6870",
-    "43113": "0x7f1EAB0db83c02263539E3bFf99b638E61916B96"
+    "43113": "0x384FD30bcef20c3621Fd6dBc0bd3Be383505e759"
   },
   "ipfsGatewayUrl": "https://ipfs.scom.dev/ipfs/",
   "embedderCommissionFee": "0.01",
   "defaultBuilderData": {
     "providers": [
       {
-        "caption": "OpenSwap",
-        "image": "ipfs://bafkreidoi5pywhyo4hqdltlosvrvefgqj4nuclmjl325exzmjgnyl2cc4y",
         "key": "OpenSwap",
         "chainId": 97
       },
       {
-        "caption": "OpenSwap",
-        "image": "ipfs://bafkreidoi5pywhyo4hqdltlosvrvefgqj4nuclmjl325exzmjgnyl2cc4y",
         "key": "OpenSwap",
         "chainId": 43113
       }

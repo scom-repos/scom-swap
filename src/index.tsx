@@ -1,4 +1,4 @@
-import { Module, Panel, Button, Label, VStack, Image, Container, IEventBus, application, customModule, Modal, Input, Control, customElements, ControlElement, IDataSchema, Styles, HStack, Icon } from '@ijstech/components';
+import { Module, Panel, Button, Label, VStack, Image, Container, IEventBus, application, customModule, Modal, Input, Control, customElements, ControlElement, IDataSchema, Styles, HStack, Icon, IUISchema } from '@ijstech/components';
 import { BigNumber, Constants, IEventBusRegistry, INetwork, Wallet } from '@ijstech/eth-wallet';
 import './index.css';
 import {
@@ -36,10 +36,10 @@ import {
 import { PriceInfo } from './price-info/index';
 import { ExpertModeSettings } from './expert-mode-settings/index'
 import configData from './data.json';
-import formSchema from './formSchema.json';
+import { getBuilderSchema, getProjectOwnerSchema } from './formSchema';
 import ScomWalletModal, { IWalletPlugin } from '@scom/scom-wallet-modal';
 import ScomDappContainer from '@scom/scom-dapp-container'
-import getDexList from '@scom/scom-dex-list';
+import getDexList, { IDexInfo } from '@scom/scom-dex-list';
 import ScomCommissionFeeSetup from '@scom/scom-commission-fee-setup';
 import ScomTokenInput from '@scom/scom-token-input';
 import ScomTxStatusModal from '@scom/scom-tx-status-modal';
@@ -52,6 +52,7 @@ const defaultInput = '1';
 type StatusMapType = 'approve' | 'swap';
 
 interface ScomSwapElement extends ControlElement {
+  campaignId?: number;
   lazyLoad?: boolean;
   category: Category;
   providers: IProviderUI[];
@@ -239,11 +240,21 @@ export default class ScomSwap extends Module {
     return !!(providers?.length || networks?.length || wallets?.length || !isNaN(Number(defaultChainId)));
   }
 
-  private getActions(category?: string) {
-    return this._getActions(formSchema.general.dataSchema as any, formSchema.theme.dataSchema as any, category);
+  private determineActionsByTarget(target: 'builder' | 'projectOwner', category?: string) {
+    if (target === 'builder') {
+
+      return this.getBuilderActions(category);
+    }
+    else {
+      return this.getProjectOwnerActions();
+    }
   }
 
-  private _getActions(propertiesSchema: IDataSchema, themeSchema: IDataSchema, category?: string) {
+  private getBuilderActions(category?: string) {
+    const formSchema: any = getBuilderSchema();
+    const propertiesDataSchema = formSchema.general.dataSchema;
+    const propertiesUISchema = formSchema.general.uiSchema;
+    const themeDataSchema = formSchema.theme.dataSchema;
     let self = this;
     const actions: any[] = [
       {
@@ -348,8 +359,8 @@ export default class ScomSwap extends Module {
             redo: () => { }
           }
         },
-        userInputDataSchema: propertiesSchema,
-        userInputUISchema: formSchema.general.uiSchema
+        userInputDataSchema: propertiesDataSchema,
+        userInputUISchema: propertiesUISchema
       });
       actions.push(
         {
@@ -375,10 +386,32 @@ export default class ScomSwap extends Module {
               redo: () => { }
             }
           },
-          userInputDataSchema: themeSchema
+          userInputDataSchema: themeDataSchema
         }
       )
     }
+    return actions
+  }
+
+  private getProjectOwnerActions() {
+    const providerOptions = this.state.dexInfoList.map((dexInfo: IDexInfo) => {
+      return {
+        title: dexInfo.dexName, 
+        icon: dexInfo.image, 
+        description: "",
+        const: dexInfo.dexCode 
+      }
+    });
+    const formSchema: any = getProjectOwnerSchema(providerOptions);
+    const propertiesDataSchema = formSchema.general.dataSchema;
+    const propertiesUISchema = formSchema.general.uiSchema;
+    const actions: any[] = [
+      {
+        name: 'Settings',
+        userInputDataSchema: propertiesDataSchema,
+        userInputUISchema: propertiesUISchema
+      }
+    ];
     return actions
   }
 
@@ -392,11 +425,12 @@ export default class ScomSwap extends Module {
           const selectors = await getProviderProxySelectors(this.state, this._data.providers);
           return selectors;
         },
-        getActions: this.getActions.bind(this),
+        getActions: (category?: string) => {
+          return this.determineActionsByTarget('projectOwner', category);
+        },
         getData: this.getData.bind(this),
         setData: async (value: any) => {
-          const defaultData = configData.defaultBuilderData;
-          this.setData({ ...defaultData, ...value });
+          this.setData(value);
         },
         getTag: this.getTag.bind(this),
         setTag: this.setTag.bind(this)
@@ -404,7 +438,9 @@ export default class ScomSwap extends Module {
       {
         name: 'Builder Configurator',
         target: 'Builders',
-        getActions: this.getActions.bind(this),
+        getActions: (category?: string) => {
+          return this.determineActionsByTarget('builder', category);
+        },
         getData: this.getData.bind(this),
         setData: async (value: any) => {
           const defaultData = configData.defaultBuilderData;
@@ -581,10 +617,8 @@ export default class ScomSwap extends Module {
     if (!providers.length) return undefined;
     let _providers: IProvider[] = [];
     if (this.isFixedPair) {
-      const { key, caption, image } = providers[0];
+      const { key } = providers[0];
       let defaultProvider: IProvider = {
-        caption,
-        image,
         key
       };
       _providers.push(defaultProvider);
@@ -598,10 +632,8 @@ export default class ScomSwap extends Module {
       });
       Object.keys(providersByKeys).forEach(k => {
         const arr = providersByKeys[k];
-        const { key, caption, image } = arr[0];
+        const { key } = arr[0];
         let defaultProvider: IProvider = {
-          caption,
-          image,
           key
         }
         _providers.push(defaultProvider);
@@ -1450,7 +1482,8 @@ export default class ScomSwap extends Module {
         toAmount: this.record.toAmount,
         isFromEstimated: this.isFrom,
         providerList: this.originalData?.providers || [],
-        commissions: this.commissions
+        campaignId: this._data.campaignId,
+        referrer: this.commissions.find(v => v.chainId === this.state.getChainId())?.walletAddress,
       }
 
       const { error } = await executeSwap(this.state, swapData);
@@ -1638,6 +1671,7 @@ export default class ScomSwap extends Module {
       //   light: {...defaultColors},
       //   dark: {...defaultColors}
       // })
+      const campaignId = this.getAttribute('campaignId', true);
       const category = this.getAttribute('category', true, "fixed-pair");
       const providers = this.getAttribute('providers', true, []);
       const commissions = this.getAttribute('commissions', true, []);
@@ -1646,7 +1680,7 @@ export default class ScomSwap extends Module {
       const networks = this.getAttribute('networks', true);
       const wallets = this.getAttribute('wallets', true);
       const showHeader = this.getAttribute('showHeader', true);
-      let data = { category, providers, commissions, tokens, defaultChainId, networks, wallets, showHeader };
+      let data = { campaignId, category, providers, commissions, tokens, defaultChainId, networks, wallets, showHeader };
       if (!this.isEmptyData(data)) {
         await this.setData(data);
       }

@@ -20,14 +20,10 @@ export interface IContractInfo {
 }
 
 export interface IProvider {
-  caption: string;
-  image: string;
   key: string;
 }
 
 export interface IProviderUI {
-  caption: string;
-  image: string;
   key: string;
   chainId: number;
 }
@@ -44,6 +40,7 @@ export interface INetworkConfig {
 }
 
 export interface ISwapConfigUI {
+  campaignId?: number;
   category: Category;
   providers: IProviderUI[];
   commissions?: ICommissionInfo[];

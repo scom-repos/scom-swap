@@ -1,6 +1,6 @@
 import { Wallet, BigNumber, Utils, Erc20, TransactionReceipt } from "@ijstech/eth-wallet";
 import { Contracts } from "../contracts/oswap-openswap-contract/index";
-import { Contracts as ProxyContracts } from '../contracts/scom-commission-proxy-contract/index';
+import { Contracts as ProxyContracts } from '@scom/scom-commission-proxy-contract';
 import { executeRouterSwap, getDexPairReserves, getRouterSwapTxData, IExecuteSwapOptions, getSwapProxySelectors } from '@scom/scom-dex-list';
 import { ITokenObject } from '@scom/scom-token-list';
 import {
@@ -667,7 +667,7 @@ export const getCommissionAmount = (state: State, commissions: ICommissionInfo[]
   return commissionsAmount;
 }
 
-const AmmTradeExactIn = async function (state: State, wallet: any, market: string, routeTokens: ITokenObject[], amountIn: string, amountOutMin: string, toAddress: string, deadline: number, feeOnTransfer: boolean, commissions: ICommissionInfo[]) {
+const AmmTradeExactIn = async function (state: State, wallet: any, market: string, routeTokens: ITokenObject[], amountIn: string, amountOutMin: string, toAddress: string, deadline: number, feeOnTransfer: boolean, campaignId?: number, referrer?: string) {
   if (routeTokens.length < 2) {
     return null;
   }
@@ -683,17 +683,8 @@ const AmmTradeExactIn = async function (state: State, wallet: any, market: strin
   }
   let receipt;
 
-  const proxyAddress = state.getProxyAddress();
-  const proxy = new ProxyContracts.Proxy(wallet, proxyAddress);
   const amount = tokenIn.address ? Utils.toDecimals(amountIn, tokenIn.decimals).dp(0) : Utils.toDecimals(amountIn).dp(0);
   const _amountOutMin = Utils.toDecimals(amountOutMin, tokenOut.decimals).dp(0);
-  const _commissions = (commissions || []).filter(v => v.chainId == chainId).map(v => {
-    return {
-      to: v.walletAddress,
-      amount: amount.times(v.share).dp(0)
-    }
-  });
-  const commissionsAmount = _commissions.length ? _commissions.map(v => v.amount).reduce((a, b) => a.plus(b)).dp(0) : new BigNumber(0);
   if (!tokenIn.address) {
     const params = {
       amountOutMin: _amountOutMin,
@@ -712,19 +703,21 @@ const AmmTradeExactIn = async function (state: State, wallet: any, market: strin
         value: amount
       }
     }
-    if (_commissions.length) {
+    if (campaignId !== undefined) {
       let txData = await getRouterSwapTxData(wallet.chainId, market, executeSwapOptions);
+      const proxyAddress = state.getProxyAddress();
+      const proxy = new ProxyContracts.ProxyV3(wallet, proxyAddress);
       receipt = await proxy.proxyCall({
+        campaignId,
         target: routerAddress,
         tokensIn: [
           {
             token: Utils.nullAddress,
-            amount: amount.plus(commissionsAmount),
-            directTransfer: false,
-            commissions: _commissions
+            amount: amount
           }
         ],
         data: txData,
+        referrer,
         to: wallet.address,
         tokensOut: []
       })
@@ -733,12 +726,6 @@ const AmmTradeExactIn = async function (state: State, wallet: any, market: strin
       receipt = await executeRouterSwap(wallet.chainId, market, executeSwapOptions);
     }
   } else {
-    const tokensIn = {
-      token: tokenIn.address,
-      amount: amount.plus(commissionsAmount),
-      directTransfer: false,
-      commissions: _commissions
-    };
     const params = {
       amountIn: amount,
       amountOutMin: _amountOutMin,
@@ -754,17 +741,24 @@ const AmmTradeExactIn = async function (state: State, wallet: any, market: strin
       tokenInType: 'ERC20',
       tokenOutType: !tokenOut.address ? 'ETH' : 'ERC20'
     }
-    if (_commissions.length) {
+    if (campaignId !== undefined) {
       let txData = await getRouterSwapTxData(wallet.chainId, market, executeSwapOptions);
+      const proxyAddress = state.getProxyAddress();
+      const proxy = new ProxyContracts.ProxyV3(wallet, proxyAddress);
       receipt = await proxy.proxyCall({
+        campaignId,
         target: routerAddress,
         tokensIn: [
-          tokensIn
+          {
+            token: tokenIn.address,
+            amount: amount
+          }
         ],
         data: txData,
+        referrer,
         to: wallet.address,
         tokensOut: []
-      });
+      })
     }
     else {
       receipt = await executeRouterSwap(wallet.chainId, market, executeSwapOptions);
@@ -773,7 +767,7 @@ const AmmTradeExactIn = async function (state: State, wallet: any, market: strin
   return receipt;
 }
 
-const AmmTradeExactOut = async function (state: State, wallet: any, market: string, routeTokens: ITokenObject[], amountOut: string, amountInMax: string, toAddress: string, deadline: number, commissions: ICommissionInfo[]) {
+const AmmTradeExactOut = async function (state: State, wallet: any, market: string, routeTokens: ITokenObject[], amountOut: string, amountInMax: string, toAddress: string, deadline: number, campaignId?: number, referrer?: string) {
   if (routeTokens.length < 2) {
     return null;
   }
@@ -788,17 +782,8 @@ const AmmTradeExactOut = async function (state: State, wallet: any, market: stri
     addresses.push(routeTokens[i].address || wrappedTokenAddress);
   }
   let receipt;
-  const proxyAddress = state.getProxyAddress();
-  const proxy = new ProxyContracts.Proxy(wallet, proxyAddress);
   const _amountInMax = Utils.toDecimals(amountInMax, tokenIn.decimals).dp(0);
   const _amountOut = Utils.toDecimals(amountOut, tokenOut.decimals).dp(0);
-  const _commissions = (commissions || []).filter(v => v.chainId == chainId).map(v => {
-    return {
-      to: v.walletAddress,
-      amount: _amountInMax.times(v.share).dp(0)
-    }
-  });
-  const commissionsAmount = _commissions.length ? _commissions.map(v => v.amount).reduce((a, b) => a.plus(b)).dp(0) : new BigNumber(0);
   if (!tokenIn.address) {
     const params = {
       amountOut: _amountOut,
@@ -816,19 +801,21 @@ const AmmTradeExactOut = async function (state: State, wallet: any, market: stri
         value: _amountInMax
       }
     }
-    if (_commissions.length) {
+    if (campaignId !== undefined) {
       let txData = await getRouterSwapTxData(wallet.chainId, market, executeSwapOptions);
+      const proxyAddress = state.getProxyAddress();
+      const proxy = new ProxyContracts.ProxyV3(wallet, proxyAddress);
       receipt = await proxy.proxyCall({
+        campaignId,
         target: routerAddress,
         tokensIn: [
           {
             token: Utils.nullAddress,
-            amount: _amountInMax.plus(commissionsAmount),
-            directTransfer: false,
-            commissions: _commissions
+            amount: _amountInMax
           }
         ],
         data: txData,
+        referrer,
         to: wallet.address,
         tokensOut: []
       })
@@ -837,12 +824,6 @@ const AmmTradeExactOut = async function (state: State, wallet: any, market: stri
       receipt = await executeRouterSwap(wallet.chainId, market, executeSwapOptions);
     }
   } else {
-    const tokensIn = {
-      token: tokenIn.address,
-      amount: _amountInMax.plus(commissionsAmount),
-      directTransfer: false,
-      commissions: _commissions
-    };
     const params = {
       amountOut: _amountOut,
       amountInMax: _amountInMax,
@@ -858,19 +839,24 @@ const AmmTradeExactOut = async function (state: State, wallet: any, market: stri
       tokenOutType: !tokenOut.address ? 'ETH' : 'ERC20'
     }
 
-    if (_commissions.length) {
+    if (campaignId !== undefined) {
       let txData = await getRouterSwapTxData(wallet.chainId, market, executeSwapOptions);
+      const proxyAddress = state.getProxyAddress();
+      const proxy = new ProxyContracts.ProxyV3(wallet, proxyAddress);
       receipt = await proxy.proxyCall({
+        campaignId,
         target: routerAddress,
         tokensIn: [
-          tokensIn
+          {
+            token: tokenIn.address,
+            amount: _amountInMax
+          }
         ],
         data: txData,
+        referrer,
         to: wallet.address,
-        tokensOut: [
-          tokenOut.address
-        ]
-      });
+        tokensOut: []
+      })
     }
     else {
       receipt = await executeRouterSwap(wallet.chainId, market, executeSwapOptions);
@@ -888,7 +874,8 @@ interface SwapData {
   toAmount: BigNumber;
   isFromEstimated: boolean;
   groupQueueOfferIndex?: number;
-  commissions?: ICommissionInfo[];
+  campaignId?: number;
+  referrer?: string;
 }
 
 
@@ -921,7 +908,8 @@ const executeSwap: (state: State, swapData: SwapData) => Promise<{
         amountInMax.toString(),
         toAddress,
         transactionDeadline,
-        swapData.commissions
+        swapData.campaignId,
+        swapData.referrer
       );
     } else {
       const amountOutMin = swapData.toAmount.times(
@@ -937,7 +925,8 @@ const executeSwap: (state: State, swapData: SwapData) => Promise<{
         toAddress,
         transactionDeadline,
         false,
-        swapData.commissions
+        swapData.campaignId,
+        swapData.referrer
       );
     }
   } catch (error) {

@@ -10,6 +10,7 @@
         "@scom/scom-wallet-modal",
         "@scom/scom-network-list",
         "@scom/scom-dex-list",
+        "@scom/scom-commission-proxy-contract",
         "@scom/scom-dapp-container",
         "@scom/scom-commission-fee-setup",
         "@scom/scom-token-input",
