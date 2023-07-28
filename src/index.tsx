@@ -479,12 +479,15 @@ export default class ScomSwap extends Module {
     this.removeRpcWalletEvents();
     const rpcWalletId = await this.state.initRpcWallet(this.defaultChainId);
     const rpcWallet = this.state.getRpcWallet();
-    const event = rpcWallet.registerWalletEvent(this, Constants.RpcWalletEvent.Connected, async (connected: boolean) => {
+    const chainChangedEvent = rpcWallet.registerWalletEvent(this, Constants.RpcWalletEvent.ChainChanged, async (chainId: number) => {
+      this.onChainChange();
+    });
+    const connectedEvent = rpcWallet.registerWalletEvent(this, Constants.RpcWalletEvent.Connected, async (connected: boolean) => {
       if (this.swapBtn) this.swapBtn.visible = true;
       this.updateContractAddress();
       if (this.originalData?.providers?.length) await this.initializeWidgetConfig();
     });
-    this.rpcWalletEvents.push(event);
+    this.rpcWalletEvents.push(chainChangedEvent, connectedEvent);
     if (rpcWallet.instanceId) {
       if (this.firstTokenInput) this.firstTokenInput.rpcWalletId = rpcWallet.instanceId;
       if (this.secondTokenInput) this.secondTokenInput.rpcWalletId = rpcWallet.instanceId;
@@ -627,7 +630,6 @@ export default class ScomSwap extends Module {
   }
 
   private registerEvent() {
-    this.clientEvents.push(this.$eventBus.register(this, EventId.chainChanged, this.onChainChange));
     this.clientEvents.push(this.$eventBus.register(this, EventId.SlippageToleranceChanged, () => { this.priceInfo.Items = this.getPriceInfo() }));
     this.clientEvents.push(this.$eventBus.register(this, EventId.ExpertModeChanged, () => {
       this.updateSwapButtonCaption();

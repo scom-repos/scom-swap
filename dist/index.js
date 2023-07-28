@@ -16164,7 +16164,10 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
             this.removeRpcWalletEvents();
             const rpcWalletId = await this.state.initRpcWallet(this.defaultChainId);
             const rpcWallet = this.state.getRpcWallet();
-            const event = rpcWallet.registerWalletEvent(this, eth_wallet_6.Constants.RpcWalletEvent.Connected, async (connected) => {
+            const chainChangedEvent = rpcWallet.registerWalletEvent(this, eth_wallet_6.Constants.RpcWalletEvent.ChainChanged, async (chainId) => {
+                this.onChainChange();
+            });
+            const connectedEvent = rpcWallet.registerWalletEvent(this, eth_wallet_6.Constants.RpcWalletEvent.Connected, async (connected) => {
                 var _a, _b;
                 if (this.swapBtn)
                     this.swapBtn.visible = true;
@@ -16172,7 +16175,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                 if ((_b = (_a = this.originalData) === null || _a === void 0 ? void 0 : _a.providers) === null || _b === void 0 ? void 0 : _b.length)
                     await this.initializeWidgetConfig();
             });
-            this.rpcWalletEvents.push(event);
+            this.rpcWalletEvents.push(chainChangedEvent, connectedEvent);
             if (rpcWallet.instanceId) {
                 if (this.firstTokenInput)
                     this.firstTokenInput.rpcWalletId = rpcWallet.instanceId;
@@ -16575,7 +16578,6 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
             this.registerEvent();
         }
         registerEvent() {
-            this.clientEvents.push(this.$eventBus.register(this, "chainChanged" /* EventId.chainChanged */, this.onChainChange));
             this.clientEvents.push(this.$eventBus.register(this, "SlippageToleranceChanged" /* EventId.SlippageToleranceChanged */, () => { this.priceInfo.Items = this.getPriceInfo(); }));
             this.clientEvents.push(this.$eventBus.register(this, "ExpertModeChanged" /* EventId.ExpertModeChanged */, () => {
                 this.updateSwapButtonCaption();
