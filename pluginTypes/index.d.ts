@@ -10082,7 +10082,8 @@ declare module "@scom/scom-swap/formSchema.ts" {
                         items: {
                             type: string;
                             properties: {
-                                name: {
+                                key: {
+                                    title: string;
                                     type: string;
                                     oneOf: any[];
                                     required: boolean;

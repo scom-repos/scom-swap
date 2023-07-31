@@ -15298,7 +15298,8 @@ define("@scom/scom-swap/formSchema.ts", ["require", "exports"], function (requir
                             items: {
                                 type: "object",
                                 properties: {
-                                    name: {
+                                    key: {
+                                        title: "Name",
                                         type: "string",
                                         oneOf: providerOptions,
                                         required: true
