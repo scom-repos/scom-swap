@@ -10076,36 +10076,16 @@ declare module "@scom/scom-swap/formSchema.ts" {
                         type: string;
                         format: string;
                     };
-                    category: {
-                        type: string;
-                        required: boolean;
-                        enum: string[];
-                    };
-                    tokens: {
-                        type: string;
-                        required: boolean;
-                        items: {
-                            type: string;
-                            properties: {
-                                address: {
-                                    type: string;
-                                };
-                            };
-                        };
-                    };
                     providers: {
                         type: string;
                         required: boolean;
                         items: {
                             type: string;
                             properties: {
-                                key: {
-                                    type: string;
-                                    required: boolean;
-                                };
-                                provider: {
+                                name: {
                                     type: string;
                                     oneOf: any[];
+                                    required: boolean;
                                 };
                             };
                         };
@@ -10114,13 +10094,7 @@ declare module "@scom/scom-swap/formSchema.ts" {
             };
             uiSchema: {
                 type: string;
-                elements: ({
-                    type: string;
-                    elements: {
-                        type: string;
-                        scope: string;
-                    }[];
-                } | {
+                elements: {
                     type: string;
                     elements: {
                         type: string;
@@ -10148,7 +10122,7 @@ declare module "@scom/scom-swap/formSchema.ts" {
                             }[];
                         })[];
                     }[];
-                })[];
+                }[];
             };
         };
     };

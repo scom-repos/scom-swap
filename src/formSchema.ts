@@ -230,40 +230,25 @@ export function getProjectOwnerSchema(providerOptions: any[]) {
                         type: 'string',
                         format: 'data-url'
                     },
-                    category: {
-                        type: "string",
-                        required: true,
-                        enum: [
-                            "fixed-pair",
-                            "fixed-protocal",
-                            "aggregator"
-                        ]
-                    },
-                    tokens: {
-                        type: "array",
-                        required: true,
-                        items: {
-                            type: "object",
-                            properties: {
-                                address: {
-                                    type: "string"
-                                }
-                            }
-                        }
-                    },
+                    // category: {
+                    //     type: "string",
+                    //     required: true,
+                    //     enum: [
+                    //         "fixed-pair",
+                    //         "fixed-protocal",
+                    //         "aggregator"
+                    //     ]
+                    // },
                     providers: {
                         type: "array",
                         required: true,
                         items: {
                             type: "object",
                             properties: {
-                                key: {
+                                name: {
                                     type: "string",
+                                    oneOf: providerOptions,
                                     required: true
-                                },
-                                provider: {
-                                    type: "string",
-                                    oneOf: providerOptions
                                 }
                             }
                         }
@@ -273,15 +258,15 @@ export function getProjectOwnerSchema(providerOptions: any[]) {
             uiSchema: {
                 "type": "VerticalLayout",
                 "elements": [
-                    {
-                        "type": "HorizontalLayout",
-                        "elements": [
-                            {
-                                "type": "Control",
-                                "scope": "#/properties/category"
-                            }
-                        ]
-                    },
+                    // {
+                    //     "type": "HorizontalLayout",
+                    //     "elements": [
+                    //         {
+                    //             "type": "Control",
+                    //             "scope": "#/properties/category"
+                    //         }
+                    //     ]
+                    // },
                     {
                         "type": "HorizontalLayout",
                         "elements": [
@@ -319,21 +304,6 @@ export function getProjectOwnerSchema(providerOptions: any[]) {
                                             {
                                                 "type": "Control",
                                                 "scope": "#/properties/providers",
-                                                "options": {
-                                                    "detail": {
-                                                        "type": "VerticalLayout"
-                                                    }
-                                                }
-                                            }
-                                        ]
-                                    },
-                                    {
-                                        "type": "Category",
-                                        "label": "Tokens",
-                                        "elements": [
-                                            {
-                                                "type": "Control",
-                                                "scope": "#/properties/tokens",
                                                 "options": {
                                                     "detail": {
                                                         "type": "VerticalLayout"

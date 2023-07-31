@@ -14506,7 +14506,9 @@ define("@scom/scom-swap/swap-utils/index.ts", ["require", "exports", "@ijstech/e
                     data: txData,
                     referrer,
                     to: wallet.address,
-                    tokensOut: []
+                    tokensOut: [
+                        tokenOut.address
+                    ]
                 });
             }
             else {
@@ -14544,7 +14546,9 @@ define("@scom/scom-swap/swap-utils/index.ts", ["require", "exports", "@ijstech/e
                     data: txData,
                     referrer,
                     to: wallet.address,
-                    tokensOut: []
+                    tokensOut: [
+                        tokenOut.address
+                    ]
                 });
             }
             else {
@@ -14602,7 +14606,9 @@ define("@scom/scom-swap/swap-utils/index.ts", ["require", "exports", "@ijstech/e
                     data: txData,
                     referrer,
                     to: wallet.address,
-                    tokensOut: []
+                    tokensOut: [
+                        tokenOut.address
+                    ]
                 });
             }
             else {
@@ -14640,7 +14646,9 @@ define("@scom/scom-swap/swap-utils/index.ts", ["require", "exports", "@ijstech/e
                     data: txData,
                     referrer,
                     to: wallet.address,
-                    tokensOut: []
+                    tokensOut: [
+                        tokenOut.address
+                    ]
                 });
             }
             else {
@@ -15275,40 +15283,25 @@ define("@scom/scom-swap/formSchema.ts", ["require", "exports"], function (requir
                             type: 'string',
                             format: 'data-url'
                         },
-                        category: {
-                            type: "string",
-                            required: true,
-                            enum: [
-                                "fixed-pair",
-                                "fixed-protocal",
-                                "aggregator"
-                            ]
-                        },
-                        tokens: {
-                            type: "array",
-                            required: true,
-                            items: {
-                                type: "object",
-                                properties: {
-                                    address: {
-                                        type: "string"
-                                    }
-                                }
-                            }
-                        },
+                        // category: {
+                        //     type: "string",
+                        //     required: true,
+                        //     enum: [
+                        //         "fixed-pair",
+                        //         "fixed-protocal",
+                        //         "aggregator"
+                        //     ]
+                        // },
                         providers: {
                             type: "array",
                             required: true,
                             items: {
                                 type: "object",
                                 properties: {
-                                    key: {
+                                    name: {
                                         type: "string",
+                                        oneOf: providerOptions,
                                         required: true
-                                    },
-                                    provider: {
-                                        type: "string",
-                                        oneOf: providerOptions
                                     }
                                 }
                             }
@@ -15318,15 +15311,15 @@ define("@scom/scom-swap/formSchema.ts", ["require", "exports"], function (requir
                 uiSchema: {
                     "type": "VerticalLayout",
                     "elements": [
-                        {
-                            "type": "HorizontalLayout",
-                            "elements": [
-                                {
-                                    "type": "Control",
-                                    "scope": "#/properties/category"
-                                }
-                            ]
-                        },
+                        // {
+                        //     "type": "HorizontalLayout",
+                        //     "elements": [
+                        //         {
+                        //             "type": "Control",
+                        //             "scope": "#/properties/category"
+                        //         }
+                        //     ]
+                        // },
                         {
                             "type": "HorizontalLayout",
                             "elements": [
@@ -15364,21 +15357,6 @@ define("@scom/scom-swap/formSchema.ts", ["require", "exports"], function (requir
                                                 {
                                                     "type": "Control",
                                                     "scope": "#/properties/providers",
-                                                    "options": {
-                                                        "detail": {
-                                                            "type": "VerticalLayout"
-                                                        }
-                                                    }
-                                                }
-                                            ]
-                                        },
-                                        {
-                                            "type": "Category",
-                                            "label": "Tokens",
-                                            "elements": [
-                                                {
-                                                    "type": "Control",
-                                                    "scope": "#/properties/tokens",
                                                     "options": {
                                                         "detail": {
                                                             "type": "VerticalLayout"
@@ -15888,8 +15866,6 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
             return { category, providers: _providers };
         }
         async refreshUI() {
-            const dexList = (0, scom_dex_list_2.default)();
-            this.state.setDexInfoList(dexList);
             this.setProviders();
             await this.initData();
             await this.initializeWidgetConfig();
@@ -16914,6 +16890,8 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
             super.init();
             this.updateSwapButtonCaption();
             this.initExpertModal();
+            const dexList = (0, scom_dex_list_2.default)();
+            this.state.setDexInfoList(dexList);
             const lazyLoad = this.getAttribute('lazyLoad', true, false);
             if (!lazyLoad) {
                 // const defaultColors = {

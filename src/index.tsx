@@ -643,8 +643,6 @@ export default class ScomSwap extends Module {
   }
 
   private async refreshUI() {
-    const dexList = getDexList();
-    this.state.setDexInfoList(dexList);
     this.setProviders();
     await this.initData();
     await this.initializeWidgetConfig();
@@ -1659,6 +1657,8 @@ export default class ScomSwap extends Module {
     super.init();
     this.updateSwapButtonCaption();
     this.initExpertModal();
+    const dexList = getDexList();
+    this.state.setDexInfoList(dexList);
     const lazyLoad = this.getAttribute('lazyLoad', true, false);
     if (!lazyLoad) {
       // const defaultColors = {

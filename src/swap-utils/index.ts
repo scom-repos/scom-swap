@@ -719,7 +719,9 @@ const AmmTradeExactIn = async function (state: State, wallet: any, market: strin
         data: txData,
         referrer,
         to: wallet.address,
-        tokensOut: []
+        tokensOut: [
+          tokenOut.address
+        ]
       })
     }
     else {
@@ -757,7 +759,9 @@ const AmmTradeExactIn = async function (state: State, wallet: any, market: strin
         data: txData,
         referrer,
         to: wallet.address,
-        tokensOut: []
+        tokensOut: [
+          tokenOut.address
+        ]
       })
     }
     else {
@@ -817,7 +821,9 @@ const AmmTradeExactOut = async function (state: State, wallet: any, market: stri
         data: txData,
         referrer,
         to: wallet.address,
-        tokensOut: []
+        tokensOut: [
+          tokenOut.address
+        ]
       })
     }
     else {
@@ -855,7 +861,9 @@ const AmmTradeExactOut = async function (state: State, wallet: any, market: stri
         data: txData,
         referrer,
         to: wallet.address,
-        tokensOut: []
+        tokensOut: [
+          tokenOut.address
+        ]
       })
     }
     else {
