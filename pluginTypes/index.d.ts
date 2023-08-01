@@ -10134,6 +10134,7 @@ declare module "@scom/scom-swap" {
     import { ITokenObject } from '@scom/scom-token-list';
     import { ISwapConfigUI, IProviderUI, Category, ICommissionInfo, INetworkConfig } from "@scom/scom-swap/global/index.ts";
     import { IWalletPlugin } from '@scom/scom-wallet-modal';
+    import { IDexInfo } from '@scom/scom-dex-list';
     import ScomCommissionFeeSetup from '@scom/scom-commission-fee-setup';
     interface ScomSwapElement extends ControlElement {
         campaignId?: number;
@@ -10249,6 +10250,7 @@ declare module "@scom/scom-swap" {
             name: string;
             target: string;
             getProxySelectors: () => Promise<string[]>;
+            getDexProviderOptions: (chainId: number) => any[] | IDexInfo;
             getPair: (market: string, tokenA: ITokenObject, tokenB: ITokenObject) => Promise<string>;
             getActions: (category?: string) => any[];
             getData: any;
@@ -10267,6 +10269,7 @@ declare module "@scom/scom-swap" {
             getTag: any;
             setTag: any;
             getProxySelectors?: undefined;
+            getDexProviderOptions?: undefined;
             getPair?: undefined;
             elementName?: undefined;
             getLinkParams?: undefined;
@@ -10297,6 +10300,7 @@ declare module "@scom/scom-swap" {
             getTag: any;
             setTag: any;
             getProxySelectors?: undefined;
+            getDexProviderOptions?: undefined;
             getPair?: undefined;
             getActions?: undefined;
         })[];

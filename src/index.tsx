@@ -243,7 +243,6 @@ export default class ScomSwap extends Module {
 
   private determineActionsByTarget(target: 'builder' | 'projectOwner', category?: string) {
     if (target === 'builder') {
-
       return this.getBuilderActions(category);
     }
     else {
@@ -425,6 +424,10 @@ export default class ScomSwap extends Module {
         getProxySelectors: async () => {
           const selectors = await getProviderProxySelectors(this.state, this._data.providers);
           return selectors;
+        },
+        getDexProviderOptions: (chainId: number) => {
+          const providers = this.state.dexInfoList.find(v => v.chainId === chainId) || [];
+          return providers;
         },
         getPair: async (market: string, tokenA: ITokenObject, tokenB: ITokenObject) => {
           const pair = await getPair(this.state, market, tokenA, tokenB);
