@@ -426,7 +426,7 @@ export default class ScomSwap extends Module {
           return selectors;
         },
         getDexProviderOptions: (chainId: number) => {
-          const providers = this.state.dexInfoList.find(v => v.chainId === chainId) || [];
+          const providers = this.state.dexInfoList.filter(v => v.chainId === chainId) || [];
           return providers;
         },
         getPair: async (market: string, tokenA: ITokenObject, tokenB: ITokenObject) => {

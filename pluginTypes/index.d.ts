@@ -10250,7 +10250,7 @@ declare module "@scom/scom-swap" {
             name: string;
             target: string;
             getProxySelectors: () => Promise<string[]>;
-            getDexProviderOptions: (chainId: number) => any[] | IDexInfo;
+            getDexProviderOptions: (chainId: number) => IDexInfo[];
             getPair: (market: string, tokenA: ITokenObject, tokenB: ITokenObject) => Promise<string>;
             getActions: (category?: string) => any[];
             getData: any;

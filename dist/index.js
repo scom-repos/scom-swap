@@ -15628,7 +15628,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                         return selectors;
                     },
                     getDexProviderOptions: (chainId) => {
-                        const providers = this.state.dexInfoList.find(v => v.chainId === chainId) || [];
+                        const providers = this.state.dexInfoList.filter(v => v.chainId === chainId) || [];
                         return providers;
                     },
                     getPair: async (market, tokenA, tokenB) => {
