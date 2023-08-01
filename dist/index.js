@@ -26,37 +26,9 @@ define("@scom/scom-swap/assets.ts", ["require", "exports", "@ijstech/components"
         return `${moduleDir}/${path}`;
     }
     ;
-    const TokenFolderName = {
-        1: "ethereum",
-        25: "cronos",
-        56: "bsc",
-        97: "bsc-testnet",
-        137: "polygon",
-        338: "cronos-testnet",
-        31337: "amino",
-        80001: "mumbai",
-        43113: "fuji",
-        43114: "avalanche",
-        250: "fantom",
-        4002: "fantom-testnet",
-        13370: "aminox-testnet"
-    };
-    function tokenPath(tokenObj, chainId) {
-        var _a;
-        const pathPrefix = 'img/tokens';
-        if (tokenObj && chainId && chainId >= 0) {
-            let folderName = TokenFolderName[chainId];
-            let fileName = (!tokenObj.isNative ? (_a = tokenObj === null || tokenObj === void 0 ? void 0 : tokenObj.address) === null || _a === void 0 ? void 0 : _a.toLowerCase() : tokenObj.symbol) + '.png';
-            return fullPath(`${pathPrefix}/${folderName}/${fileName}`);
-        }
-        else {
-            return fullPath(`${pathPrefix}/Custom.png`);
-        }
-    }
     exports.default = {
         logo: fullPath('img/logo.svg'),
-        fullPath,
-        tokenPath
+        fullPath
     };
 });
 define("@scom/scom-swap/index.css.ts", ["require", "exports", "@ijstech/components", "@scom/scom-swap/assets.ts"], function (require, exports, components_2, assets_1) {
@@ -13861,7 +13833,7 @@ define("@scom/scom-swap/store/index.ts", ["require", "exports", "@scom/scom-toke
 define("@scom/scom-swap/swap-utils/index.ts", ["require", "exports", "@ijstech/eth-wallet", "@scom/scom-swap/contracts/oswap-openswap-contract/index.ts", "@scom/scom-commission-proxy-contract", "@scom/scom-dex-list", "@scom/scom-swap/global/index.ts", "@scom/scom-swap/store/index.ts", "@scom/scom-token-list"], function (require, exports, eth_wallet_5, index_5, scom_commission_proxy_contract_1, scom_dex_list_1, index_6, index_7, scom_token_list_3) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.getProviderProxySelectors = exports.setApprovalModalSpenderAddress = exports.getApprovalModelAction = exports.getRouterAddress = exports.getChainNativeToken = exports.executeSwap = exports.getAllRoutesData = exports.getTradeFeeMap = exports.getExtendedRouteObjData = exports.getCommissionAmount = exports.getCurrentCommissions = void 0;
+    exports.getProviderProxySelectors = exports.setApprovalModalSpenderAddress = exports.getApprovalModelAction = exports.getRouterAddress = exports.getChainNativeToken = exports.executeSwap = exports.getPair = exports.getAllRoutesData = exports.getTradeFeeMap = exports.getExtendedRouteObjData = exports.getCommissionAmount = exports.getCurrentCommissions = void 0;
     const routeAPI = 'https://route.openswap.xyz/trading/v1/route';
     const newRouteAPI = 'https://indexer.ijs.dev/trading/v1/route';
     const getChainNativeToken = (chainId) => {
@@ -14033,6 +14005,21 @@ define("@scom/scom-swap/swap-utils/index.ts", ["require", "exports", "@ijstech/e
         return Array.from(selectorsSet);
     };
     exports.getProviderProxySelectors = getProviderProxySelectors;
+    const getPair = async (state, market, tokenA, tokenB) => {
+        const wallet = state.getRpcWallet();
+        let chainId = state.getChainId();
+        if (!tokenA.address)
+            tokenA = getWETH(chainId);
+        if (!tokenB.address)
+            tokenB = getWETH(chainId);
+        let factory = new index_5.Contracts.OSWAP_Factory(wallet, getFactoryAddress(state, market));
+        let pair = await factory.getPair({
+            param1: tokenA.address,
+            param2: tokenB.address
+        });
+        return pair;
+    };
+    exports.getPair = getPair;
     const getAllAvailableRoutes = async (state, markets, tokenList, tokenIn, tokenOut) => {
         const wallet = state.getRpcWallet();
         let getPairPromises = [];
@@ -14045,19 +14032,6 @@ define("@scom/scom-swap/swap-utils/index.ts", ["require", "exports", "@ijstech/e
                 tokenOut = getWETH(chainId);
             let reserveObj = await (0, scom_dex_list_1.getDexPairReserves)(wallet, wallet.chainId, market, pairAddress, tokenIn.address, tokenOut.address);
             return reserveObj;
-        };
-        const getPair = async (state, market, tokenA, tokenB) => {
-            let chainId = state.getChainId();
-            if (!tokenA.address)
-                tokenA = getWETH(chainId);
-            if (!tokenB.address)
-                tokenB = getWETH(chainId);
-            let factory = new index_5.Contracts.OSWAP_Factory(wallet, getFactoryAddress(state, market));
-            let pair = await factory.getPair({
-                param1: tokenA.address,
-                param2: tokenB.address
-            });
-            return pair;
         };
         let composeAvailableRoutePromise = async (state, market, tokenIn, tokenOut) => {
             try {
@@ -14981,7 +14955,7 @@ define("@scom/scom-swap/data.json.ts", ["require", "exports"], function (require
             }
         ],
         "proxyAddresses": {
-            "43113": "0x384FD30bcef20c3621Fd6dBc0bd3Be383505e759"
+            "43113": "0x83aaf000f0a09f860564e894535cc18f5a50f627"
         },
         "ipfsGatewayUrl": "https://ipfs.scom.dev/ipfs/",
         "embedderCommissionFee": "0.01",
@@ -15652,6 +15626,10 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                     getProxySelectors: async () => {
                         const selectors = await (0, index_9.getProviderProxySelectors)(this.state, this._data.providers);
                         return selectors;
+                    },
+                    getPair: async (market, tokenA, tokenB) => {
+                        const pair = await (0, index_9.getPair)(this.state, market, tokenA, tokenB);
+                        return pair;
                     },
                     getActions: (category) => {
                         return this.determineActionsByTarget('projectOwner', category);

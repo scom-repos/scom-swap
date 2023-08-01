@@ -15,7 +15,8 @@ import {
   setApprovalModalSpenderAddress,
   getCommissionAmount,
   getCurrentCommissions,
-  getProviderProxySelectors
+  getProviderProxySelectors,
+  getPair
 } from './swap-utils/index'
 import { ITokenObject } from '@scom/scom-token-list';
 import {
@@ -424,6 +425,10 @@ export default class ScomSwap extends Module {
         getProxySelectors: async () => {
           const selectors = await getProviderProxySelectors(this.state, this._data.providers);
           return selectors;
+        },
+        getPair: async (market: string, tokenA: ITokenObject, tokenB: ITokenObject) => {
+          const pair = await getPair(this.state, market, tokenA, tokenB);
+          return pair;
         },
         getActions: (category?: string) => {
           return this.determineActionsByTarget('projectOwner', category);

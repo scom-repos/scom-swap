@@ -11,7 +11,7 @@ export default {
     }       
   ],
   "proxyAddresses": {
-    "43113": "0x384FD30bcef20c3621Fd6dBc0bd3Be383505e759"
+    "43113": "0x83aaf000f0a09f860564e894535cc18f5a50f627"
   },
   "ipfsGatewayUrl": "https://ipfs.scom.dev/ipfs/",
   "embedderCommissionFee": "0.01",

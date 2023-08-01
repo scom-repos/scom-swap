@@ -209,6 +209,19 @@ const getProviderProxySelectors = async (state: State, providers: IProviderUI[])
   return Array.from(selectorsSet);
 }
 
+const getPair = async (state: State, market: string, tokenA: ITokenObject, tokenB: ITokenObject) => {
+  const wallet = state.getRpcWallet();
+  let chainId = state.getChainId();
+  if (!tokenA.address) tokenA = getWETH(chainId);
+  if (!tokenB.address) tokenB = getWETH(chainId);
+  let factory = new Contracts.OSWAP_Factory(wallet, getFactoryAddress(state, market));
+  let pair = await factory.getPair({
+    param1: tokenA.address!,
+    param2: tokenB.address!
+  });
+  return pair;
+}
+
 const getAllAvailableRoutes = async (state: State, markets: string[], tokenList: ITokenObject[], tokenIn: ITokenObject, tokenOut: ITokenObject) => {
   const wallet = state.getRpcWallet();
   let getPairPromises:Promise<void>[] = [];
@@ -220,18 +233,6 @@ const getAllAvailableRoutes = async (state: State, markets: string[], tokenList:
     if (!tokenOut.address) tokenOut = getWETH(chainId);
     let reserveObj = await getDexPairReserves(wallet, wallet.chainId, market, pairAddress, tokenIn.address, tokenOut.address);
     return reserveObj;
-  }
-
-  const getPair = async (state: State, market: string, tokenA: ITokenObject, tokenB: ITokenObject) => {
-    let chainId = state.getChainId();
-    if (!tokenA.address) tokenA = getWETH(chainId);
-    if (!tokenB.address) tokenB = getWETH(chainId);
-    let factory = new Contracts.OSWAP_Factory(wallet, getFactoryAddress(state, market));
-    let pair = await factory.getPair({
-      param1: tokenA.address!,
-      param2: tokenB.address!
-    });
-    return pair;
   }
 
   let composeAvailableRoutePromise = async (state: State, market: string, tokenIn: ITokenObject, tokenOut: ITokenObject) => {
@@ -963,6 +964,7 @@ export {
   getExtendedRouteObjData,
   getTradeFeeMap,
   getAllRoutesData,
+  getPair,
   SwapData,
   executeSwap,
   getChainNativeToken,

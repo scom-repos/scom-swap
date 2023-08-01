@@ -7,13 +7,10 @@
 /// <reference path="@scom/scom-token-input/@scom/scom-token-modal/@ijstech/eth-wallet/index.d.ts" />
 /// <amd-module name="@scom/scom-swap/assets.ts" />
 declare module "@scom/scom-swap/assets.ts" {
-    import { ITokenObject } from '@scom/scom-token-list';
     function fullPath(path: string): string;
-    function tokenPath(tokenObj?: ITokenObject, chainId?: number): string;
     const _default: {
         logo: string;
         fullPath: typeof fullPath;
-        tokenPath: typeof tokenPath;
     };
     export default _default;
 }
@@ -9787,6 +9784,7 @@ declare module "@scom/scom-swap/swap-utils/index.ts" {
     function getRouterAddress(state: State, key: string): string;
     function getTradeFeeMap(state: State): TradeFeeMap;
     const getProviderProxySelectors: (state: State, providers: IProviderUI[]) => Promise<string[]>;
+    const getPair: (state: State, market: string, tokenA: ITokenObject, tokenB: ITokenObject) => Promise<string>;
     function getExtendedRouteObjData(wallet: any, bestRouteObj: any, tradeFeeMap: TradeFeeMap, swapPrice: BigNumber, isHybridOrQueue: boolean): Promise<any>;
     function getAllRoutesData(state: State, firstTokenObject: ITokenObject, secondTokenObject: ITokenObject, firstInput: BigNumber, secondInput: BigNumber, isFromEstimated: boolean, useAPI: boolean, commissions: ICommissionInfo[]): Promise<any[]>;
     export const getCurrentCommissions: (state: State, commissions: ICommissionInfo[]) => ICommissionInfo[];
@@ -9809,7 +9807,7 @@ declare module "@scom/scom-swap/swap-utils/index.ts" {
     }>;
     const getApprovalModelAction: (options: IERC20ApprovalEventOptions) => Promise<import("@scom/scom-swap/global/index.ts").IERC20ApprovalAction>;
     const setApprovalModalSpenderAddress: (state: State, market: string, contractAddress?: string) => void;
-    export { getExtendedRouteObjData, getTradeFeeMap, getAllRoutesData, SwapData, executeSwap, getChainNativeToken, getRouterAddress, getApprovalModelAction, setApprovalModalSpenderAddress, getProviderProxySelectors };
+    export { getExtendedRouteObjData, getTradeFeeMap, getAllRoutesData, getPair, SwapData, executeSwap, getChainNativeToken, getRouterAddress, getApprovalModelAction, setApprovalModalSpenderAddress, getProviderProxySelectors };
 }
 /// <amd-module name="@scom/scom-swap/price-info/priceInfo.css.ts" />
 declare module "@scom/scom-swap/price-info/priceInfo.css.ts" { }
@@ -10251,6 +10249,7 @@ declare module "@scom/scom-swap" {
             name: string;
             target: string;
             getProxySelectors: () => Promise<string[]>;
+            getPair: (market: string, tokenA: ITokenObject, tokenB: ITokenObject) => Promise<string>;
             getActions: (category?: string) => any[];
             getData: any;
             setData: (value: any) => Promise<void>;
@@ -10268,6 +10267,7 @@ declare module "@scom/scom-swap" {
             getTag: any;
             setTag: any;
             getProxySelectors?: undefined;
+            getPair?: undefined;
             elementName?: undefined;
             getLinkParams?: undefined;
             bindOnChanged?: undefined;
@@ -10297,6 +10297,7 @@ declare module "@scom/scom-swap" {
             getTag: any;
             setTag: any;
             getProxySelectors?: undefined;
+            getPair?: undefined;
             getActions?: undefined;
         })[];
         private getData;
