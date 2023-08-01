@@ -217,7 +217,7 @@ export function getBuilderSchema() {
     }
 }
 
-export function getProjectOwnerSchema(providerOptions: any[]) {
+export function getProjectOwnerSchema() {
     return {
         general: {
             dataSchema: {
@@ -239,21 +239,21 @@ export function getProjectOwnerSchema(providerOptions: any[]) {
                     //         "aggregator"
                     //     ]
                     // },
-                    providers: {
-                        type: "array",
-                        required: true,
-                        items: {
-                            type: "object",
-                            properties: {
-                                key: {
-                                    title: "Name",
-                                    type: "string",
-                                    oneOf: providerOptions,
-                                    required: true
-                                }
-                            }
-                        }
-                    }
+                    // providers: {
+                    //     type: "array",
+                    //     required: true,
+                    //     items: {
+                    //         type: "object",
+                    //         properties: {
+                    //             key: {
+                    //                 title: "Name",
+                    //                 type: "string",
+                    //                 oneOf: providerOptions,
+                    //                 required: true
+                    //             }
+                    //         }
+                    //     }
+                    // }
                 }
             },
             uiSchema: {
@@ -295,21 +295,6 @@ export function getProjectOwnerSchema(providerOptions: any[]) {
                                                         "scope": "#/properties/logo"
                                                     }
                                                 ]
-                                            }
-                                        ]
-                                    },
-                                    {
-                                        "type": "Category",
-                                        "label": "Providers",
-                                        "elements": [
-                                            {
-                                                "type": "Control",
-                                                "scope": "#/properties/providers",
-                                                "options": {
-                                                    "detail": {
-                                                        "type": "VerticalLayout"
-                                                    }
-                                                }
                                             }
                                         ]
                                     }

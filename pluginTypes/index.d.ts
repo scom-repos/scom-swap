@@ -10062,7 +10062,7 @@ declare module "@scom/scom-swap/formSchema.ts" {
             };
         };
     };
-    export function getProjectOwnerSchema(providerOptions: any[]): {
+    export function getProjectOwnerSchema(): {
         general: {
             dataSchema: {
                 type: string;
@@ -10074,21 +10074,6 @@ declare module "@scom/scom-swap/formSchema.ts" {
                         type: string;
                         format: string;
                     };
-                    providers: {
-                        type: string;
-                        required: boolean;
-                        items: {
-                            type: string;
-                            properties: {
-                                key: {
-                                    title: string;
-                                    type: string;
-                                    oneOf: any[];
-                                    required: boolean;
-                                };
-                            };
-                        };
-                    };
                 };
             };
             uiSchema: {
@@ -10097,7 +10082,7 @@ declare module "@scom/scom-swap/formSchema.ts" {
                     type: string;
                     elements: {
                         type: string;
-                        elements: ({
+                        elements: {
                             type: string;
                             label: string;
                             elements: {
@@ -10107,19 +10092,7 @@ declare module "@scom/scom-swap/formSchema.ts" {
                                     scope: string;
                                 }[];
                             }[];
-                        } | {
-                            type: string;
-                            label: string;
-                            elements: {
-                                type: string;
-                                scope: string;
-                                options: {
-                                    detail: {
-                                        type: string;
-                                    };
-                                };
-                            }[];
-                        })[];
+                        }[];
                     }[];
                 }[];
             };

@@ -15244,7 +15244,7 @@ define("@scom/scom-swap/formSchema.ts", ["require", "exports"], function (requir
         };
     }
     exports.getBuilderSchema = getBuilderSchema;
-    function getProjectOwnerSchema(providerOptions) {
+    function getProjectOwnerSchema() {
         return {
             general: {
                 dataSchema: {
@@ -15266,21 +15266,21 @@ define("@scom/scom-swap/formSchema.ts", ["require", "exports"], function (requir
                         //         "aggregator"
                         //     ]
                         // },
-                        providers: {
-                            type: "array",
-                            required: true,
-                            items: {
-                                type: "object",
-                                properties: {
-                                    key: {
-                                        title: "Name",
-                                        type: "string",
-                                        oneOf: providerOptions,
-                                        required: true
-                                    }
-                                }
-                            }
-                        }
+                        // providers: {
+                        //     type: "array",
+                        //     required: true,
+                        //     items: {
+                        //         type: "object",
+                        //         properties: {
+                        //             key: {
+                        //                 title: "Name",
+                        //                 type: "string",
+                        //                 oneOf: providerOptions,
+                        //                 required: true
+                        //             }
+                        //         }
+                        //     }
+                        // }
                     }
                 },
                 uiSchema: {
@@ -15322,21 +15322,6 @@ define("@scom/scom-swap/formSchema.ts", ["require", "exports"], function (requir
                                                             "scope": "#/properties/logo"
                                                         }
                                                     ]
-                                                }
-                                            ]
-                                        },
-                                        {
-                                            "type": "Category",
-                                            "label": "Providers",
-                                            "elements": [
-                                                {
-                                                    "type": "Control",
-                                                    "scope": "#/properties/providers",
-                                                    "options": {
-                                                        "detail": {
-                                                            "type": "VerticalLayout"
-                                                        }
-                                                    }
                                                 }
                                             ]
                                         }
@@ -15597,15 +15582,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
             return actions;
         }
         getProjectOwnerActions() {
-            const providerOptions = this.state.dexInfoList.map((dexInfo) => {
-                return {
-                    title: dexInfo.dexName,
-                    icon: dexInfo.image,
-                    description: "",
-                    const: dexInfo.dexCode
-                };
-            });
-            const formSchema = (0, formSchema_1.getProjectOwnerSchema)(providerOptions);
+            const formSchema = (0, formSchema_1.getProjectOwnerSchema)();
             const propertiesDataSchema = formSchema.general.dataSchema;
             const propertiesUISchema = formSchema.general.uiSchema;
             const actions = [

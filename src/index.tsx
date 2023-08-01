@@ -394,15 +394,7 @@ export default class ScomSwap extends Module {
   }
 
   private getProjectOwnerActions() {
-    const providerOptions = this.state.dexInfoList.map((dexInfo: IDexInfo) => {
-      return {
-        title: dexInfo.dexName, 
-        icon: dexInfo.image, 
-        description: "",
-        const: dexInfo.dexCode 
-      }
-    });
-    const formSchema: any = getProjectOwnerSchema(providerOptions);
+    const formSchema: any = getProjectOwnerSchema();
     const propertiesDataSchema = formSchema.general.dataSchema;
     const propertiesUISchema = formSchema.general.uiSchema;
     const actions: any[] = [
