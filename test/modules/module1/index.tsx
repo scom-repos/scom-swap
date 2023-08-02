@@ -101,14 +101,10 @@ export default class Module1 extends Module {
           <i-scom-swap
             providers={[
               {
-                "caption": "OpenSwap",
-                "image": "ipfs://bafkreidoi5pywhyo4hqdltlosvrvefgqj4nuclmjl325exzmjgnyl2cc4y",
                 "key": "OpenSwap",
                 "chainId": 97
               },
               {
-                "caption": "OpenSwap",
-                "image": "ipfs://bafkreidoi5pywhyo4hqdltlosvrvefgqj4nuclmjl325exzmjgnyl2cc4y",
                 "key": "OpenSwap",
                 "chainId": 43113
               }
