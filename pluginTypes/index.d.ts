@@ -9598,14 +9598,15 @@ declare module "@scom/scom-swap/contracts/oswap-openswap-contract/index.ts" {
 }
 /// <amd-module name="@scom/scom-swap/global/utils/common.ts" />
 declare module "@scom/scom-swap/global/utils/common.ts" {
-    import { BigNumber, ISendTxEventsOptions } from "@ijstech/eth-wallet";
+    import { BigNumber, ISendTxEventsOptions, IRpcWallet } from "@ijstech/eth-wallet";
     import { ITokenObject } from "@scom/scom-token-list";
     export const registerSendTxEvents: (sendTxEventHandlers: ISendTxEventsOptions) => void;
     export const approveERC20Max: (token: ITokenObject, spenderAddress: string, callback?: any, confirmationCallback?: any) => Promise<import("@ijstech/eth-contract").TransactionReceipt>;
-    export const getERC20Allowance: (token: ITokenObject, spenderAddress: string) => Promise<BigNumber>;
+    export const getERC20Allowance: (wallet: IRpcWallet, token: ITokenObject, spenderAddress: string) => Promise<BigNumber>;
 }
 /// <amd-module name="@scom/scom-swap/global/utils/approvalModel.ts" />
 declare module "@scom/scom-swap/global/utils/approvalModel.ts" {
+    import { IRpcWallet } from "@ijstech/eth-wallet";
     import { ITokenObject } from '@scom/scom-token-list';
     export enum ApprovalStatus {
         TO_BE_APPROVED = 0,
@@ -9630,11 +9631,12 @@ declare module "@scom/scom-swap/global/utils/approvalModel.ts" {
     export interface IERC20ApprovalAction {
         doApproveAction: (token: ITokenObject, inputAmount: string, data?: any) => Promise<void>;
         doPayAction: (data?: any) => Promise<void>;
-        checkAllowance: (token: ITokenObject, inputAmount: string) => Promise<void>;
+        checkAllowance: (token: ITokenObject, inputAmount: string, data?: any) => Promise<void>;
     }
     export class ERC20ApprovalModel {
+        private wallet;
         private options;
-        constructor(options: IERC20ApprovalOptions);
+        constructor(wallet: IRpcWallet, options: IERC20ApprovalOptions);
         set spenderAddress(value: string);
         private checkAllowance;
         private doApproveAction;
@@ -9787,8 +9789,6 @@ declare module "@scom/scom-swap/swap-utils/index.ts" {
     const getPair: (state: State, market: string, tokenA: ITokenObject, tokenB: ITokenObject) => Promise<string>;
     function getExtendedRouteObjData(wallet: any, bestRouteObj: any, tradeFeeMap: TradeFeeMap, swapPrice: BigNumber, isHybridOrQueue: boolean): Promise<any>;
     function getAllRoutesData(state: State, firstTokenObject: ITokenObject, secondTokenObject: ITokenObject, firstInput: BigNumber, secondInput: BigNumber, isFromEstimated: boolean, useAPI: boolean, commissions: ICommissionInfo[]): Promise<any[]>;
-    export const getCurrentCommissions: (state: State, commissions: ICommissionInfo[]) => ICommissionInfo[];
-    export const getCommissionAmount: (state: State, commissions: ICommissionInfo[], amount: BigNumber) => BigNumber;
     interface SwapData {
         provider: string;
         routeTokens: any[];
@@ -9805,9 +9805,36 @@ declare module "@scom/scom-swap/swap-utils/index.ts" {
         receipt: TransactionReceipt | null;
         error: Record<string, string> | null;
     }>;
-    const getApprovalModelAction: (options: IERC20ApprovalEventOptions) => Promise<import("@scom/scom-swap/global/index.ts").IERC20ApprovalAction>;
+    const getApprovalModelAction: (state: State, options: IERC20ApprovalEventOptions) => Promise<import("@scom/scom-swap/global/index.ts").IERC20ApprovalAction>;
     const setApprovalModalSpenderAddress: (state: State, market: string, contractAddress?: string) => void;
-    export { getExtendedRouteObjData, getTradeFeeMap, getAllRoutesData, getPair, SwapData, executeSwap, getChainNativeToken, getRouterAddress, getApprovalModelAction, setApprovalModalSpenderAddress, getProviderProxySelectors };
+    const getProxyCampaign: (state: State, campaignId: number) => Promise<{
+        projectId: BigNumber;
+        maxInputTokensInEachCall: BigNumber;
+        maxOutputTokensInEachCall: BigNumber;
+        referrersRequireApproval: boolean;
+        startDate: BigNumber;
+        endDate: BigNumber;
+        targetAndSelectors: string[];
+        acceptAnyInToken: boolean;
+        acceptAnyOutToken: boolean;
+        inTokens: string[];
+        directTransferInToken: boolean[];
+        commissionInTokenConfig: {
+            rate: BigNumber;
+            feeOnProjectOwner: boolean;
+            capPerTransaction: BigNumber;
+            capPerCampaign: BigNumber;
+        }[];
+        outTokens: string[];
+        commissionOutTokenConfig: {
+            rate: BigNumber;
+            feeOnProjectOwner: boolean;
+            capPerTransaction: BigNumber;
+            capPerCampaign: BigNumber;
+        }[];
+        referrers: string[];
+    }>;
+    export { getExtendedRouteObjData, getTradeFeeMap, getAllRoutesData, getPair, SwapData, executeSwap, getChainNativeToken, getRouterAddress, getApprovalModelAction, setApprovalModalSpenderAddress, getProviderProxySelectors, getProxyCampaign };
 }
 /// <amd-module name="@scom/scom-swap/price-info/priceInfo.css.ts" />
 declare module "@scom/scom-swap/price-info/priceInfo.css.ts" { }

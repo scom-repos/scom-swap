@@ -13,8 +13,6 @@ import {
   executeSwap,
   getApprovalModelAction,
   setApprovalModalSpenderAddress,
-  getCommissionAmount,
-  getCurrentCommissions,
   getProviderProxySelectors,
   getPair
 } from './swap-utils/index'
@@ -598,7 +596,7 @@ export default class ScomSwap extends Module {
 
   private updateContractAddress() {
     if (this.approvalModelAction) {
-      if (getCurrentCommissions(this.state, this.commissions).length) {
+      if (this._data.campaignId !== undefined) {
         this.contractAddress = this.state.getProxyAddress();
       } else {
         this.contractAddress = '';
@@ -702,10 +700,8 @@ export default class ScomSwap extends Module {
   }
   get maxSold() {
     if (!this.fromToken || !this.record) return new BigNumber(0)
-    const commissionAmount = getCommissionAmount(this.state, this.commissions, new BigNumber(this.record.fromAmount));
-    const amountWithCommission = this.record.fromAmount.plus(commissionAmount);
-    if (!this.isFrom) return new BigNumber(amountWithCommission);
-    return new BigNumber(this.getMinReceivedMaxSold() || amountWithCommission);
+    if (!this.isFrom) return new BigNumber(this.record.fromAmount);
+    return new BigNumber(this.getMinReceivedMaxSold() || this.record.fromAmount);
   }
   get isSwapping(): boolean {
     const key = this.record?.key;
@@ -845,22 +841,33 @@ export default class ScomSwap extends Module {
   }
 
   private async initApprovalModelAction() {
-    this.approvalModelAction = await getApprovalModelAction({
+    this.approvalModelAction = await getApprovalModelAction(this.state, {
       sender: this,
       payAction: this.onSubmit,
-      onToBeApproved: async (token: ITokenObject) => {
-        this.swapBtn.enabled = true;
+      onToBeApproved: async (token: ITokenObject, data?: any) => {
+        this.setMapStatus('approve', data.key, ApprovalStatus.TO_BE_APPROVED);
+        this.setMapStatus('swap', data.key, ApprovalStatus.TO_BE_APPROVED);
+        this.updateSwapButtonCaption();
+        const enabled = !this.isSwapButtonDisabled();
+        this.swapBtn.enabled = enabled;
       },
-      onToBePaid: async (token: ITokenObject) => {
+      onToBePaid: async (token: ITokenObject, data?: any) => {
+        this.setMapStatus('approve', data.key, ApprovalStatus.NONE);
+        this.setMapStatus('swap', data.key, ApprovalStatus.TO_BE_APPROVED);
+        this.updateSwapButtonCaption();
+        const enabled = !this.isSwapButtonDisabled();
+        this.swapBtn.enabled = enabled;
       },
       onApproving: async (token: ITokenObject, receipt?: string, data?: any) => {
         this.setMapStatus('approve', data.key, ApprovalStatus.APPROVING);
+        this.updateSwapButtonCaption();
         this.showResultMessage('success', receipt);
         if (this.isApprovingRouter && !this.swapBtn.rightIcon.visible)
           this.swapBtn.rightIcon.visible = true;
       },
       onApproved: async (token: ITokenObject, data?: any) => {
         this.setMapStatus('approve', data.key, ApprovalStatus.NONE);
+        this.updateSwapButtonCaption();
         if (this.swapBtn.rightIcon.visible)
           this.swapBtn.rightIcon.visible = false;
         await this.handleAddRoute();
@@ -901,8 +908,7 @@ export default class ScomSwap extends Module {
   }
 
   private totalAmount = () => {
-    const commissionAmount = getCommissionAmount(this.state, this.commissions, this.fromInputValue);
-    return this.fromInputValue.plus(commissionAmount);
+    return this.fromInputValue;
   }
 
   private handleSwapPopup() {
@@ -937,8 +943,7 @@ export default class ScomSwap extends Module {
     if (this.isFrom) {
       const poolAmount = new BigNumber(this.record?.amountIn);
       if (poolAmount.isZero()) return null;
-      const commissionAmount = getCommissionAmount(this.state, this.commissions, poolAmount);
-      const minReceivedMaxSold = poolAmount.plus(commissionAmount).times(1 + slippageTolerance / 100).toNumber();
+      const minReceivedMaxSold = poolAmount.times(1 + slippageTolerance / 100).toNumber();
       return minReceivedMaxSold;
     } else {
       const poolAmount = new BigNumber(this.record?.amountOut);
@@ -1006,7 +1011,7 @@ export default class ScomSwap extends Module {
     if (!item) return;
     const market = this.state.getProviderByKey(item.provider)?.key || '';
     if (this.approvalModelAction) {
-      if (getCurrentCommissions(this.state, this.commissions).length) {
+      if (this._data.campaignId !== undefined) {
         this.contractAddress = this.state.getProxyAddress();
         setApprovalModalSpenderAddress(this.state, market, this.contractAddress);
       } else {
@@ -1042,11 +1047,7 @@ export default class ScomSwap extends Module {
       }
     }
 
-    this.swapBtn.visible = true;
     this.record = item;
-    this.updateSwapButtonCaption();
-    const enabled = !this.isSwapButtonDisabled();
-    this.swapBtn.enabled = enabled;
     const isButtonLoading = this.isButtonLoading();
     if (this.swapBtn.rightIcon.visible != isButtonLoading) {
       this.swapBtn.rightIcon.visible = isButtonLoading;
@@ -1134,7 +1135,6 @@ export default class ScomSwap extends Module {
     this.swapModalConfirmBtn.caption = 'Confirm Swap';
     this.swapModalConfirmBtn.enabled = true;
     this.record = listRouting[0] || null;
-
     this.swapButtonStatusMap = {};
     this.approveButtonStatusMap = {};
     this.initRoutes();
@@ -1143,9 +1143,6 @@ export default class ScomSwap extends Module {
       // this.receiveCol.classList.add('bg-box--active');
       this.lbRouting.classList.add('visibility-hidden');
       const option = listRouting[0];
-      const approveButtonStatus = option.isApproveButtonShown ? ApprovalStatus.TO_BE_APPROVED : ApprovalStatus.NONE;
-      this.approveButtonStatusMap[option.key] = approveButtonStatus;
-      this.swapButtonStatusMap[option.key] = ApprovalStatus.TO_BE_APPROVED;
       await this.onSelectRouteItem(option);
     } else {
       // this.receiveCol.classList.remove('bg-box--active');
@@ -1162,11 +1159,16 @@ export default class ScomSwap extends Module {
     }
     if (this.record) {
       this.setApprovalSpenderAddress();
-      const commissionFee = this.state.embedderCommissionFee;
-      const commissionAmount = getCommissionAmount(this.state, this.commissions, this.record.fromAmount);
-      const total = this.record?.fromAmount ? new BigNumber(this.record.fromAmount).plus(commissionAmount) : new BigNumber(0);
-      this.lbYouPayTitle.caption = commissionAmount.gt(0) ? `You Pay (incl. ${new BigNumber(commissionFee).times(100)}% fee)` : `You Pay`;
+      await this.approvalModelAction.checkAllowance(this.fromToken as ITokenObject, this.fromInputValue.toFixed(), this.record);
+      this.swapBtn.visible = true;
+      const total = this.record?.fromAmount ? new BigNumber(this.record.fromAmount) : new BigNumber(0);
+      this.lbYouPayTitle.caption = `You Pay`;
       this.lbYouPayValue.caption = `${formatNumber(total)} ${this.fromToken?.symbol}`;
+    }
+    else {
+      this.updateSwapButtonCaption();
+      this.swapBtn.visible = true;
+      this.swapBtn.enabled = !this.isSwapButtonDisabled();
     }
   }
 
@@ -1249,9 +1251,6 @@ export default class ScomSwap extends Module {
     const priceImpact = this.getPriceImpact();
     const minimumReceived = this.getMinimumReceived();
     const tradeFeeExactAmount = this.getTradeFeeExactAmount();
-    const commissionFee = this.state.embedderCommissionFee;
-    const commissionAmount = this.record ? getCommissionAmount(this.state, this.commissions, new BigNumber(this.record.fromAmount || 0)) : new BigNumber(0);
-
     const fees = this.getFeeDetails();
     const countFees = fees.length;
     let feeTooltip: any;
@@ -1287,11 +1286,6 @@ export default class ScomSwap extends Module {
         title: "Estimated Time",
         value: this.isValidToken && this.record ? '30 seconds' : '-',
         isHidden: true,
-      },
-      {
-        title: "Commission Fee",
-        value: this.isValidToken ? `${new BigNumber(commissionFee).times(100)}% (${formatNumber(commissionAmount)} ${this.fromToken?.symbol})` : '-',
-        isHidden: !getCurrentCommissions(this.state, this.commissions).length
       }
     ];
     return info.filter((f: any) => !f.isHidden);
@@ -1396,30 +1390,31 @@ export default class ScomSwap extends Module {
     return '';
   }
   private setMapStatus(type: StatusMapType, key: string, status: ApprovalStatus) {
-    let mapStatus = {} as any;
     if (type === 'approve') {
-      mapStatus = this.approveButtonStatusMap;
+      let mapStatus = this.approveButtonStatusMap;
       mapStatus[key] = status;
       this.approveButtonStatusMap = {
         ...mapStatus
       };
-    } else {
-      mapStatus = this.swapButtonStatusMap;
+    } 
+    else {
+      let mapStatus = this.swapButtonStatusMap;
       mapStatus[key] = status;
       this.swapButtonStatusMap = {
         ...mapStatus
       };
     }
-    this.updateSwapButtonCaption();
   }
   private onSwapConfirming = (key: any) => {
     this.setMapStatus('swap', key, ApprovalStatus.APPROVING);
+    this.updateSwapButtonCaption();
     if (!this.swapBtn.rightIcon.visible)
       this.swapBtn.rightIcon.visible = true;
   }
   private onSwapConfirmed = async (data: any) => {
     const { key } = data;
     this.setMapStatus('swap', key, ApprovalStatus.TO_BE_APPROVED);
+    this.updateSwapButtonCaption();
     if (this.swapBtn.rightIcon.visible)
       this.swapBtn.rightIcon.visible = false;
     await this.handleAddRoute();
@@ -1505,12 +1500,6 @@ export default class ScomSwap extends Module {
     let inputVal = new BigNumber(balance);
     if (!address) {
       inputVal = new BigNumber(0);
-    } else {
-      const commissionAmount = getCommissionAmount(this.state, this.commissions, new BigNumber(balance));
-      if (commissionAmount.gt(0)) {
-        const totalFee = new BigNumber(balance).plus(commissionAmount).dividedBy(balance);
-        inputVal = inputVal.dividedBy(totalFee);
-      }
     }
     if (value == 0 || value) {
       inputVal = inputVal.multipliedBy(value).dividedBy(100);

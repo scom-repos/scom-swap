@@ -60,38 +60,6 @@ function getRouterAddress(state: State, key: string): string {
   return routerAddress;
 }
 
-async function allowanceRouter(state: State, wallet: any, market: string, token: ITokenObject, owner: string, contractAddress: string, callback?: any) {
-  let erc20 = new Contracts.ERC20(wallet, token.address);
-  let spender = contractAddress ? contractAddress : getRouterAddress(state, market);
-  let allowance = await erc20.allowance({
-    owner,
-    spender
-  })
-  allowance = Utils.fromDecimals(allowance, token.decimals);
-  if (callback)
-    callback(null, allowance);
-  return allowance;
-}
-
-async function checkIsApproveButtonShown(state: State, wallet: any, firstTokenObject: any, fromInput: BigNumber, market: string, contractAddress?: string) {
-  if (!state.isRpcWalletConnected()) return false;
-  let isApproveButtonShown = false;
-  const owner = wallet.account.address;
-  const chainId = state.getChainId();
-  const nativeTokenObject = getChainNativeToken(chainId);
-  if (!nativeTokenObject) return false;
-
-  const firstTokenAddress = firstTokenObject.address;
-  if (!firstTokenAddress || firstTokenAddress === nativeTokenObject.symbol) {
-    isApproveButtonShown = false;
-  } else {
-    isApproveButtonShown = false;
-    const allowance = await allowanceRouter(state, wallet, market, firstTokenObject, owner, contractAddress);
-    isApproveButtonShown = fromInput.gt(allowance);
-  }
-  return isApproveButtonShown;
-}
-
 async function composeRouteObj(state: State, wallet: any, routeObj: any, market: string, firstTokenObject: any, firstInput: BigNumber, secondInput: BigNumber, isFromEstimated: boolean, commissions: ICommissionInfo[]) {
   const slippageTolerance = state.slippageTolerance;
   if (!slippageTolerance) return null;
@@ -103,7 +71,6 @@ async function composeRouteObj(state: State, wallet: any, routeObj: any, market:
   let priceSwap = 0;
   let tradeFee = 0;
   let gasFee = 0;
-  let isApproveButtonShown = false;
 
   try {
     if (isFromEstimated) {
@@ -126,10 +93,6 @@ async function composeRouteObj(state: State, wallet: any, routeObj: any, market:
     priceSwap = new BigNumber(1).div(routeObj.price).toNumber();
     priceImpact = Number(routeObj.priceImpact) * 100;
     tradeFee = parseFloat(routeObj.tradeFee);
-
-    const commissionAmount = getCommissionAmount(state, commissions, fromAmount);
-    const contractAddress = commissionAmount.gt(0) ? state.getProxyAddress() : '';
-    isApproveButtonShown = await checkIsApproveButtonShown(state, wallet, firstTokenObject, fromAmount.plus(commissionAmount), market, contractAddress);
   } catch (err) {
     console.log('err', err)
     return null;
@@ -144,8 +107,7 @@ async function composeRouteObj(state: State, wallet: any, routeObj: any, market:
     priceImpact,
     tradeFee,
     gasFee,
-    minReceivedMaxSold,
-    isApproveButtonShown
+    minReceivedMaxSold
   };
 }
 
@@ -653,21 +615,6 @@ async function getAllRoutesData(state: State, firstTokenObject: ITokenObject, se
   return resultArr;
 }
 
-export const getCurrentCommissions = (state: State, commissions: ICommissionInfo[]) => {
-  return (commissions || []).filter(v => v.chainId == state.getChainId());
-}
-
-export const getCommissionAmount = (state: State, commissions: ICommissionInfo[], amount: BigNumber) => {
-  const _commissions = (commissions || []).filter(v => v.chainId == state.getChainId()).map(v => {
-    return {
-      to: v.walletAddress,
-      amount: amount.times(v.share)
-    }
-  });
-  const commissionsAmount = _commissions.length ? _commissions.map(v => v.amount).reduce((a, b) => a.plus(b)) : new BigNumber(0);
-  return commissionsAmount;
-}
-
 const AmmTradeExactIn = async function (state: State, wallet: any, market: string, routeTokens: ITokenObject[], amountIn: string, amountOutMin: string, toAddress: string, deadline: number, feeOnTransfer: boolean, campaignId?: number, referrer?: string) {
   if (routeTokens.length < 2) {
     return null;
@@ -946,18 +893,30 @@ const executeSwap: (state: State, swapData: SwapData) => Promise<{
 
 var approvalModel: ERC20ApprovalModel;
 
-const getApprovalModelAction = async (options: IERC20ApprovalEventOptions) => {
+const getApprovalModelAction = async (state: State, options: IERC20ApprovalEventOptions) => {
   const approvalOptions = {
     ...options,
     spenderAddress: ''
   };
-  approvalModel = new ERC20ApprovalModel(approvalOptions);
+  let wallet = state.getRpcWallet();
+  approvalModel = new ERC20ApprovalModel(wallet, approvalOptions);
   let approvalModelAction = approvalModel.getAction();
   return approvalModelAction;
 }
 
 const setApprovalModalSpenderAddress = (state: State, market: string, contractAddress?: string) => {
   approvalModel.spenderAddress = contractAddress || getRouterAddress(state, market);
+}
+
+const getProxyCampaign = async (state: State, campaignId: number) => {
+  const wallet = state.getRpcWallet();
+  const proxyAddress = state.getProxyAddress();
+  const proxy = new ProxyContracts.ProxyV3(wallet, proxyAddress);
+  const campaign = await proxy.getCampaign({
+    campaignId,
+    returnArrays: true
+  });
+  return campaign;
 }
 
 export {
@@ -971,5 +930,6 @@ export {
   getRouterAddress,
   getApprovalModelAction,
   setApprovalModalSpenderAddress,
-  getProviderProxySelectors
+  getProviderProxySelectors,
+  getProxyCampaign
 }

@@ -13545,10 +13545,9 @@ define("@scom/scom-swap/global/utils/common.ts", ["require", "exports", "@ijstec
         return receipt;
     };
     exports.approveERC20Max = approveERC20Max;
-    const getERC20Allowance = async (token, spenderAddress) => {
+    const getERC20Allowance = async (wallet, token, spenderAddress) => {
         if (!(token === null || token === void 0 ? void 0 : token.address))
             return null;
-        let wallet = eth_wallet_2.Wallet.getClientInstance();
         let erc20 = new index_3.Contracts.ERC20(wallet, token.address);
         let allowance = await erc20.allowance({
             owner: wallet.account.address,
@@ -13569,13 +13568,13 @@ define("@scom/scom-swap/global/utils/approvalModel.ts", ["require", "exports", "
         ApprovalStatus[ApprovalStatus["NONE"] = 2] = "NONE";
     })(ApprovalStatus = exports.ApprovalStatus || (exports.ApprovalStatus = {}));
     class ERC20ApprovalModel {
-        constructor(options) {
+        constructor(wallet, options) {
             this.options = {
                 sender: null,
                 spenderAddress: '',
                 payAction: async () => { },
-                onToBeApproved: async (token) => { },
-                onToBePaid: async (token) => { },
+                onToBeApproved: async (token, data) => { },
+                onToBePaid: async (token, data) => { },
                 onApproving: async (token, receipt, data) => { },
                 onApproved: async (token, data) => { },
                 onPaying: async (receipt, data) => { },
@@ -13583,16 +13582,16 @@ define("@scom/scom-swap/global/utils/approvalModel.ts", ["require", "exports", "
                 onApprovingError: async (token, err) => { },
                 onPayingError: async (err) => { }
             };
-            this.checkAllowance = async (token, inputAmount) => {
-                let allowance = await (0, common_1.getERC20Allowance)(token, this.options.spenderAddress);
+            this.checkAllowance = async (token, inputAmount, data) => {
+                let allowance = await (0, common_1.getERC20Allowance)(this.wallet, token, this.options.spenderAddress);
                 if (!allowance) {
-                    await this.options.onToBePaid.bind(this.options.sender)(token);
+                    await this.options.onToBePaid.bind(this.options.sender)(token, data);
                 }
                 else if (new eth_wallet_3.BigNumber(inputAmount).gt(allowance)) {
-                    await this.options.onToBeApproved.bind(this.options.sender)(token);
+                    await this.options.onToBeApproved.bind(this.options.sender)(token, data);
                 }
                 else {
-                    await this.options.onToBePaid.bind(this.options.sender)(token);
+                    await this.options.onToBePaid.bind(this.options.sender)(token, data);
                 }
             };
             this.doApproveAction = async (token, inputAmount, data) => {
@@ -13606,7 +13605,7 @@ define("@scom/scom-swap/global/utils/approvalModel.ts", ["require", "exports", "
                 };
                 const confirmationCallback = async (receipt) => {
                     await this.options.onApproved.bind(this.options.sender)(token, data);
-                    await this.checkAllowance(token, inputAmount);
+                    await this.checkAllowance(token, inputAmount, data);
                 };
                 (0, common_1.approveERC20Max)(token, this.options.spenderAddress, txHashCallback, confirmationCallback);
             };
@@ -13635,6 +13634,7 @@ define("@scom/scom-swap/global/utils/approvalModel.ts", ["require", "exports", "
                     checkAllowance: this.checkAllowance
                 };
             };
+            this.wallet = wallet;
             this.options = options;
         }
         set spenderAddress(value) {
@@ -13833,7 +13833,7 @@ define("@scom/scom-swap/store/index.ts", ["require", "exports", "@scom/scom-toke
 define("@scom/scom-swap/swap-utils/index.ts", ["require", "exports", "@ijstech/eth-wallet", "@scom/scom-swap/contracts/oswap-openswap-contract/index.ts", "@scom/scom-commission-proxy-contract", "@scom/scom-dex-list", "@scom/scom-swap/global/index.ts", "@scom/scom-swap/store/index.ts", "@scom/scom-token-list"], function (require, exports, eth_wallet_5, index_5, scom_commission_proxy_contract_1, scom_dex_list_1, index_6, index_7, scom_token_list_3) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.getProviderProxySelectors = exports.setApprovalModalSpenderAddress = exports.getApprovalModelAction = exports.getRouterAddress = exports.getChainNativeToken = exports.executeSwap = exports.getPair = exports.getAllRoutesData = exports.getTradeFeeMap = exports.getExtendedRouteObjData = exports.getCommissionAmount = exports.getCurrentCommissions = void 0;
+    exports.getProxyCampaign = exports.getProviderProxySelectors = exports.setApprovalModalSpenderAddress = exports.getApprovalModelAction = exports.getRouterAddress = exports.getChainNativeToken = exports.executeSwap = exports.getPair = exports.getAllRoutesData = exports.getTradeFeeMap = exports.getExtendedRouteObjData = void 0;
     const routeAPI = 'https://route.openswap.xyz/trading/v1/route';
     const newRouteAPI = 'https://indexer.ijs.dev/trading/v1/route';
     const getChainNativeToken = (chainId) => {
@@ -13859,38 +13859,6 @@ define("@scom/scom-swap/swap-utils/index.ts", ["require", "exports", "@ijstech/e
         return routerAddress;
     }
     exports.getRouterAddress = getRouterAddress;
-    async function allowanceRouter(state, wallet, market, token, owner, contractAddress, callback) {
-        let erc20 = new index_5.Contracts.ERC20(wallet, token.address);
-        let spender = contractAddress ? contractAddress : getRouterAddress(state, market);
-        let allowance = await erc20.allowance({
-            owner,
-            spender
-        });
-        allowance = eth_wallet_5.Utils.fromDecimals(allowance, token.decimals);
-        if (callback)
-            callback(null, allowance);
-        return allowance;
-    }
-    async function checkIsApproveButtonShown(state, wallet, firstTokenObject, fromInput, market, contractAddress) {
-        if (!state.isRpcWalletConnected())
-            return false;
-        let isApproveButtonShown = false;
-        const owner = wallet.account.address;
-        const chainId = state.getChainId();
-        const nativeTokenObject = getChainNativeToken(chainId);
-        if (!nativeTokenObject)
-            return false;
-        const firstTokenAddress = firstTokenObject.address;
-        if (!firstTokenAddress || firstTokenAddress === nativeTokenObject.symbol) {
-            isApproveButtonShown = false;
-        }
-        else {
-            isApproveButtonShown = false;
-            const allowance = await allowanceRouter(state, wallet, market, firstTokenObject, owner, contractAddress);
-            isApproveButtonShown = fromInput.gt(allowance);
-        }
-        return isApproveButtonShown;
-    }
     async function composeRouteObj(state, wallet, routeObj, market, firstTokenObject, firstInput, secondInput, isFromEstimated, commissions) {
         const slippageTolerance = state.slippageTolerance;
         if (!slippageTolerance)
@@ -13903,7 +13871,6 @@ define("@scom/scom-swap/swap-utils/index.ts", ["require", "exports", "@ijstech/e
         let priceSwap = 0;
         let tradeFee = 0;
         let gasFee = 0;
-        let isApproveButtonShown = false;
         try {
             if (isFromEstimated) {
                 let poolAmount = new eth_wallet_5.BigNumber(routeObj.amountIn);
@@ -13927,9 +13894,6 @@ define("@scom/scom-swap/swap-utils/index.ts", ["require", "exports", "@ijstech/e
             priceSwap = new eth_wallet_5.BigNumber(1).div(routeObj.price).toNumber();
             priceImpact = Number(routeObj.priceImpact) * 100;
             tradeFee = parseFloat(routeObj.tradeFee);
-            const commissionAmount = (0, exports.getCommissionAmount)(state, commissions, fromAmount);
-            const contractAddress = commissionAmount.gt(0) ? state.getProxyAddress() : '';
-            isApproveButtonShown = await checkIsApproveButtonShown(state, wallet, firstTokenObject, fromAmount.plus(commissionAmount), market, contractAddress);
         }
         catch (err) {
             console.log('err', err);
@@ -13942,8 +13906,7 @@ define("@scom/scom-swap/swap-utils/index.ts", ["require", "exports", "@ijstech/e
             priceImpact,
             tradeFee,
             gasFee,
-            minReceivedMaxSold,
-            isApproveButtonShown });
+            minReceivedMaxSold });
     }
     function getTradeFeeMap(state) {
         let tradeFeeMap = {};
@@ -14416,21 +14379,6 @@ define("@scom/scom-swap/swap-utils/index.ts", ["require", "exports", "@ijstech/e
         return resultArr;
     }
     exports.getAllRoutesData = getAllRoutesData;
-    const getCurrentCommissions = (state, commissions) => {
-        return (commissions || []).filter(v => v.chainId == state.getChainId());
-    };
-    exports.getCurrentCommissions = getCurrentCommissions;
-    const getCommissionAmount = (state, commissions, amount) => {
-        const _commissions = (commissions || []).filter(v => v.chainId == state.getChainId()).map(v => {
-            return {
-                to: v.walletAddress,
-                amount: amount.times(v.share)
-            };
-        });
-        const commissionsAmount = _commissions.length ? _commissions.map(v => v.amount).reduce((a, b) => a.plus(b)) : new eth_wallet_5.BigNumber(0);
-        return commissionsAmount;
-    };
-    exports.getCommissionAmount = getCommissionAmount;
     const AmmTradeExactIn = async function (state, wallet, market, routeTokens, amountIn, amountOutMin, toAddress, deadline, feeOnTransfer, campaignId, referrer) {
         if (routeTokens.length < 2) {
             return null;
@@ -14658,9 +14606,10 @@ define("@scom/scom-swap/swap-utils/index.ts", ["require", "exports", "@ijstech/e
     };
     exports.executeSwap = executeSwap;
     var approvalModel;
-    const getApprovalModelAction = async (options) => {
+    const getApprovalModelAction = async (state, options) => {
         const approvalOptions = Object.assign(Object.assign({}, options), { spenderAddress: '' });
-        approvalModel = new index_6.ERC20ApprovalModel(approvalOptions);
+        let wallet = state.getRpcWallet();
+        approvalModel = new index_6.ERC20ApprovalModel(wallet, approvalOptions);
         let approvalModelAction = approvalModel.getAction();
         return approvalModelAction;
     };
@@ -14669,6 +14618,17 @@ define("@scom/scom-swap/swap-utils/index.ts", ["require", "exports", "@ijstech/e
         approvalModel.spenderAddress = contractAddress || getRouterAddress(state, market);
     };
     exports.setApprovalModalSpenderAddress = setApprovalModalSpenderAddress;
+    const getProxyCampaign = async (state, campaignId) => {
+        const wallet = state.getRpcWallet();
+        const proxyAddress = state.getProxyAddress();
+        const proxy = new scom_commission_proxy_contract_1.Contracts.ProxyV3(wallet, proxyAddress);
+        const campaign = await proxy.getCampaign({
+            campaignId,
+            returnArrays: true
+        });
+        return campaign;
+    };
+    exports.getProxyCampaign = getProxyCampaign;
 });
 define("@scom/scom-swap/price-info/priceInfo.css.ts", ["require", "exports", "@ijstech/components"], function (require, exports, components_4) {
     "use strict";
@@ -15779,7 +15739,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
         }
         updateContractAddress() {
             if (this.approvalModelAction) {
-                if ((0, index_9.getCurrentCommissions)(this.state, this.commissions).length) {
+                if (this._data.campaignId !== undefined) {
                     this.contractAddress = this.state.getProxyAddress();
                 }
                 else {
@@ -15942,8 +15902,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                 });
             };
             this.totalAmount = () => {
-                const commissionAmount = (0, index_9.getCommissionAmount)(this.state, this.commissions, this.fromInputValue);
-                return this.fromInputValue.plus(commissionAmount);
+                return this.fromInputValue;
             };
             this.getMinReceivedMaxSold = () => {
                 var _a, _b;
@@ -15954,8 +15913,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                     const poolAmount = new eth_wallet_6.BigNumber((_a = this.record) === null || _a === void 0 ? void 0 : _a.amountIn);
                     if (poolAmount.isZero())
                         return null;
-                    const commissionAmount = (0, index_9.getCommissionAmount)(this.state, this.commissions, poolAmount);
-                    const minReceivedMaxSold = poolAmount.plus(commissionAmount).times(1 + slippageTolerance / 100).toNumber();
+                    const minReceivedMaxSold = poolAmount.times(1 + slippageTolerance / 100).toNumber();
                     return minReceivedMaxSold;
                 }
                 else {
@@ -15984,12 +15942,14 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
             };
             this.onSwapConfirming = (key) => {
                 this.setMapStatus('swap', key, index_10.ApprovalStatus.APPROVING);
+                this.updateSwapButtonCaption();
                 if (!this.swapBtn.rightIcon.visible)
                     this.swapBtn.rightIcon.visible = true;
             };
             this.onSwapConfirmed = async (data) => {
                 const { key } = data;
                 this.setMapStatus('swap', key, index_10.ApprovalStatus.TO_BE_APPROVED);
+                this.updateSwapButtonCaption();
                 if (this.swapBtn.rightIcon.visible)
                     this.swapBtn.rightIcon.visible = false;
                 await this.handleAddRoute();
@@ -16037,13 +15997,6 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                 let inputVal = new eth_wallet_6.BigNumber(balance);
                 if (!address) {
                     inputVal = new eth_wallet_6.BigNumber(0);
-                }
-                else {
-                    const commissionAmount = (0, index_9.getCommissionAmount)(this.state, this.commissions, new eth_wallet_6.BigNumber(balance));
-                    if (commissionAmount.gt(0)) {
-                        const totalFee = new eth_wallet_6.BigNumber(balance).plus(commissionAmount).dividedBy(balance);
-                        inputVal = inputVal.dividedBy(totalFee);
-                    }
                 }
                 if (value == 0 || value) {
                     inputVal = inputVal.multipliedBy(value).dividedBy(100);
@@ -16137,11 +16090,9 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
         get maxSold() {
             if (!this.fromToken || !this.record)
                 return new eth_wallet_6.BigNumber(0);
-            const commissionAmount = (0, index_9.getCommissionAmount)(this.state, this.commissions, new eth_wallet_6.BigNumber(this.record.fromAmount));
-            const amountWithCommission = this.record.fromAmount.plus(commissionAmount);
             if (!this.isFrom)
-                return new eth_wallet_6.BigNumber(amountWithCommission);
-            return new eth_wallet_6.BigNumber(this.getMinReceivedMaxSold() || amountWithCommission);
+                return new eth_wallet_6.BigNumber(this.record.fromAmount);
+            return new eth_wallet_6.BigNumber(this.getMinReceivedMaxSold() || this.record.fromAmount);
         }
         get isSwapping() {
             var _a;
@@ -16192,22 +16143,33 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
             }
         }
         async initApprovalModelAction() {
-            this.approvalModelAction = await (0, index_9.getApprovalModelAction)({
+            this.approvalModelAction = await (0, index_9.getApprovalModelAction)(this.state, {
                 sender: this,
                 payAction: this.onSubmit,
-                onToBeApproved: async (token) => {
-                    this.swapBtn.enabled = true;
+                onToBeApproved: async (token, data) => {
+                    this.setMapStatus('approve', data.key, index_10.ApprovalStatus.TO_BE_APPROVED);
+                    this.setMapStatus('swap', data.key, index_10.ApprovalStatus.TO_BE_APPROVED);
+                    this.updateSwapButtonCaption();
+                    const enabled = !this.isSwapButtonDisabled();
+                    this.swapBtn.enabled = enabled;
                 },
-                onToBePaid: async (token) => {
+                onToBePaid: async (token, data) => {
+                    this.setMapStatus('approve', data.key, index_10.ApprovalStatus.NONE);
+                    this.setMapStatus('swap', data.key, index_10.ApprovalStatus.TO_BE_APPROVED);
+                    this.updateSwapButtonCaption();
+                    const enabled = !this.isSwapButtonDisabled();
+                    this.swapBtn.enabled = enabled;
                 },
                 onApproving: async (token, receipt, data) => {
                     this.setMapStatus('approve', data.key, index_10.ApprovalStatus.APPROVING);
+                    this.updateSwapButtonCaption();
                     this.showResultMessage('success', receipt);
                     if (this.isApprovingRouter && !this.swapBtn.rightIcon.visible)
                         this.swapBtn.rightIcon.visible = true;
                 },
                 onApproved: async (token, data) => {
                     this.setMapStatus('approve', data.key, index_10.ApprovalStatus.NONE);
+                    this.updateSwapButtonCaption();
                     if (this.swapBtn.rightIcon.visible)
                         this.swapBtn.rightIcon.visible = false;
                     await this.handleAddRoute();
@@ -16337,7 +16299,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                 return;
             const market = ((_a = this.state.getProviderByKey(item.provider)) === null || _a === void 0 ? void 0 : _a.key) || '';
             if (this.approvalModelAction) {
-                if ((0, index_9.getCurrentCommissions)(this.state, this.commissions).length) {
+                if (this._data.campaignId !== undefined) {
                     this.contractAddress = this.state.getProxyAddress();
                     (0, index_9.setApprovalModalSpenderAddress)(this.state, market, this.contractAddress);
                 }
@@ -16373,11 +16335,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                     this.toInputValue = typeof balanceValue !== 'object' ? new eth_wallet_6.BigNumber(balanceValue) : balanceValue;
                 }
             }
-            this.swapBtn.visible = true;
             this.record = item;
-            this.updateSwapButtonCaption();
-            const enabled = !this.isSwapButtonDisabled();
-            this.swapBtn.enabled = enabled;
             const isButtonLoading = this.isButtonLoading();
             if (this.swapBtn.rightIcon.visible != isButtonLoading) {
                 this.swapBtn.rightIcon.visible = isButtonLoading;
@@ -16477,9 +16435,6 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                 // this.receiveCol.classList.add('bg-box--active');
                 this.lbRouting.classList.add('visibility-hidden');
                 const option = listRouting[0];
-                const approveButtonStatus = option.isApproveButtonShown ? index_10.ApprovalStatus.TO_BE_APPROVED : index_10.ApprovalStatus.NONE;
-                this.approveButtonStatusMap[option.key] = approveButtonStatus;
-                this.swapButtonStatusMap[option.key] = index_10.ApprovalStatus.TO_BE_APPROVED;
                 await this.onSelectRouteItem(option);
             }
             else {
@@ -16498,11 +16453,16 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
             }
             if (this.record) {
                 this.setApprovalSpenderAddress();
-                const commissionFee = this.state.embedderCommissionFee;
-                const commissionAmount = (0, index_9.getCommissionAmount)(this.state, this.commissions, this.record.fromAmount);
-                const total = ((_a = this.record) === null || _a === void 0 ? void 0 : _a.fromAmount) ? new eth_wallet_6.BigNumber(this.record.fromAmount).plus(commissionAmount) : new eth_wallet_6.BigNumber(0);
-                this.lbYouPayTitle.caption = commissionAmount.gt(0) ? `You Pay (incl. ${new eth_wallet_6.BigNumber(commissionFee).times(100)}% fee)` : `You Pay`;
+                await this.approvalModelAction.checkAllowance(this.fromToken, this.fromInputValue.toFixed(), this.record);
+                this.swapBtn.visible = true;
+                const total = ((_a = this.record) === null || _a === void 0 ? void 0 : _a.fromAmount) ? new eth_wallet_6.BigNumber(this.record.fromAmount) : new eth_wallet_6.BigNumber(0);
+                this.lbYouPayTitle.caption = `You Pay`;
                 this.lbYouPayValue.caption = `${(0, index_10.formatNumber)(total)} ${(_b = this.fromToken) === null || _b === void 0 ? void 0 : _b.symbol}`;
+            }
+            else {
+                this.updateSwapButtonCaption();
+                this.swapBtn.visible = true;
+                this.swapBtn.enabled = !this.isSwapButtonDisabled();
             }
         }
         getPricePercent(routes, isFrom) {
@@ -16585,13 +16545,10 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
             }
         }
         getPriceInfo() {
-            var _a;
             const rate = this.getRate();
             const priceImpact = this.getPriceImpact();
             const minimumReceived = this.getMinimumReceived();
             const tradeFeeExactAmount = this.getTradeFeeExactAmount();
-            const commissionFee = this.state.embedderCommissionFee;
-            const commissionAmount = this.record ? (0, index_9.getCommissionAmount)(this.state, this.commissions, new eth_wallet_6.BigNumber(this.record.fromAmount || 0)) : new eth_wallet_6.BigNumber(0);
             const fees = this.getFeeDetails();
             const countFees = fees.length;
             let feeTooltip;
@@ -16627,11 +16584,6 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                     title: "Estimated Time",
                     value: this.isValidToken && this.record ? '30 seconds' : '-',
                     isHidden: true,
-                },
-                {
-                    title: "Commission Fee",
-                    value: this.isValidToken ? `${new eth_wallet_6.BigNumber(commissionFee).times(100)}% (${(0, index_10.formatNumber)(commissionAmount)} ${(_a = this.fromToken) === null || _a === void 0 ? void 0 : _a.symbol})` : '-',
-                    isHidden: !(0, index_9.getCurrentCommissions)(this.state, this.commissions).length
                 }
             ];
             return info.filter((f) => !f.isHidden);
@@ -16725,18 +16677,16 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
             return '';
         }
         setMapStatus(type, key, status) {
-            let mapStatus = {};
             if (type === 'approve') {
-                mapStatus = this.approveButtonStatusMap;
+                let mapStatus = this.approveButtonStatusMap;
                 mapStatus[key] = status;
                 this.approveButtonStatusMap = Object.assign({}, mapStatus);
             }
             else {
-                mapStatus = this.swapButtonStatusMap;
+                let mapStatus = this.swapButtonStatusMap;
                 mapStatus[key] = status;
                 this.swapButtonStatusMap = Object.assign({}, mapStatus);
             }
-            this.updateSwapButtonCaption();
         }
         isButtonLoading() {
             if (this.isApproveButtonShown) {
