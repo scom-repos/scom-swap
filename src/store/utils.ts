@@ -1,5 +1,5 @@
 import { application } from '@ijstech/components';
-import { INetwork, Wallet } from '@ijstech/eth-wallet';
+import { INetwork, Wallet, ERC20ApprovalModel, IERC20ApprovalEventOptions } from '@ijstech/eth-wallet';
 import { ITokenObject } from '@scom/scom-token-list';
 import { IProvider } from '../global/index';
 import { ChainNativeTokenByChainId } from '@scom/scom-token-list';
@@ -26,6 +26,7 @@ export class State {
   apiGatewayUrls: Record<string, string> = {};
   embedderCommissionFee: string = "0";
   rpcWalletId: string = "";
+  approvalModel: ERC20ApprovalModel;
 
   constructor(options: any) {
     this.networkMap = getNetworkList();
@@ -135,6 +136,17 @@ export class State {
       };
       wallet.setNetworkInfo(this.networkMap[network.chainId]);
     }
+  }
+
+  async setApprovalModelAction(options: IERC20ApprovalEventOptions) {
+    const approvalOptions = {
+      ...options,
+      spenderAddress: ''
+    };
+    let wallet = this.getRpcWallet();
+    this.approvalModel = new ERC20ApprovalModel(wallet, approvalOptions);
+    let approvalModelAction = this.approvalModel.getAction();
+    return approvalModelAction;
   }
 }
 

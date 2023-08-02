@@ -1,5 +1,3 @@
-/// <reference path="@ijstech/eth-contract/index.d.ts" />
-/// <reference path="@scom/scom-dex-list/@ijstech/eth-contract/index.d.ts" />
 /// <reference path="@ijstech/eth-wallet/index.d.ts" />
 /// <reference path="@scom/scom-dex-list/@ijstech/eth-wallet/index.d.ts" />
 /// <reference path="@scom/scom-dapp-container/@ijstech/eth-wallet/index.d.ts" />
@@ -25,6 +23,136 @@ declare module "@scom/scom-swap/global/utils/helper.ts" {
     export const isInvalidInput: (val: any) => boolean;
     export const limitDecimals: (value: any, decimals: number) => any;
     export function getAPI(url: string, paramsObj?: any): Promise<any>;
+}
+/// <amd-module name="@scom/scom-swap/global/utils/swapInterface.ts" />
+declare module "@scom/scom-swap/global/utils/swapInterface.ts" {
+    import { IWalletPlugin } from "@scom/scom-wallet-modal";
+    import { ITokenObject } from '@scom/scom-token-list';
+    export type Category = 'fixed-pair' | 'aggregator';
+    export interface ISwapConfig {
+        category: Category;
+        providers: IProvider[];
+    }
+    export interface IContractInfo {
+        factoryAddress: string;
+        routerAddress: string;
+        tradeFee: {
+            fee: string;
+            base: string;
+        };
+        fromToken?: string;
+        toToken?: string;
+    }
+    export interface IProvider {
+        key: string;
+    }
+    export interface IProviderUI {
+        key: string;
+        chainId: number;
+    }
+    export interface ICommissionInfo {
+        chainId: number;
+        walletAddress: string;
+        share: string;
+    }
+    export interface INetworkConfig {
+        chainName?: string;
+        chainId: number;
+    }
+    export interface ISwapConfigUI {
+        campaignId?: number;
+        category: Category;
+        providers: IProviderUI[];
+        commissions?: ICommissionInfo[];
+        tokens?: ITokenObject[];
+        defaultChainId: number;
+        wallets: IWalletPlugin[];
+        networks: INetworkConfig[];
+        showHeader?: boolean;
+        logo?: string;
+        title?: string;
+    }
+}
+/// <amd-module name="@scom/scom-swap/global/utils/index.ts" />
+declare module "@scom/scom-swap/global/utils/index.ts" {
+    export { getAPI, formatNumber, formatNumberWithSeparators, limitDecimals, isInvalidInput } from "@scom/scom-swap/global/utils/helper.ts";
+    export { IContractInfo, IProvider, ISwapConfig, ISwapConfigUI, IProviderUI, Category, ICommissionInfo, INetworkConfig } from "@scom/scom-swap/global/utils/swapInterface.ts";
+}
+/// <amd-module name="@scom/scom-swap/global/index.ts" />
+declare module "@scom/scom-swap/global/index.ts" {
+    export const enum EventId {
+        ConnectWallet = "connectWallet",
+        IsWalletConnected = "isWalletConnected",
+        IsWalletDisconnected = "IsWalletDisconnected",
+        Paid = "Paid",
+        chainChanged = "chainChanged",
+        SlippageToleranceChanged = "SlippageToleranceChanged",
+        ExpertModeChanged = "ExpertModeChanged",
+        ShowExpertModal = "ShowExpertModal"
+    }
+    export enum ApprovalStatus {
+        TO_BE_APPROVED = 0,
+        APPROVING = 1,
+        NONE = 2
+    }
+    export * from "@scom/scom-swap/global/utils/index.ts";
+}
+/// <amd-module name="@scom/scom-swap/store/utils.ts" />
+declare module "@scom/scom-swap/store/utils.ts" {
+    import { INetwork, ERC20ApprovalModel, IERC20ApprovalEventOptions } from '@ijstech/eth-wallet';
+    import { ITokenObject } from '@scom/scom-token-list';
+    import { IProvider } from "@scom/scom-swap/global/index.ts";
+    import { IDexInfo } from '@scom/scom-dex-list';
+    export enum WalletPlugin {
+        MetaMask = "metamask",
+        WalletConnect = "walletconnect"
+    }
+    export type ProxyAddresses = {
+        [key: number]: string;
+    };
+    export class State {
+        isExpertMode: boolean;
+        slippageTolerance: number;
+        transactionDeadline: number;
+        infuraId: string;
+        networkMap: {
+            [key: number]: INetwork;
+        };
+        dexInfoList: IDexInfo[];
+        providerList: IProvider[];
+        proxyAddresses: ProxyAddresses;
+        ipfsGatewayUrl: string;
+        apiGatewayUrls: Record<string, string>;
+        embedderCommissionFee: string;
+        rpcWalletId: string;
+        approvalModel: ERC20ApprovalModel;
+        constructor(options: any);
+        initRpcWallet(defaultChainId: number): string;
+        setProviderList(value: IProvider[]): void;
+        setDexInfoList(value: IDexInfo[]): void;
+        getProxyAddress(chainId?: number): string;
+        getProviderByKey(providerKey: string): IProvider;
+        getRpcWallet(): import("@ijstech/eth-wallet").IRpcWallet;
+        isRpcWalletConnected(): boolean;
+        getChainId(): number;
+        toggleExpertMode(): void;
+        private initData;
+        private setNetworkList;
+        setApprovalModelAction(options: IERC20ApprovalEventOptions): Promise<import("approvalModel/ERC20ApprovalModel").IERC20ApprovalAction>;
+    }
+    export const getNetworkInfo: (chainId: number) => any;
+    export function isClientWalletConnected(): boolean;
+    export const hasMetaMask: () => boolean;
+    export const getChainNativeToken: (chainId: number) => ITokenObject;
+    export function getClientWallet(): import("@ijstech/eth-wallet").IClientWallet;
+}
+/// <amd-module name="@scom/scom-swap/store/index.ts" />
+declare module "@scom/scom-swap/store/index.ts" {
+    import { ITokenObject } from '@scom/scom-token-list';
+    export const nullAddress = "0x0000000000000000000000000000000000000000";
+    export const getWETH: (chainId: number) => ITokenObject;
+    export const getSupportedTokens: (tokens: ITokenObject[], chainId: number) => ITokenObject[];
+    export * from "@scom/scom-swap/store/utils.ts";
 }
 /// <amd-module name="@scom/scom-swap/contracts/oswap-openswap-contract/contracts/OpenSwap.json.ts" />
 declare module "@scom/scom-swap/contracts/oswap-openswap-contract/contracts/OpenSwap.json.ts" {
@@ -9596,184 +9724,11 @@ declare module "@scom/scom-swap/contracts/oswap-openswap-contract/index.ts" {
     export { deploy, deployCoreContracts, deployOracleContracts, deployRangeContracts, deployRestrictedContracts, deployHybridRouter, initHybridRouterRegistry, deployRestrictedPairOracle, IDeploymentResult, IDeploymentContracts, toDeploymentContracts } from "@scom/scom-swap/contracts/oswap-openswap-contract/deploy.ts";
     export { OpenSwap } from "@scom/scom-swap/contracts/oswap-openswap-contract/OpenSwap.ts";
 }
-/// <amd-module name="@scom/scom-swap/global/utils/common.ts" />
-declare module "@scom/scom-swap/global/utils/common.ts" {
-    import { BigNumber, ISendTxEventsOptions, IRpcWallet } from "@ijstech/eth-wallet";
-    import { ITokenObject } from "@scom/scom-token-list";
-    export const registerSendTxEvents: (sendTxEventHandlers: ISendTxEventsOptions) => void;
-    export const approveERC20Max: (token: ITokenObject, spenderAddress: string, callback?: any, confirmationCallback?: any) => Promise<import("@ijstech/eth-contract").TransactionReceipt>;
-    export const getERC20Allowance: (wallet: IRpcWallet, token: ITokenObject, spenderAddress: string) => Promise<BigNumber>;
-}
-/// <amd-module name="@scom/scom-swap/global/utils/approvalModel.ts" />
-declare module "@scom/scom-swap/global/utils/approvalModel.ts" {
-    import { IRpcWallet } from "@ijstech/eth-wallet";
-    import { ITokenObject } from '@scom/scom-token-list';
-    export enum ApprovalStatus {
-        TO_BE_APPROVED = 0,
-        APPROVING = 1,
-        NONE = 2
-    }
-    export interface IERC20ApprovalEventOptions {
-        sender: any;
-        payAction: () => Promise<void>;
-        onToBeApproved: (token: ITokenObject) => Promise<void>;
-        onToBePaid: (token: ITokenObject) => Promise<void>;
-        onApproving: (token: ITokenObject, receipt?: string, data?: any) => Promise<void>;
-        onApproved: (token: ITokenObject, data?: any) => Promise<void>;
-        onPaying: (receipt?: string, data?: any) => Promise<void>;
-        onPaid: (data?: any) => Promise<void>;
-        onApprovingError: (token: ITokenObject, err: Error) => Promise<void>;
-        onPayingError: (err: Error) => Promise<void>;
-    }
-    export interface IERC20ApprovalOptions extends IERC20ApprovalEventOptions {
-        spenderAddress: string;
-    }
-    export interface IERC20ApprovalAction {
-        doApproveAction: (token: ITokenObject, inputAmount: string, data?: any) => Promise<void>;
-        doPayAction: (data?: any) => Promise<void>;
-        checkAllowance: (token: ITokenObject, inputAmount: string, data?: any) => Promise<void>;
-    }
-    export class ERC20ApprovalModel {
-        private wallet;
-        private options;
-        constructor(wallet: IRpcWallet, options: IERC20ApprovalOptions);
-        set spenderAddress(value: string);
-        private checkAllowance;
-        private doApproveAction;
-        private doPayAction;
-        getAction: () => IERC20ApprovalAction;
-    }
-}
-/// <amd-module name="@scom/scom-swap/global/utils/swapInterface.ts" />
-declare module "@scom/scom-swap/global/utils/swapInterface.ts" {
-    import { IWalletPlugin } from "@scom/scom-wallet-modal";
-    import { ITokenObject } from '@scom/scom-token-list';
-    export type Category = 'fixed-pair' | 'aggregator';
-    export interface ISwapConfig {
-        category: Category;
-        providers: IProvider[];
-    }
-    export interface IContractInfo {
-        factoryAddress: string;
-        routerAddress: string;
-        tradeFee: {
-            fee: string;
-            base: string;
-        };
-        fromToken?: string;
-        toToken?: string;
-    }
-    export interface IProvider {
-        key: string;
-    }
-    export interface IProviderUI {
-        key: string;
-        chainId: number;
-    }
-    export interface ICommissionInfo {
-        chainId: number;
-        walletAddress: string;
-        share: string;
-    }
-    export interface INetworkConfig {
-        chainName?: string;
-        chainId: number;
-    }
-    export interface ISwapConfigUI {
-        campaignId?: number;
-        category: Category;
-        providers: IProviderUI[];
-        commissions?: ICommissionInfo[];
-        tokens?: ITokenObject[];
-        defaultChainId: number;
-        wallets: IWalletPlugin[];
-        networks: INetworkConfig[];
-        showHeader?: boolean;
-        logo?: string;
-        title?: string;
-    }
-}
-/// <amd-module name="@scom/scom-swap/global/utils/index.ts" />
-declare module "@scom/scom-swap/global/utils/index.ts" {
-    export { getAPI, formatNumber, formatNumberWithSeparators, limitDecimals, isInvalidInput } from "@scom/scom-swap/global/utils/helper.ts";
-    export { registerSendTxEvents, approveERC20Max, getERC20Allowance } from "@scom/scom-swap/global/utils/common.ts";
-    export { ApprovalStatus, IERC20ApprovalEventOptions, IERC20ApprovalOptions, IERC20ApprovalAction, ERC20ApprovalModel } from "@scom/scom-swap/global/utils/approvalModel.ts";
-    export { IContractInfo, IProvider, ISwapConfig, ISwapConfigUI, IProviderUI, Category, ICommissionInfo, INetworkConfig } from "@scom/scom-swap/global/utils/swapInterface.ts";
-}
-/// <amd-module name="@scom/scom-swap/global/index.ts" />
-declare module "@scom/scom-swap/global/index.ts" {
-    export const enum EventId {
-        ConnectWallet = "connectWallet",
-        IsWalletConnected = "isWalletConnected",
-        IsWalletDisconnected = "IsWalletDisconnected",
-        Paid = "Paid",
-        chainChanged = "chainChanged",
-        SlippageToleranceChanged = "SlippageToleranceChanged",
-        ExpertModeChanged = "ExpertModeChanged",
-        ShowExpertModal = "ShowExpertModal"
-    }
-    export * from "@scom/scom-swap/global/utils/index.ts";
-}
-/// <amd-module name="@scom/scom-swap/store/utils.ts" />
-declare module "@scom/scom-swap/store/utils.ts" {
-    import { INetwork } from '@ijstech/eth-wallet';
-    import { ITokenObject } from '@scom/scom-token-list';
-    import { IProvider } from "@scom/scom-swap/global/index.ts";
-    import { IDexInfo } from '@scom/scom-dex-list';
-    export enum WalletPlugin {
-        MetaMask = "metamask",
-        WalletConnect = "walletconnect"
-    }
-    export type ProxyAddresses = {
-        [key: number]: string;
-    };
-    export class State {
-        isExpertMode: boolean;
-        slippageTolerance: number;
-        transactionDeadline: number;
-        infuraId: string;
-        networkMap: {
-            [key: number]: INetwork;
-        };
-        dexInfoList: IDexInfo[];
-        providerList: IProvider[];
-        proxyAddresses: ProxyAddresses;
-        ipfsGatewayUrl: string;
-        apiGatewayUrls: Record<string, string>;
-        embedderCommissionFee: string;
-        rpcWalletId: string;
-        constructor(options: any);
-        initRpcWallet(defaultChainId: number): string;
-        setProviderList(value: IProvider[]): void;
-        setDexInfoList(value: IDexInfo[]): void;
-        getProxyAddress(chainId?: number): string;
-        getProviderByKey(providerKey: string): IProvider;
-        getRpcWallet(): import("@ijstech/eth-wallet").IRpcWallet;
-        isRpcWalletConnected(): boolean;
-        getChainId(): number;
-        toggleExpertMode(): void;
-        private initData;
-        private setNetworkList;
-    }
-    export const getNetworkInfo: (chainId: number) => any;
-    export function isClientWalletConnected(): boolean;
-    export const hasMetaMask: () => boolean;
-    export const getChainNativeToken: (chainId: number) => ITokenObject;
-    export function getClientWallet(): import("@ijstech/eth-wallet").IClientWallet;
-}
-/// <amd-module name="@scom/scom-swap/store/index.ts" />
-declare module "@scom/scom-swap/store/index.ts" {
-    import { ITokenObject } from '@scom/scom-token-list';
-    export const nullAddress = "0x0000000000000000000000000000000000000000";
-    export const getWETH: (chainId: number) => ITokenObject;
-    export const getSupportedTokens: (tokens: ITokenObject[], chainId: number) => ITokenObject[];
-    export * from "@scom/scom-swap/store/utils.ts";
-}
 /// <amd-module name="@scom/scom-swap/swap-utils/index.ts" />
 declare module "@scom/scom-swap/swap-utils/index.ts" {
     import { BigNumber, TransactionReceipt } from "@ijstech/eth-wallet";
     import { ITokenObject } from '@scom/scom-token-list';
-    import { IERC20ApprovalEventOptions, ICommissionInfo, IProviderUI } from "@scom/scom-swap/global/index.ts";
+    import { ICommissionInfo, IProviderUI } from "@scom/scom-swap/global/index.ts";
     import { State } from "@scom/scom-swap/store/index.ts";
     interface TradeFee {
         fee: string;
@@ -9805,7 +9760,6 @@ declare module "@scom/scom-swap/swap-utils/index.ts" {
         receipt: TransactionReceipt | null;
         error: Record<string, string> | null;
     }>;
-    const getApprovalModelAction: (state: State, options: IERC20ApprovalEventOptions) => Promise<import("@scom/scom-swap/global/index.ts").IERC20ApprovalAction>;
     const setApprovalModalSpenderAddress: (state: State, market: string, contractAddress?: string) => void;
     const getProxyCampaign: (state: State, campaignId: number) => Promise<{
         projectId: BigNumber;
@@ -9834,7 +9788,7 @@ declare module "@scom/scom-swap/swap-utils/index.ts" {
         }[];
         referrers: string[];
     }>;
-    export { getExtendedRouteObjData, getTradeFeeMap, getAllRoutesData, getPair, SwapData, executeSwap, getChainNativeToken, getRouterAddress, getApprovalModelAction, setApprovalModalSpenderAddress, getProviderProxySelectors, getProxyCampaign };
+    export { getExtendedRouteObjData, getTradeFeeMap, getAllRoutesData, getPair, SwapData, executeSwap, getChainNativeToken, getRouterAddress, setApprovalModalSpenderAddress, getProviderProxySelectors, getProxyCampaign };
 }
 /// <amd-module name="@scom/scom-swap/price-info/priceInfo.css.ts" />
 declare module "@scom/scom-swap/price-info/priceInfo.css.ts" { }

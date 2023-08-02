@@ -1,5 +1,5 @@
 import { Module, Panel, Button, Label, VStack, Image, Container, IEventBus, application, customModule, Modal, Input, Control, customElements, ControlElement, IDataSchema, Styles, HStack, Icon, IUISchema } from '@ijstech/components';
-import { BigNumber, Constants, IEventBusRegistry, INetwork, Wallet } from '@ijstech/eth-wallet';
+import { BigNumber, Constants, IEventBusRegistry, INetwork, Wallet, IERC20ApprovalAction } from '@ijstech/eth-wallet';
 import './index.css';
 import {
   isClientWalletConnected,
@@ -11,7 +11,6 @@ import { tokenStore, DefaultERC20Tokens, ChainNativeTokenByChainId, assets as to
 import {
   getAllRoutesData,
   executeSwap,
-  getApprovalModelAction,
   setApprovalModalSpenderAddress,
   getProviderProxySelectors,
   getPair
@@ -21,7 +20,6 @@ import {
   formatNumber,
   ApprovalStatus,
   EventId,
-  IERC20ApprovalAction,
   limitDecimals,
   isInvalidInput,
   IProvider,
@@ -841,7 +839,7 @@ export default class ScomSwap extends Module {
   }
 
   private async initApprovalModelAction() {
-    this.approvalModelAction = await getApprovalModelAction(this.state, {
+    this.approvalModelAction = await this.state.setApprovalModelAction({
       sender: this,
       payAction: this.onSubmit,
       onToBeApproved: async (token: ITokenObject, data?: any) => {
@@ -1631,7 +1629,6 @@ export default class ScomSwap extends Module {
 
   private async initData() {
     if (!this.isInited) {
-      // await this.initTokenSelection();
       await this.initApprovalModelAction();
       this.isInited = true;
     }

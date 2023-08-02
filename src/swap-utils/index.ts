@@ -1,12 +1,15 @@
-import { Wallet, BigNumber, Utils, Erc20, TransactionReceipt } from "@ijstech/eth-wallet";
+import { 
+  Wallet, 
+  BigNumber, 
+  Utils,   
+  TransactionReceipt 
+} from "@ijstech/eth-wallet";
 import { Contracts } from "../contracts/oswap-openswap-contract/index";
 import { Contracts as ProxyContracts } from '@scom/scom-commission-proxy-contract';
 import { executeRouterSwap, getDexPairReserves, getRouterSwapTxData, IExecuteSwapOptions, getSwapProxySelectors } from '@scom/scom-dex-list';
 import { ITokenObject } from '@scom/scom-token-list';
 import {
   getAPI,
-  IERC20ApprovalEventOptions,
-  ERC20ApprovalModel,
   ICommissionInfo,
   IProviderUI,
 } from "../global/index";
@@ -891,21 +894,8 @@ const executeSwap: (state: State, swapData: SwapData) => Promise<{
   return { receipt, error: null };
 };
 
-var approvalModel: ERC20ApprovalModel;
-
-const getApprovalModelAction = async (state: State, options: IERC20ApprovalEventOptions) => {
-  const approvalOptions = {
-    ...options,
-    spenderAddress: ''
-  };
-  let wallet = state.getRpcWallet();
-  approvalModel = new ERC20ApprovalModel(wallet, approvalOptions);
-  let approvalModelAction = approvalModel.getAction();
-  return approvalModelAction;
-}
-
 const setApprovalModalSpenderAddress = (state: State, market: string, contractAddress?: string) => {
-  approvalModel.spenderAddress = contractAddress || getRouterAddress(state, market);
+  state.approvalModel.spenderAddress = contractAddress || getRouterAddress(state, market);
 }
 
 const getProxyCampaign = async (state: State, campaignId: number) => {
@@ -928,7 +918,6 @@ export {
   executeSwap,
   getChainNativeToken,
   getRouterAddress,
-  getApprovalModelAction,
   setApprovalModalSpenderAddress,
   getProviderProxySelectors,
   getProxyCampaign

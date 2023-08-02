@@ -9,4 +9,10 @@ export const enum EventId {
   ShowExpertModal = 'ShowExpertModal'
 }
 
+export enum ApprovalStatus {
+  TO_BE_APPROVED,
+  APPROVING,
+  NONE,
+}
+
 export * from './utils/index';
