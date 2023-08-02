@@ -760,8 +760,7 @@ define("@scom/scom-swap/store/utils.ts", ["require", "exports", "@ijstech/compon
 define("@scom/scom-swap/store/index.ts", ["require", "exports", "@scom/scom-token-list", "@scom/scom-swap/store/utils.ts"], function (require, exports, scom_token_list_2, utils_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.getSupportedTokens = exports.getWETH = exports.nullAddress = void 0;
-    exports.nullAddress = "0x0000000000000000000000000000000000000000";
+    exports.getSupportedTokens = exports.getWETH = void 0;
     const getWETH = (chainId) => {
         let wrappedToken = scom_token_list_2.WETHByChainId[chainId];
         return wrappedToken;

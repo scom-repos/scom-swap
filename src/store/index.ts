@@ -1,8 +1,6 @@
 import { ITokenObject } from '@scom/scom-token-list';
 import { WETHByChainId } from '@scom/scom-token-list';
 
-export const nullAddress = "0x0000000000000000000000000000000000000000";
-
 export const getWETH = (chainId: number): ITokenObject => {
   let wrappedToken = WETHByChainId[chainId];
   return wrappedToken;

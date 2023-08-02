@@ -138,7 +138,7 @@ declare module "@scom/scom-swap/store/utils.ts" {
         toggleExpertMode(): void;
         private initData;
         private setNetworkList;
-        setApprovalModelAction(options: IERC20ApprovalEventOptions): Promise<import("approvalModel/ERC20ApprovalModel").IERC20ApprovalAction>;
+        setApprovalModelAction(options: IERC20ApprovalEventOptions): Promise<import("@ijstech/eth-wallet").IERC20ApprovalAction>;
     }
     export const getNetworkInfo: (chainId: number) => any;
     export function isClientWalletConnected(): boolean;
@@ -149,7 +149,6 @@ declare module "@scom/scom-swap/store/utils.ts" {
 /// <amd-module name="@scom/scom-swap/store/index.ts" />
 declare module "@scom/scom-swap/store/index.ts" {
     import { ITokenObject } from '@scom/scom-token-list';
-    export const nullAddress = "0x0000000000000000000000000000000000000000";
     export const getWETH: (chainId: number) => ITokenObject;
     export const getSupportedTokens: (tokens: ITokenObject[], chainId: number) => ITokenObject[];
     export * from "@scom/scom-swap/store/utils.ts";
