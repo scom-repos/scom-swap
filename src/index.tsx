@@ -13,7 +13,8 @@ import {
   executeSwap,
   setApprovalModalSpenderAddress,
   getProviderProxySelectors,
-  getPair
+  getPair,
+  getCommissionRate
 } from './swap-utils/index'
 import { ITokenObject } from '@scom/scom-token-list';
 import {
@@ -246,6 +247,13 @@ export default class ScomSwap extends Module {
     }
   }
 
+  private async loadCommissionFee() {
+    if (this._data.campaignId && this.state.embedderCommissionFee === undefined) {
+      const commissionRate = await getCommissionRate(this.state, this._data.campaignId);
+      this.state.embedderCommissionFee = commissionRate;
+    }
+  }
+
   private getBuilderActions(category?: string) {
     const formSchema: any = getBuilderSchema();
     const propertiesDataSchema = formSchema.general.dataSchema;
@@ -280,8 +288,9 @@ export default class ScomSwap extends Module {
           }
         },
         customUI: {
-          render: (data?: any, onConfirm?: (result: boolean, data: any) => void) => {
+          render: async (data?: any, onConfirm?: (result: boolean, data: any) => void) => {
             const vstack = new VStack();
+            await self.loadCommissionFee();
             const config = new ScomCommissionFeeSetup(null, {
               commissions: self._data.commissions || [],
               fee: self.state.embedderCommissionFee,
@@ -481,7 +490,8 @@ export default class ScomSwap extends Module {
             await callback(data);
           }
         },
-        getData: () => {
+        getData: async () => {
+          await self.loadCommissionFee();
           const fee = this.state.embedderCommissionFee;
           return { ...this._data, fee }
         },
@@ -646,13 +656,6 @@ export default class ScomSwap extends Module {
 
   constructor(parent?: Container, options?: any) {
     super(parent, options);
-    this.state = new State(configData);
-    this.fromInputValue = new BigNumber(0);
-    this.toInputValue = new BigNumber(0);
-    this.swapButtonStatusMap = {};
-    this.approveButtonStatusMap = {};
-    this.$eventBus = application.EventBus;
-    this.registerEvent();
   }
 
   private registerEvent() {
@@ -666,7 +669,6 @@ export default class ScomSwap extends Module {
     const currentChainId = this.state.getChainId();
     if (currentChainId != null && currentChainId != undefined)
       this.swapBtn.visible = true;
-    // this.availableMarkets = getAvailableMarkets() || [];
     this.updateContractAddress();
     if (this.originalData?.providers?.length) await this.initializeWidgetConfig();
   }
@@ -1641,6 +1643,13 @@ export default class ScomSwap extends Module {
   async init() {
     this.isReadyCallbackQueued = true;
     super.init();
+    this.state = new State(configData);
+    this.fromInputValue = new BigNumber(0);
+    this.toInputValue = new BigNumber(0);
+    this.swapButtonStatusMap = {};
+    this.approveButtonStatusMap = {};
+    this.$eventBus = application.EventBus;
+    this.registerEvent();
     this.updateSwapButtonCaption();
     this.initExpertModal();
     const dexList = getDexList();

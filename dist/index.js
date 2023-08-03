@@ -624,7 +624,6 @@ define("@scom/scom-swap/store/utils.ts", ["require", "exports", "@ijstech/compon
             this.proxyAddresses = {};
             this.ipfsGatewayUrl = "";
             this.apiGatewayUrls = {};
-            this.embedderCommissionFee = "0";
             this.rpcWalletId = "";
             this.networkMap = (0, scom_network_list_1.default)();
             this.initData(options);
@@ -696,9 +695,6 @@ define("@scom/scom-swap/store/utils.ts", ["require", "exports", "@ijstech/compon
             }
             if (options.apiGatewayUrls) {
                 this.apiGatewayUrls = options.apiGatewayUrls;
-            }
-            if (options.embedderCommissionFee) {
-                this.embedderCommissionFee = options.embedderCommissionFee;
             }
         }
         setNetworkList(networkList, infuraId) {
@@ -13708,7 +13704,7 @@ define("@scom/scom-swap/contracts/oswap-openswap-contract/index.ts", ["require",
 define("@scom/scom-swap/swap-utils/index.ts", ["require", "exports", "@ijstech/eth-wallet", "@scom/scom-swap/contracts/oswap-openswap-contract/index.ts", "@scom/scom-commission-proxy-contract", "@scom/scom-dex-list", "@scom/scom-swap/global/index.ts", "@scom/scom-swap/store/index.ts", "@scom/scom-token-list"], function (require, exports, eth_wallet_3, index_4, scom_commission_proxy_contract_1, scom_dex_list_1, index_5, index_6, scom_token_list_3) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.getProxyCampaign = exports.getProviderProxySelectors = exports.setApprovalModalSpenderAddress = exports.getRouterAddress = exports.getChainNativeToken = exports.executeSwap = exports.getPair = exports.getAllRoutesData = exports.getTradeFeeMap = exports.getExtendedRouteObjData = void 0;
+    exports.getCommissionRate = exports.getProviderProxySelectors = exports.setApprovalModalSpenderAddress = exports.getRouterAddress = exports.getChainNativeToken = exports.executeSwap = exports.getPair = exports.getAllRoutesData = exports.getTradeFeeMap = exports.getExtendedRouteObjData = void 0;
     const routeAPI = 'https://route.openswap.xyz/trading/v1/route';
     const newRouteAPI = 'https://indexer.ijs.dev/trading/v1/route';
     const getChainNativeToken = (chainId) => {
@@ -14484,17 +14480,14 @@ define("@scom/scom-swap/swap-utils/index.ts", ["require", "exports", "@ijstech/e
         state.approvalModel.spenderAddress = contractAddress || getRouterAddress(state, market);
     };
     exports.setApprovalModalSpenderAddress = setApprovalModalSpenderAddress;
-    const getProxyCampaign = async (state, campaignId) => {
-        const wallet = state.getRpcWallet();
+    const getCommissionRate = async (state, campaignId) => {
+        const rpcWallet = state.getRpcWallet();
         const proxyAddress = state.getProxyAddress();
-        const proxy = new scom_commission_proxy_contract_1.Contracts.ProxyV3(wallet, proxyAddress);
-        const campaign = await proxy.getCampaign({
-            campaignId,
-            returnArrays: true
-        });
-        return campaign;
+        await rpcWallet.init();
+        let commissionRate = await scom_commission_proxy_contract_1.ContractUtils.getCommissionRate(rpcWallet, proxyAddress, campaignId);
+        return eth_wallet_3.Utils.fromDecimals(commissionRate, 6).toFixed();
     };
-    exports.getProxyCampaign = getProxyCampaign;
+    exports.getCommissionRate = getCommissionRate;
 });
 define("@scom/scom-swap/price-info/priceInfo.css.ts", ["require", "exports", "@ijstech/components"], function (require, exports, components_4) {
     "use strict";
@@ -14784,7 +14777,6 @@ define("@scom/scom-swap/data.json.ts", ["require", "exports"], function (require
             "43113": "0x83aaf000f0a09f860564e894535cc18f5a50f627"
         },
         "ipfsGatewayUrl": "https://ipfs.scom.dev/ipfs/",
-        "embedderCommissionFee": "0.01",
         "defaultBuilderData": {
             "providers": [
                 {
@@ -15251,6 +15243,12 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                 return this.getProjectOwnerActions();
             }
         }
+        async loadCommissionFee() {
+            if (this._data.campaignId && this.state.embedderCommissionFee === undefined) {
+                const commissionRate = await (0, index_8.getCommissionRate)(this.state, this._data.campaignId);
+                this.state.embedderCommissionFee = commissionRate;
+            }
+        }
         getBuilderActions(category) {
             const formSchema = (0, formSchema_1.getBuilderSchema)();
             const propertiesDataSchema = formSchema.general.dataSchema;
@@ -15288,8 +15286,9 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                         };
                     },
                     customUI: {
-                        render: (data, onConfirm) => {
+                        render: async (data, onConfirm) => {
                             const vstack = new components_8.VStack();
+                            await self.loadCommissionFee();
                             const config = new scom_commission_fee_setup_1.default(null, {
                                 commissions: self._data.commissions || [],
                                 fee: self.state.embedderCommissionFee,
@@ -15494,7 +15493,8 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                             await callback(data);
                         };
                     },
-                    getData: () => {
+                    getData: async () => {
+                        await self.loadCommissionFee();
                         const fee = this.state.embedderCommissionFee;
                         return Object.assign(Object.assign({}, this._data), { fee });
                     },
@@ -15677,7 +15677,6 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                 const currentChainId = this.state.getChainId();
                 if (currentChainId != null && currentChainId != undefined)
                     this.swapBtn.visible = true;
-                // this.availableMarkets = getAvailableMarkets() || [];
                 this.updateContractAddress();
                 if ((_b = (_a = this.originalData) === null || _a === void 0 ? void 0 : _a.providers) === null || _b === void 0 ? void 0 : _b.length)
                     await this.initializeWidgetConfig();
@@ -15913,13 +15912,6 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                 this.txStatusModal.message = Object.assign({}, params);
                 this.txStatusModal.showModal();
             };
-            this.state = new index_7.State(data_json_1.default);
-            this.fromInputValue = new eth_wallet_4.BigNumber(0);
-            this.toInputValue = new eth_wallet_4.BigNumber(0);
-            this.swapButtonStatusMap = {};
-            this.approveButtonStatusMap = {};
-            this.$eventBus = components_8.application.EventBus;
-            this.registerEvent();
         }
         registerEvent() {
             this.clientEvents.push(this.$eventBus.register(this, "SlippageToleranceChanged" /* EventId.SlippageToleranceChanged */, () => { this.priceInfo.Items = this.getPriceInfo(); }));
@@ -16663,6 +16655,13 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
         async init() {
             this.isReadyCallbackQueued = true;
             super.init();
+            this.state = new index_7.State(data_json_1.default);
+            this.fromInputValue = new eth_wallet_4.BigNumber(0);
+            this.toInputValue = new eth_wallet_4.BigNumber(0);
+            this.swapButtonStatusMap = {};
+            this.approveButtonStatusMap = {};
+            this.$eventBus = components_8.application.EventBus;
+            this.registerEvent();
             this.updateSwapButtonCaption();
             this.initExpertModal();
             const dexList = (0, scom_dex_list_2.default)();

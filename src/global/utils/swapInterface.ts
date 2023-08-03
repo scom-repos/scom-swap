@@ -31,7 +31,6 @@ export interface IProviderUI {
 export interface ICommissionInfo {
   chainId: number;
   walletAddress: string;
-  share: string;
 }
 
 export interface INetworkConfig {

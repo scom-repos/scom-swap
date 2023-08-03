@@ -1,5 +1,6 @@
 /// <reference path="@ijstech/eth-wallet/index.d.ts" />
 /// <reference path="@scom/scom-dex-list/@ijstech/eth-wallet/index.d.ts" />
+/// <reference path="@scom/scom-commission-proxy-contract/@ijstech/eth-wallet/index.d.ts" />
 /// <reference path="@scom/scom-dapp-container/@ijstech/eth-wallet/index.d.ts" />
 /// <reference path="@scom/scom-token-input/@ijstech/eth-wallet/index.d.ts" />
 /// <reference path="@scom/scom-token-input/@scom/scom-token-modal/@ijstech/eth-wallet/index.d.ts" />
@@ -53,7 +54,6 @@ declare module "@scom/scom-swap/global/utils/swapInterface.ts" {
     export interface ICommissionInfo {
         chainId: number;
         walletAddress: string;
-        share: string;
     }
     export interface INetworkConfig {
         chainName?: string;
@@ -9760,34 +9760,8 @@ declare module "@scom/scom-swap/swap-utils/index.ts" {
         error: Record<string, string> | null;
     }>;
     const setApprovalModalSpenderAddress: (state: State, market: string, contractAddress?: string) => void;
-    const getProxyCampaign: (state: State, campaignId: number) => Promise<{
-        projectId: BigNumber;
-        maxInputTokensInEachCall: BigNumber;
-        maxOutputTokensInEachCall: BigNumber;
-        referrersRequireApproval: boolean;
-        startDate: BigNumber;
-        endDate: BigNumber;
-        targetAndSelectors: string[];
-        acceptAnyInToken: boolean;
-        acceptAnyOutToken: boolean;
-        inTokens: string[];
-        directTransferInToken: boolean[];
-        commissionInTokenConfig: {
-            rate: BigNumber;
-            feeOnProjectOwner: boolean;
-            capPerTransaction: BigNumber;
-            capPerCampaign: BigNumber;
-        }[];
-        outTokens: string[];
-        commissionOutTokenConfig: {
-            rate: BigNumber;
-            feeOnProjectOwner: boolean;
-            capPerTransaction: BigNumber;
-            capPerCampaign: BigNumber;
-        }[];
-        referrers: string[];
-    }>;
-    export { getExtendedRouteObjData, getTradeFeeMap, getAllRoutesData, getPair, SwapData, executeSwap, getChainNativeToken, getRouterAddress, setApprovalModalSpenderAddress, getProviderProxySelectors, getProxyCampaign };
+    const getCommissionRate: (state: State, campaignId: number) => Promise<string>;
+    export { getExtendedRouteObjData, getTradeFeeMap, getAllRoutesData, getPair, SwapData, executeSwap, getChainNativeToken, getRouterAddress, setApprovalModalSpenderAddress, getProviderProxySelectors, getCommissionRate };
 }
 /// <amd-module name="@scom/scom-swap/price-info/priceInfo.css.ts" />
 declare module "@scom/scom-swap/price-info/priceInfo.css.ts" { }
@@ -9856,7 +9830,6 @@ declare module "@scom/scom-swap/data.json.ts" {
             "43113": string;
         };
         ipfsGatewayUrl: string;
-        embedderCommissionFee: string;
         defaultBuilderData: {
             providers: {
                 key: string;
@@ -10197,6 +10170,7 @@ declare module "@scom/scom-swap" {
         set width(value: string | number);
         private get hasData();
         private determineActionsByTarget;
+        private loadCommissionFee;
         private getBuilderActions;
         private getProjectOwnerActions;
         getConfigurators(): ({
@@ -10235,7 +10209,7 @@ declare module "@scom/scom-swap" {
                 data: any;
             };
             bindOnChanged: (element: ScomCommissionFeeSetup, callback: (data: any) => Promise<void>) => void;
-            getData: () => {
+            getData: () => Promise<{
                 fee: string;
                 campaignId?: number;
                 category: Category;
@@ -10248,7 +10222,7 @@ declare module "@scom/scom-swap" {
                 showHeader?: boolean;
                 logo?: string;
                 title?: string;
-            };
+            }>;
             setData: (properties: ISwapConfigUI, linkParams?: Record<string, any>) => Promise<void>;
             getTag: any;
             setTag: any;

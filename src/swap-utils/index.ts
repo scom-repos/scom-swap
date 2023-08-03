@@ -5,7 +5,7 @@ import {
   TransactionReceipt 
 } from "@ijstech/eth-wallet";
 import { Contracts } from "../contracts/oswap-openswap-contract/index";
-import { Contracts as ProxyContracts } from '@scom/scom-commission-proxy-contract';
+import { Contracts as ProxyContracts, ContractUtils as ProxyContractUtils } from '@scom/scom-commission-proxy-contract';
 import { executeRouterSwap, getDexPairReserves, getRouterSwapTxData, IExecuteSwapOptions, getSwapProxySelectors } from '@scom/scom-dex-list';
 import { ITokenObject } from '@scom/scom-token-list';
 import {
@@ -898,15 +898,12 @@ const setApprovalModalSpenderAddress = (state: State, market: string, contractAd
   state.approvalModel.spenderAddress = contractAddress || getRouterAddress(state, market);
 }
 
-const getProxyCampaign = async (state: State, campaignId: number) => {
-  const wallet = state.getRpcWallet();
+const getCommissionRate = async (state: State, campaignId: number) => {
+  const rpcWallet = state.getRpcWallet();
   const proxyAddress = state.getProxyAddress();
-  const proxy = new ProxyContracts.ProxyV3(wallet, proxyAddress);
-  const campaign = await proxy.getCampaign({
-    campaignId,
-    returnArrays: true
-  });
-  return campaign;
+  await rpcWallet.init();
+  let commissionRate = await ProxyContractUtils.getCommissionRate(rpcWallet, proxyAddress, campaignId)
+  return Utils.fromDecimals(commissionRate, 6).toFixed();
 }
 
 export {
@@ -920,5 +917,5 @@ export {
   getRouterAddress,
   setApprovalModalSpenderAddress,
   getProviderProxySelectors,
-  getProxyCampaign
+  getCommissionRate
 }

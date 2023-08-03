@@ -24,7 +24,7 @@ export class State {
   proxyAddresses: ProxyAddresses = {};
   ipfsGatewayUrl: string = "";
   apiGatewayUrls: Record<string, string> = {};
-  embedderCommissionFee: string = "0";
+  embedderCommissionFee: string;
   rpcWalletId: string = "";
   approvalModel: ERC20ApprovalModel;
 
@@ -108,9 +108,6 @@ export class State {
     }
     if (options.apiGatewayUrls) {
       this.apiGatewayUrls = options.apiGatewayUrls;
-    }
-    if (options.embedderCommissionFee) {
-      this.embedderCommissionFee = options.embedderCommissionFee;
     }
   }
 
