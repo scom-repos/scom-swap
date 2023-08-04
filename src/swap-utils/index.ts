@@ -4,7 +4,7 @@ import {
   Utils,   
   TransactionReceipt 
 } from "@ijstech/eth-wallet";
-import { Contracts } from "../contracts/oswap-openswap-contract/index";
+import { Contracts } from "@scom/oswap-openswap-contract";
 import { Contracts as ProxyContracts, ContractUtils as ProxyContractUtils } from '@scom/scom-commission-proxy-contract';
 import { executeRouterSwap, getDexPairReserves, getRouterSwapTxData, IExecuteSwapOptions, getSwapProxySelectors } from '@scom/scom-dex-list';
 import { ITokenObject } from '@scom/scom-token-list';
