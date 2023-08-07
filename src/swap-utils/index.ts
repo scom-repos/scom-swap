@@ -126,7 +126,6 @@ function getTradeFeeMap(state: State) {
 async function getBestAmountInRouteFromAPI(state: State, wallet: any, tokenIn: ITokenObject, tokenOut: ITokenObject, amountOut: string, chainId?: number) {
   chainId = state.getChainId();
   let wrappedTokenAddress = getWETH(chainId);
-  let tradeFeeMap = getTradeFeeMap(state);
   let network = chainId ? getNetworkInfo(chainId) : null;
   let api = network?.isTestnet || network?.isDisabled ? newRouteAPI : routeAPI;
   let routeObjArr = await getAPI(api, {
@@ -144,7 +143,6 @@ async function getBestAmountInRouteFromAPI(state: State, wallet: any, tokenIn: I
 async function getBestAmountOutRouteFromAPI(state: State, wallet: any, tokenIn: ITokenObject, tokenOut: ITokenObject, amountIn: string, chainId?: number) {
   chainId = state.getChainId();
   let wrappedTokenAddress = getWETH(chainId);
-  let tradeFeeMap = getTradeFeeMap(state);
   let network = chainId ? getNetworkInfo(chainId) : null;
   let api = network?.isTestnet || network?.isDisabled ? newRouteAPI : routeAPI;
   let routeObjArr = await getAPI(api, {

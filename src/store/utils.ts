@@ -22,7 +22,6 @@ export class State {
   dexInfoList: IDexInfo[] = [];
   providerList: IProvider[] = [];
   proxyAddresses: ProxyAddresses = {};
-  ipfsGatewayUrl: string = "";
   apiGatewayUrls: Record<string, string> = {};
   embedderCommissionFee: string;
   rpcWalletId: string = "";
@@ -102,9 +101,6 @@ export class State {
     }
     if (options.proxyAddresses) {
       this.proxyAddresses = options.proxyAddresses;
-    }
-    if (options.ipfsGatewayUrl) {
-      this.ipfsGatewayUrl = options.ipfsGatewayUrl;
     }
     if (options.apiGatewayUrls) {
       this.apiGatewayUrls = options.apiGatewayUrls;

@@ -804,8 +804,7 @@ export default class ScomSwap extends Module {
       this.secondTokenInput.tokenReadOnly = this.isFixedPair;
       this.pnlBranding.visible = !!this._data.logo || !!this._data.title;
       if (this._data.logo?.startsWith('ipfs://')) {
-        const ipfsGatewayUrl = this.state.ipfsGatewayUrl;
-        this.imgLogo.url = this._data.logo.replace('ipfs://', ipfsGatewayUrl);
+        this.imgLogo.url = this._data.logo.replace('ipfs://', '/ipfs/');
       }
       else {
         this.imgLogo.url = this._data.logo;

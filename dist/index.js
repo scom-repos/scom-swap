@@ -622,7 +622,6 @@ define("@scom/scom-swap/store/utils.ts", ["require", "exports", "@ijstech/compon
             this.dexInfoList = [];
             this.providerList = [];
             this.proxyAddresses = {};
-            this.ipfsGatewayUrl = "";
             this.apiGatewayUrls = {};
             this.rpcWalletId = "";
             this.networkMap = (0, scom_network_list_1.default)();
@@ -689,9 +688,6 @@ define("@scom/scom-swap/store/utils.ts", ["require", "exports", "@ijstech/compon
             }
             if (options.proxyAddresses) {
                 this.proxyAddresses = options.proxyAddresses;
-            }
-            if (options.ipfsGatewayUrl) {
-                this.ipfsGatewayUrl = options.ipfsGatewayUrl;
             }
             if (options.apiGatewayUrls) {
                 this.apiGatewayUrls = options.apiGatewayUrls;
@@ -858,7 +854,6 @@ define("@scom/scom-swap/swap-utils/index.ts", ["require", "exports", "@ijstech/e
     async function getBestAmountInRouteFromAPI(state, wallet, tokenIn, tokenOut, amountOut, chainId) {
         chainId = state.getChainId();
         let wrappedTokenAddress = getWETH(chainId);
-        let tradeFeeMap = getTradeFeeMap(state);
         let network = chainId ? (0, index_3.getNetworkInfo)(chainId) : null;
         let api = (network === null || network === void 0 ? void 0 : network.isTestnet) || (network === null || network === void 0 ? void 0 : network.isDisabled) ? newRouteAPI : routeAPI;
         let routeObjArr = await (0, index_2.getAPI)(api, {
@@ -876,7 +871,6 @@ define("@scom/scom-swap/swap-utils/index.ts", ["require", "exports", "@ijstech/e
     async function getBestAmountOutRouteFromAPI(state, wallet, tokenIn, tokenOut, amountIn, chainId) {
         chainId = state.getChainId();
         let wrappedTokenAddress = getWETH(chainId);
-        let tradeFeeMap = getTradeFeeMap(state);
         let network = chainId ? (0, index_3.getNetworkInfo)(chainId) : null;
         let api = (network === null || network === void 0 ? void 0 : network.isTestnet) || (network === null || network === void 0 ? void 0 : network.isDisabled) ? newRouteAPI : routeAPI;
         let routeObjArr = await (0, index_2.getAPI)(api, {
@@ -1843,7 +1837,6 @@ define("@scom/scom-swap/data.json.ts", ["require", "exports"], function (require
         "proxyAddresses": {
             "43113": "0x83aaf000f0a09f860564e894535cc18f5a50f627"
         },
-        "ipfsGatewayUrl": "https://ipfs.scom.dev/ipfs/",
         "defaultBuilderData": {
             "providers": [
                 {
@@ -2800,8 +2793,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                     this.secondTokenInput.tokenReadOnly = this.isFixedPair;
                     this.pnlBranding.visible = !!this._data.logo || !!this._data.title;
                     if ((_a = this._data.logo) === null || _a === void 0 ? void 0 : _a.startsWith('ipfs://')) {
-                        const ipfsGatewayUrl = this.state.ipfsGatewayUrl;
-                        this.imgLogo.url = this._data.logo.replace('ipfs://', ipfsGatewayUrl);
+                        this.imgLogo.url = this._data.logo.replace('ipfs://', '/ipfs/');
                     }
                     else {
                         this.imgLogo.url = this._data.logo;

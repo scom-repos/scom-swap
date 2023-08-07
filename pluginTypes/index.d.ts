@@ -1,5 +1,4 @@
 /// <reference path="@ijstech/eth-wallet/index.d.ts" />
-/// <reference path="@scom/scom-dex-list/@ijstech/eth-wallet/index.d.ts" />
 /// <reference path="@scom/scom-commission-proxy-contract/@ijstech/eth-wallet/index.d.ts" />
 /// <reference path="@scom/scom-dapp-container/@ijstech/eth-wallet/index.d.ts" />
 /// <reference path="@scom/scom-token-input/@ijstech/eth-wallet/index.d.ts" />
@@ -121,7 +120,6 @@ declare module "@scom/scom-swap/store/utils.ts" {
         dexInfoList: IDexInfo[];
         providerList: IProvider[];
         proxyAddresses: ProxyAddresses;
-        ipfsGatewayUrl: string;
         apiGatewayUrls: Record<string, string>;
         embedderCommissionFee: string;
         rpcWalletId: string;
@@ -259,7 +257,6 @@ declare module "@scom/scom-swap/data.json.ts" {
         proxyAddresses: {
             "43113": string;
         };
-        ipfsGatewayUrl: string;
         defaultBuilderData: {
             providers: {
                 key: string;

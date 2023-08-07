@@ -3,17 +3,24 @@
     "type": "widget",
     "version": "0.1.16",
     "dependencies": [
-        "@ijstech/components",
-        "@ijstech/eth-wallet",
-        "@scom/scom-token-list",
-        "@scom/scom-wallet-modal",
-        "@scom/scom-network-list",
-        "@scom/scom-dex-list",
-        "@scom/oswap-openswap-contract",
-        "@scom/scom-commission-proxy-contract",
-        "@scom/scom-dapp-container",
-        "@scom/scom-commission-fee-setup",
-        "@scom/scom-token-input",
-        "@scom/scom-tx-status-modal"
+        [        
+            "@ijstech/components",
+            "@ijstech/eth-wallet",
+            "@scom/scom-token-list",
+            "@scom/scom-wallet-modal",
+            "@scom/scom-network-list",
+            "@scom/oswap-openswap-contract",
+            "@scom/scom-commission-proxy-contract",
+            "@scom/scom-dapp-container",
+            "@scom/scom-commission-fee-setup",
+            "@scom/scom-token-input",
+            "@scom/scom-tx-status-modal",
+            "@scom/oswap-bakery-swap-contract",
+            "@scom/oswap-trader-joe-contract",
+            "@scom/oswap-impossible-swap-contract"
+        ],
+        [
+            "@scom/scom-dex-list"
+        ]
     ]
 }
