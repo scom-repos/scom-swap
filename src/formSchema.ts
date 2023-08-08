@@ -187,6 +187,15 @@ export function getBuilderSchema() {
                             inputFontColor: {
                                 type: 'string',
                                 format: 'color'
+                            },
+                            buttonBackground: {
+                                type: 'string'
+                            },
+                            buttonHoverBackground: {
+                                type: 'string'
+                            },
+                            buttonDisabledBackground: {
+                                type: 'string'
                             }
                         }
                     },
@@ -208,6 +217,15 @@ export function getBuilderSchema() {
                             inputFontColor: {
                                 type: 'string',
                                 format: 'color'
+                            },
+                            buttonBackground: {
+                                type: 'string'
+                            },
+                            buttonHoverBackground: {
+                                type: 'string'
+                            },
+                            buttonDisabledBackground: {
+                                type: 'string'
                             }
                         }
                     }

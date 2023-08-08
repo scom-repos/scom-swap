@@ -37,10 +37,10 @@ define("@scom/scom-swap/index.css.ts", ["require", "exports", "@ijstech/componen
     exports.swapStyle = void 0;
     const Theme = components_2.Styles.Theme.ThemeVars;
     const colorVar = {
-        primaryButton: 'transparent linear-gradient(90deg, #AC1D78 0%, #E04862 100%) 0% 0% no-repeat padding-box',
-        primaryGradient: 'linear-gradient(255deg,#f15e61,#b52082)',
+        // primaryButton: 'transparent linear-gradient(90deg, #AC1D78 0%, #E04862 100%) 0% 0% no-repeat padding-box',
+        // primaryGradient: 'linear-gradient(255deg,#f15e61,#b52082)',
         darkBg: '#181E3E 0% 0% no-repeat padding-box',
-        primaryDisabled: 'transparent linear-gradient(270deg,#351f52,#552a42) 0% 0% no-repeat padding-box !important'
+        // primaryDisabled: 'transparent linear-gradient(270deg,#351f52,#552a42) 0% 0% no-repeat padding-box !important'
     };
     components_2.Styles.fontFace({
         fontFamily: "Montserrat Regular",
@@ -138,7 +138,7 @@ define("@scom/scom-swap/index.css.ts", ["require", "exports", "@ijstech/componen
             },
             '#swapContainer i-button:not(.disabled):hover': {
                 transition: 'all .2s ease-out',
-                background: 'linear-gradient(255deg,#f15e61,#b52082)',
+                background: 'var(--button-hover-background)',
                 color: Theme.colors.primary.contrastText
             },
             '#swapContainer i-button:focus': {
@@ -443,7 +443,7 @@ define("@scom/scom-swap/index.css.ts", ["require", "exports", "@ijstech/componen
                 },
             },
             '.btn-os': {
-                background: colorVar.primaryButton,
+                background: 'var(--button-background)',
                 height: 'auto !important',
                 color: Theme.text.primary,
                 transition: 'background .3s ease',
@@ -467,7 +467,7 @@ define("@scom/scom-swap/index.css.ts", ["require", "exports", "@ijstech/componen
                 },
             },
             '.btn-os:not(.disabled):not(.is-spinning):hover, .btn-os:not(.disabled):not(.is-spinning):focus': {
-                background: colorVar.primaryGradient,
+                background: 'var(--button-hover-background)',
                 backgroundColor: 'transparent',
                 boxShadow: 'none',
                 opacity: .9
@@ -476,7 +476,7 @@ define("@scom/scom-swap/index.css.ts", ["require", "exports", "@ijstech/componen
                 boxShadow: '0 0 0 0.2rem rgb(0 123 255 / 25%)'
             },
             '.btn-os.disabled, .btn-os.is-spinning': {
-                background: colorVar.primaryDisabled,
+                background: 'var(--button-disabled-background)',
                 opacity: 1
             },
             '.dark-modal > div > div': {
@@ -1312,6 +1312,7 @@ define("@scom/scom-swap/swap-utils/index.ts", ["require", "exports", "@ijstech/e
     }
     exports.getAllRoutesData = getAllRoutesData;
     const AmmTradeExactIn = async function (state, wallet, market, routeTokens, amountIn, amountOutMin, toAddress, deadline, feeOnTransfer, campaignId, referrer) {
+        var _a;
         if (routeTokens.length < 2) {
             return null;
         }
@@ -1401,7 +1402,7 @@ define("@scom/scom-swap/swap-utils/index.ts", ["require", "exports", "@ijstech/e
                     referrer,
                     to: wallet.address,
                     tokensOut: [
-                        tokenOut.address
+                        (_a = tokenOut.address) !== null && _a !== void 0 ? _a : eth_wallet_3.Utils.nullAddress
                     ]
                 });
             }
@@ -1412,6 +1413,7 @@ define("@scom/scom-swap/swap-utils/index.ts", ["require", "exports", "@ijstech/e
         return receipt;
     };
     const AmmTradeExactOut = async function (state, wallet, market, routeTokens, amountOut, amountInMax, toAddress, deadline, campaignId, referrer) {
+        var _a;
         if (routeTokens.length < 2) {
             return null;
         }
@@ -1501,7 +1503,7 @@ define("@scom/scom-swap/swap-utils/index.ts", ["require", "exports", "@ijstech/e
                     referrer,
                     to: wallet.address,
                     tokensOut: [
-                        tokenOut.address
+                        (_a = tokenOut.address) !== null && _a !== void 0 ? _a : eth_wallet_3.Utils.nullAddress
                     ]
                 });
             }
@@ -2092,6 +2094,15 @@ define("@scom/scom-swap/formSchema.ts", ["require", "exports"], function (requir
                                 inputFontColor: {
                                     type: 'string',
                                     format: 'color'
+                                },
+                                buttonBackground: {
+                                    type: 'string'
+                                },
+                                buttonHoverBackground: {
+                                    type: 'string'
+                                },
+                                buttonDisabledBackground: {
+                                    type: 'string'
                                 }
                             }
                         },
@@ -2646,12 +2657,15 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                 this.style.removeProperty(name);
         }
         updateTheme() {
-            var _a, _b, _c, _d, _e;
+            var _a, _b, _c, _d, _e, _f, _g, _h;
             const themeVar = ((_a = this.dappContainer) === null || _a === void 0 ? void 0 : _a.theme) || 'light';
             this.updateStyle('--text-primary', (_b = this.tag[themeVar]) === null || _b === void 0 ? void 0 : _b.fontColor);
             this.updateStyle('--background-main', (_c = this.tag[themeVar]) === null || _c === void 0 ? void 0 : _c.backgroundColor);
             this.updateStyle('--input-font_color', (_d = this.tag[themeVar]) === null || _d === void 0 ? void 0 : _d.inputFontColor);
             this.updateStyle('--input-background', (_e = this.tag[themeVar]) === null || _e === void 0 ? void 0 : _e.inputBackgroundColor);
+            this.updateStyle('--button-background', ((_f = this.tag[themeVar]) === null || _f === void 0 ? void 0 : _f.buttonBackground) || 'transparent linear-gradient(90deg, #AC1D78 0%, #E04862 100%) 0% 0% no-repeat padding-box');
+            this.updateStyle('--button-hover-background', ((_g = this.tag[themeVar]) === null || _g === void 0 ? void 0 : _g.buttonHoverBackground) || 'linear-gradient(255deg,#f15e61,#b52082)');
+            this.updateStyle('--button-disabled-background', ((_h = this.tag[themeVar]) === null || _h === void 0 ? void 0 : _h.buttonDisabledBackground) || 'transparent linear-gradient(270deg,#351f52,#552a42) 0% 0% no-repeat padding-box !important');
         }
         setProviders() {
             var _a;
@@ -2787,6 +2801,8 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                     const currentChainId = this.state.getChainId();
                     scom_token_list_4.tokenStore.updateTokenMapData(currentChainId);
                     this.closeNetworkErrModal();
+                    await this.initWallet();
+                    await this.updateBalance();
                     this.initializeDefaultTokenPair();
                     this.toggleReverseImage.enabled = !this.isFixedPair;
                     this.firstTokenInput.tokenReadOnly = this.isFixedPair;
@@ -2800,8 +2816,6 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                     }
                     this.lbTitle.caption = this._data.title;
                     this.updateSwapButtonCaption();
-                    await this.initWallet();
-                    await this.updateBalance();
                     this.secondTokenInput.inputReadOnly = false;
                     this.firstTokenInput.inputReadOnly = false;
                     if (!this.isFixedPair) {
@@ -3779,7 +3793,9 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                                                         this.$render("i-label", { id: "payBalance", class: "text--grey ml-auto", caption: "Balance: 0" }),
                                                         this.$render("i-button", { id: "maxButton", class: "btn-max", caption: "Max", enabled: false, onClick: () => this.onSetMaxBalance() }))),
                                                 this.$render("i-panel", { id: "payCol", class: "bg-box", width: "100%", margin: { top: 'auto' } },
-                                                    this.$render("i-scom-token-input", { id: "firstTokenInput", placeholder: '0.0', value: '-', tokenReadOnly: false, isBalanceShown: false, isBtnMaxShown: false, isCommonShown: true, inputReadOnly: true, background: { color: Theme.input.background }, border: { radius: '1rem' }, height: 56, display: 'flex', font: { size: '1.25rem' }, onInputAmountChanged: this.onTokenInputChange, onSelectToken: (token) => this.onSelectToken(token, true), class: "token-input" })))),
+                                                    this.$render("i-scom-token-input", { id: "firstTokenInput", placeholder: '0.0', value: '-', tokenReadOnly: false, isBalanceShown: false, isBtnMaxShown: false, isCommonShown: true, inputReadOnly: true, background: { color: Theme.input.background }, border: { radius: '1rem' }, 
+                                                        // height={56}
+                                                        display: 'flex', font: { size: '1.25rem' }, onInputAmountChanged: this.onTokenInputChange, onSelectToken: (token) => this.onSelectToken(token, true), class: "token-input" })))),
                                         this.$render("i-hstack", { horizontalAlignment: "space-between" },
                                             this.$render("i-label", { id: "lbYouPayTitle", caption: "You Pay", font: { size: '1rem' } }),
                                             this.$render("i-label", { id: "lbYouPayValue", caption: "0", font: { size: '1rem' } }))),
@@ -3794,7 +3810,9 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                                                     this.$render("i-vstack", { class: "text-right", width: "100%" },
                                                         this.$render("i-label", { id: "receiveBalance", class: "text--grey ml-auto", caption: "Balance: 0" }))),
                                                 this.$render("i-panel", { id: "receiveCol", class: "bg-box", background: { color: Theme.input.background }, width: "100%", margin: { top: 'auto' } },
-                                                    this.$render("i-scom-token-input", { id: "secondTokenInput", value: '-', placeholder: '0.0', inputReadOnly: true, tokenReadOnly: false, isBalanceShown: false, isBtnMaxShown: false, isCommonShown: true, background: { color: Theme.input.background }, border: { radius: '1rem' }, height: 56, display: 'flex', font: { size: '1.25rem' }, onInputAmountChanged: this.onTokenInputChange, onSelectToken: (token) => this.onSelectToken(token, false), class: "token-input" })))),
+                                                    this.$render("i-scom-token-input", { id: "secondTokenInput", value: '-', placeholder: '0.0', inputReadOnly: true, tokenReadOnly: false, isBalanceShown: false, isBtnMaxShown: false, isCommonShown: true, background: { color: Theme.input.background }, border: { radius: '1rem' }, 
+                                                        // height={56}
+                                                        display: 'flex', font: { size: '1.25rem' }, onInputAmountChanged: this.onTokenInputChange, onSelectToken: (token) => this.onSelectToken(token, false), class: "token-input" })))),
                                         this.$render("i-hstack", { horizontalAlignment: "end" },
                                             this.$render("i-label", { id: "lbRouting", caption: "No routing", opacity: 0.75, font: { size: '1rem' }, class: "visibility-hidden" }))))),
                             this.$render("i-panel", { id: "pnlPriceInfo" }),

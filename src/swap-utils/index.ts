@@ -709,7 +709,7 @@ const AmmTradeExactIn = async function (state: State, wallet: any, market: strin
         referrer,
         to: wallet.address,
         tokensOut: [
-          tokenOut.address
+          tokenOut.address ?? Utils.nullAddress
         ]
       })
     }
@@ -811,7 +811,7 @@ const AmmTradeExactOut = async function (state: State, wallet: any, market: stri
         referrer,
         to: wallet.address,
         tokensOut: [
-          tokenOut.address
+          tokenOut.address ?? Utils.nullAddress
         ]
       })
     }

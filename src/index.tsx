@@ -591,6 +591,10 @@ export default class ScomSwap extends Module {
     this.updateStyle('--background-main', this.tag[themeVar]?.backgroundColor);
     this.updateStyle('--input-font_color', this.tag[themeVar]?.inputFontColor);
     this.updateStyle('--input-background', this.tag[themeVar]?.inputBackgroundColor);
+    //FIXME: temporary solution
+    this.updateStyle('--button-background', this.tag[themeVar]?.buttonBackground || 'transparent linear-gradient(90deg, #AC1D78 0%, #E04862 100%) 0% 0% no-repeat padding-box');
+    this.updateStyle('--button-hover-background', this.tag[themeVar]?.buttonHoverBackground || 'linear-gradient(255deg,#f15e61,#b52082)');
+    this.updateStyle('--button-disabled-background', this.tag[themeVar]?.buttonDisabledBackground || 'transparent linear-gradient(270deg,#351f52,#552a42) 0% 0% no-repeat padding-box !important');
   }
 
   private setProviders() {
@@ -798,6 +802,8 @@ export default class ScomSwap extends Module {
       const currentChainId = this.state.getChainId();
       tokenStore.updateTokenMapData(currentChainId);
       this.closeNetworkErrModal();
+      await this.initWallet();
+      await this.updateBalance();
       this.initializeDefaultTokenPair();
       this.toggleReverseImage.enabled = !this.isFixedPair;
       this.firstTokenInput.tokenReadOnly = this.isFixedPair;
@@ -813,8 +819,6 @@ export default class ScomSwap extends Module {
 
       this.updateSwapButtonCaption();
 
-      await this.initWallet();
-      await this.updateBalance();
       this.secondTokenInput.inputReadOnly = false;
       this.firstTokenInput.inputReadOnly = false;
       if (!this.isFixedPair) {
@@ -1724,7 +1728,7 @@ export default class ScomSwap extends Module {
                             inputReadOnly={true}
                             background={{ color: Theme.input.background }}
                             border={{ radius: '1rem' }}
-                            height={56}
+                            // height={56}
                             display='flex'
                             font={{ size: '1.25rem' }}
                             onInputAmountChanged={this.onTokenInputChange}
@@ -1765,7 +1769,7 @@ export default class ScomSwap extends Module {
                             isCommonShown={true}
                             background={{ color: Theme.input.background }}
                             border={{ radius: '1rem' }}
-                            height={56}
+                            // height={56}
                             display='flex'
                             font={{ size: '1.25rem' }}
                             onInputAmountChanged={this.onTokenInputChange}

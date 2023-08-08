@@ -3,10 +3,10 @@ import Assets from './assets';
 const Theme = Styles.Theme.ThemeVars;
 
 const colorVar = {
-  primaryButton: 'transparent linear-gradient(90deg, #AC1D78 0%, #E04862 100%) 0% 0% no-repeat padding-box',
-  primaryGradient: 'linear-gradient(255deg,#f15e61,#b52082)',
+  // primaryButton: 'transparent linear-gradient(90deg, #AC1D78 0%, #E04862 100%) 0% 0% no-repeat padding-box',
+  // primaryGradient: 'linear-gradient(255deg,#f15e61,#b52082)',
   darkBg: '#181E3E 0% 0% no-repeat padding-box',
-  primaryDisabled: 'transparent linear-gradient(270deg,#351f52,#552a42) 0% 0% no-repeat padding-box !important'
+  // primaryDisabled: 'transparent linear-gradient(270deg,#351f52,#552a42) 0% 0% no-repeat padding-box !important'
 }
 
 Styles.fontFace({
@@ -115,7 +115,7 @@ export const swapStyle = Styles.style({
     },
     '#swapContainer i-button:not(.disabled):hover': {
       transition: 'all .2s ease-out',
-      background: 'linear-gradient(255deg,#f15e61,#b52082)',
+      background: 'var(--button-hover-background)',
       color: Theme.colors.primary.contrastText
     },
     '#swapContainer i-button:focus': {
@@ -420,7 +420,7 @@ export const swapStyle = Styles.style({
       },
     },
     '.btn-os': {
-      background: colorVar.primaryButton,
+      background: 'var(--button-background)',
       height: 'auto !important',
       color: Theme.text.primary,
       transition: 'background .3s ease',
@@ -444,7 +444,7 @@ export const swapStyle = Styles.style({
       },
     },
     '.btn-os:not(.disabled):not(.is-spinning):hover, .btn-os:not(.disabled):not(.is-spinning):focus': {
-      background: colorVar.primaryGradient,
+      background: 'var(--button-hover-background)',
       backgroundColor: 'transparent',
       boxShadow: 'none',
       opacity: .9
@@ -453,7 +453,7 @@ export const swapStyle = Styles.style({
       boxShadow: '0 0 0 0.2rem rgb(0 123 255 / 25%)'
     },
     '.btn-os.disabled, .btn-os.is-spinning': {
-      background: colorVar.primaryDisabled,
+      background: 'var(--button-disabled-background)',
       opacity: 1
     },
     '.dark-modal > div > div': {

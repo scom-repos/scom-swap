@@ -415,6 +415,15 @@ declare module "@scom/scom-swap/formSchema.ts" {
                                 type: string;
                                 format: string;
                             };
+                            buttonBackground: {
+                                type: string;
+                            };
+                            buttonHoverBackground: {
+                                type: string;
+                            };
+                            buttonDisabledBackground: {
+                                type: string;
+                            };
                         };
                     };
                     light: {
