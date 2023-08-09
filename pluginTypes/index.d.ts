@@ -415,13 +415,19 @@ declare module "@scom/scom-swap/formSchema.ts" {
                                 type: string;
                                 format: string;
                             };
-                            buttonBackground: {
+                            primaryButtonBackground: {
                                 type: string;
                             };
-                            buttonHoverBackground: {
+                            primaryButtonHoverBackground: {
                                 type: string;
                             };
-                            buttonDisabledBackground: {
+                            primaryButtonDisabledBackground: {
+                                type: string;
+                            };
+                            maxButtonBackground: {
+                                type: string;
+                            };
+                            maxButtonHoverBackground: {
                                 type: string;
                             };
                         };
@@ -444,6 +450,21 @@ declare module "@scom/scom-swap/formSchema.ts" {
                             inputFontColor: {
                                 type: string;
                                 format: string;
+                            };
+                            primaryButtonBackground: {
+                                type: string;
+                            };
+                            primaryButtonHoverBackground: {
+                                type: string;
+                            };
+                            primaryButtonDisabledBackground: {
+                                type: string;
+                            };
+                            maxButtonBackground: {
+                                type: string;
+                            };
+                            maxButtonHoverBackground: {
+                                type: string;
                             };
                         };
                     };

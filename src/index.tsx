@@ -592,9 +592,11 @@ export default class ScomSwap extends Module {
     this.updateStyle('--input-font_color', this.tag[themeVar]?.inputFontColor);
     this.updateStyle('--input-background', this.tag[themeVar]?.inputBackgroundColor);
     //FIXME: temporary solution
-    this.updateStyle('--button-background', this.tag[themeVar]?.buttonBackground || 'transparent linear-gradient(90deg, #AC1D78 0%, #E04862 100%) 0% 0% no-repeat padding-box');
-    this.updateStyle('--button-hover-background', this.tag[themeVar]?.buttonHoverBackground || 'linear-gradient(255deg,#f15e61,#b52082)');
-    this.updateStyle('--button-disabled-background', this.tag[themeVar]?.buttonDisabledBackground || 'transparent linear-gradient(270deg,#351f52,#552a42) 0% 0% no-repeat padding-box !important');
+    this.updateStyle('--primary-button-background', this.tag[themeVar]?.primaryButtonBackground || 'transparent linear-gradient(90deg, #AC1D78 0%, #E04862 100%) 0% 0% no-repeat padding-box');
+    this.updateStyle('--primary-button-hover-background', this.tag[themeVar]?.primaryButtonHoverBackground || 'linear-gradient(255deg,#f15e61,#b52082)');
+    this.updateStyle('--primary-button-disabled-background', this.tag[themeVar]?.primaryButtonDisabledBackground || 'transparent linear-gradient(270deg,#351f52,#552a42) 0% 0% no-repeat padding-box');
+    this.updateStyle('--max-button-background', this.tag[themeVar]?.maxButtonBackground || 'transparent linear-gradient(255deg,#e75b66,#b52082) 0% 0% no-repeat padding-box');
+    this.updateStyle('--max-button-hover-background', this.tag[themeVar]?.maxButtonHoverBackground || 'linear-gradient(255deg,#f15e61,#b52082)');
   }
 
   private setProviders() {

@@ -188,13 +188,19 @@ export function getBuilderSchema() {
                                 type: 'string',
                                 format: 'color'
                             },
-                            buttonBackground: {
+                            primaryButtonBackground: {
                                 type: 'string'
                             },
-                            buttonHoverBackground: {
+                            primaryButtonHoverBackground: {
                                 type: 'string'
                             },
-                            buttonDisabledBackground: {
+                            primaryButtonDisabledBackground: {
+                                type: 'string'
+                            },
+                            maxButtonBackground: {
+                                type: 'string'
+                            },
+                            maxButtonHoverBackground: {
                                 type: 'string'
                             }
                         }
@@ -218,13 +224,19 @@ export function getBuilderSchema() {
                                 type: 'string',
                                 format: 'color'
                             },
-                            buttonBackground: {
+                            primaryButtonBackground: {
                                 type: 'string'
                             },
-                            buttonHoverBackground: {
+                            primaryButtonHoverBackground: {
                                 type: 'string'
                             },
-                            buttonDisabledBackground: {
+                            primaryButtonDisabledBackground: {
+                                type: 'string'
+                            },
+                            maxButtonBackground: {
+                                type: 'string'
+                            },
+                            maxButtonHoverBackground: {
                                 type: 'string'
                             }
                         }

@@ -113,9 +113,9 @@ export const swapStyle = Styles.style({
     '#swapContainer i-button.disabled': {
       opacity: 0.4,
     },
-    '#swapContainer i-button:not(.disabled):hover': {
+    '#swapContainer i-button#btn-max:not(.disabled):hover': {
       transition: 'all .2s ease-out',
-      background: 'var(--button-hover-background)',
+      background: 'var(--max-button-hover-background)',
       color: Theme.colors.primary.contrastText
     },
     '#swapContainer i-button:focus': {
@@ -224,7 +224,7 @@ export const swapStyle = Styles.style({
       padding: '0 0.5rem',
       marginLeft: '0.5rem',
       bottom: '1.5px',
-      background: 'transparent linear-gradient(255deg,#e75b66,#b52082) 0% 0% no-repeat padding-box',
+      background: 'var(--max-button-background)',
       color: Theme.colors.primary.contrastText
     },
     '.bg-box': {
@@ -420,7 +420,7 @@ export const swapStyle = Styles.style({
       },
     },
     '.btn-os': {
-      background: 'var(--button-background)',
+      background: 'var(--primary-button-background)',
       height: 'auto !important',
       color: Theme.text.primary,
       transition: 'background .3s ease',
@@ -444,7 +444,7 @@ export const swapStyle = Styles.style({
       },
     },
     '.btn-os:not(.disabled):not(.is-spinning):hover, .btn-os:not(.disabled):not(.is-spinning):focus': {
-      background: 'var(--button-hover-background)',
+      background: 'var(--primary-button-hover-background)',
       backgroundColor: 'transparent',
       boxShadow: 'none',
       opacity: .9
@@ -453,7 +453,7 @@ export const swapStyle = Styles.style({
       boxShadow: '0 0 0 0.2rem rgb(0 123 255 / 25%)'
     },
     '.btn-os.disabled, .btn-os.is-spinning': {
-      background: 'var(--button-disabled-background)',
+      background: 'var(--primary-button-disabled-background)',
       opacity: 1
     },
     '.dark-modal > div > div': {

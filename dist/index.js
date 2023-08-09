@@ -136,9 +136,9 @@ define("@scom/scom-swap/index.css.ts", ["require", "exports", "@ijstech/componen
             '#swapContainer i-button.disabled': {
                 opacity: 0.4,
             },
-            '#swapContainer i-button:not(.disabled):hover': {
+            '#swapContainer i-button#btn-max:not(.disabled):hover': {
                 transition: 'all .2s ease-out',
-                background: 'var(--button-hover-background)',
+                background: 'var(--max-button-hover-background)',
                 color: Theme.colors.primary.contrastText
             },
             '#swapContainer i-button:focus': {
@@ -247,7 +247,7 @@ define("@scom/scom-swap/index.css.ts", ["require", "exports", "@ijstech/componen
                 padding: '0 0.5rem',
                 marginLeft: '0.5rem',
                 bottom: '1.5px',
-                background: 'transparent linear-gradient(255deg,#e75b66,#b52082) 0% 0% no-repeat padding-box',
+                background: 'var(--max-button-background)',
                 color: Theme.colors.primary.contrastText
             },
             '.bg-box': {
@@ -443,7 +443,7 @@ define("@scom/scom-swap/index.css.ts", ["require", "exports", "@ijstech/componen
                 },
             },
             '.btn-os': {
-                background: 'var(--button-background)',
+                background: 'var(--primary-button-background)',
                 height: 'auto !important',
                 color: Theme.text.primary,
                 transition: 'background .3s ease',
@@ -467,7 +467,7 @@ define("@scom/scom-swap/index.css.ts", ["require", "exports", "@ijstech/componen
                 },
             },
             '.btn-os:not(.disabled):not(.is-spinning):hover, .btn-os:not(.disabled):not(.is-spinning):focus': {
-                background: 'var(--button-hover-background)',
+                background: 'var(--primary-button-hover-background)',
                 backgroundColor: 'transparent',
                 boxShadow: 'none',
                 opacity: .9
@@ -476,7 +476,7 @@ define("@scom/scom-swap/index.css.ts", ["require", "exports", "@ijstech/componen
                 boxShadow: '0 0 0 0.2rem rgb(0 123 255 / 25%)'
             },
             '.btn-os.disabled, .btn-os.is-spinning': {
-                background: 'var(--button-disabled-background)',
+                background: 'var(--primary-button-disabled-background)',
                 opacity: 1
             },
             '.dark-modal > div > div': {
@@ -2095,13 +2095,19 @@ define("@scom/scom-swap/formSchema.ts", ["require", "exports"], function (requir
                                     type: 'string',
                                     format: 'color'
                                 },
-                                buttonBackground: {
+                                primaryButtonBackground: {
                                     type: 'string'
                                 },
-                                buttonHoverBackground: {
+                                primaryButtonHoverBackground: {
                                     type: 'string'
                                 },
-                                buttonDisabledBackground: {
+                                primaryButtonDisabledBackground: {
+                                    type: 'string'
+                                },
+                                maxButtonBackground: {
+                                    type: 'string'
+                                },
+                                maxButtonHoverBackground: {
                                     type: 'string'
                                 }
                             }
@@ -2124,6 +2130,21 @@ define("@scom/scom-swap/formSchema.ts", ["require", "exports"], function (requir
                                 inputFontColor: {
                                     type: 'string',
                                     format: 'color'
+                                },
+                                primaryButtonBackground: {
+                                    type: 'string'
+                                },
+                                primaryButtonHoverBackground: {
+                                    type: 'string'
+                                },
+                                primaryButtonDisabledBackground: {
+                                    type: 'string'
+                                },
+                                maxButtonBackground: {
+                                    type: 'string'
+                                },
+                                maxButtonHoverBackground: {
+                                    type: 'string'
                                 }
                             }
                         }
@@ -2657,15 +2678,18 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                 this.style.removeProperty(name);
         }
         updateTheme() {
-            var _a, _b, _c, _d, _e, _f, _g, _h;
+            var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k;
             const themeVar = ((_a = this.dappContainer) === null || _a === void 0 ? void 0 : _a.theme) || 'light';
             this.updateStyle('--text-primary', (_b = this.tag[themeVar]) === null || _b === void 0 ? void 0 : _b.fontColor);
             this.updateStyle('--background-main', (_c = this.tag[themeVar]) === null || _c === void 0 ? void 0 : _c.backgroundColor);
             this.updateStyle('--input-font_color', (_d = this.tag[themeVar]) === null || _d === void 0 ? void 0 : _d.inputFontColor);
             this.updateStyle('--input-background', (_e = this.tag[themeVar]) === null || _e === void 0 ? void 0 : _e.inputBackgroundColor);
-            this.updateStyle('--button-background', ((_f = this.tag[themeVar]) === null || _f === void 0 ? void 0 : _f.buttonBackground) || 'transparent linear-gradient(90deg, #AC1D78 0%, #E04862 100%) 0% 0% no-repeat padding-box');
-            this.updateStyle('--button-hover-background', ((_g = this.tag[themeVar]) === null || _g === void 0 ? void 0 : _g.buttonHoverBackground) || 'linear-gradient(255deg,#f15e61,#b52082)');
-            this.updateStyle('--button-disabled-background', ((_h = this.tag[themeVar]) === null || _h === void 0 ? void 0 : _h.buttonDisabledBackground) || 'transparent linear-gradient(270deg,#351f52,#552a42) 0% 0% no-repeat padding-box !important');
+            //FIXME: temporary solution
+            this.updateStyle('--primary-button-background', ((_f = this.tag[themeVar]) === null || _f === void 0 ? void 0 : _f.primaryButtonBackground) || 'transparent linear-gradient(90deg, #AC1D78 0%, #E04862 100%) 0% 0% no-repeat padding-box');
+            this.updateStyle('--primary-button-hover-background', ((_g = this.tag[themeVar]) === null || _g === void 0 ? void 0 : _g.primaryButtonHoverBackground) || 'linear-gradient(255deg,#f15e61,#b52082)');
+            this.updateStyle('--primary-button-disabled-background', ((_h = this.tag[themeVar]) === null || _h === void 0 ? void 0 : _h.primaryButtonDisabledBackground) || 'transparent linear-gradient(270deg,#351f52,#552a42) 0% 0% no-repeat padding-box');
+            this.updateStyle('--max-button-background', ((_j = this.tag[themeVar]) === null || _j === void 0 ? void 0 : _j.maxButtonBackground) || 'transparent linear-gradient(255deg,#e75b66,#b52082) 0% 0% no-repeat padding-box');
+            this.updateStyle('--max-button-hover-background', ((_k = this.tag[themeVar]) === null || _k === void 0 ? void 0 : _k.maxButtonHoverBackground) || 'linear-gradient(255deg,#f15e61,#b52082)');
         }
         setProviders() {
             var _a;
