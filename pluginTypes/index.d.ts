@@ -133,7 +133,7 @@ declare module "@scom/scom-swap/store/utils.ts" {
             key?: string;
             chainId?: number;
         }): IDexInfo[];
-        getDexDetail(key: string, chainId: number): import("@scom/scom-dex-list").IDexDetail;
+        getDexDetail(key: string, chainId: number): import("@scom/scom-dex-list/interfaces.ts").IDexDetail;
         getProxyAddress(chainId?: number): string;
         getProviderByKey(providerKey: string): IProvider;
         getRpcWallet(): import("@ijstech/eth-wallet").IRpcWallet;
