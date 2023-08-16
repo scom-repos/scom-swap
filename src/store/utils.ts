@@ -4,7 +4,7 @@ import { ITokenObject } from '@scom/scom-token-list';
 import { IProvider } from '../global/index';
 import { ChainNativeTokenByChainId } from '@scom/scom-token-list';
 import getNetworkList from '@scom/scom-network-list'
-import { IDexInfo } from '@scom/scom-dex-list';
+import { IDexDetail, IDexInfo } from '@scom/scom-dex-list';
 
 export enum WalletPlugin {
   MetaMask = 'metamask',
@@ -76,7 +76,7 @@ export class State {
   getDexDetail(key: string, chainId: number) {
     for (const dex of this.dexInfoList) {
       if (dex.dexCode === key) {
-        const dexDetail = dex.details.find(v => v.chainId === chainId);
+        const dexDetail: IDexDetail = dex.details.find(v => v.chainId === chainId);
         if (dexDetail) {
           return dexDetail;
         }
