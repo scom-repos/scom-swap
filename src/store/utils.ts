@@ -60,6 +60,31 @@ export class State {
     this.dexInfoList = value;
   }
 
+  getDexInfoList(options?: { key?: string, chainId?: number }) {
+    if (!options) return this.dexInfoList;
+    const { key, chainId } = options;
+    let dexList = this.dexInfoList;
+    if (key) {
+      dexList = dexList.filter(v => v.dexCode === key);
+    }
+    if (chainId) {
+      dexList = dexList.filter(v => v.details.some(d => d.chainId === chainId));
+    }
+    return dexList;
+  }
+
+  getDexDetail(key: string, chainId: number) {
+    for (const dex of this.dexInfoList) {
+      if (dex.dexCode === key) {
+        const dexDetail = dex.details.find(v => v.chainId === chainId);
+        if (dexDetail) {
+          return dexDetail;
+        }
+      }
+    }
+    return undefined;
+  }
+
   getProxyAddress(chainId?: number) {
     const _chainId = chainId || Wallet.getInstance().chainId;
     const proxyAddresses = this.proxyAddresses;

@@ -37,7 +37,7 @@ import configData from './data.json';
 import { getBuilderSchema, getProjectOwnerSchema } from './formSchema';
 import ScomWalletModal, { IWalletPlugin } from '@scom/scom-wallet-modal';
 import ScomDappContainer from '@scom/scom-dapp-container'
-import getDexList, { IDexInfo } from '@scom/scom-dex-list';
+import getDexList from '@scom/scom-dex-list';
 import ScomCommissionFeeSetup from '@scom/scom-commission-fee-setup';
 import ScomTokenInput from '@scom/scom-token-input';
 import ScomTxStatusModal from '@scom/scom-tx-status-modal';
@@ -423,7 +423,7 @@ export default class ScomSwap extends Module {
           return selectors;
         },
         getDexProviderOptions: (chainId: number) => {
-          const providers = this.state.dexInfoList.filter(v => v.chainId === chainId) || [];
+          const providers = this.state.getDexInfoList({ chainId });
           return providers;
         },
         getPair: async (market: string, tokenA: ITokenObject, tokenB: ITokenObject) => {
@@ -693,7 +693,7 @@ export default class ScomSwap extends Module {
 
   get isApproveButtonShown(): boolean {
     const warningMessageText = this.getWarningMessageText();
-    return warningMessageText === '' && this.approveButtonStatus !== ApprovalStatus.NONE
+    return warningMessageText === '' && this.approveButtonStatus !== undefined && this.approveButtonStatus !== ApprovalStatus.NONE
   }
   get isPriceImpactTooHigh(): boolean {
     const warningMessageText = this.getWarningMessageText();

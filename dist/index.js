@@ -653,6 +653,30 @@ define("@scom/scom-swap/store/utils.ts", ["require", "exports", "@ijstech/compon
         setDexInfoList(value) {
             this.dexInfoList = value;
         }
+        getDexInfoList(options) {
+            if (!options)
+                return this.dexInfoList;
+            const { key, chainId } = options;
+            let dexList = this.dexInfoList;
+            if (key) {
+                dexList = dexList.filter(v => v.dexCode === key);
+            }
+            if (chainId) {
+                dexList = dexList.filter(v => v.details.some(d => d.chainId === chainId));
+            }
+            return dexList;
+        }
+        getDexDetail(key, chainId) {
+            for (const dex of this.dexInfoList) {
+                if (dex.dexCode === key) {
+                    const dexDetail = dex.details.find(v => v.chainId === chainId);
+                    if (dexDetail) {
+                        return dexDetail;
+                    }
+                }
+            }
+            return undefined;
+        }
         getProxyAddress(chainId) {
             const _chainId = chainId || eth_wallet_2.Wallet.getInstance().chainId;
             const proxyAddresses = this.proxyAddresses;
@@ -782,14 +806,12 @@ define("@scom/scom-swap/swap-utils/index.ts", ["require", "exports", "@ijstech/e
     };
     const getFactoryAddress = (state, key) => {
         var _a;
-        const dexInfoList = state.dexInfoList;
-        const factoryAddress = ((_a = dexInfoList.find(v => v.chainId == state.getChainId() && v.dexCode == key)) === null || _a === void 0 ? void 0 : _a.factoryAddress) || '';
+        const factoryAddress = ((_a = state.getDexDetail(key, state.getChainId())) === null || _a === void 0 ? void 0 : _a.factoryAddress) || '';
         return factoryAddress;
     };
     function getRouterAddress(state, key) {
         var _a;
-        const dexInfoList = state.dexInfoList;
-        const routerAddress = ((_a = dexInfoList.find(v => v.chainId == state.getChainId() && v.dexCode == key)) === null || _a === void 0 ? void 0 : _a.routerAddress) || '';
+        const routerAddress = ((_a = state.getDexDetail(key, state.getChainId())) === null || _a === void 0 ? void 0 : _a.routerAddress) || '';
         return routerAddress;
     }
     exports.getRouterAddress = getRouterAddress;
@@ -844,9 +866,10 @@ define("@scom/scom-swap/swap-utils/index.ts", ["require", "exports", "@ijstech/e
     }
     function getTradeFeeMap(state) {
         let tradeFeeMap = {};
-        const dexInfoList = state.dexInfoList.filter(v => v.chainId == state.getChainId());
+        const chainId = state.getChainId();
+        const dexInfoList = state.getDexInfoList({ chainId });
         for (let dexInfo of dexInfoList) {
-            tradeFeeMap[dexInfo.dexCode] = dexInfo.tradeFee;
+            tradeFeeMap[dexInfo.dexCode] = dexInfo.details.find(v => v.chainId === chainId).tradeFee;
         }
         return tradeFeeMap;
     }
@@ -886,14 +909,15 @@ define("@scom/scom-swap/swap-utils/index.ts", ["require", "exports", "@ijstech/e
         return bestRouteObjArr;
     }
     const getProviderProxySelectors = async (state, providers) => {
+        var _a;
         const wallet = state.getRpcWallet();
         await wallet.init();
-        const dexInfoList = state.dexInfoList;
         let selectorsSet = new Set();
         for (let provider of providers) {
-            const dex = dexInfoList.find(v => v.chainId == provider.chainId && v.dexCode == provider.key);
+            const dex = state.getDexInfoList({ key: provider.key, chainId: provider.chainId })[0];
             if (dex) {
-                const selectors = await (0, scom_dex_list_1.getSwapProxySelectors)(wallet, dex);
+                const routerAddress = ((_a = dex.details.find(v => v.chainId === provider.chainId)) === null || _a === void 0 ? void 0 : _a.routerAddress) || '';
+                const selectors = await (0, scom_dex_list_1.getSwapProxySelectors)(wallet, dex.dexType, provider.chainId, routerAddress);
                 selectors.forEach(v => selectorsSet.add(v));
             }
         }
@@ -2522,7 +2546,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                         return selectors;
                     },
                     getDexProviderOptions: (chainId) => {
-                        const providers = this.state.dexInfoList.filter(v => v.chainId === chainId) || [];
+                        const providers = this.state.getDexInfoList({ chainId });
                         return providers;
                     },
                     getPair: async (market, tokenA, tokenB) => {
@@ -3029,7 +3053,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
         // }
         get isApproveButtonShown() {
             const warningMessageText = this.getWarningMessageText();
-            return warningMessageText === '' && this.approveButtonStatus !== index_6.ApprovalStatus.NONE;
+            return warningMessageText === '' && this.approveButtonStatus !== undefined && this.approveButtonStatus !== index_6.ApprovalStatus.NONE;
         }
         get isPriceImpactTooHigh() {
             var _a;

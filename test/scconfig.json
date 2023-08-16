@@ -21,7 +21,12 @@
     "@scom/scom-wallet-modal": "*",
     "@scom/scom-token-list": "*",
     "@scom/scom-network-list": "*",
-    "@scom/scom-token-input": "*"
+    "@scom/scom-token-input": "*",
+    "@scom/oswap-impossible-swap-contract": "*",
+    "@scom/oswap-trader-joe-contract": "*",
+    "@scom/oswap-bakery-swap-contract": "*",
+    "@scom/oswap-openswap-contract": "*",
+    "@scom/scom-commission-proxy-contract": "*"
   },
   "menus": [
     {
@@ -46,7 +51,9 @@
     }
   ],
   "wallets": [
-    { "name": "metamask" }
+    {
+      "name": "metamask"
+    }
   ],
   "themes": {
     "default": "light",

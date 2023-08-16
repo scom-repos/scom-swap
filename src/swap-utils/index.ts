@@ -1,8 +1,8 @@
-import { 
-  Wallet, 
-  BigNumber, 
-  Utils,   
-  TransactionReceipt 
+import {
+  Wallet,
+  BigNumber,
+  Utils,
+  TransactionReceipt
 } from "@ijstech/eth-wallet";
 import { Contracts } from "@scom/oswap-openswap-contract";
 import { Contracts as ProxyContracts, ContractUtils as ProxyContractUtils } from '@scom/scom-commission-proxy-contract';
@@ -31,10 +31,10 @@ interface TradeFeeMap {
   [key: string]: TradeFee
 }
 interface AvailableRoute {
-  pair:string,
-  market:string,
-  tokenIn:ITokenObject,
-  tokenOut:ITokenObject,
+  pair: string,
+  market: string,
+  tokenIn: ITokenObject,
+  tokenOut: ITokenObject,
   reserveA: BigNumber,
   reserveB: BigNumber,
 }
@@ -53,13 +53,12 @@ const getWrappedTokenAddress = (chainId: number): string => {
 };
 
 const getFactoryAddress = (state: State, key: string): string => {
-  const dexInfoList = state.dexInfoList;
-  const factoryAddress = dexInfoList.find(v => v.chainId == state.getChainId() && v.dexCode == key)?.factoryAddress || '';
+  const factoryAddress = state.getDexDetail(key, state.getChainId())?.factoryAddress || '';
   return factoryAddress;
 }
+
 function getRouterAddress(state: State, key: string): string {
-  const dexInfoList = state.dexInfoList;
-  const routerAddress = dexInfoList.find(v => v.chainId == state.getChainId() && v.dexCode == key)?.routerAddress || '';
+  const routerAddress = state.getDexDetail(key, state.getChainId())?.routerAddress || '';
   return routerAddress;
 }
 
@@ -116,9 +115,10 @@ async function composeRouteObj(state: State, wallet: any, routeObj: any, market:
 
 function getTradeFeeMap(state: State) {
   let tradeFeeMap: TradeFeeMap = {};
-  const dexInfoList = state.dexInfoList.filter(v => v.chainId == state.getChainId());
+  const chainId = state.getChainId();
+  const dexInfoList = state.getDexInfoList({ chainId });
   for (let dexInfo of dexInfoList) {
-    tradeFeeMap[dexInfo.dexCode] = dexInfo.tradeFee;
+    tradeFeeMap[dexInfo.dexCode] = dexInfo.details.find(v => v.chainId === chainId).tradeFee;
   }
   return tradeFeeMap;
 }
@@ -160,12 +160,12 @@ async function getBestAmountOutRouteFromAPI(state: State, wallet: any, tokenIn: 
 const getProviderProxySelectors = async (state: State, providers: IProviderUI[]) => {
   const wallet = state.getRpcWallet();
   await wallet.init();
-  const dexInfoList = state.dexInfoList;
   let selectorsSet: Set<string> = new Set();
   for (let provider of providers) {
-    const dex = dexInfoList.find(v => v.chainId == provider.chainId && v.dexCode == provider.key);
+    const dex = state.getDexInfoList({ key: provider.key, chainId: provider.chainId })[0];
     if (dex) {
-      const selectors = await getSwapProxySelectors(wallet, dex);
+      const routerAddress = dex.details.find(v => v.chainId === provider.chainId)?.routerAddress || '';
+      const selectors = await getSwapProxySelectors(wallet, dex.dexType, provider.chainId, routerAddress);
       selectors.forEach(v => selectorsSet.add(v));
     }
   }
@@ -173,7 +173,7 @@ const getProviderProxySelectors = async (state: State, providers: IProviderUI[])
 }
 
 const getPair = async (state: State, market: string, tokenA: ITokenObject, tokenB: ITokenObject) => {
-  const wallet = state.getRpcWallet();
+  const wallet: any = state.getRpcWallet();
   let chainId = state.getChainId();
   if (!tokenA.address) tokenA = getWETH(chainId);
   if (!tokenB.address) tokenB = getWETH(chainId);
@@ -187,7 +187,7 @@ const getPair = async (state: State, market: string, tokenA: ITokenObject, token
 
 const getAllAvailableRoutes = async (state: State, markets: string[], tokenList: ITokenObject[], tokenIn: ITokenObject, tokenOut: ITokenObject) => {
   const wallet = state.getRpcWallet();
-  let getPairPromises:Promise<void>[] = [];
+  let getPairPromises: Promise<void>[] = [];
   let availableRoutes: AvailableRoute[] = [];
 
   const getReservesByPair = async (market: string, pairAddress: string, tokenIn: ITokenObject, tokenOut: ITokenObject) => {
@@ -210,7 +210,7 @@ const getAllAvailableRoutes = async (state: State, markets: string[], tokenList:
         tokenOut,
         ...reserveObj
       });
-    } catch (err) { 
+    } catch (err) {
       console.log('err', err);
     }
   }
@@ -421,7 +421,7 @@ const getAllExactAmountInPaths = async (tradeFeeMap: any, availableRoutes: any[]
     let entryList = availableRoutes.filter((v) => v.tokenIn.address == tokenIn.address);
     for (let i = 0; i < entryList.length; i++) {
       let pairInfo = entryList[i];
-      let routeObj =  getAmmRouteObj(pairInfo); // pairInfo.market == Market.MIXED_QUEUE ? getQueueRouteObj(pairInfo) : getAmmRouteObj(pairInfo);
+      let routeObj = getAmmRouteObj(pairInfo); // pairInfo.market == Market.MIXED_QUEUE ? getQueueRouteObj(pairInfo) : getAmmRouteObj(pairInfo);
       if (!routeObj) continue;
       if ((!pairInfo.tokenOut.address && !tokenOut.address) ||
         (pairInfo.tokenOut.address && tokenOut.address && pairInfo.tokenOut.address.toLowerCase() == tokenOut.address.toLowerCase())) {
@@ -518,7 +518,7 @@ async function getExtendedRouteObjData(wallet: any, bestRouteObj: any, tradeFeeM
       .reduce((prev: any, curr: any) => prev.times(curr));
   }
 
-  let fee = new BigNumber(1).minus(bestRouteObj.market.map((market:number) => {
+  let fee = new BigNumber(1).minus(bestRouteObj.market.map((market: number) => {
     let tradeFeeObj = tradeFeeMap[market]
     let tradeFee = new BigNumber(tradeFeeObj.fee).div(tradeFeeObj.base);
     return new BigNumber(1).minus(tradeFee)
