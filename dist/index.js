@@ -3758,7 +3758,6 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                     await components_8.application.loadPackage('@scom/scom-wallet-modal', '*');
                     this.mdWallet.networks = this.networks;
                     this.mdWallet.wallets = this.wallets;
-                    // this.$eventBus.dispatch(EventId.ConnectWallet);
                     this.mdWallet.showModal();
                 }
                 return;
