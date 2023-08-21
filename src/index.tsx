@@ -1441,7 +1441,6 @@ export default class ScomSwap extends Module {
         await application.loadPackage('@scom/scom-wallet-modal', '*');
         this.mdWallet.networks = this.networks;
         this.mdWallet.wallets = this.wallets;
-        // this.$eventBus.dispatch(EventId.ConnectWallet);
         this.mdWallet.showModal();
       }
       return;

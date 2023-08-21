@@ -1,9 +1,9 @@
-/// <reference path="@scom/scom-dex-list/index.d.ts" />
 /// <reference path="@ijstech/eth-wallet/index.d.ts" />
 /// <reference path="@scom/scom-commission-proxy-contract/@ijstech/eth-wallet/index.d.ts" />
 /// <reference path="@scom/scom-dapp-container/@ijstech/eth-wallet/index.d.ts" />
 /// <reference path="@scom/scom-token-input/@ijstech/eth-wallet/index.d.ts" />
 /// <reference path="@scom/scom-token-input/@scom/scom-token-modal/@ijstech/eth-wallet/index.d.ts" />
+/// <reference path="@scom/scom-dex-list/index.d.ts" />
 /// <amd-module name="@scom/scom-swap/assets.ts" />
 declare module "@scom/scom-swap/assets.ts" {
     function fullPath(path: string): string;
@@ -102,7 +102,7 @@ declare module "@scom/scom-swap/store/utils.ts" {
     import { INetwork, ERC20ApprovalModel, IERC20ApprovalEventOptions } from '@ijstech/eth-wallet';
     import { ITokenObject } from '@scom/scom-token-list';
     import { IProvider } from "@scom/scom-swap/global/index.ts";
-    import { IDexInfo } from '@scom/scom-dex-list';
+    import { IDexDetail, IDexInfo } from '@scom/scom-dex-list';
     export enum WalletPlugin {
         MetaMask = "metamask",
         WalletConnect = "walletconnect"
@@ -133,7 +133,7 @@ declare module "@scom/scom-swap/store/utils.ts" {
             key?: string;
             chainId?: number;
         }): IDexInfo[];
-        getDexDetail(key: string, chainId: number): import("@scom/scom-dex-list/interfaces.ts").IDexDetail;
+        getDexDetail(key: string, chainId: number): IDexDetail;
         getProxyAddress(chainId?: number): string;
         getProviderByKey(providerKey: string): IProvider;
         getRpcWallet(): import("@ijstech/eth-wallet").IRpcWallet;
