@@ -1,8 +1,8 @@
 /// <reference path="@ijstech/eth-wallet/index.d.ts" />
 /// <reference path="@scom/scom-commission-proxy-contract/@ijstech/eth-wallet/index.d.ts" />
-/// <reference path="@scom/scom-dapp-container/@ijstech/eth-wallet/index.d.ts" />
 /// <reference path="@scom/scom-token-input/@ijstech/eth-wallet/index.d.ts" />
 /// <reference path="@scom/scom-token-input/@scom/scom-token-modal/@ijstech/eth-wallet/index.d.ts" />
+/// <reference path="@scom/scom-dapp-container/@ijstech/eth-wallet/index.d.ts" />
 /// <reference path="@scom/scom-dex-list/index.d.ts" />
 /// <amd-module name="@scom/scom-swap/assets.ts" />
 declare module "@scom/scom-swap/assets.ts" {
@@ -133,7 +133,7 @@ declare module "@scom/scom-swap/store/utils.ts" {
             key?: string;
             chainId?: number;
         }): IDexInfo[];
-        getDexDetail(key: string, chainId: number): IDexDetail;
+        getDexDetail(key: string, chainId: number): import("@scom/scom-dex-list").IDexDetail;
         getProxyAddress(chainId?: number): string;
         getProviderByKey(providerKey: string): IProvider;
         getRpcWallet(): import("@ijstech/eth-wallet").IRpcWallet;
@@ -291,6 +291,8 @@ declare module "@scom/scom-swap/data.json.ts" {
 }
 /// <amd-module name="@scom/scom-swap/formSchema.ts" />
 declare module "@scom/scom-swap/formSchema.ts" {
+    import ScomNetworkPicker from '@scom/scom-network-picker';
+    import ScomTokenInput from '@scom/scom-token-input';
     export function getBuilderSchema(): {
         general: {
             dataSchema: {
@@ -393,9 +395,38 @@ declare module "@scom/scom-swap/formSchema.ts" {
                                     };
                                 };
                             }[];
+                        } | {
+                            type: string;
+                            label: string;
+                            elements: {
+                                type: string;
+                                scope: string;
+                            }[];
                         })[];
                     }[];
                 })[];
+            };
+            customControls(rpcWalletId: string): {
+                "#/properties/networks/properties/chainId": {
+                    render: () => ScomNetworkPicker;
+                    getData: (control: ScomNetworkPicker) => number;
+                    setData: (control: ScomNetworkPicker, value: number) => void;
+                };
+                "#/properties/tokens/properties/chainId": {
+                    render: () => ScomNetworkPicker;
+                    getData: (control: ScomNetworkPicker) => number;
+                    setData: (control: ScomNetworkPicker, value: number) => void;
+                };
+                "#/properties/tokens/properties/address": {
+                    render: () => ScomTokenInput;
+                    getData: (control: ScomTokenInput) => string;
+                    setData: (control: ScomTokenInput, value: string) => void;
+                };
+                "#/properties/providers/properties/chainId": {
+                    render: () => ScomNetworkPicker;
+                    getData: (control: ScomNetworkPicker) => number;
+                    setData: (control: ScomNetworkPicker, value: number) => void;
+                };
             };
         };
         theme: {

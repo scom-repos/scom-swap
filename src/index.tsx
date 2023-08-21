@@ -259,6 +259,7 @@ export default class ScomSwap extends Module {
     const propertiesDataSchema = formSchema.general.dataSchema;
     const propertiesUISchema = formSchema.general.uiSchema;
     const themeDataSchema = formSchema.theme.dataSchema;
+    const propertiesCustomControls = formSchema.general.customControls(this.state.getRpcWallet()?.instanceId);
     let self = this;
     const actions: any[] = [
       {
@@ -365,7 +366,8 @@ export default class ScomSwap extends Module {
           }
         },
         userInputDataSchema: propertiesDataSchema,
-        userInputUISchema: propertiesUISchema
+        userInputUISchema: propertiesUISchema,
+        customControls: propertiesCustomControls
       });
       actions.push(
         {

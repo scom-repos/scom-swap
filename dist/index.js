@@ -1924,11 +1924,12 @@ define("@scom/scom-swap/data.json.ts", ["require", "exports"], function (require
         }
     };
 });
-define("@scom/scom-swap/formSchema.ts", ["require", "exports"], function (require, exports) {
+define("@scom/scom-swap/formSchema.ts", ["require", "exports", "@scom/scom-network-picker", "@scom/scom-token-input"], function (require, exports, scom_network_picker_1, scom_token_input_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.getProjectOwnerSchema = exports.getBuilderSchema = void 0;
-    ///<amd-module name='@scom/scom-swap/formSchema.ts'/> 
+    const chainIds = [1, 56, 137, 250, 97, 80001, 43113, 43114];
+    const networks = chainIds.map(v => { return { chainId: v }; });
     function getBuilderSchema() {
         return {
             general: {
@@ -1959,7 +1960,7 @@ define("@scom/scom-swap/formSchema.ts", ["require", "exports"], function (requir
                                 properties: {
                                     chainId: {
                                         type: "number",
-                                        enum: [1, 56, 137, 250, 97, 80001, 43113, 43114],
+                                        enum: chainIds,
                                         required: true
                                     }
                                 }
@@ -1973,7 +1974,7 @@ define("@scom/scom-swap/formSchema.ts", ["require", "exports"], function (requir
                                 properties: {
                                     chainId: {
                                         type: "number",
-                                        enum: [1, 56, 137, 250, 97, 80001, 43113, 43114],
+                                        enum: chainIds,
                                         required: true
                                     },
                                     address: {
@@ -1994,7 +1995,7 @@ define("@scom/scom-swap/formSchema.ts", ["require", "exports"], function (requir
                                     },
                                     chainId: {
                                         type: "number",
-                                        enum: [1, 56, 137, 250, 97, 80001, 43113, 43114],
+                                        enum: chainIds,
                                         required: true
                                     }
                                 }
@@ -2080,12 +2081,7 @@ define("@scom/scom-swap/formSchema.ts", ["require", "exports"], function (requir
                                             "elements": [
                                                 {
                                                     "type": "Control",
-                                                    "scope": "#/properties/tokens",
-                                                    "options": {
-                                                        "detail": {
-                                                            "type": "VerticalLayout"
-                                                        }
-                                                    }
+                                                    "scope": "#/properties/tokens"
                                                 }
                                             ]
                                         }
@@ -2094,6 +2090,64 @@ define("@scom/scom-swap/formSchema.ts", ["require", "exports"], function (requir
                             ]
                         }
                     ]
+                },
+                customControls(rpcWalletId) {
+                    let networkPickers = [];
+                    let tokenInputs = [];
+                    return {
+                        "#/properties/networks/properties/chainId": customNetworkPicker(),
+                        "#/properties/tokens/properties/chainId": {
+                            render: () => {
+                                const idx = networkPickers.length;
+                                networkPickers[idx] = new scom_network_picker_1.default(undefined, {
+                                    type: 'combobox',
+                                    networks,
+                                    onCustomNetworkSelected: () => {
+                                        var _a;
+                                        const chainId = (_a = networkPickers[idx].selectedNetwork) === null || _a === void 0 ? void 0 : _a.chainId;
+                                        tokenInputs[idx].targetChainId = chainId;
+                                    }
+                                });
+                                return networkPickers[idx];
+                            },
+                            getData: (control) => {
+                                var _a;
+                                return (_a = control.selectedNetwork) === null || _a === void 0 ? void 0 : _a.chainId;
+                            },
+                            setData: (control, value) => {
+                                control.setNetworkByChainId(value);
+                                const idx = networkPickers.findIndex(f => f === control);
+                                if (tokenInputs[idx])
+                                    tokenInputs[idx].targetChainId = value;
+                            }
+                        },
+                        "#/properties/tokens/properties/address": {
+                            render: () => {
+                                var _a, _b;
+                                const idx = tokenInputs.length;
+                                tokenInputs[idx] = new scom_token_input_1.default(undefined, {
+                                    type: 'combobox',
+                                    isBalanceShown: false,
+                                    isBtnMaxShown: false,
+                                    isInputShown: false
+                                });
+                                tokenInputs[idx].rpcWalletId = rpcWalletId;
+                                const chainId = (_b = (_a = networkPickers[idx]) === null || _a === void 0 ? void 0 : _a.selectedNetwork) === null || _b === void 0 ? void 0 : _b.chainId;
+                                if (chainId && tokenInputs[idx].targetChainId !== chainId) {
+                                    tokenInputs[idx].targetChainId = chainId;
+                                }
+                                return tokenInputs[idx];
+                            },
+                            getData: (control) => {
+                                var _a, _b;
+                                return ((_a = control.token) === null || _a === void 0 ? void 0 : _a.address) || ((_b = control.token) === null || _b === void 0 ? void 0 : _b.symbol);
+                            },
+                            setData: (control, value) => {
+                                control.address = value;
+                            }
+                        },
+                        "#/properties/providers/properties/chainId": customNetworkPicker()
+                    };
                 }
             },
             theme: {
@@ -2178,6 +2232,24 @@ define("@scom/scom-swap/formSchema.ts", ["require", "exports"], function (requir
         };
     }
     exports.getBuilderSchema = getBuilderSchema;
+    const customNetworkPicker = () => {
+        return {
+            render: () => {
+                const networkPicker = new scom_network_picker_1.default(undefined, {
+                    type: 'combobox',
+                    networks
+                });
+                return networkPicker;
+            },
+            getData: (control) => {
+                var _a;
+                return (_a = control.selectedNetwork) === null || _a === void 0 ? void 0 : _a.chainId;
+            },
+            setData: (control, value) => {
+                control.setNetworkByChainId(value);
+            }
+        };
+    };
     function getProjectOwnerSchema() {
         return {
             general: {
@@ -2366,10 +2438,12 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
             }
         }
         getBuilderActions(category) {
+            var _a;
             const formSchema = (0, formSchema_1.getBuilderSchema)();
             const propertiesDataSchema = formSchema.general.dataSchema;
             const propertiesUISchema = formSchema.general.uiSchema;
             const themeDataSchema = formSchema.theme.dataSchema;
+            const propertiesCustomControls = formSchema.general.customControls((_a = this.state.getRpcWallet()) === null || _a === void 0 ? void 0 : _a.instanceId);
             let self = this;
             const actions = [
                 {
@@ -2484,7 +2558,8 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                         };
                     },
                     userInputDataSchema: propertiesDataSchema,
-                    userInputUISchema: propertiesUISchema
+                    userInputUISchema: propertiesUISchema,
+                    customControls: propertiesCustomControls
                 });
                 actions.push({
                     name: 'Theme Settings',
