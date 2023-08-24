@@ -4,15 +4,6 @@
 /// <reference path="@scom/scom-token-input/@scom/scom-token-modal/@ijstech/eth-wallet/index.d.ts" />
 /// <reference path="@scom/scom-dapp-container/@ijstech/eth-wallet/index.d.ts" />
 /// <reference path="@scom/scom-dex-list/index.d.ts" />
-/// <amd-module name="@scom/scom-swap/assets.ts" />
-declare module "@scom/scom-swap/assets.ts" {
-    function fullPath(path: string): string;
-    const _default: {
-        logo: string;
-        fullPath: typeof fullPath;
-    };
-    export default _default;
-}
 /// <amd-module name="@scom/scom-swap/index.css.ts" />
 declare module "@scom/scom-swap/index.css.ts" {
     export const swapStyle: string;
@@ -227,8 +218,8 @@ declare module "@scom/scom-swap/price-info/index.tsx" {
 }
 /// <amd-module name="@scom/scom-swap/expert-mode-settings/index.css.ts" />
 declare module "@scom/scom-swap/expert-mode-settings/index.css.ts" {
-    const _default_1: string;
-    export default _default_1;
+    const _default: string;
+    export default _default;
 }
 /// <amd-module name="@scom/scom-swap/expert-mode-settings/index.tsx" />
 declare module "@scom/scom-swap/expert-mode-settings/index.tsx" {
@@ -255,7 +246,7 @@ declare module "@scom/scom-swap/expert-mode-settings/index.tsx" {
 }
 /// <amd-module name="@scom/scom-swap/data.json.ts" />
 declare module "@scom/scom-swap/data.json.ts" {
-    const _default_2: {
+    const _default_1: {
         infuraId: string;
         networks: {
             chainId: number;
@@ -287,7 +278,7 @@ declare module "@scom/scom-swap/data.json.ts" {
             showFooter: boolean;
         };
     };
-    export default _default_2;
+    export default _default_1;
 }
 /// <amd-module name="@scom/scom-swap/formSchema.ts" />
 declare module "@scom/scom-swap/formSchema.ts" {
