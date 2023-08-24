@@ -1,5 +1,4 @@
 import { Styles } from '@ijstech/components';
-import Assets from './assets';
 const Theme = Styles.Theme.ThemeVars;
 
 const colorVar = {
@@ -8,70 +7,6 @@ const colorVar = {
   darkBg: '#181E3E 0% 0% no-repeat padding-box',
   // primaryDisabled: 'transparent linear-gradient(270deg,#351f52,#552a42) 0% 0% no-repeat padding-box !important'
 }
-
-Styles.fontFace({
-  fontFamily: "Montserrat Regular",
-  src: `url("${Assets.fullPath('fonts/montserrat/Montserrat-Regular.ttf')}") format("truetype")`,
-  fontWeight: 'nomal',
-  fontStyle: 'normal'
-})
-
-Styles.fontFace({
-  fontFamily: "Montserrat Bold",
-  src: `url("${Assets.fullPath('fonts/montserrat/Montserrat-Bold.ttf')}") format("truetype")`,
-  fontWeight: 'bold',
-  fontStyle: 'normal'
-})
-
-Styles.fontFace({
-  fontFamily: "Montserrat Light",
-  src: `url("${Assets.fullPath('fonts/montserrat/Montserrat-Light.ttf')}") format("truetype")`,
-  fontStyle: 'normal'
-})
-
-Styles.fontFace({
-  fontFamily: "Montserrat Medium",
-  src: `url("${Assets.fullPath('fonts/montserrat/Montserrat-Medium.ttf')}") format("truetype")`,
-  fontStyle: 'normal'
-})
-
-Styles.fontFace({
-  fontFamily: "Montserrat SemiBold",
-  src: `url("${Assets.fullPath('fonts/montserrat/Montserrat-SemiBold.ttf')}") format("truetype")`,
-  fontStyle: 'normal'
-})
-
-Styles.fontFace({
-  fontFamily: "Raleway Regular",
-  src: `url("${Assets.fullPath('fonts/raleway/Raleway-Regular.ttf')}") format("truetype")`,
-  fontWeight: 'nomal',
-  fontStyle: 'normal'
-})
-
-Styles.fontFace({
-  fontFamily: "Raleway Bold",
-  src: `url("${Assets.fullPath('fonts/raleway/Raleway-Bold.ttf')}") format("truetype")`,
-  fontWeight: 'bold',
-  fontStyle: 'normal'
-})
-
-Styles.fontFace({
-  fontFamily: "Raleway Light",
-  src: `url("${Assets.fullPath('fonts/raleway/Raleway-Light.ttf')}") format("truetype")`,
-  fontStyle: 'normal'
-})
-
-Styles.fontFace({
-  fontFamily: "Raleway Medium",
-  src: `url("${Assets.fullPath('fonts/raleway/Raleway-Medium.ttf')}") format("truetype")`,
-  fontStyle: 'normal'
-})
-
-Styles.fontFace({
-  fontFamily: "Raleway SemiBold",
-  src: `url("${Assets.fullPath('fonts/raleway/Raleway-SemiBold.ttf')}") format("truetype")`,
-  fontStyle: 'normal'
-})
 
 export const swapStyle = Styles.style({
   $nest: {
@@ -426,7 +361,6 @@ export const swapStyle = Styles.style({
       transition: 'background .3s ease',
       fontSize: '1rem',
       fontWeight: 'bold',
-      fontFamily: 'Raleway Bold',
       $nest: {
         'i-icon.loading-icon': {
           marginInline: '0.25rem',
