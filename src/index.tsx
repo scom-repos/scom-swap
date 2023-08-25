@@ -341,7 +341,7 @@ export default class ScomSwap extends Module {
               this._data.tokens = [];
               if (userInputData.tokens) {
                 for (let inputToken of userInputData.tokens) {
-                  if (!inputToken.address) {
+                  if (!inputToken.address || !(inputToken.address).toLowerCase().startsWith('0x')) {
                     const nativeToken = ChainNativeTokenByChainId[inputToken.chainId];
                     if (nativeToken) this._data.tokens.push({ ...nativeToken, chainId: inputToken.chainId });
                   }

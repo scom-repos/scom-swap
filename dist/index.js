@@ -2461,7 +2461,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                                 this._data.tokens = [];
                                 if (userInputData.tokens) {
                                     for (let inputToken of userInputData.tokens) {
-                                        if (!inputToken.address) {
+                                        if (!inputToken.address || !(inputToken.address).toLowerCase().startsWith('0x')) {
                                             const nativeToken = scom_token_list_4.ChainNativeTokenByChainId[inputToken.chainId];
                                             if (nativeToken)
                                                 this._data.tokens.push(Object.assign(Object.assign({}, nativeToken), { chainId: inputToken.chainId }));
