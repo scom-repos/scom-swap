@@ -256,10 +256,9 @@ export default class ScomSwap extends Module {
 
   private getBuilderActions(category?: string) {
     const formSchema: any = getBuilderSchema();
-    const propertiesDataSchema = formSchema.general.dataSchema;
-    const propertiesUISchema = formSchema.general.uiSchema;
-    const themeDataSchema = formSchema.theme.dataSchema;
-    const propertiesCustomControls = formSchema.general.customControls(this.state.getRpcWallet()?.instanceId);
+    const dataSchema = formSchema.dataSchema;
+    const uiSchema = formSchema.uiSchema;
+    const customControls = formSchema.customControls(this.state.getRpcWallet()?.instanceId);
     let self = this;
     const actions: any[] = [
       {
@@ -319,28 +318,48 @@ export default class ScomSwap extends Module {
     ]
     if (category && category !== 'offers') {
       actions.push({
-        name: 'Settings',
-        icon: 'cog',
+        name: 'Edit',
+        icon: 'edit',
         command: (builder: any, userInputData: any) => {
-          let _oldData: ISwapConfigUI = {
+          let oldData: ISwapConfigUI = {
             category: 'fixed-pair',
             providers: [],
             defaultChainId: 0,
             wallets: [],
             networks: []
-          }
+          };
+          let oldTag = {};
           return {
             execute: async () => {
-              _oldData = { ...this._data };
-              this._data.logo = userInputData.logo;
-              this._data.title = userInputData.title;
-              this._data.networks = userInputData.networks;
+              oldData = JSON.parse(JSON.stringify(this._data));
+              const {
+                logo,
+                title,
+                networks,
+                category,
+                providers,
+                tokens,
+                ...themeSettings
+              } = userInputData;
+
+              const generalSettings = {
+                logo,
+                title,
+                networks,
+                category,
+                providers,
+                tokens
+              };
+
+              this._data.logo = generalSettings.logo;
+              this._data.title = generalSettings.title;
+              this._data.networks = generalSettings.networks;
               this._data.defaultChainId = this._data.networks[0].chainId;
-              this._data.category = userInputData.category;
-              this._data.providers = userInputData.providers;
+              this._data.category = generalSettings.category;
+              this._data.providers = generalSettings.providers;
               this._data.tokens = [];
-              if (userInputData.tokens) {
-                for (let inputToken of userInputData.tokens) {
+              if (generalSettings.tokens) {
+                for (let inputToken of generalSettings.tokens) {
                   if (!inputToken.address || !(inputToken.address).toLowerCase().startsWith('0x')) {
                     const nativeToken = ChainNativeTokenByChainId[inputToken.chainId];
                     if (nativeToken) this._data.tokens.push({ ...nativeToken, chainId: inputToken.chainId });
@@ -356,46 +375,29 @@ export default class ScomSwap extends Module {
               this.updateContractAddress();
               this.refreshUI();
               if (builder?.setData) builder.setData(this._data);
+
+              oldTag = JSON.parse(JSON.stringify(this.tag));
+              if (builder?.setTag) builder.setTag(themeSettings);
+              else this.setTag(themeSettings);
+              if (this.dappContainer) this.dappContainer.setTag(themeSettings);
             },
             undo: () => {
-              this._data = { ..._oldData };
+              this._data = JSON.parse(JSON.stringify(oldData));
               this.refreshUI();
               if (builder?.setData) builder.setData(this._data);
+
+              this.tag = JSON.parse(JSON.stringify(oldTag));
+              if (builder?.setTag) builder.setTag(this.tag);
+              else this.setTag(this.tag);
+              if (this.dappContainer) this.dappContainer.setTag(this.tag);
             },
             redo: () => { }
           }
         },
-        userInputDataSchema: propertiesDataSchema,
-        userInputUISchema: propertiesUISchema,
-        customControls: propertiesCustomControls
+        userInputDataSchema: dataSchema,
+        userInputUISchema: uiSchema,
+        customControls: customControls
       });
-      actions.push(
-        {
-          name: 'Theme Settings',
-          icon: 'palette',
-          command: (builder: any, userInputData: any) => {
-            let oldTag = {};
-            return {
-              execute: async () => {
-                if (!userInputData) return;
-                oldTag = JSON.parse(JSON.stringify(this.tag));
-                if (builder) builder.setTag(userInputData);
-                else this.setTag(userInputData);
-                if (this.dappContainer) this.dappContainer.setTag(userInputData);
-              },
-              undo: () => {
-                if (!userInputData) return;
-                this.tag = JSON.parse(JSON.stringify(oldTag));
-                if (builder) builder.setTag(this.tag);
-                else this.setTag(this.tag);
-                if (this.dappContainer) this.dappContainer.setTag(this.tag);
-              },
-              redo: () => { }
-            }
-          },
-          userInputDataSchema: themeDataSchema
-        }
-      )
     }
     return actions
   }

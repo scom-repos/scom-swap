@@ -285,218 +285,243 @@ declare module "@scom/scom-swap/formSchema.ts" {
     import ScomNetworkPicker from '@scom/scom-network-picker';
     import ScomTokenInput from '@scom/scom-token-input';
     export function getBuilderSchema(): {
-        general: {
-            dataSchema: {
-                type: string;
-                properties: {
-                    title: {
+        dataSchema: {
+            type: string;
+            properties: {
+                title: {
+                    type: string;
+                };
+                logo: {
+                    type: string;
+                    format: string;
+                };
+                category: {
+                    type: string;
+                    required: boolean;
+                    enum: string[];
+                };
+                networks: {
+                    type: string;
+                    required: boolean;
+                    items: {
                         type: string;
-                    };
-                    logo: {
-                        type: string;
-                        format: string;
-                    };
-                    category: {
-                        type: string;
-                        required: boolean;
-                        enum: string[];
-                    };
-                    networks: {
-                        type: string;
-                        required: boolean;
-                        items: {
-                            type: string;
-                            properties: {
-                                chainId: {
-                                    type: string;
-                                    enum: number[];
-                                    required: boolean;
-                                };
-                            };
-                        };
-                    };
-                    tokens: {
-                        type: string;
-                        required: boolean;
-                        items: {
-                            type: string;
-                            properties: {
-                                chainId: {
-                                    type: string;
-                                    enum: number[];
-                                    required: boolean;
-                                };
-                                address: {
-                                    type: string;
-                                };
-                            };
-                        };
-                    };
-                    providers: {
-                        type: string;
-                        required: boolean;
-                        items: {
-                            type: string;
-                            properties: {
-                                key: {
-                                    type: string;
-                                    required: boolean;
-                                };
-                                chainId: {
-                                    type: string;
-                                    enum: number[];
-                                    required: boolean;
-                                };
+                        properties: {
+                            chainId: {
+                                type: string;
+                                enum: number[];
+                                required: boolean;
                             };
                         };
                     };
                 };
-            };
-            uiSchema: {
-                type: string;
-                elements: ({
+                tokens: {
                     type: string;
-                    elements: {
+                    required: boolean;
+                    items: {
                         type: string;
-                        scope: string;
-                    }[];
-                } | {
+                        properties: {
+                            chainId: {
+                                type: string;
+                                enum: number[];
+                                required: boolean;
+                            };
+                            address: {
+                                type: string;
+                            };
+                        };
+                    };
+                };
+                providers: {
                     type: string;
-                    elements: {
+                    required: boolean;
+                    items: {
                         type: string;
-                        elements: ({
+                        properties: {
+                            key: {
+                                type: string;
+                                required: boolean;
+                            };
+                            chainId: {
+                                type: string;
+                                enum: number[];
+                                required: boolean;
+                            };
+                        };
+                    };
+                };
+                dark: {
+                    type: string;
+                    properties: {
+                        backgroundColor: {
                             type: string;
-                            label: string;
+                            format: string;
+                        };
+                        fontColor: {
+                            type: string;
+                            format: string;
+                        };
+                        inputBackgroundColor: {
+                            type: string;
+                            format: string;
+                        };
+                        inputFontColor: {
+                            type: string;
+                            format: string;
+                        };
+                        maxButtonBackground: {
+                            type: string;
+                            format: string;
+                        };
+                        maxButtonHoverBackground: {
+                            type: string;
+                            format: string;
+                        };
+                        primaryButtonBackground: {
+                            type: string;
+                            format: string;
+                        };
+                        primaryButtonHoverBackground: {
+                            type: string;
+                            format: string;
+                        };
+                        primaryButtonDisabledBackground: {
+                            type: string;
+                            format: string;
+                        };
+                    };
+                };
+                light: {
+                    type: string;
+                    properties: {
+                        backgroundColor: {
+                            type: string;
+                            format: string;
+                        };
+                        fontColor: {
+                            type: string;
+                            format: string;
+                        };
+                        inputBackgroundColor: {
+                            type: string;
+                            format: string;
+                        };
+                        inputFontColor: {
+                            type: string;
+                            format: string;
+                        };
+                        maxButtonBackground: {
+                            type: string;
+                            format: string;
+                        };
+                        maxButtonHoverBackground: {
+                            type: string;
+                            format: string;
+                        };
+                        primaryButtonBackground: {
+                            type: string;
+                            format: string;
+                        };
+                        primaryButtonHoverBackground: {
+                            type: string;
+                            format: string;
+                        };
+                        primaryButtonDisabledBackground: {
+                            type: string;
+                            format: string;
+                        };
+                    };
+                };
+            };
+        };
+        uiSchema: {
+            type: string;
+            elements: ({
+                type: string;
+                label: string;
+                elements: {
+                    type: string;
+                    elements: {
+                        type: string;
+                        label: string;
+                        elements: {
+                            type: string;
                             elements: {
                                 type: string;
+                                scope: string;
+                            }[];
+                        }[];
+                    }[];
+                }[];
+            } | {
+                type: string;
+                label: string;
+                elements: {
+                    type: string;
+                    elements: ({
+                        type: string;
+                        elements: {
+                            type: string;
+                            scope: string;
+                        }[];
+                    } | {
+                        type: string;
+                        elements: {
+                            type: string;
+                            elements: ({
+                                type: string;
+                                label: string;
+                                elements: {
+                                    type: string;
+                                    elements: {
+                                        type: string;
+                                        scope: string;
+                                    }[];
+                                }[];
+                            } | {
+                                type: string;
+                                label: string;
+                                elements: {
+                                    type: string;
+                                    scope: string;
+                                    options: {
+                                        detail: {
+                                            type: string;
+                                        };
+                                    };
+                                }[];
+                            } | {
+                                type: string;
+                                label: string;
                                 elements: {
                                     type: string;
                                     scope: string;
                                 }[];
-                            }[];
-                        } | {
-                            type: string;
-                            label: string;
-                            elements: {
-                                type: string;
-                                scope: string;
-                                options: {
-                                    detail: {
-                                        type: string;
-                                    };
-                                };
-                            }[];
-                        } | {
-                            type: string;
-                            label: string;
-                            elements: {
-                                type: string;
-                                scope: string;
-                            }[];
-                        })[];
-                    }[];
-                })[];
-            };
-            customControls(rpcWalletId: string): {
-                "#/properties/networks/properties/chainId": {
-                    render: () => ScomNetworkPicker;
-                    getData: (control: ScomNetworkPicker) => number;
-                    setData: (control: ScomNetworkPicker, value: number) => void;
-                };
-                "#/properties/tokens/properties/chainId": {
-                    render: () => ScomNetworkPicker;
-                    getData: (control: ScomNetworkPicker) => number;
-                    setData: (control: ScomNetworkPicker, value: number) => void;
-                };
-                "#/properties/tokens/properties/address": {
-                    render: () => ScomTokenInput;
-                    getData: (control: ScomTokenInput) => string;
-                    setData: (control: ScomTokenInput, value: string) => void;
-                };
-                "#/properties/providers/properties/chainId": {
-                    render: () => ScomNetworkPicker;
-                    getData: (control: ScomNetworkPicker) => number;
-                    setData: (control: ScomNetworkPicker, value: number) => void;
-                };
-            };
+                            })[];
+                        }[];
+                    })[];
+                }[];
+            })[];
         };
-        theme: {
-            dataSchema: {
-                type: string;
-                properties: {
-                    dark: {
-                        type: string;
-                        properties: {
-                            backgroundColor: {
-                                type: string;
-                                format: string;
-                            };
-                            fontColor: {
-                                type: string;
-                                format: string;
-                            };
-                            inputBackgroundColor: {
-                                type: string;
-                                format: string;
-                            };
-                            inputFontColor: {
-                                type: string;
-                                format: string;
-                            };
-                            primaryButtonBackground: {
-                                type: string;
-                            };
-                            primaryButtonHoverBackground: {
-                                type: string;
-                            };
-                            primaryButtonDisabledBackground: {
-                                type: string;
-                            };
-                            maxButtonBackground: {
-                                type: string;
-                            };
-                            maxButtonHoverBackground: {
-                                type: string;
-                            };
-                        };
-                    };
-                    light: {
-                        type: string;
-                        properties: {
-                            backgroundColor: {
-                                type: string;
-                                format: string;
-                            };
-                            fontColor: {
-                                type: string;
-                                format: string;
-                            };
-                            inputBackgroundColor: {
-                                type: string;
-                                format: string;
-                            };
-                            inputFontColor: {
-                                type: string;
-                                format: string;
-                            };
-                            primaryButtonBackground: {
-                                type: string;
-                            };
-                            primaryButtonHoverBackground: {
-                                type: string;
-                            };
-                            primaryButtonDisabledBackground: {
-                                type: string;
-                            };
-                            maxButtonBackground: {
-                                type: string;
-                            };
-                            maxButtonHoverBackground: {
-                                type: string;
-                            };
-                        };
-                    };
-                };
+        customControls(rpcWalletId: string): {
+            '#/properties/networks/properties/chainId': {
+                render: () => ScomNetworkPicker;
+                getData: (control: ScomNetworkPicker) => number;
+                setData: (control: ScomNetworkPicker, value: number) => void;
+            };
+            '#/properties/tokens/properties/chainId': {
+                render: () => ScomNetworkPicker;
+                getData: (control: ScomNetworkPicker) => number;
+                setData: (control: ScomNetworkPicker, value: number) => void;
+            };
+            '#/properties/tokens/properties/address': {
+                render: () => ScomTokenInput;
+                getData: (control: ScomTokenInput) => string;
+                setData: (control: ScomTokenInput, value: string) => void;
+            };
+            '#/properties/providers/properties/chainId': {
+                render: () => ScomNetworkPicker;
+                getData: (control: ScomNetworkPicker) => number;
+                setData: (control: ScomNetworkPicker, value: number) => void;
             };
         };
     };

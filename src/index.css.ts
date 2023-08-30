@@ -48,7 +48,7 @@ export const swapStyle = Styles.style({
     '#swapContainer i-button.disabled': {
       opacity: 0.4,
     },
-    '#swapContainer i-button#btn-max:not(.disabled):hover': {
+    '#swapContainer i-button.btn-max:not(.disabled):hover': {
       transition: 'all .2s ease-out',
       background: 'var(--max-button-hover-background)',
       color: Theme.colors.primary.contrastText
@@ -379,7 +379,7 @@ export const swapStyle = Styles.style({
     },
     '.btn-os:not(.disabled):not(.is-spinning):hover, .btn-os:not(.disabled):not(.is-spinning):focus': {
       background: 'var(--primary-button-hover-background)',
-      backgroundColor: 'transparent',
+      // backgroundColor: 'transparent',
       boxShadow: 'none',
       opacity: .9
     },
