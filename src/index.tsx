@@ -904,6 +904,8 @@ export default class ScomSwap extends Module {
   private async onRevertSwap() {
     this.onUpdateEstimatedPosition(!this.isEstimated('from'), true);
     [this.fromToken, this.toToken] = [this.toToken, this.fromToken];
+    const enabled = !this.isMaxDisabled();
+    this.maxButton.enabled = enabled;
     [this.fromInputValue, this.toInputValue] = [this.toInputValue, this.fromInputValue];
     [this.payBalance.caption, this.receiveBalance.caption] = [this.receiveBalance.caption, this.payBalance.caption];
     [this.fromTokenSymbol, this.toTokenSymbol] = [this.toTokenSymbol, this.fromTokenSymbol];
