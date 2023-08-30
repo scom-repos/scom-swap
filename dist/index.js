@@ -18,6 +18,17 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
+var __rest = (this && this.__rest) || function (s, e) {
+    var t = {};
+    for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e.indexOf(p) < 0)
+        t[p] = s[p];
+    if (s != null && typeof Object.getOwnPropertySymbols === "function")
+        for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {
+            if (e.indexOf(p[i]) < 0 && Object.prototype.propertyIsEnumerable.call(s, p[i]))
+                t[p[i]] = s[p[i]];
+        }
+    return t;
+};
 define("@scom/scom-swap/index.css.ts", ["require", "exports", "@ijstech/components"], function (require, exports, components_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
@@ -69,7 +80,7 @@ define("@scom/scom-swap/index.css.ts", ["require", "exports", "@ijstech/componen
             '#swapContainer i-button.disabled': {
                 opacity: 0.4,
             },
-            '#swapContainer i-button#btn-max:not(.disabled):hover': {
+            '#swapContainer i-button.btn-max:not(.disabled):hover': {
                 transition: 'all .2s ease-out',
                 background: 'var(--max-button-hover-background)',
                 color: Theme.colors.primary.contrastText
@@ -400,7 +411,7 @@ define("@scom/scom-swap/index.css.ts", ["require", "exports", "@ijstech/componen
             },
             '.btn-os:not(.disabled):not(.is-spinning):hover, .btn-os:not(.disabled):not(.is-spinning):focus': {
                 background: 'var(--primary-button-hover-background)',
-                backgroundColor: 'transparent',
+                // backgroundColor: 'transparent',
                 boxShadow: 'none',
                 opacity: .9
             },
@@ -1862,304 +1873,423 @@ define("@scom/scom-swap/formSchema.ts", ["require", "exports", "@scom/scom-netwo
     exports.getProjectOwnerSchema = exports.getBuilderSchema = void 0;
     const chainIds = [1, 56, 137, 250, 97, 80001, 43113, 43114];
     const networks = chainIds.map(v => { return { chainId: v }; });
+    const theme = {
+        type: 'object',
+        properties: {
+            backgroundColor: {
+                type: 'string',
+                format: 'color'
+            },
+            fontColor: {
+                type: 'string',
+                format: 'color'
+            },
+            inputBackgroundColor: {
+                type: 'string',
+                format: 'color'
+            },
+            inputFontColor: {
+                type: 'string',
+                format: 'color'
+            },
+            maxButtonBackground: {
+                type: 'string',
+                format: 'color'
+            },
+            maxButtonHoverBackground: {
+                type: 'string',
+                format: 'color'
+            },
+            primaryButtonBackground: {
+                type: 'string',
+                format: 'color'
+            },
+            primaryButtonHoverBackground: {
+                type: 'string',
+                format: 'color'
+            },
+            primaryButtonDisabledBackground: {
+                type: 'string',
+                format: 'color'
+            }
+        }
+    };
+    const themeUISchema = {
+        type: 'Category',
+        label: 'Theme',
+        elements: [
+            {
+                type: 'VerticalLayout',
+                elements: [
+                    {
+                        type: 'Group',
+                        label: 'Dark',
+                        elements: [
+                            {
+                                type: 'HorizontalLayout',
+                                elements: [
+                                    {
+                                        type: 'Control',
+                                        scope: '#/properties/dark/properties/backgroundColor'
+                                    },
+                                    {
+                                        type: 'Control',
+                                        scope: '#/properties/dark/properties/fontColor'
+                                    }
+                                ]
+                            },
+                            {
+                                type: 'HorizontalLayout',
+                                elements: [
+                                    {
+                                        type: 'Control',
+                                        scope: '#/properties/dark/properties/inputBackgroundColor'
+                                    },
+                                    {
+                                        type: 'Control',
+                                        scope: '#/properties/dark/properties/inputFontColor'
+                                    }
+                                ]
+                            },
+                            {
+                                type: 'HorizontalLayout',
+                                elements: [
+                                    {
+                                        type: 'Control',
+                                        scope: '#/properties/dark/properties/maxButtonBackground'
+                                    },
+                                    {
+                                        type: 'Control',
+                                        scope: '#/properties/dark/properties/maxButtonHoverBackground'
+                                    }
+                                ]
+                            },
+                            {
+                                type: 'HorizontalLayout',
+                                elements: [
+                                    {
+                                        type: 'Control',
+                                        scope: '#/properties/dark/properties/primaryButtonBackground'
+                                    },
+                                    {
+                                        type: 'Control',
+                                        scope: '#/properties/dark/properties/primaryButtonHoverBackground'
+                                    }
+                                ]
+                            },
+                            {
+                                type: 'HorizontalLayout',
+                                elements: [
+                                    {
+                                        type: 'Control',
+                                        scope: '#/properties/dark/properties/primaryButtonDisabledBackground'
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        type: 'Group',
+                        label: 'Light',
+                        elements: [
+                            {
+                                type: 'HorizontalLayout',
+                                elements: [
+                                    {
+                                        type: 'Control',
+                                        scope: '#/properties/light/properties/backgroundColor'
+                                    },
+                                    {
+                                        type: 'Control',
+                                        scope: '#/properties/light/properties/fontColor'
+                                    }
+                                ]
+                            },
+                            {
+                                type: 'HorizontalLayout',
+                                elements: [
+                                    {
+                                        type: 'Control',
+                                        scope: '#/properties/light/properties/inputBackgroundColor'
+                                    },
+                                    {
+                                        type: 'Control',
+                                        scope: '#/properties/light/properties/inputFontColor'
+                                    }
+                                ]
+                            },
+                            {
+                                type: 'HorizontalLayout',
+                                elements: [
+                                    {
+                                        type: 'Control',
+                                        scope: '#/properties/light/properties/maxButtonBackground'
+                                    },
+                                    {
+                                        type: 'Control',
+                                        scope: '#/properties/light/properties/maxButtonHoverBackground'
+                                    }
+                                ]
+                            },
+                            {
+                                type: 'HorizontalLayout',
+                                elements: [
+                                    {
+                                        type: 'Control',
+                                        scope: '#/properties/light/properties/primaryButtonBackground'
+                                    },
+                                    {
+                                        type: 'Control',
+                                        scope: '#/properties/light/properties/primaryButtonHoverBackground'
+                                    }
+                                ]
+                            },
+                            {
+                                type: 'HorizontalLayout',
+                                elements: [
+                                    {
+                                        type: 'Control',
+                                        scope: '#/properties/light/properties/primaryButtonDisabledBackground'
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    };
     function getBuilderSchema() {
         return {
-            general: {
-                dataSchema: {
-                    type: "object",
-                    properties: {
-                        title: {
-                            type: 'string'
-                        },
-                        logo: {
-                            type: 'string',
-                            format: 'data-url'
-                        },
-                        category: {
-                            type: "string",
-                            required: true,
-                            enum: [
-                                "fixed-pair",
-                                "fixed-protocal",
-                                "aggregator"
-                            ]
-                        },
-                        networks: {
-                            type: "array",
-                            required: true,
-                            items: {
-                                type: "object",
-                                properties: {
-                                    chainId: {
-                                        type: "number",
-                                        enum: chainIds,
-                                        required: true
-                                    }
-                                }
-                            }
-                        },
-                        tokens: {
-                            type: "array",
-                            required: true,
-                            items: {
-                                type: "object",
-                                properties: {
-                                    chainId: {
-                                        type: "number",
-                                        enum: chainIds,
-                                        required: true
-                                    },
-                                    address: {
-                                        type: "string"
-                                    }
-                                }
-                            }
-                        },
-                        providers: {
-                            type: "array",
-                            required: true,
-                            items: {
-                                type: "object",
-                                properties: {
-                                    key: {
-                                        type: "string",
-                                        required: true
-                                    },
-                                    chainId: {
-                                        type: "number",
-                                        enum: chainIds,
-                                        required: true
-                                    }
+            dataSchema: {
+                type: 'object',
+                properties: {
+                    title: {
+                        type: 'string'
+                    },
+                    logo: {
+                        type: 'string',
+                        format: 'data-url'
+                    },
+                    category: {
+                        type: 'string',
+                        required: true,
+                        enum: [
+                            'fixed-pair',
+                            'fixed-protocal',
+                            'aggregator'
+                        ]
+                    },
+                    networks: {
+                        type: 'array',
+                        required: true,
+                        items: {
+                            type: 'object',
+                            properties: {
+                                chainId: {
+                                    type: 'number',
+                                    enum: chainIds,
+                                    required: true
                                 }
                             }
                         }
-                    }
-                },
-                uiSchema: {
-                    "type": "VerticalLayout",
-                    "elements": [
-                        {
-                            "type": "HorizontalLayout",
-                            "elements": [
-                                {
-                                    "type": "Control",
-                                    "scope": "#/properties/category"
+                    },
+                    tokens: {
+                        type: 'array',
+                        required: true,
+                        items: {
+                            type: 'object',
+                            properties: {
+                                chainId: {
+                                    type: 'number',
+                                    enum: chainIds,
+                                    required: true
+                                },
+                                address: {
+                                    type: 'string'
                                 }
-                            ]
-                        },
-                        {
-                            "type": "HorizontalLayout",
-                            "elements": [
-                                {
-                                    "type": "Categorization",
-                                    "elements": [
-                                        {
-                                            "type": "Category",
-                                            "label": "Branding",
-                                            "elements": [
-                                                {
-                                                    "type": "HorizontalLayout",
-                                                    "elements": [
-                                                        {
-                                                            "type": "Control",
-                                                            "scope": "#/properties/title"
-                                                        }
-                                                    ]
-                                                },
-                                                {
-                                                    "type": "HorizontalLayout",
-                                                    "elements": [
-                                                        {
-                                                            "type": "Control",
-                                                            "scope": "#/properties/logo"
-                                                        }
-                                                    ]
-                                                }
-                                            ]
-                                        },
-                                        {
-                                            "type": "Category",
-                                            "label": "Networks",
-                                            "elements": [
-                                                {
-                                                    "type": "Control",
-                                                    "scope": "#/properties/networks",
-                                                    "options": {
-                                                        "detail": {
-                                                            "type": "VerticalLayout"
-                                                        }
-                                                    }
-                                                }
-                                            ]
-                                        },
-                                        {
-                                            "type": "Category",
-                                            "label": "Providers",
-                                            "elements": [
-                                                {
-                                                    "type": "Control",
-                                                    "scope": "#/properties/providers",
-                                                    "options": {
-                                                        "detail": {
-                                                            "type": "VerticalLayout"
-                                                        }
-                                                    }
-                                                }
-                                            ]
-                                        },
-                                        {
-                                            "type": "Category",
-                                            "label": "Tokens",
-                                            "elements": [
-                                                {
-                                                    "type": "Control",
-                                                    "scope": "#/properties/tokens"
-                                                }
-                                            ]
-                                        }
-                                    ]
-                                }
-                            ]
+                            }
                         }
-                    ]
-                },
-                customControls(rpcWalletId) {
-                    let networkPickers = [];
-                    let tokenInputs = [];
-                    return {
-                        "#/properties/networks/properties/chainId": customNetworkPicker(),
-                        "#/properties/tokens/properties/chainId": {
-                            render: () => {
-                                const idx = networkPickers.length;
-                                networkPickers[idx] = new scom_network_picker_1.default(undefined, {
-                                    type: 'combobox',
-                                    networks,
-                                    onCustomNetworkSelected: () => {
-                                        var _a;
-                                        const chainId = (_a = networkPickers[idx].selectedNetwork) === null || _a === void 0 ? void 0 : _a.chainId;
-                                        tokenInputs[idx].targetChainId = chainId;
-                                    }
-                                });
-                                return networkPickers[idx];
-                            },
-                            getData: (control) => {
-                                var _a;
-                                return (_a = control.selectedNetwork) === null || _a === void 0 ? void 0 : _a.chainId;
-                            },
-                            setData: (control, value) => {
-                                control.setNetworkByChainId(value);
-                                const idx = networkPickers.findIndex(f => f === control);
-                                if (tokenInputs[idx])
-                                    tokenInputs[idx].targetChainId = value;
-                            }
-                        },
-                        "#/properties/tokens/properties/address": {
-                            render: () => {
-                                var _a, _b;
-                                const idx = tokenInputs.length;
-                                tokenInputs[idx] = new scom_token_input_1.default(undefined, {
-                                    type: 'combobox',
-                                    isBalanceShown: false,
-                                    isBtnMaxShown: false,
-                                    isInputShown: false
-                                });
-                                tokenInputs[idx].rpcWalletId = rpcWalletId;
-                                const chainId = (_b = (_a = networkPickers[idx]) === null || _a === void 0 ? void 0 : _a.selectedNetwork) === null || _b === void 0 ? void 0 : _b.chainId;
-                                if (chainId && tokenInputs[idx].targetChainId !== chainId) {
-                                    tokenInputs[idx].targetChainId = chainId;
+                    },
+                    providers: {
+                        type: 'array',
+                        required: true,
+                        items: {
+                            type: 'object',
+                            properties: {
+                                key: {
+                                    type: 'string',
+                                    required: true
+                                },
+                                chainId: {
+                                    type: 'number',
+                                    enum: chainIds,
+                                    required: true
                                 }
-                                return tokenInputs[idx];
-                            },
-                            getData: (control) => {
-                                var _a, _b;
-                                return ((_a = control.token) === null || _a === void 0 ? void 0 : _a.address) || ((_b = control.token) === null || _b === void 0 ? void 0 : _b.symbol);
-                            },
-                            setData: (control, value) => {
-                                control.address = value;
                             }
-                        },
-                        "#/properties/providers/properties/chainId": customNetworkPicker()
-                    };
+                        }
+                    },
+                    dark: theme,
+                    light: theme
                 }
             },
-            theme: {
-                dataSchema: {
-                    type: 'object',
-                    properties: {
-                        "dark": {
-                            type: 'object',
-                            properties: {
-                                backgroundColor: {
-                                    type: 'string',
-                                    format: 'color'
-                                },
-                                fontColor: {
-                                    type: 'string',
-                                    format: 'color'
-                                },
-                                inputBackgroundColor: {
-                                    type: 'string',
-                                    format: 'color'
-                                },
-                                inputFontColor: {
-                                    type: 'string',
-                                    format: 'color'
-                                },
-                                primaryButtonBackground: {
-                                    type: 'string'
-                                },
-                                primaryButtonHoverBackground: {
-                                    type: 'string'
-                                },
-                                primaryButtonDisabledBackground: {
-                                    type: 'string'
-                                },
-                                maxButtonBackground: {
-                                    type: 'string'
-                                },
-                                maxButtonHoverBackground: {
-                                    type: 'string'
-                                }
+            uiSchema: {
+                type: 'Categorization',
+                elements: [
+                    {
+                        type: 'Category',
+                        label: 'General',
+                        elements: [
+                            {
+                                type: 'VerticalLayout',
+                                elements: [
+                                    {
+                                        type: 'HorizontalLayout',
+                                        elements: [
+                                            {
+                                                type: 'Control',
+                                                scope: '#/properties/category'
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        type: 'HorizontalLayout',
+                                        elements: [
+                                            {
+                                                type: 'Categorization',
+                                                elements: [
+                                                    {
+                                                        type: 'Category',
+                                                        label: 'Branding',
+                                                        elements: [
+                                                            {
+                                                                type: 'HorizontalLayout',
+                                                                elements: [
+                                                                    {
+                                                                        type: 'Control',
+                                                                        scope: '#/properties/title'
+                                                                    }
+                                                                ]
+                                                            },
+                                                            {
+                                                                type: 'HorizontalLayout',
+                                                                elements: [
+                                                                    {
+                                                                        type: 'Control',
+                                                                        scope: '#/properties/logo'
+                                                                    }
+                                                                ]
+                                                            }
+                                                        ]
+                                                    },
+                                                    {
+                                                        type: 'Category',
+                                                        label: 'Networks',
+                                                        elements: [
+                                                            {
+                                                                type: 'Control',
+                                                                scope: '#/properties/networks',
+                                                                options: {
+                                                                    detail: {
+                                                                        type: 'VerticalLayout'
+                                                                    }
+                                                                }
+                                                            }
+                                                        ]
+                                                    },
+                                                    {
+                                                        type: 'Category',
+                                                        label: 'Providers',
+                                                        elements: [
+                                                            {
+                                                                type: 'Control',
+                                                                scope: '#/properties/providers',
+                                                                options: {
+                                                                    detail: {
+                                                                        type: 'VerticalLayout'
+                                                                    }
+                                                                }
+                                                            }
+                                                        ]
+                                                    },
+                                                    {
+                                                        type: 'Category',
+                                                        label: 'Tokens',
+                                                        elements: [
+                                                            {
+                                                                type: 'Control',
+                                                                scope: '#/properties/tokens'
+                                                            }
+                                                        ]
+                                                    }
+                                                ]
+                                            }
+                                        ]
+                                    }
+                                ]
                             }
+                        ]
+                    },
+                    themeUISchema
+                ]
+            },
+            customControls(rpcWalletId) {
+                let networkPickers = [];
+                let tokenInputs = [];
+                return {
+                    '#/properties/networks/properties/chainId': customNetworkPicker(),
+                    '#/properties/tokens/properties/chainId': {
+                        render: () => {
+                            const idx = networkPickers.length;
+                            networkPickers[idx] = new scom_network_picker_1.default(undefined, {
+                                type: 'combobox',
+                                networks,
+                                onCustomNetworkSelected: () => {
+                                    var _a;
+                                    const chainId = (_a = networkPickers[idx].selectedNetwork) === null || _a === void 0 ? void 0 : _a.chainId;
+                                    tokenInputs[idx].targetChainId = chainId;
+                                }
+                            });
+                            return networkPickers[idx];
                         },
-                        "light": {
-                            type: 'object',
-                            properties: {
-                                backgroundColor: {
-                                    type: 'string',
-                                    format: 'color'
-                                },
-                                fontColor: {
-                                    type: 'string',
-                                    format: 'color'
-                                },
-                                inputBackgroundColor: {
-                                    type: 'string',
-                                    format: 'color'
-                                },
-                                inputFontColor: {
-                                    type: 'string',
-                                    format: 'color'
-                                },
-                                primaryButtonBackground: {
-                                    type: 'string'
-                                },
-                                primaryButtonHoverBackground: {
-                                    type: 'string'
-                                },
-                                primaryButtonDisabledBackground: {
-                                    type: 'string'
-                                },
-                                maxButtonBackground: {
-                                    type: 'string'
-                                },
-                                maxButtonHoverBackground: {
-                                    type: 'string'
-                                }
-                            }
+                        getData: (control) => {
+                            var _a;
+                            return (_a = control.selectedNetwork) === null || _a === void 0 ? void 0 : _a.chainId;
+                        },
+                        setData: (control, value) => {
+                            control.setNetworkByChainId(value);
+                            const idx = networkPickers.findIndex(f => f === control);
+                            if (tokenInputs[idx])
+                                tokenInputs[idx].targetChainId = value;
                         }
-                    }
-                }
+                    },
+                    '#/properties/tokens/properties/address': {
+                        render: () => {
+                            var _a, _b;
+                            const idx = tokenInputs.length;
+                            tokenInputs[idx] = new scom_token_input_1.default(undefined, {
+                                type: 'combobox',
+                                isBalanceShown: false,
+                                isBtnMaxShown: false,
+                                isInputShown: false
+                            });
+                            tokenInputs[idx].rpcWalletId = rpcWalletId;
+                            const chainId = (_b = (_a = networkPickers[idx]) === null || _a === void 0 ? void 0 : _a.selectedNetwork) === null || _b === void 0 ? void 0 : _b.chainId;
+                            if (chainId && tokenInputs[idx].targetChainId !== chainId) {
+                                tokenInputs[idx].targetChainId = chainId;
+                            }
+                            return tokenInputs[idx];
+                        },
+                        getData: (control) => {
+                            var _a, _b;
+                            return ((_a = control.token) === null || _a === void 0 ? void 0 : _a.address) || ((_b = control.token) === null || _b === void 0 ? void 0 : _b.symbol);
+                        },
+                        setData: (control, value) => {
+                            control.address = value;
+                        }
+                    },
+                    '#/properties/providers/properties/chainId': customNetworkPicker()
+                };
             }
         };
     }
@@ -2186,7 +2316,7 @@ define("@scom/scom-swap/formSchema.ts", ["require", "exports", "@scom/scom-netwo
         return {
             general: {
                 dataSchema: {
-                    type: "object",
+                    type: 'object',
                     properties: {
                         title: {
                             type: 'string'
@@ -2196,23 +2326,23 @@ define("@scom/scom-swap/formSchema.ts", ["require", "exports", "@scom/scom-netwo
                             format: 'data-url'
                         },
                         // category: {
-                        //     type: "string",
+                        //     type: 'string',
                         //     required: true,
                         //     enum: [
-                        //         "fixed-pair",
-                        //         "fixed-protocal",
-                        //         "aggregator"
+                        //         'fixed-pair',
+                        //         'fixed-protocal',
+                        //         'aggregator'
                         //     ]
                         // },
                         // providers: {
-                        //     type: "array",
+                        //     type: 'array',
                         //     required: true,
                         //     items: {
-                        //         type: "object",
+                        //         type: 'object',
                         //         properties: {
                         //             key: {
-                        //                 title: "Name",
-                        //                 type: "string",
+                        //                 title: 'Name',
+                        //                 type: 'string',
                         //                 oneOf: providerOptions,
                         //                 required: true
                         //             }
@@ -2222,42 +2352,42 @@ define("@scom/scom-swap/formSchema.ts", ["require", "exports", "@scom/scom-netwo
                     }
                 },
                 uiSchema: {
-                    "type": "VerticalLayout",
-                    "elements": [
+                    type: 'VerticalLayout',
+                    elements: [
                         // {
-                        //     "type": "HorizontalLayout",
-                        //     "elements": [
+                        //     type: 'HorizontalLayout',
+                        //     elements: [
                         //         {
-                        //             "type": "Control",
-                        //             "scope": "#/properties/category"
+                        //             type: 'Control',
+                        //             scope: '#/properties/category'
                         //         }
                         //     ]
                         // },
                         {
-                            "type": "HorizontalLayout",
-                            "elements": [
+                            type: 'HorizontalLayout',
+                            elements: [
                                 {
-                                    "type": "Categorization",
-                                    "elements": [
+                                    type: 'Categorization',
+                                    elements: [
                                         {
-                                            "type": "Category",
-                                            "label": "Branding",
-                                            "elements": [
+                                            type: 'Category',
+                                            label: 'Branding',
+                                            elements: [
                                                 {
-                                                    "type": "HorizontalLayout",
-                                                    "elements": [
+                                                    type: 'HorizontalLayout',
+                                                    elements: [
                                                         {
-                                                            "type": "Control",
-                                                            "scope": "#/properties/title"
+                                                            type: 'Control',
+                                                            scope: '#/properties/title'
                                                         }
                                                     ]
                                                 },
                                                 {
-                                                    "type": "HorizontalLayout",
-                                                    "elements": [
+                                                    type: 'HorizontalLayout',
+                                                    elements: [
                                                         {
-                                                            "type": "Control",
-                                                            "scope": "#/properties/logo"
+                                                            type: 'Control',
+                                                            scope: '#/properties/logo'
                                                         }
                                                     ]
                                                 }
@@ -2372,10 +2502,9 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
         getBuilderActions(category) {
             var _a;
             const formSchema = (0, formSchema_1.getBuilderSchema)();
-            const propertiesDataSchema = formSchema.general.dataSchema;
-            const propertiesUISchema = formSchema.general.uiSchema;
-            const themeDataSchema = formSchema.theme.dataSchema;
-            const propertiesCustomControls = formSchema.general.customControls((_a = this.state.getRpcWallet()) === null || _a === void 0 ? void 0 : _a.instanceId);
+            const dataSchema = formSchema.dataSchema;
+            const uiSchema = formSchema.uiSchema;
+            const customControls = formSchema.customControls((_a = this.state.getRpcWallet()) === null || _a === void 0 ? void 0 : _a.instanceId);
             let self = this;
             const actions = [
                 {
@@ -2439,28 +2568,38 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
             ];
             if (category && category !== 'offers') {
                 actions.push({
-                    name: 'Settings',
-                    icon: 'cog',
+                    name: 'Edit',
+                    icon: 'edit',
                     command: (builder, userInputData) => {
-                        let _oldData = {
+                        let oldData = {
                             category: 'fixed-pair',
                             providers: [],
                             defaultChainId: 0,
                             wallets: [],
                             networks: []
                         };
+                        let oldTag = {};
                         return {
                             execute: async () => {
-                                _oldData = Object.assign({}, this._data);
-                                this._data.logo = userInputData.logo;
-                                this._data.title = userInputData.title;
-                                this._data.networks = userInputData.networks;
+                                oldData = JSON.parse(JSON.stringify(this._data));
+                                const { logo, title, networks, category, providers, tokens } = userInputData, themeSettings = __rest(userInputData, ["logo", "title", "networks", "category", "providers", "tokens"]);
+                                const generalSettings = {
+                                    logo,
+                                    title,
+                                    networks,
+                                    category,
+                                    providers,
+                                    tokens
+                                };
+                                this._data.logo = generalSettings.logo;
+                                this._data.title = generalSettings.title;
+                                this._data.networks = generalSettings.networks;
                                 this._data.defaultChainId = this._data.networks[0].chainId;
-                                this._data.category = userInputData.category;
-                                this._data.providers = userInputData.providers;
+                                this._data.category = generalSettings.category;
+                                this._data.providers = generalSettings.providers;
                                 this._data.tokens = [];
-                                if (userInputData.tokens) {
-                                    for (let inputToken of userInputData.tokens) {
+                                if (generalSettings.tokens) {
+                                    for (let inputToken of generalSettings.tokens) {
                                         if (!inputToken.address || !(inputToken.address).toLowerCase().startsWith('0x')) {
                                             const nativeToken = scom_token_list_4.ChainNativeTokenByChainId[inputToken.chainId];
                                             if (nativeToken)
@@ -2479,42 +2618,21 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                                 this.refreshUI();
                                 if (builder === null || builder === void 0 ? void 0 : builder.setData)
                                     builder.setData(this._data);
+                                oldTag = JSON.parse(JSON.stringify(this.tag));
+                                if (builder === null || builder === void 0 ? void 0 : builder.setTag)
+                                    builder.setTag(themeSettings);
+                                else
+                                    this.setTag(themeSettings);
+                                if (this.dappContainer)
+                                    this.dappContainer.setTag(themeSettings);
                             },
                             undo: () => {
-                                this._data = Object.assign({}, _oldData);
+                                this._data = JSON.parse(JSON.stringify(oldData));
                                 this.refreshUI();
                                 if (builder === null || builder === void 0 ? void 0 : builder.setData)
                                     builder.setData(this._data);
-                            },
-                            redo: () => { }
-                        };
-                    },
-                    userInputDataSchema: propertiesDataSchema,
-                    userInputUISchema: propertiesUISchema,
-                    customControls: propertiesCustomControls
-                });
-                actions.push({
-                    name: 'Theme Settings',
-                    icon: 'palette',
-                    command: (builder, userInputData) => {
-                        let oldTag = {};
-                        return {
-                            execute: async () => {
-                                if (!userInputData)
-                                    return;
-                                oldTag = JSON.parse(JSON.stringify(this.tag));
-                                if (builder)
-                                    builder.setTag(userInputData);
-                                else
-                                    this.setTag(userInputData);
-                                if (this.dappContainer)
-                                    this.dappContainer.setTag(userInputData);
-                            },
-                            undo: () => {
-                                if (!userInputData)
-                                    return;
                                 this.tag = JSON.parse(JSON.stringify(oldTag));
-                                if (builder)
+                                if (builder === null || builder === void 0 ? void 0 : builder.setTag)
                                     builder.setTag(this.tag);
                                 else
                                     this.setTag(this.tag);
@@ -2524,7 +2642,9 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                             redo: () => { }
                         };
                     },
-                    userInputDataSchema: themeDataSchema
+                    userInputDataSchema: dataSchema,
+                    userInputUISchema: uiSchema,
+                    customControls: customControls
                 });
             }
             return actions;
