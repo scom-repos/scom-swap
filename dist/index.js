@@ -2419,9 +2419,8 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
         }
         removeRpcWalletEvents() {
             const rpcWallet = this.state.getRpcWallet();
-            for (let event of this.rpcWalletEvents) {
-                rpcWallet.unregisterWalletEvent(event);
-            }
+            if (rpcWallet)
+                rpcWallet.unregisterAllWalletEvents();
             this.rpcWalletEvents = [];
         }
         onHide() {

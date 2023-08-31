@@ -164,9 +164,7 @@ export default class ScomSwap extends Module {
 
   removeRpcWalletEvents() {
     const rpcWallet = this.state.getRpcWallet();
-    for (let event of this.rpcWalletEvents) {
-      rpcWallet.unregisterWalletEvent(event);
-    }
+    if (rpcWallet) rpcWallet.unregisterAllWalletEvents();
     this.rpcWalletEvents = [];
   }
 
