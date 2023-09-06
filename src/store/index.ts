@@ -11,3 +11,4 @@ export const getSupportedTokens = (tokens: ITokenObject[], chainId: number) => {
 }
 
 export * from './utils';
+export * from './cross-chain';

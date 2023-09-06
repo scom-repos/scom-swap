@@ -23,6 +23,8 @@
     "@scom/oswap-trader-joe-contract": "*",
     "@scom/oswap-bakery-swap-contract": "*",
     "@scom/oswap-openswap-contract": "*",
+    "@scom/oswap-chainlink-contract": "*",
+    "@scom/oswap-cross-chain-bridge-contract": "*",
     "@scom/scom-commission-proxy-contract": "*"
   },
   "menus": [
