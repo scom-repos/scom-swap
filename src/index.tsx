@@ -153,7 +153,6 @@ export default class ScomSwap extends Module {
   private networkErrModal: Modal;
   private supportedNetworksElm: VStack;
   private contractAddress: string;
-  private rpcWalletEvents: IEventBusRegistry[] = [];
   private clientEvents: any[] = [];
 
   static async create(options?: ScomSwapElement, parent?: Container) {
@@ -165,7 +164,6 @@ export default class ScomSwap extends Module {
   removeRpcWalletEvents() {
     const rpcWallet = this.state.getRpcWallet();
     if (rpcWallet) rpcWallet.unregisterAllWalletEvents();
-    this.rpcWalletEvents = [];
   }
 
   onHide() {
@@ -531,7 +529,6 @@ export default class ScomSwap extends Module {
       this.updateContractAddress();
       if (this.originalData?.providers?.length) await this.initializeWidgetConfig();
     });
-    this.rpcWalletEvents.push(chainChangedEvent, connectedEvent);
     if (rpcWallet.instanceId) {
       if (this.firstTokenInput) this.firstTokenInput.rpcWalletId = rpcWallet.instanceId;
       if (this.secondTokenInput) this.secondTokenInput.rpcWalletId = rpcWallet.instanceId;
@@ -1133,7 +1130,7 @@ export default class ScomSwap extends Module {
     let listRouting: any[] = [];
     const useAPI = this._data.category === 'aggregator';
     this.updateContractAddress();
-    listRouting = await getAllRoutesData(this.state, this.fromToken, this.toToken, this.fromInputValue, this.toInputValue, this.isFrom, useAPI, this.commissions);
+    listRouting = await getAllRoutesData(this.state, this.fromToken, this.toToken, this.fromInputValue, this.toInputValue, this.isFrom, useAPI);
     listRouting = listRouting.map((v: any) => {
       // const config = ProviderConfigMap[v.provider];
       return {
