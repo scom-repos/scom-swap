@@ -10,7 +10,6 @@ import { executeRouterSwap, getDexPairReserves, getRouterSwapTxData, IExecuteSwa
 import { ITokenObject } from '@scom/scom-token-list';
 import {
   getAPI,
-  ICommissionInfo,
   IProviderUI,
 } from "../global/index";
 
@@ -64,7 +63,7 @@ function getRouterAddress(state: State, key: string): string {
   return routerAddress;
 }
 
-async function composeRouteObj(state: State, wallet: any, routeObj: any, market: string, firstTokenObject: any, firstInput: BigNumber, secondInput: BigNumber, isFromEstimated: boolean, commissions: ICommissionInfo[]) {
+async function composeRouteObj(state: State, routeObj: any, firstInput: BigNumber, secondInput: BigNumber, isFromEstimated: boolean) {
   const slippageTolerance = state.slippageTolerance;
   if (!slippageTolerance) return null;
   let fromAmount = new BigNumber(0);
@@ -125,7 +124,7 @@ function getTradeFeeMap(state: State) {
   return tradeFeeMap;
 }
 
-async function getBestAmountInRouteFromAPI(state: State, wallet: any, tokenIn: ITokenObject, tokenOut: ITokenObject, amountOut: string, chainId?: number) {
+async function getBestAmountInRouteFromAPI(state: State, tokenIn: ITokenObject, tokenOut: ITokenObject, amountOut: string, chainId?: number) {
   chainId = state.getChainId();
   let wrappedTokenAddress = getWETH(chainId);
   let network = chainId ? getNetworkInfo(chainId) : null;
@@ -142,7 +141,7 @@ async function getBestAmountInRouteFromAPI(state: State, wallet: any, tokenIn: I
   return bestRouteObjArr;
 }
 
-async function getBestAmountOutRouteFromAPI(state: State, wallet: any, tokenIn: ITokenObject, tokenOut: ITokenObject, amountIn: string, chainId?: number) {
+async function getBestAmountOutRouteFromAPI(state: State, tokenIn: ITokenObject, tokenOut: ITokenObject, amountIn: string, chainId?: number) {
   chainId = state.getChainId();
   let wrappedTokenAddress = getWETH(chainId);
   let network = chainId ? getNetworkInfo(chainId) : null;
@@ -477,7 +476,7 @@ const getBestAmountInRoute = async (state: State, markets: string[], tokenIn: IT
   let tokenLowestIn = bestRouteObj.amounts[0];
   let lowestIn = Utils.fromDecimals(tokenLowestIn, tokenIn.decimals).toFixed();
   let swapPrice = new BigNumber(lowestIn).div(amountOut);
-  let extendedData = await getExtendedRouteObjData(wallet, bestRouteObj, tradeFeeMap, swapPrice, true);
+  let extendedData = await getExtendedRouteObjData(bestRouteObj, tradeFeeMap, swapPrice, true);
   return {
     ...extendedData,
     amountIn: lowestIn
@@ -501,14 +500,14 @@ const getBestAmountOutRoute = async (state: State, markets: string[], tokenIn: I
   let tokenHighestOut = bestRouteObj.amounts[bestRouteObj.amounts.length - 1];
   let highestOut = Utils.fromDecimals(tokenHighestOut, tokenOut.decimals).toFixed();
   let swapPrice = new BigNumber(amountIn).div(highestOut);
-  let extendedData = await getExtendedRouteObjData(wallet, bestRouteObj, tradeFeeMap, swapPrice, isHybrid);
+  let extendedData = await getExtendedRouteObjData(bestRouteObj, tradeFeeMap, swapPrice, isHybrid);
   return {
     ...extendedData,
     amountOut: highestOut
   };
 }
 
-async function getExtendedRouteObjData(wallet: any, bestRouteObj: any, tradeFeeMap: TradeFeeMap, swapPrice: BigNumber, isHybridOrQueue: boolean) {
+async function getExtendedRouteObjData(bestRouteObj: any, tradeFeeMap: TradeFeeMap, swapPrice: BigNumber, isHybridOrQueue: boolean) {
   let currPrice = new BigNumber(0);
   if (bestRouteObj.customDataList.length > 0) {
     currPrice = bestRouteObj.market.map((v: string, i: number) => {
@@ -540,17 +539,16 @@ async function getExtendedRouteObjData(wallet: any, bestRouteObj: any, tradeFeeM
   return extendedRouteObj;
 }
 
-async function getAllRoutesData(state: State, firstTokenObject: ITokenObject, secondTokenObject: ITokenObject, firstInput: BigNumber, secondInput: BigNumber, isFromEstimated: boolean, useAPI: boolean, commissions: ICommissionInfo[]) {
-  let wallet = state.getRpcWallet();
+async function getAllRoutesData(state: State, firstTokenObject: ITokenObject, secondTokenObject: ITokenObject, firstInput: BigNumber, secondInput: BigNumber, isFromEstimated: boolean, useAPI: boolean) {
   let resultArr: any[] = [];
   if (firstTokenObject && secondTokenObject && (firstInput.gt(0) || secondInput.gt(0))) {
     let routeDataArr = [];
     if (useAPI) {
       if (isFromEstimated) {
-        routeDataArr = await getBestAmountInRouteFromAPI(state, wallet, firstTokenObject, secondTokenObject, secondInput.toString());
+        routeDataArr = await getBestAmountInRouteFromAPI(state, firstTokenObject, secondTokenObject, secondInput.toString());
       }
       else {
-        routeDataArr = await getBestAmountOutRouteFromAPI(state, wallet, firstTokenObject, secondTokenObject, firstInput.toString());
+        routeDataArr = await getBestAmountOutRouteFromAPI(state, firstTokenObject, secondTokenObject, firstInput.toString());
       }
     }
 
@@ -606,9 +604,7 @@ async function getAllRoutesData(state: State, firstTokenObject: ITokenObject, se
     if (routeDataArr && routeDataArr.length > 0) {
       for (let i = 0; i < routeDataArr.length; i++) {
         let optionObj = routeDataArr[i];
-        const providerList = state.providerList;
-        const provider = providerList.find(item => item.key === optionObj.provider)?.key || '';
-        let routeObj = await composeRouteObj(state, wallet, optionObj, provider, firstTokenObject, firstInput, secondInput, isFromEstimated, commissions);
+        let routeObj = await composeRouteObj(state, optionObj, firstInput, secondInput, isFromEstimated);
         if (!routeObj) continue;
         resultArr.push(routeObj);
       }

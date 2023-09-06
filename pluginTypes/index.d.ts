@@ -457,7 +457,7 @@ declare module "@scom/scom-swap/crosschain-utils/index.ts" {
 declare module "@scom/scom-swap/swap-utils/index.ts" {
     import { BigNumber, TransactionReceipt } from "@ijstech/eth-wallet";
     import { ITokenObject } from '@scom/scom-token-list';
-    import { ICommissionInfo, IProviderUI } from "@scom/scom-swap/global/index.ts";
+    import { IProviderUI } from "@scom/scom-swap/global/index.ts";
     import { State } from "@scom/scom-swap/store/index.ts";
     import { GetAvailableRouteOptionsParams, NewOrderParams, TradeFeeMap } from "@scom/scom-swap/crosschain-utils/index.ts";
     const getChainNativeToken: (chainId: number) => ITokenObject;
@@ -465,8 +465,8 @@ declare module "@scom/scom-swap/swap-utils/index.ts" {
     function getTradeFeeMap(state: State): TradeFeeMap;
     const getProviderProxySelectors: (state: State, providers: IProviderUI[]) => Promise<string[]>;
     const getPair: (state: State, market: string, tokenA: ITokenObject, tokenB: ITokenObject) => Promise<string>;
-    function getExtendedRouteObjData(wallet: any, bestRouteObj: any, tradeFeeMap: TradeFeeMap, swapPrice: BigNumber, isHybridOrQueue: boolean): Promise<any>;
-    function getAllRoutesData(state: State, firstTokenObject: ITokenObject, secondTokenObject: ITokenObject, firstInput: BigNumber, secondInput: BigNumber, isFromEstimated: boolean, useAPI: boolean, commissions: ICommissionInfo[]): Promise<any[]>;
+    function getExtendedRouteObjData(bestRouteObj: any, tradeFeeMap: TradeFeeMap, swapPrice: BigNumber, isHybridOrQueue: boolean): Promise<any>;
+    function getAllRoutesData(state: State, firstTokenObject: ITokenObject, secondTokenObject: ITokenObject, firstInput: BigNumber, secondInput: BigNumber, isFromEstimated: boolean, useAPI: boolean): Promise<any[]>;
     interface SwapData {
         provider: string;
         routeTokens: any[];
@@ -970,7 +970,6 @@ declare module "@scom/scom-swap" {
         private networkErrModal;
         private supportedNetworksElm;
         private contractAddress;
-        private rpcWalletEvents;
         private clientEvents;
         private crossChainApprovalStatus;
         private oldSupportedChainList;

@@ -1524,8 +1524,8 @@ define("@scom/scom-swap/crosschain-utils/API.ts", ["require", "exports", "@scom/
             };
             let amountOut = eth_wallet_3.Utils.fromDecimals(routeObj.amountOut, routeObj.tokens[routeObj.tokens.length - 1].decimals);
             let swapPrice = new eth_wallet_3.BigNumber(fromAmount).div(amountOut);
-            let targetChainWallet = initCrossChainWallet(chainId);
-            let extendedData = bestRouteObj.pairs.length !== 0 ? await getExtendedRouteObjData(targetChainWallet, bestRouteObj, tradeFeeMap, swapPrice, true) : await getExtendedRouteObjDataForDirectRoute(bestRouteObj, swapPrice);
+            // let targetChainWallet = initCrossChainWallet(chainId)
+            let extendedData = bestRouteObj.pairs.length !== 0 ? await getExtendedRouteObjData(bestRouteObj, tradeFeeMap, swapPrice, true) : await getExtendedRouteObjDataForDirectRoute(bestRouteObj, swapPrice);
             let provider = providerConfigByDexId[dexId].key;
             let key = provider + '|' + (routeObj.isDirectRoute ? '0' : '1');
             bestRouteObj = Object.assign(Object.assign({}, extendedData), { amountOut,
@@ -1650,7 +1650,7 @@ define("@scom/scom-swap/swap-utils/index.ts", ["require", "exports", "@ijstech/e
         return routerAddress;
     }
     exports.getRouterAddress = getRouterAddress;
-    async function composeRouteObj(state, wallet, routeObj, market, firstTokenObject, firstInput, secondInput, isFromEstimated, commissions) {
+    async function composeRouteObj(state, routeObj, firstInput, secondInput, isFromEstimated) {
         const slippageTolerance = state.slippageTolerance;
         if (!slippageTolerance)
             return null;
@@ -1709,7 +1709,7 @@ define("@scom/scom-swap/swap-utils/index.ts", ["require", "exports", "@ijstech/e
         return tradeFeeMap;
     }
     exports.getTradeFeeMap = getTradeFeeMap;
-    async function getBestAmountInRouteFromAPI(state, wallet, tokenIn, tokenOut, amountOut, chainId) {
+    async function getBestAmountInRouteFromAPI(state, tokenIn, tokenOut, amountOut, chainId) {
         chainId = state.getChainId();
         let wrappedTokenAddress = getWETH(chainId);
         let network = chainId ? (0, index_5.getNetworkInfo)(chainId) : null;
@@ -1726,7 +1726,7 @@ define("@scom/scom-swap/swap-utils/index.ts", ["require", "exports", "@ijstech/e
         let bestRouteObjArr = [];
         return bestRouteObjArr;
     }
-    async function getBestAmountOutRouteFromAPI(state, wallet, tokenIn, tokenOut, amountIn, chainId) {
+    async function getBestAmountOutRouteFromAPI(state, tokenIn, tokenOut, amountIn, chainId) {
         chainId = state.getChainId();
         let wrappedTokenAddress = getWETH(chainId);
         let network = chainId ? (0, index_5.getNetworkInfo)(chainId) : null;
@@ -2050,7 +2050,7 @@ define("@scom/scom-swap/swap-utils/index.ts", ["require", "exports", "@ijstech/e
         let tokenLowestIn = bestRouteObj.amounts[0];
         let lowestIn = eth_wallet_4.Utils.fromDecimals(tokenLowestIn, tokenIn.decimals).toFixed();
         let swapPrice = new eth_wallet_4.BigNumber(lowestIn).div(amountOut);
-        let extendedData = await getExtendedRouteObjData(wallet, bestRouteObj, tradeFeeMap, swapPrice, true);
+        let extendedData = await getExtendedRouteObjData(bestRouteObj, tradeFeeMap, swapPrice, true);
         return Object.assign(Object.assign({}, extendedData), { amountIn: lowestIn });
     };
     const getBestAmountOutRoute = async (state, markets, tokenIn, tokenOut, amountIn, tokenList, isHybrid) => {
@@ -2068,10 +2068,10 @@ define("@scom/scom-swap/swap-utils/index.ts", ["require", "exports", "@ijstech/e
         let tokenHighestOut = bestRouteObj.amounts[bestRouteObj.amounts.length - 1];
         let highestOut = eth_wallet_4.Utils.fromDecimals(tokenHighestOut, tokenOut.decimals).toFixed();
         let swapPrice = new eth_wallet_4.BigNumber(amountIn).div(highestOut);
-        let extendedData = await getExtendedRouteObjData(wallet, bestRouteObj, tradeFeeMap, swapPrice, isHybrid);
+        let extendedData = await getExtendedRouteObjData(bestRouteObj, tradeFeeMap, swapPrice, isHybrid);
         return Object.assign(Object.assign({}, extendedData), { amountOut: highestOut });
     };
-    async function getExtendedRouteObjData(wallet, bestRouteObj, tradeFeeMap, swapPrice, isHybridOrQueue) {
+    async function getExtendedRouteObjData(bestRouteObj, tradeFeeMap, swapPrice, isHybridOrQueue) {
         let currPrice = new eth_wallet_4.BigNumber(0);
         if (bestRouteObj.customDataList.length > 0) {
             currPrice = bestRouteObj.market.map((v, i) => {
@@ -2099,18 +2099,17 @@ define("@scom/scom-swap/swap-utils/index.ts", ["require", "exports", "@ijstech/e
         return extendedRouteObj;
     }
     exports.getExtendedRouteObjData = getExtendedRouteObjData;
-    async function getAllRoutesData(state, firstTokenObject, secondTokenObject, firstInput, secondInput, isFromEstimated, useAPI, commissions) {
-        var _a, _b, _c;
-        let wallet = state.getRpcWallet();
+    async function getAllRoutesData(state, firstTokenObject, secondTokenObject, firstInput, secondInput, isFromEstimated, useAPI) {
+        var _a, _b;
         let resultArr = [];
         if (firstTokenObject && secondTokenObject && (firstInput.gt(0) || secondInput.gt(0))) {
             let routeDataArr = [];
             if (useAPI) {
                 if (isFromEstimated) {
-                    routeDataArr = await getBestAmountInRouteFromAPI(state, wallet, firstTokenObject, secondTokenObject, secondInput.toString());
+                    routeDataArr = await getBestAmountInRouteFromAPI(state, firstTokenObject, secondTokenObject, secondInput.toString());
                 }
                 else {
-                    routeDataArr = await getBestAmountOutRouteFromAPI(state, wallet, firstTokenObject, secondTokenObject, firstInput.toString());
+                    routeDataArr = await getBestAmountOutRouteFromAPI(state, firstTokenObject, secondTokenObject, firstInput.toString());
                 }
             }
             if (isFromEstimated) {
@@ -2158,9 +2157,7 @@ define("@scom/scom-swap/swap-utils/index.ts", ["require", "exports", "@ijstech/e
             if (routeDataArr && routeDataArr.length > 0) {
                 for (let i = 0; i < routeDataArr.length; i++) {
                     let optionObj = routeDataArr[i];
-                    const providerList = state.providerList;
-                    const provider = ((_c = providerList.find(item => item.key === optionObj.provider)) === null || _c === void 0 ? void 0 : _c.key) || '';
-                    let routeObj = await composeRouteObj(state, wallet, optionObj, provider, firstTokenObject, firstInput, secondInput, isFromEstimated, commissions);
+                    let routeObj = await composeRouteObj(state, optionObj, firstInput, secondInput, isFromEstimated);
                     if (!routeObj)
                         continue;
                     resultArr.push(routeObj);
@@ -3331,7 +3328,6 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
             const rpcWallet = this.state.getRpcWallet();
             if (rpcWallet)
                 rpcWallet.unregisterAllWalletEvents();
-            this.rpcWalletEvents = [];
         }
         onHide() {
             this.dappContainer.onHide();
@@ -3683,7 +3679,6 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                 if ((_b = (_a = this.originalData) === null || _a === void 0 ? void 0 : _a.providers) === null || _b === void 0 ? void 0 : _b.length)
                     await this.initializeWidgetConfig();
             });
-            this.rpcWalletEvents.push(chainChangedEvent, connectedEvent);
             if (rpcWallet.instanceId) {
                 if (this.firstTokenInput)
                     this.firstTokenInput.rpcWalletId = rpcWallet.instanceId;
@@ -3828,7 +3823,6 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
             this.defaultEdit = true;
             this.isInited = false;
             this.supportedChainList = [];
-            this.rpcWalletEvents = [];
             this.clientEvents = [];
             // Cross Chain
             this.crossChainApprovalStatus = index_10.ApprovalStatus.NONE;
@@ -4899,7 +4893,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
             const useAPI = this._data.category === 'aggregator';
             this.updateContractAddress();
             if (!this.isCrossChain) {
-                listRouting = await (0, index_8.getAllRoutesData)(this.state, this.fromToken, this.toToken, this.fromInputValue, this.toInputValue, this.isFrom, useAPI, this.commissions);
+                listRouting = await (0, index_8.getAllRoutesData)(this.state, this.fromToken, this.toToken, this.fromInputValue, this.toInputValue, this.isFrom, useAPI);
                 listRouting = listRouting.map((v) => {
                     return Object.assign(Object.assign({}, v), { isHybrid: false // market == Market.HYBRID,
                      });
