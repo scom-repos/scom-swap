@@ -1556,37 +1556,6 @@ define("@scom/scom-swap/price-info/index.tsx", ["require", "exports", "@ijstech/
     let PriceInfo = class PriceInfo extends components_4.Module {
         constructor(parent, options) {
             super(parent, options);
-            this.renderItems = async () => {
-                if (this.priceContent.children.length === this.Items.length) {
-                    this.updateItems();
-                    return;
-                }
-                this.priceContent.innerHTML = '';
-                for (let i = 0; i < this.Items.length; i++) {
-                    const item = this.Items[i];
-                    const row = new components_4.HStack();
-                    row.horizontalAlignment = "space-between";
-                    row.verticalAlignment = "center";
-                    row.padding = { top: '0.25rem', bottom: '0.25rem', left: 0, right: 0 };
-                    if (item.isHidden) {
-                        row.classList.add('hidden');
-                    }
-                    const titleLabel = new components_4.Label(row, { caption: item.title });
-                    row.appendChild(titleLabel);
-                    if (item.tooltip) {
-                        const iconTooltip = this.renderIconTooltip(row, item);
-                        row.appendChild(await iconTooltip);
-                    }
-                    const valueLabel = new components_4.Label(row, { caption: item.value });
-                    valueLabel.classList.add("ml-auto");
-                    row.appendChild(valueLabel);
-                    if (item.isToggleShown) {
-                        const image = this.onRenderToggleBtn(row);
-                        row.appendChild(image);
-                    }
-                    this.priceContent.appendChild(row);
-                }
-            };
             this.onRenderToggleBtn = (parent) => {
                 const image = new components_4.Icon(parent, {
                     width: 18,
@@ -1664,7 +1633,44 @@ define("@scom/scom-swap/price-info/index.tsx", ["require", "exports", "@ijstech/
         }
         set Items(value) {
             this._items = value;
-            this.renderItems();
+        }
+        async setData(value) {
+            this.Items = value;
+            await this.renderItems();
+        }
+        getData() {
+            return this.Items;
+        }
+        async renderItems() {
+            if (this.priceContent.children.length === this.Items.length) {
+                this.updateItems();
+                return;
+            }
+            this.priceContent.innerHTML = '';
+            for (let i = 0; i < this.Items.length; i++) {
+                const item = this.Items[i];
+                const row = new components_4.HStack();
+                row.horizontalAlignment = "space-between";
+                row.verticalAlignment = "center";
+                row.padding = { top: '0.25rem', bottom: '0.25rem', left: 0, right: 0 };
+                if (item.isHidden) {
+                    row.classList.add('hidden');
+                }
+                const titleLabel = new components_4.Label(row, { caption: item.title });
+                row.appendChild(titleLabel);
+                if (item.tooltip) {
+                    const iconTooltip = this.renderIconTooltip(row, item);
+                    row.appendChild(await iconTooltip);
+                }
+                const valueLabel = new components_4.Label(row, { caption: item.value });
+                valueLabel.classList.add("ml-auto");
+                row.appendChild(valueLabel);
+                if (item.isToggleShown) {
+                    const image = this.onRenderToggleBtn(row);
+                    row.appendChild(image);
+                }
+                this.priceContent.appendChild(row);
+            }
         }
         init() {
             super.init();
@@ -2401,7 +2407,7 @@ define("@scom/scom-swap/formSchema.ts", ["require", "exports", "@scom/scom-netwo
     }
     exports.getProjectOwnerSchema = getProjectOwnerSchema;
 });
-define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstech/eth-wallet", "@scom/scom-swap/store/index.ts", "@scom/scom-token-list", "@scom/scom-swap/swap-utils/index.ts", "@scom/scom-swap/global/index.ts", "@scom/scom-swap/price-info/index.tsx", "@scom/scom-swap/expert-mode-settings/index.tsx", "@scom/scom-swap/data.json.ts", "@scom/scom-swap/formSchema.ts", "@scom/scom-dex-list", "@scom/scom-commission-fee-setup", "@scom/scom-swap/index.css.ts", "@scom/scom-swap/index.css.ts"], function (require, exports, components_7, eth_wallet_4, index_4, scom_token_list_4, index_5, index_6, index_7, index_8, data_json_1, formSchema_1, scom_dex_list_2, scom_commission_fee_setup_1, index_css_2) {
+define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstech/eth-wallet", "@scom/scom-swap/store/index.ts", "@scom/scom-token-list", "@scom/scom-swap/swap-utils/index.ts", "@scom/scom-swap/global/index.ts", "@scom/scom-swap/expert-mode-settings/index.tsx", "@scom/scom-swap/data.json.ts", "@scom/scom-swap/formSchema.ts", "@scom/scom-dex-list", "@scom/scom-commission-fee-setup", "@scom/scom-swap/index.css.ts", "@scom/scom-swap/index.css.ts"], function (require, exports, components_7, eth_wallet_4, index_4, scom_token_list_4, index_5, index_6, index_7, data_json_1, formSchema_1, scom_dex_list_2, scom_commission_fee_setup_1, index_css_2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     const Theme = components_7.Styles.Theme.ThemeVars;
@@ -2472,6 +2478,20 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
         }
         set showHeader(value) {
             this._data.showHeader = value;
+        }
+        get title() {
+            var _a;
+            return (_a = this._data.title) !== null && _a !== void 0 ? _a : '';
+        }
+        set title(value) {
+            this._data.title = value !== null && value !== void 0 ? value : '';
+        }
+        get logo() {
+            var _a;
+            return (_a = this._data.logo) !== null && _a !== void 0 ? _a : '';
+        }
+        set logo(value) {
+            this._data.logo = value !== null && value !== void 0 ? value : '';
         }
         set width(value) {
             this.resizeLayout();
@@ -3155,7 +3175,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
             };
         }
         registerEvent() {
-            this.clientEvents.push(this.$eventBus.register(this, "SlippageToleranceChanged" /* EventId.SlippageToleranceChanged */, () => { this.priceInfo.Items = this.getPriceInfo(); }));
+            this.clientEvents.push(this.$eventBus.register(this, "SlippageToleranceChanged" /* EventId.SlippageToleranceChanged */, () => { this.priceInfo.setData(this.getPriceInfo()); }));
             this.clientEvents.push(this.$eventBus.register(this, "ExpertModeChanged" /* EventId.ExpertModeChanged */, () => {
                 this.updateSwapButtonCaption();
             }));
@@ -3329,7 +3349,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
             this.payOrReceiveToken.caption = this.isFrom ? this.fromTokenLabel.caption : this.toTokenLabel.caption;
             this.lbEstimate.caption = `${this.isFrom ? 'Input' : 'Output'} is estimated. If the price change by more than ${slippageTolerance}%, your transaction will revert`;
             this.lbPayOrReceive.caption = this.isFrom ? 'You will pay at most' : 'You will receive at least';
-            this.priceInfo2.Items = this.getPriceInfo();
+            this.priceInfo2.setData(this.getPriceInfo());
             this.swapModal.visible = true;
         }
         doSwap() {
@@ -3442,7 +3462,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                 this.swapBtn.rightIcon.visible = isButtonLoading;
             }
             if (this.priceInfo)
-                this.priceInfo.Items = this.getPriceInfo();
+                await this.priceInfo.setData(this.getPriceInfo());
         }
         onTokenInputChange(source) {
             clearTimeout(this.timeout);
@@ -3501,7 +3521,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
         resetValuesByInput() {
             this.initRoutes();
             if (this.priceInfo)
-                this.priceInfo.Items = this.getPriceInfo();
+                this.priceInfo.setData(this.getPriceInfo());
             this.fromInputValue = new eth_wallet_4.BigNumber(0);
             this.toInputValue = new eth_wallet_4.BigNumber(0);
             this.redirectToken();
@@ -3542,7 +3562,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                 // this.receiveCol.classList.remove('bg-box--active');
                 this.lbRouting.classList.remove('visibility-hidden');
                 if (this.priceInfo)
-                    this.priceInfo.Items = this.getPriceInfo();
+                    this.priceInfo.setData(this.getPriceInfo());
                 if (this.isEstimated('to')) {
                     this.toInputValue = new eth_wallet_4.BigNumber(0);
                     this.secondTokenInput.value = '';
@@ -3591,7 +3611,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
         // Price Info
         onTogglePrice(priceInfo) {
             this.isPriceToggled = !this.isPriceToggled;
-            priceInfo.Items = this.getPriceInfo();
+            priceInfo.setData(this.getPriceInfo());
         }
         getRate() {
             var _a, _b, _c, _d;
@@ -3830,15 +3850,15 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
         }
         onRenderPriceInfo() {
             if (!this.priceInfo) {
-                this.priceInfo = new index_7.PriceInfo();
+                this.priceInfo = this.$render("i-scom-swap-price-info", null);
                 this.priceInfo.width = 'auto';
                 this.priceInfo.height = 'auto';
                 this.pnlPriceInfo.appendChild(this.priceInfo);
                 this.priceInfo.onTogglePrice = this.onTogglePrice.bind(this);
             }
-            this.priceInfo.Items = this.getPriceInfo();
+            this.priceInfo.setData(this.getPriceInfo());
             if (!this.priceInfo2) {
-                this.priceInfo2 = new index_7.PriceInfo();
+                this.priceInfo2 = this.$render("i-scom-swap-price-info", null);
                 this.priceInfo2.width = 'auto';
                 this.priceInfo2.height = 'auto';
                 this.priceInfo2.onTogglePrice = this.onTogglePrice.bind(this);
@@ -3846,7 +3866,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
             this.priceInfoContainer.appendChild(this.priceInfo2);
         }
         initExpertModal() {
-            this.expertModal = new index_8.ExpertModeSettings(this.state);
+            this.expertModal = new index_7.ExpertModeSettings(this.state);
             this.swapComponent.appendChild(this.expertModal);
             this.$eventBus.register(this, "ShowExpertModal" /* EventId.ShowExpertModal */, () => {
                 this.expertModal.showModal();
@@ -3929,7 +3949,9 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                 const networks = this.getAttribute('networks', true);
                 const wallets = this.getAttribute('wallets', true);
                 const showHeader = this.getAttribute('showHeader', true);
-                let data = { campaignId, category, providers, commissions, tokens, defaultChainId, networks, wallets, showHeader };
+                const title = this.getAttribute('title', true);
+                const logo = this.getAttribute('logo', true);
+                let data = { campaignId, category, providers, commissions, tokens, defaultChainId, networks, wallets, showHeader, title, logo };
                 if (!this.isEmptyData(data)) {
                     await this.setData(data);
                 }

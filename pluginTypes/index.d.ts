@@ -50,7 +50,7 @@ declare module "@scom/scom-swap/global/utils/swapInterface.ts" {
         chainName?: string;
         chainId: number;
     }
-    export interface ISwapConfigUI {
+    export interface ISwapWidgetData {
         campaignId?: number;
         category: Category;
         providers: IProviderUI[];
@@ -67,7 +67,7 @@ declare module "@scom/scom-swap/global/utils/swapInterface.ts" {
 /// <amd-module name="@scom/scom-swap/global/utils/index.ts" />
 declare module "@scom/scom-swap/global/utils/index.ts" {
     export { getAPI, formatNumber, formatNumberWithSeparators, limitDecimals, isInvalidInput } from "@scom/scom-swap/global/utils/helper.ts";
-    export { IContractInfo, IProvider, ISwapConfig, ISwapConfigUI, IProviderUI, Category, ICommissionInfo, INetworkConfig } from "@scom/scom-swap/global/utils/swapInterface.ts";
+    export { IContractInfo, IProvider, ISwapConfig, ISwapWidgetData, IProviderUI, Category, ICommissionInfo, INetworkConfig } from "@scom/scom-swap/global/utils/swapInterface.ts";
 }
 /// <amd-module name="@scom/scom-swap/global/index.ts" />
 declare module "@scom/scom-swap/global/index.ts" {
@@ -206,9 +206,11 @@ declare module "@scom/scom-swap/price-info/index.tsx" {
         private _items;
         onTogglePrice: any;
         constructor(parent?: Container, options?: any);
-        get Items(): any[];
-        set Items(value: any[]);
-        renderItems: () => Promise<void>;
+        private get Items();
+        private set Items(value);
+        setData(value: any[]): Promise<void>;
+        getData(): any[];
+        private renderItems;
         onRenderToggleBtn: (parent: Control) => Icon;
         renderIconTooltip: (parent: Control, item: any) => Promise<Icon>;
         updateItems: () => Promise<void>;
@@ -568,9 +570,10 @@ declare module "@scom/scom-swap" {
     import { BigNumber } from '@ijstech/eth-wallet';
     import "@scom/scom-swap/index.css.ts";
     import { ITokenObject } from '@scom/scom-token-list';
-    import { ISwapConfigUI, IProviderUI, Category, ICommissionInfo, INetworkConfig } from "@scom/scom-swap/global/index.ts";
+    import { ISwapWidgetData, IProviderUI, Category, ICommissionInfo, INetworkConfig } from "@scom/scom-swap/global/index.ts";
     import { IWalletPlugin } from '@scom/scom-wallet-modal';
     import ScomCommissionFeeSetup from '@scom/scom-commission-fee-setup';
+    export { ISwapWidgetData };
     interface ScomSwapElement extends ControlElement {
         campaignId?: number;
         lazyLoad?: boolean;
@@ -581,6 +584,7 @@ declare module "@scom/scom-swap" {
         networks: INetworkConfig[];
         wallets: IWalletPlugin[];
         showHeader?: boolean;
+        commissions?: ICommissionInfo[];
         logo?: string;
         title?: string;
     }
@@ -675,6 +679,10 @@ declare module "@scom/scom-swap" {
         set networks(value: INetworkConfig[]);
         get showHeader(): boolean;
         set showHeader(value: boolean);
+        get title(): string;
+        set title(value: string);
+        get logo(): string;
+        set logo(value: string);
         set width(value: string | number);
         private get hasData();
         private determineActionsByTarget;
@@ -731,7 +739,7 @@ declare module "@scom/scom-swap" {
                 logo?: string;
                 title?: string;
             }>;
-            setData: (properties: ISwapConfigUI, linkParams?: Record<string, any>) => Promise<void>;
+            setData: (properties: ISwapWidgetData, linkParams?: Record<string, any>) => Promise<void>;
             getTag: any;
             setTag: any;
             getProxySelectors?: undefined;
@@ -818,7 +826,7 @@ declare module "@scom/scom-swap" {
         private closeNetworkErrModal;
         private resizeLayout;
         private initData;
-        isEmptyData(value: ISwapConfigUI): boolean;
+        isEmptyData(value: ISwapWidgetData): boolean;
         init(): Promise<void>;
         render(): any;
     }
