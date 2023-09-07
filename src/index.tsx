@@ -39,7 +39,7 @@ import {
   limitDecimals,
   isInvalidInput,
   IProvider,
-  ISwapConfigUI,
+  ISwapWidgetData,
   IProviderUI,
   Category,
   ICommissionInfo,
@@ -59,6 +59,8 @@ import ScomTxStatusModal from '@scom/scom-tx-status-modal';
 import { swapStyle } from './index.css';
 import assets from './assets';
 
+export { ISwapWidgetData };
+
 const Theme = Styles.Theme.ThemeVars;
 const priceImpactTooHighMsg = 'Price Impact Too High. If you want to bypass this check, please turn on Expert Mode';
 const defaultInput = '1';
@@ -74,6 +76,7 @@ interface ScomSwapElement extends ControlElement {
   networks: INetworkConfig[];
   wallets: IWalletPlugin[];
   showHeader?: boolean;
+  commissions?: ICommissionInfo[];
   logo?: string;
   title?: string;
 }
@@ -91,7 +94,7 @@ declare const window: any;
 @customElements('i-scom-swap')
 export default class ScomSwap extends Module {
   private state: State;
-  private _data: ISwapConfigUI = {
+  private _data: ISwapWidgetData = {
     category: 'fixed-pair',
     providers: [],
     tokens: [],
@@ -282,6 +285,20 @@ export default class ScomSwap extends Module {
     this._data.showHeader = value;
   }
 
+  get title() {
+    return this._data.title ?? '';
+  }
+  set title(value: string) {
+    this._data.title = value ?? '';
+  }
+
+  get logo() {
+    return this._data.logo ?? '';
+  }
+  set logo(value: string) {
+    this._data.logo = value ?? '';
+  }
+
   set width(value: string | number) {
     this.resizeLayout();
   }
@@ -318,7 +335,7 @@ export default class ScomSwap extends Module {
         name: 'Commissions',
         icon: 'dollar-sign',
         command: (builder: any, userInputData: any) => {
-          let _oldData: ISwapConfigUI = {
+          let _oldData: ISwapWidgetData = {
             category: 'fixed-pair',
             providers: [],
             defaultChainId: 0,
@@ -374,7 +391,7 @@ export default class ScomSwap extends Module {
         name: 'Edit',
         icon: 'edit',
         command: (builder: any, userInputData: any) => {
-          let oldData: ISwapConfigUI = {
+          let oldData: ISwapWidgetData = {
             category: 'fixed-pair',
             providers: [],
             defaultChainId: 0,
@@ -552,7 +569,7 @@ export default class ScomSwap extends Module {
           const fee = this.state.embedderCommissionFee;
           return { ...this._data, fee }
         },
-        setData: async (properties: ISwapConfigUI, linkParams?: Record<string, any>) => {
+        setData: async (properties: ISwapWidgetData, linkParams?: Record<string, any>) => {
           let resultingData = {
             ...properties
           }
@@ -600,7 +617,7 @@ export default class ScomSwap extends Module {
     if (this.dappContainer?.setData) this.dappContainer.setData(data);
   }
 
-  private async setData(value: ISwapConfigUI) {
+  private async setData(value: ISwapWidgetData) {
     this._data = value;
     await this.resetRpcWallet();
     this.updateContractAddress();
@@ -721,7 +738,7 @@ export default class ScomSwap extends Module {
   }
 
   private registerEvent() {
-    this.clientEvents.push(this.$eventBus.register(this, EventId.SlippageToleranceChanged, () => { this.priceInfo.Items = this.getPriceInfo() }));
+    this.clientEvents.push(this.$eventBus.register(this, EventId.SlippageToleranceChanged, () => { this.priceInfo.setData(this.getPriceInfo()) }));
     this.clientEvents.push(this.$eventBus.register(this, EventId.ExpertModeChanged, () => {
       this.updateSwapButtonCaption();
     }));
@@ -1130,7 +1147,7 @@ export default class ScomSwap extends Module {
     this.payOrReceiveToken.caption = this.isFrom ? this.fromTokenLabel.caption : this.toTokenLabel.caption;
     this.lbEstimate.caption = `${this.isFrom ? 'Input' : 'Output'} is estimated. If the price change by more than ${slippageTolerance}%, your transaction will revert`;
     this.lbPayOrReceive.caption = this.isFrom ? 'You will pay at most' : 'You will receive at least';
-    this.priceInfo2.Items = this.getPriceInfo();
+    this.priceInfo2.setData(this.getPriceInfo());
 
     this.swapModal.visible = true;
   }
@@ -1263,7 +1280,7 @@ export default class ScomSwap extends Module {
       this.swapBtn.rightIcon.visible = isButtonLoading;
     }
     if (this.priceInfo)
-      this.priceInfo.Items = this.getPriceInfo();
+      await this.priceInfo.setData(this.getPriceInfo());
   }
 
   private onTokenInputChange(source: Control) {
@@ -1318,7 +1335,7 @@ export default class ScomSwap extends Module {
   }
   private resetValuesByInput() {
     this.initRoutes();
-    if (this.priceInfo) this.priceInfo.Items = this.getPriceInfo();
+    if (this.priceInfo) this.priceInfo.setData(this.getPriceInfo());
     this.fromInputValue = new BigNumber(0);
     this.toInputValue = new BigNumber(0);
     this.redirectToken();
@@ -1479,7 +1496,7 @@ export default class ScomSwap extends Module {
       // this.receiveCol.classList.remove('bg-box--active');
       this.lbRouting.classList.remove('visibility-hidden');
       if (this.priceInfo)
-        this.priceInfo.Items = this.getPriceInfo();
+        this.priceInfo.setData(this.getPriceInfo());
       if (this.isEstimated('to')) {
         this.toInputValue = new BigNumber(0);
         this.secondTokenInput.value = '';
@@ -1528,7 +1545,7 @@ export default class ScomSwap extends Module {
   // Price Info
   private onTogglePrice(priceInfo: PriceInfo) {
     this.isPriceToggled = !this.isPriceToggled;
-    priceInfo.Items = this.getPriceInfo();
+    priceInfo.setData(this.getPriceInfo());
   }
   private getRate() {
     const value = this.isPriceToggled ? this.record?.priceSwap : this.record?.price;
@@ -1936,16 +1953,16 @@ export default class ScomSwap extends Module {
 
   private onRenderPriceInfo() {
     if (!this.priceInfo) {
-      this.priceInfo = new PriceInfo();
+      this.priceInfo = <i-scom-swap-price-info></i-scom-swap-price-info>
       this.priceInfo.width = 'auto';
       this.priceInfo.height = 'auto';
       this.pnlPriceInfo.appendChild(this.priceInfo);
       this.priceInfo.onTogglePrice = this.onTogglePrice.bind(this);
     }
-    this.priceInfo.Items = this.getPriceInfo();
+    this.priceInfo.setData(this.getPriceInfo());
 
     if (!this.priceInfo2) {
-      this.priceInfo2 = new PriceInfo();
+      this.priceInfo2 = <i-scom-swap-price-info></i-scom-swap-price-info>
       this.priceInfo2.width = 'auto';
       this.priceInfo2.height = 'auto';
       this.priceInfo2.onTogglePrice = this.onTogglePrice.bind(this);
@@ -2338,7 +2355,7 @@ export default class ScomSwap extends Module {
     }
   }
 
-  isEmptyData(value: ISwapConfigUI) {
+  isEmptyData(value: ISwapWidgetData) {
     return !value || !value.networks || value.networks.length === 0;
   }
 
@@ -2377,7 +2394,9 @@ export default class ScomSwap extends Module {
       const networks = this.getAttribute('networks', true);
       const wallets = this.getAttribute('wallets', true);
       const showHeader = this.getAttribute('showHeader', true);
-      let data = { campaignId, category, providers, commissions, tokens, defaultChainId, networks, wallets, showHeader };
+      const title = this.getAttribute('title', true);
+      const logo = this.getAttribute('logo', true);
+      let data = { campaignId, category, providers, commissions, tokens, defaultChainId, networks, wallets, showHeader, title, logo };
       if (!this.isEmptyData(data)) {
         await this.setData(data);
       }

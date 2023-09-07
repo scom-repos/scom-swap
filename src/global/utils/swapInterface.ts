@@ -38,7 +38,7 @@ export interface INetworkConfig {
   chainId: number;
 }
 
-export interface ISwapConfigUI {
+export interface ISwapWidgetData {
   campaignId?: number;
   category: Category;
   providers: IProviderUI[];

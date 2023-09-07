@@ -20,15 +20,23 @@ export class PriceInfo extends Module {
     super(parent, options);
   }
 
-  get Items(): any[] {
+  private get Items(): any[] {
     return this._items;
   }
-  set Items(value: any[]) {
+  private set Items(value: any[]) {
     this._items = value;
-    this.renderItems();
   }
 
-  renderItems = async () => {
+  async setData(value: any[]) {
+    this.Items = value;
+    await this.renderItems();
+  }
+
+  getData() {
+    return this.Items;
+  }
+
+  private async renderItems() {
     if (this.priceContent.children.length === this.Items.length) {
       this.updateItems();
       return;
