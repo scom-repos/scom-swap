@@ -210,7 +210,8 @@ export function getBuilderSchema() {
                     enum: [
                         'fixed-pair',
                         'fixed-protocal',
-                        'aggregator'
+                        'aggregator',
+                        'cross-chain-swap'
                     ]
                 },
                 networks: {

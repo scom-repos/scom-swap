@@ -1,7 +1,7 @@
 import { IWalletPlugin } from "@scom/scom-wallet-modal";
 import { ITokenObject } from '@scom/scom-token-list';
 
-export type Category = 'fixed-pair' | 'aggregator';
+export type Category = 'fixed-pair' | 'fixed-protocal' | 'aggregator' | 'cross-chain-swap';
 
 export interface ISwapConfig {
   category: Category;

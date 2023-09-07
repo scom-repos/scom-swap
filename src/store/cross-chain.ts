@@ -199,166 +199,88 @@ const crossChainSupportedChainIds = [
 ];
 
 interface ProviderConfig {
-  caption: string;
-  marketCode: Market;
   key: string;
   dexId?: number;
   supportedChains?: number[];
 }
 
-enum Market {
-  OPENSWAP,
-  UNISWAP,
-  SUSHISWAP,
-  PANCAKESWAPV1,
-  PANCAKESWAP,
-  BAKERYSWAP,
-  BURGERSWAP,
-  IFSWAPV1,
-  OPENSWAPV1,
-  HYBRID,
-  MIXED_QUEUE,
-  GROUP_QUEUE,
-  QUICKSWAP,
-  BISWAP,
-  PANGOLIN,
-  TRADERJOE,
-  SPIRITSWAP,
-  SPOOKYSWAP,
-  PEGGED_QUEUE,
-  HAKUSWAP,
-  JETSWAP,
-  IFSWAPV3
-}
-
 const ProviderConfigMap: { [key: string]: ProviderConfig } = {
   OpenSwap: {
-    caption: 'OpenSwap',
-    marketCode: Market.OPENSWAP,
     key: 'OpenSwap',
     dexId: 1,
     supportedChains: [42, 56, 97, 4002, 43113, 43114, 137, 80001, 13370, 338, 42161, 421613]
   },
   Uniswap: {
-    caption: 'Uniswap',
-    marketCode: Market.UNISWAP,
     key: 'Uniswap',
     dexId: 10,
     supportedChains: [1, 42]
   },
   SushiSwap: {
-    caption: 'SushiSwap',
-    marketCode: Market.SUSHISWAP,
     key: 'SushiSwap',
     dexId: 8,
     supportedChains: [1, 42, 137, 250, 43113, 43114, 42161]
   },
   PancakeSwap: {
-    caption: 'PancakeSwap',
-    marketCode: Market.PANCAKESWAP,
     key: 'PancakeSwap',
     dexId: 2,
     supportedChains: [56, 97]
   },
-  PancakeSwapV1: {
-    caption: 'PancakeSwapV1',
-    marketCode: Market.PANCAKESWAPV1,
-    key: 'PancakeSwapV1'
-  },
   BakerySwap: {
-    caption: 'BakerySwap',
-    marketCode: Market.BAKERYSWAP,
     key: 'BakerySwap',
     dexId: 3,
     supportedChains: [56, 97]
   },
   BurgerSwap: {
-    caption: 'BurgerSwap',
-    marketCode: Market.BURGERSWAP,
     key: 'BurgerSwap',
-    dexId: 4
+    dexId: 4,
+    supportedChains: []
   },
   Oracle: {
-    caption: 'Oracle',
-    marketCode: Market.MIXED_QUEUE,
     key: 'Oracle',
     dexId: 5,
     supportedChains: [56, 97, 43113, 43114]
   },
-  PeggedOracle: {
-    caption: 'Pegged Queue',
-    marketCode: Market.PEGGED_QUEUE,
-    key: 'PeggedOracle'
-  },
-  GroupQueue: {
-    caption: 'Group Queue',
-    marketCode: Market.GROUP_QUEUE,
-    key: 'GroupQueue'
-  },
   IFSwapV1: {
-    caption: 'IFSwapV1',
-    marketCode: Market.IFSWAPV1,
     key: 'IFSwapV1',
     dexId: 7,
     supportedChains: [56]
   },
   IFSwapV3: {
-    caption: 'IFSwapV3',
-    marketCode: Market.IFSWAPV3,
     key: 'IFSwapV3',
     dexId: 18,
     supportedChains: [56]
   },
-  OpenSwapV1: {
-    caption: 'OpenSwapV1',
-    marketCode: Market.OPENSWAPV1,
-    key: 'OpenSwapV1'
-  },
   Hybrid: {
-    caption: 'Smart Router',
-    marketCode: Market.HYBRID,
     key: 'Hybrid',
     dexId: 0,
     supportedChains: [42, 56, 97, 43113, 43114]
   },
   QuickSwap: {
-    caption: 'QuickSwap',
-    marketCode: Market.QUICKSWAP,
     key: 'QuickSwap',
     dexId: 9,
     supportedChains: [137]
   },
   BiSwap: {
-    caption: 'BiSwap',
-    marketCode: Market.BISWAP,
     key: 'BiSwap',
     dexId: 11,
     supportedChains: [56]
   },
   Pangolin: {
-    caption: 'Pangolin',
-    marketCode: Market.PANGOLIN,
     key: 'Pangolin',
     dexId: 12,
     supportedChains: [43113, 43114]
   },
   TraderJoe: {
-    caption: 'TraderJoe',
-    marketCode: Market.TRADERJOE,
     key: 'TraderJoe',
     dexId: 13,
     supportedChains: [43114]
   },
   SpiritSwap: {
-    caption: 'SpiritSwap',
-    marketCode: Market.SPIRITSWAP,
     key: 'SpiritSwap',
     dexId: 15,
     supportedChains: [250]
   },
   SpookySwap: {
-    caption: 'SpookySwap',
-    marketCode: Market.SPOOKYSWAP,
     key: 'SpookySwap',
     dexId: 14,
     supportedChains: [250]
@@ -371,15 +293,6 @@ const getBridgeVaultVersion = (chainId: number): string => {
   if (isTestnet) return '0.1.9';
   // Mainnet
   return '1.1.1';
-}
-
-const getOpenSwapToken = (chainId: number) => {
-  let tokens = DefaultERC20Tokens[chainId];
-  if (!tokens) return null;
-  for (const token of tokens) {
-    if (token.name == "OpenSwap" && token.symbol == "OSWAP") return token;
-  }
-  return null;
 }
 
 const bridgeVaultConstantMap = BridgeVaultGroupList.reduce((acc, cur) => {
@@ -398,10 +311,8 @@ export {
   crossChainNativeTokenList,
   crossChainSupportedChainIds,
   ProviderConfig,
-  Market,
   ProviderConfigMap,
   MockOracleMap,
   getBridgeVaultVersion,
-  getOpenSwapToken,
   bridgeVaultConstantMap
 }

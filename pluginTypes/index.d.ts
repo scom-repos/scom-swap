@@ -3,7 +3,6 @@
 /// <reference path="@scom/scom-token-input/@ijstech/eth-wallet/index.d.ts" />
 /// <reference path="@scom/scom-token-input/@scom/scom-token-modal/@ijstech/eth-wallet/index.d.ts" />
 /// <reference path="@scom/scom-dapp-container/@ijstech/eth-wallet/index.d.ts" />
-/// <reference path="@scom/scom-token-list/index.d.ts" />
 /// <reference path="@scom/scom-dex-list/index.d.ts" />
 /// <amd-module name="@scom/scom-swap/index.css.ts" />
 declare module "@scom/scom-swap/index.css.ts" {
@@ -21,7 +20,7 @@ declare module "@scom/scom-swap/global/utils/helper.ts" {
 declare module "@scom/scom-swap/global/utils/swapInterface.ts" {
     import { IWalletPlugin } from "@scom/scom-wallet-modal";
     import { ITokenObject } from '@scom/scom-token-list';
-    export type Category = 'fixed-pair' | 'aggregator';
+    export type Category = 'fixed-pair' | 'fixed-protocal' | 'aggregator' | 'cross-chain-swap';
     export interface ISwapConfig {
         category: Category;
         providers: IProvider[];
@@ -194,47 +193,20 @@ declare module "@scom/scom-swap/store/cross-chain.ts" {
         isTestnet: boolean;
     })[];
     interface ProviderConfig {
-        caption: string;
-        marketCode: Market;
         key: string;
         dexId?: number;
         supportedChains?: number[];
-    }
-    enum Market {
-        OPENSWAP = 0,
-        UNISWAP = 1,
-        SUSHISWAP = 2,
-        PANCAKESWAPV1 = 3,
-        PANCAKESWAP = 4,
-        BAKERYSWAP = 5,
-        BURGERSWAP = 6,
-        IFSWAPV1 = 7,
-        OPENSWAPV1 = 8,
-        HYBRID = 9,
-        MIXED_QUEUE = 10,
-        GROUP_QUEUE = 11,
-        QUICKSWAP = 12,
-        BISWAP = 13,
-        PANGOLIN = 14,
-        TRADERJOE = 15,
-        SPIRITSWAP = 16,
-        SPOOKYSWAP = 17,
-        PEGGED_QUEUE = 18,
-        HAKUSWAP = 19,
-        JETSWAP = 20,
-        IFSWAPV3 = 21
     }
     const ProviderConfigMap: {
         [key: string]: ProviderConfig;
     };
     const getBridgeVaultVersion: (chainId: number) => string;
-    const getOpenSwapToken: (chainId: number) => import("@scom/scom-token-list").ITokenObject;
     const bridgeVaultConstantMap: {
         [assetSymbol: string]: {
             [chainId: string]: BridgeVaultConstant;
         };
     };
-    export { baseRoute, BridgeVaultGroupList, CrossChainAddressMap, crossChainNativeTokenList, crossChainSupportedChainIds, ProviderConfig, Market, ProviderConfigMap, MockOracleMap, getBridgeVaultVersion, getOpenSwapToken, bridgeVaultConstantMap };
+    export { baseRoute, BridgeVaultGroupList, CrossChainAddressMap, crossChainNativeTokenList, crossChainSupportedChainIds, ProviderConfig, ProviderConfigMap, MockOracleMap, getBridgeVaultVersion, bridgeVaultConstantMap };
 }
 /// <amd-module name="@scom/scom-swap/store/index.ts" />
 declare module "@scom/scom-swap/store/index.ts" {
@@ -357,7 +329,6 @@ declare module "@scom/scom-swap/crosschain-utils/crosschain-utils.types.ts" {
         caption: string;
         fromToken: ITokenObject;
         toToken: ITokenObject;
-        isRegistered: boolean;
         pairAddress: string;
         provider: string;
     }
@@ -387,7 +358,6 @@ declare module "@scom/scom-swap/crosschain-utils/crosschain-utils.types.ts" {
     export interface IRouteAPI {
         address: string;
         dexId: number;
-        isRegistered: boolean;
         reserves: {
             reserve0: string;
             reserve1: string;
@@ -441,7 +411,7 @@ declare module "@scom/scom-swap/crosschain-utils/API.ts" {
         receipt: TransactionReceipt | null;
         error: Record<string, string> | null;
     }>;
-    const getAvailableRouteOptions: (state: State, params: GetAvailableRouteOptionsParams, getExtendedRouteObjData: Function) => Promise<ICrossChainRouteResult[]>;
+    const getAvailableRouteOptions: (state: State, params: GetAvailableRouteOptionsParams, getTradeFeeMap: Function, getExtendedRouteObjData: Function) => Promise<ICrossChainRouteResult[]>;
     const getVaultAssetBalance: (chainId: number, vaultAddress: string) => Promise<BigNumber>;
     const getOraclePriceMap: (chainId: number) => Promise<{
         [key: string]: BigNumber;
@@ -974,7 +944,6 @@ declare module "@scom/scom-swap" {
         private crossChainApprovalStatus;
         private oldSupportedChainList;
         private targetChainTokenBalances;
-        private targetChainTokenMap;
         private minSwapHintLabel;
         private srcChainBox;
         private desChainBox;
@@ -1117,7 +1086,6 @@ declare module "@scom/scom-swap" {
         get approveButtonStatus(): any;
         get isApprovingRouter(): boolean;
         get isValidToken(): boolean;
-        get targetTokenMap(): any;
         private redirectToken;
         private fixedNumber;
         private getTokenKey;
@@ -1169,9 +1137,9 @@ declare module "@scom/scom-swap" {
         private isMaxDisabled;
         private onRenderPriceInfo;
         get chainId(): number;
-        get isCrossChainEnabled(): boolean;
+        private get isCrossChainSwap();
+        private get isCrossChainEnabled();
         get isCrossChain(): boolean;
-        get targetChainTokenDataList(): any[];
         get fromTokenToVaultMap(): {
             [key: string]: any;
         };

@@ -121,7 +121,6 @@ export interface IBestSmartRoute {
   caption: string;
   fromToken: ITokenObject;
   toToken: ITokenObject;
-  isRegistered: boolean;
   pairAddress: string;
   provider: string;
 }
@@ -154,7 +153,6 @@ export interface IRoutesAPI {
 export interface IRouteAPI {
   address: string;
   dexId: number;
-  isRegistered: boolean;
   reserves: {
     reserve0: string;
     reserve1: string;

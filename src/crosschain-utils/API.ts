@@ -11,9 +11,8 @@ import {
   getNetworkInfo,
   State,
   ProviderConfig,
-  MockOracleMap,
-  Market,
-} from "../store/index"
+  MockOracleMap
+} from "../store/index";
 import { Wallet, BigNumber, Erc20, Utils, TransactionReceipt, Contracts } from "@ijstech/eth-wallet";
 import { Contracts as OpenSwapContracts } from "@scom/oswap-openswap-contract";
 import { Contracts as CrossChainContracts } from "@scom/oswap-cross-chain-bridge-contract";
@@ -27,15 +26,14 @@ import {
   ICrossChainRouteFromAPI,
   ICrossChainRouteResult,
   SwapExactETHForTokensParams,
-  SwapExactTokensForTokensParams,
-  TradeFeeMap,
+  SwapExactTokensForTokensParams
 } from "./crosschain-utils.types";
 import { DefaultTokens, ITokenObject, tokenStore } from "@scom/scom-token-list";
 import { nullAddress } from "@ijstech/eth-contract";
 
 const routeAPI = baseRoute + '/trading/v1/cross-chain-route';
 const GetBridgeVaultAPI = baseRoute + '/trading/v1/bridge-vault';
-const GetBondsInBridgeVaultAPI = baseRoute + '/trading/v1/bonds-by-chain-id-and-vault-troll-registry'
+const GetBondsInBridgeVaultAPI = baseRoute + '/trading/v1/bonds-by-chain-id-and-vault-troll-registry';
 
 const getTokenByVaultAddress = (chainId: number, vaultAddress: string) => {
   if (!chainId) return null;
@@ -70,8 +68,8 @@ const initCrossChainWallet = (chainId: number) => {
 }
 
 const getTargetChainTokenInfoObj = async (chainId: number) => {
-  let targetChainWallet = initCrossChainWallet(chainId)
-  let balances = {}
+  let targetChainWallet = initCrossChainWallet(chainId);
+  let balances = {};
 
   let tokenMap = getTargetChainTokenMap(chainId);
   if (!chainId || !DefaultTokens[chainId]) return { tokenMap, balances };
@@ -223,7 +221,7 @@ const composeRouteObjBridge = async (routeObj: any, firstInput: BigNumber, vault
   let price = 0;
   let priceSwap = 0;
   let tradeFee = 0;
-  let fees: IBridgeFees
+  let fees: IBridgeFees;
 
   let isApproveButtonShown = false;
 
@@ -292,46 +290,7 @@ const checkIsApproveButtonShown = async (state: State, tokenIn: ITokenObject, fr
   return fromInput.gt(allowance);
 }
 
-function getTradeFee(market: Market) {
-  switch (market) {
-    case Market.BISWAP:
-      return { fee: "1", base: "1000" };
-    case Market.UNISWAP:
-    case Market.SUSHISWAP:
-    case Market.BAKERYSWAP:
-    case Market.PANGOLIN:
-    case Market.TRADERJOE:
-    case Market.QUICKSWAP:
-    case Market.SPIRITSWAP:
-      return { fee: "3", base: "1000" };
-    case Market.PANCAKESWAPV1:
-    case Market.SPOOKYSWAP:
-      return { fee: "2", base: "1000" };
-    case Market.PANCAKESWAP:
-      return { fee: "25", base: "10000" };
-    case Market.BURGERSWAP:
-      return { fee: "3", base: "1000" };
-    case Market.IFSWAPV1:
-      return { fee: "6", base: "10000" };
-    case Market.IFSWAPV3: //trade fee by pair. 0.3% is default
-      return { fee: "30", base: "10000" }
-    case Market.MIXED_QUEUE:
-      return { fee: "1", base: "1000" };
-    case Market.PEGGED_QUEUE:
-      return { fee: "1", base: "1000" };
-    case Market.OPENSWAP:
-    default:
-      return { fee: "200", base: "100000" };
-  }
-}
-
-async function getTradeFeeMap(markets: Market[]) {
-  let tradeFeeMap: TradeFeeMap = {};
-  markets.forEach(market => tradeFeeMap[market] = getTradeFee(market));
-  return tradeFeeMap;
-}
-
-const getAvailableRouteOptions = async (state: State, params: GetAvailableRouteOptionsParams, getExtendedRouteObjData: Function): Promise<ICrossChainRouteResult[]> => {
+const getAvailableRouteOptions = async (state: State, params: GetAvailableRouteOptionsParams, getTradeFeeMap: Function, getExtendedRouteObjData: Function): Promise<ICrossChainRouteResult[]> => {
   let { fromChainId, toChainId, tokenIn, tokenOut, amountIn } = params;
   // Handle native token
 
@@ -347,8 +306,7 @@ const getAvailableRouteOptions = async (state: State, params: GetAvailableRouteO
     tokenOut.address = crossChainNativeTokenList[toChainId].wethAddress;
   }
 
-  const tradeFeeMapMarkets = Object.values(ProviderConfigMap).map(({ marketCode }) => marketCode);
-  const tradeFeeMap = await getTradeFeeMap(tradeFeeMapMarkets);
+  const tradeFeeMap = await getTradeFeeMap(state);
   
   const routeObjArr: { routes: ICrossChainRouteFromAPI[] } = await getAPI(routeAPI, {
     fromChainId,
@@ -372,10 +330,9 @@ const getAvailableRouteOptions = async (state: State, params: GetAvailableRouteO
     let bestRouteObj: any
     bestRouteObj = {
       pairs: routeObj.route.map(v => v.address),
-      isRegistered: routeObj.route.map(v => v.isRegistered),
       market: routeObj.route.map(v => {
         let dexId = [5, 6].includes(v.dexId) ? 5 : v.dexId;
-        return providerConfigByDexId[dexId].marketCode;
+        return providerConfigByDexId[dexId].key;
       }),
       route: routeObj.tokens,
       customDataList: routeObj.route.map(v => {
@@ -390,7 +347,6 @@ const getAvailableRouteOptions = async (state: State, params: GetAvailableRouteO
 
     let amountOut = Utils.fromDecimals(routeObj.amountOut, routeObj.tokens[routeObj.tokens.length - 1].decimals);
     let swapPrice = new BigNumber(fromAmount).div(amountOut);
-    // let targetChainWallet = initCrossChainWallet(chainId)
     let extendedData = bestRouteObj.pairs.length !== 0 ? await getExtendedRouteObjData(bestRouteObj, tradeFeeMap, swapPrice, true) : await getExtendedRouteObjDataForDirectRoute(bestRouteObj, swapPrice);
     let provider = providerConfigByDexId[dexId].key;
     let key = provider + '|' + (routeObj.isDirectRoute ? '0' : '1');

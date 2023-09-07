@@ -521,6 +521,7 @@ async function getExtendedRouteObjData(bestRouteObj: any, tradeFeeMap: TradeFeeM
 
   let fee = new BigNumber(1).minus(bestRouteObj.market.map((market: number) => {
     let tradeFeeObj = tradeFeeMap[market]
+    if (!tradeFeeObj) return new BigNumber(0);
     let tradeFee = new BigNumber(tradeFeeObj.fee).div(tradeFeeObj.base);
     return new BigNumber(1).minus(tradeFee)
   }).reduce((a: any, b: any) => a.times(b)));
@@ -903,7 +904,7 @@ const getCommissionRate = async (state: State, campaignId: number) => {
 }
 
 const getCrossChainRouteOptions = async (state: State, params: GetAvailableRouteOptionsParams) => {
-  return await getAvailableRouteOptionsForCrossChain(state, params, getExtendedRouteObjData);
+  return await getAvailableRouteOptionsForCrossChain(state, params, getTradeFeeMap, getExtendedRouteObjData);
 }
 
 const createBridgeVaultOrder: (state: State, newOrderParams: NewOrderParams) => Promise<{
