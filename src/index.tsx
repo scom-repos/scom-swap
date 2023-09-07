@@ -2092,15 +2092,15 @@ export default class ScomSwap extends Module {
   private setTargetTokenList = (isDisabled?: boolean) => {
     if (crossChainSupportedChainIds.some(v => v.chainId === this.srcChain?.chainId) && !isDisabled) {
       const targetChainId = this.desChain?.chainId || this.chainId;
-      if (this.secondTokenInput.targetChainId !== targetChainId) {
-        this.secondTokenInput.targetChainId = targetChainId;
+      if (this.secondTokenInput.chainId !== targetChainId) {
+        this.secondTokenInput.chainId = targetChainId;
       }
-      this.secondTokenInput.targetTokenBalancesMap = this.targetChainTokenBalances;
+      this.secondTokenInput.tokenBalancesMapProp = this.targetChainTokenBalances;
       this.secondTokenInput.tokenDataListProp = getSupportedTokens(this._data.tokens || [], targetChainId);
     } else {
       const srcChainId = this.srcChain?.chainId || this.chainId;
-      if (this.secondTokenInput.targetChainId !== srcChainId) {
-        this.secondTokenInput.targetChainId = srcChainId;
+      if (this.secondTokenInput.chainId !== srcChainId) {
+        this.secondTokenInput.chainId = srcChainId;
       }
       this.secondTokenInput.tokenDataListProp = getSupportedTokens(this._data.tokens || [], srcChainId);
     }

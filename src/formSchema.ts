@@ -381,7 +381,7 @@ export function getBuilderSchema() {
                             networks,
                             onCustomNetworkSelected: () => {
                                 const chainId = networkPickers[idx].selectedNetwork?.chainId;
-                                tokenInputs[idx].targetChainId = chainId;
+                                tokenInputs[idx].chainId = chainId;
                             }
                         });
                         return networkPickers[idx];
@@ -392,7 +392,7 @@ export function getBuilderSchema() {
                     setData: (control: ScomNetworkPicker, value: number) => {
                         control.setNetworkByChainId(value);
                         const idx = networkPickers.findIndex(f => f === control);
-                        if (tokenInputs[idx]) tokenInputs[idx].targetChainId = value;
+                        if (tokenInputs[idx]) tokenInputs[idx].chainId = value;
                     }
                 },
                 '#/properties/tokens/properties/address': {
@@ -406,8 +406,8 @@ export function getBuilderSchema() {
                         });
                         tokenInputs[idx].rpcWalletId = rpcWalletId;
                         const chainId = networkPickers[idx]?.selectedNetwork?.chainId;
-                        if (chainId && tokenInputs[idx].targetChainId !== chainId) {
-                            tokenInputs[idx].targetChainId = chainId;
+                        if (chainId && tokenInputs[idx].chainId !== chainId) {
+                            tokenInputs[idx].chainId = chainId;
                         }
                         return tokenInputs[idx];
                     },
