@@ -135,6 +135,7 @@ export const swapStyle = Styles.style({
           width: '100% !important'
         },
         '.custom-ic--swap': {
+          margin: 'auto',
           bottom: '0 !important',
           transform: 'none !important'
         }
@@ -182,7 +183,7 @@ export const swapStyle = Styles.style({
           padding: '0.25rem',
         },
         '.custom-ic--swap': {
-          bottom: -60,
+          bottom: 28,
           transform: 'rotate(90deg)',
           padding: '0.45rem !important'
         }
@@ -213,11 +214,76 @@ export const swapStyle = Styles.style({
     // '#receiveCol': {
     //   maxWidth: 'calc(100% - 9rem)',
     // },
+    '.hints': {
+      display: 'flex',
+      alignItems: 'center',
+      marginTop: '-0.5rem',
+      $nest: {
+        '*': {
+          fontSize: '0.8rem',
+          opacity: 0.9,
+        },
+        'i-label *': {
+          marginLeft: '0.25rem',
+        },
+      },
+    },
+    '.chain-icon': {
+      margin: '0.25rem 0.5rem 0 0',
+      borderRadius: '50%',
+      border: '2px solid transparent',
+      padding: '0.25rem',
+      cursor: 'pointer',
+      filter: 'grayscale(1)',
+      $nest: {
+        '&.icon-disabled': {
+          cursor: 'default',
+        },
+        '&.icon-selected': {
+          borderColor: Theme.colors.primary.main,
+          cursor: 'default',
+          filter: 'inherit',
+        },
+        'img': {
+          width: '32px',
+          height: '32px',
+        },
+      },
+    },
+    '.chain-text': {
+      whiteSpace: 'nowrap',
+      overflow: 'hidden !important',
+      textOverflow: 'ellipsis'
+    },
     '.cursor-default': {
       cursor: 'default !important',
     },
     '.hidden': {
       display: 'none !important'
+    },
+    '.custom-md--view': {
+      $nest: {
+        'i-label > *': {
+          fontSize: '.875rem',
+          wordBreak: 'normal'
+        },
+        '.i-modal_content': {
+          padding: '0 1rem 1rem',
+        },
+        '.flex-col': {
+          flexDirection: 'column',
+        },
+        'i-button': {
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          width: '150px',
+          height: '50px !important',
+          fontWeight: 600,
+          borderRadius: 5,
+          margin: '0.5rem',
+        }
+      }
     },
     '.custom-modal': {
       $nest: {

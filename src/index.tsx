@@ -1,10 +1,15 @@
-import { Module, Panel, Button, Label, VStack, Image, Container, IEventBus, application, customModule, Modal, Input, Control, customElements, ControlElement, IDataSchema, Styles, HStack, Icon, IUISchema } from '@ijstech/components';
-import { BigNumber, Constants, IEventBusRegistry, INetwork, Wallet, IERC20ApprovalAction } from '@ijstech/eth-wallet';
+import { Module, Panel, Button, Label, VStack, Image, Container, IEventBus, application, customModule, Modal, Input, Control, customElements, ControlElement, Styles, HStack, Icon } from '@ijstech/components';
+import { BigNumber, Constants, INetwork, Wallet, IERC20ApprovalAction } from '@ijstech/eth-wallet';
 import './index.css';
 import {
   isClientWalletConnected,
   getSupportedTokens,
   State,
+  crossChainSupportedChainIds,
+  BridgeVaultGroupList,
+  WalletPlugin,
+  getNetworkInfo,
+  bridgeVaultConstantMap,
 } from "./store/index";
 import { tokenStore, DefaultERC20Tokens, ChainNativeTokenByChainId, assets as tokenAssets } from '@scom/scom-token-list';
 
@@ -14,8 +19,18 @@ import {
   setApprovalModalSpenderAddress,
   getProviderProxySelectors,
   getPair,
-  getCommissionRate
+  getCommissionRate,
+  getCrossChainRouteOptions,
+  createBridgeVaultOrder
 } from './swap-utils/index'
+import {
+  getTargetChainTokenInfoObj,
+  ICrossChainRouteResult,
+  getBridgeVault,
+  getBondsInBridgeVault,
+  getVaultAssetBalance,
+  getOraclePriceMap,
+} from './crosschain-utils/index';
 import { ITokenObject } from '@scom/scom-token-list';
 import {
   formatNumber,
@@ -42,11 +57,11 @@ import ScomCommissionFeeSetup from '@scom/scom-commission-fee-setup';
 import ScomTokenInput from '@scom/scom-token-input';
 import ScomTxStatusModal from '@scom/scom-tx-status-modal';
 import { swapStyle } from './index.css';
+import assets from './assets';
 
 export { ISwapWidgetData };
 
 const Theme = Styles.Theme.ThemeVars;
-// const currentTheme = Styles.Theme.currentTheme;
 const priceImpactTooHighMsg = 'Price Impact Too High. If you want to bypass this check, please turn on Expert Mode';
 const defaultInput = '1';
 type StatusMapType = 'approve' | 'swap';
@@ -147,7 +162,7 @@ export default class ScomSwap extends Module {
   private approvalModelAction: IERC20ApprovalAction;
 
   private toggleReverseImage: Icon;
-  private supportedChainList: INetwork[] = [];
+  private supportedChainList: INetworkConfig[] = [];
   private swapModalConfirmBtn: Button;
   private modalFees: Modal;
   private feesInfo: VStack;
@@ -157,6 +172,48 @@ export default class ScomSwap extends Module {
   private supportedNetworksElm: VStack;
   private contractAddress: string;
   private clientEvents: any[] = [];
+
+  // Cross Chain
+  private crossChainApprovalStatus: ApprovalStatus = ApprovalStatus.NONE;
+  private oldSupportedChainList: INetwork[] = [];
+  private targetChainTokenBalances: Record<string, string>;
+  private minSwapHintLabel: Label;
+  private srcChainBox: Panel;
+  private desChainBox: Panel;
+  private srcChainLabel: Label;
+  private srcChainList: HStack;
+  private desChainLabel: Label;
+  private desChainList: HStack;
+  private srcChain: INetwork | undefined;
+  private desChain: INetwork | undefined;
+  private targetChainId: number | undefined;
+  private srcChainFirstPanel: Panel;
+  private targetChainFirstPanel: Panel;
+  private srcChainTokenImage: Image;
+  private srcChainTokenLabel: Label;
+  private targetChainTokenImage: Image;
+  private targetChainTokenLabel: Label;
+  private srcChainSecondPanel: Panel;
+  private srcChainVaultImage: Image;
+  private srcChainVaultLabel: Label;
+  private srcVaultTokenImage: Image;
+  private srcVaultTokenLabel: Label;
+  private srcVaultTokenValue: Label;
+  private targetChainSecondPanel: Panel;
+  private targetChainVaultImage: Image;
+  private targetChainVaultLabel: Label;
+  private targetVaultTokenImage: Image;
+  private targetVaultTokenLabel: Label;
+  private targetVaultTokenValue: Label;
+  private targetVaultAssetBalanceLabel1: Label;
+  private targetVaultBondBalanceLabel1: Label;
+  private crossChainSoftCapLabel1: Label;
+  private targetVaultAssetBalanceLabel2: Label;
+  private targetVaultBondBalanceLabel2: Label;
+  private crossChainSoftCapLabel2: Label;
+  private crossChainVaultInfoVstack: VStack;
+  private modalViewOrder: Modal;
+  private lbReminderRejected: Label;
 
   static async create(options?: ScomSwapElement, parent?: Container) {
     let self = new this(parent, options);
@@ -712,6 +769,7 @@ export default class ScomSwap extends Module {
     return warningMessageText === '' && this.approveButtonStatus !== undefined && this.approveButtonStatus !== ApprovalStatus.NONE
   }
   get isPriceImpactTooHigh(): boolean {
+    if (this.isCrossChain) return false;
     const warningMessageText = this.getWarningMessageText();
     return this.record?.priceImpact > 15 && !this.state.isExpertMode && warningMessageText === priceImpactTooHighMsg
   }
@@ -750,6 +808,9 @@ export default class ScomSwap extends Module {
       fromToken: this.fromToken?.symbol || this.fromTokenSymbol,
       toToken: this.toToken?.symbol || this.toTokenSymbol,
     };
+    if (this.isCrossChain) {
+      this.isFrom = false;
+    }
     if (this.isFrom) {
       queryRouter = {
         ...queryRouter,
@@ -763,6 +824,10 @@ export default class ScomSwap extends Module {
     }
     this.fromTokenSymbol = queryRouter.fromToken;
     this.toTokenSymbol = queryRouter.toToken;
+    this.targetChainId = queryRouter.toChainId;
+    if (!this.isCrossChainEnabled) {
+      delete queryRouter['toChainId'];
+    }
   };
 
   private fixedNumber = (value: BigNumber | string | number) => {
@@ -786,7 +851,40 @@ export default class ScomSwap extends Module {
 
   private initializeDefaultTokenPair() {
     const currentChainId = this.state.getChainId();
-    let currentChainTokens = this._data.tokens.filter((token) => token.chainId === currentChainId);
+    let currentChainTokens = getSupportedTokens(this._data.tokens || [], currentChainId);
+    if (this.isCrossChain) {
+      let targetChainTokens = getSupportedTokens(this._data.tokens || [], this.desChain.chainId);
+      if (this.fromTokenSymbol && this.toTokenSymbol) {
+        const firstObj = currentChainTokens.find(item => this.fromTokenSymbol === item.symbol || this.fromTokenSymbol === item.address);
+        if (firstObj) {
+          this.fromToken = firstObj;
+        } else {
+          this.fromToken = currentChainTokens[0];
+        }
+        const secondObj = targetChainTokens.find(item => this.toTokenSymbol === item.symbol || this.toTokenSymbol === item.address);
+        if (secondObj) {
+          this.toToken = secondObj;
+        } else {
+          this.toToken = targetChainTokens[0];
+        }
+        this.onUpdateToken(this.fromToken as ITokenObject, true);
+        this.onUpdateToken(this.toToken as ITokenObject, false);
+        this.firstTokenInput.token = this.fromToken;
+        this.secondTokenInput.token = this.toToken;
+        this.fromInputValue = this.fromInputValue || new BigNumber(defaultInput);
+      } else {
+        let firstDefaultToken = currentChainTokens[0];
+        let secondDefaultToken = targetChainTokens[0];
+        const fromAmount = parseFloat(defaultInput);
+        this.fromInputValue = new BigNumber(fromAmount);
+        this.onUpdateToken(firstDefaultToken, true);
+        this.onUpdateToken(secondDefaultToken, false);
+        this.firstTokenInput.token = this.fromToken;
+        this.secondTokenInput.token = this.toToken;
+      }
+      return;
+    }
+
     if (currentChainTokens.length < 2) return;
     const providers = this.originalData?.providers;
     if (providers && providers.length) {
@@ -822,8 +920,9 @@ export default class ScomSwap extends Module {
       this.closeNetworkErrModal();
       await this.initWallet();
       await this.updateBalance();
+      await this.onRenderChainList();
       this.initializeDefaultTokenPair();
-      this.toggleReverseImage.enabled = !this.isFixedPair;
+      this.toggleReverseImage.enabled = !this.isFixedPair && !this.isCrossChain;
       this.firstTokenInput.tokenReadOnly = this.isFixedPair;
       this.secondTokenInput.tokenReadOnly = this.isFixedPair;
       this.pnlBranding.visible = !!this._data.logo || !!this._data.title;
@@ -842,6 +941,23 @@ export default class ScomSwap extends Module {
       if (!this.isFixedPair) {
         this.toggleReverseImage.classList.remove('cursor-default');
       }
+      if (this.isCrossChain) {
+        this.initRoutes();
+        this.toInputValue = new BigNumber(0);
+        if (this.secondTokenInput) {
+          this.secondTokenInput.value = '-';
+          this.secondTokenInput.inputReadOnly = true;
+        }
+        this.toggleReverseImage.classList.add('cursor-default');
+        if (this.isEstimated('from')) {
+          this.onUpdateEstimatedPosition(false, true);
+        }
+      } else {
+        if (this.secondTokenInput) {
+          this.secondTokenInput.inputReadOnly = false;
+        }
+        this.toggleReverseImage.classList.remove('cursor-default');
+      }
       if (this.fromInputValue.isGreaterThanOrEqualTo(0)) {
         this.onUpdateEstimatedPosition(false, true);
         this.firstTokenInput.value = this.fixedNumber(this.fromInputValue);
@@ -851,7 +967,11 @@ export default class ScomSwap extends Module {
       }
       const tokens = getSupportedTokens(this._data.tokens || [], currentChainId);
       this.firstTokenInput.tokenDataListProp = tokens;
-      this.secondTokenInput.tokenDataListProp = tokens;
+      if (!this.isCrossChain) {
+        this.secondTokenInput.tokenDataListProp = tokens;
+      } else {
+        this.setTargetTokenList();
+      }
 
       if (!this.record)
         this.swapBtn.enabled = false;
@@ -866,28 +986,44 @@ export default class ScomSwap extends Module {
       sender: this,
       payAction: this.onSubmit,
       onToBeApproved: async (token: ITokenObject, data?: any) => {
-        this.setMapStatus('approve', data.key, ApprovalStatus.TO_BE_APPROVED);
-        this.setMapStatus('swap', data.key, ApprovalStatus.TO_BE_APPROVED);
+        if (this.isCrossChain) {
+          this.crossChainApprovalStatus = ApprovalStatus.TO_BE_APPROVED;
+        } else {
+          this.setMapStatus('approve', data.key, ApprovalStatus.TO_BE_APPROVED);
+          this.setMapStatus('swap', data.key, ApprovalStatus.TO_BE_APPROVED);
+        }
         this.updateSwapButtonCaption();
         const enabled = !this.isSwapButtonDisabled();
         this.swapBtn.enabled = enabled;
       },
       onToBePaid: async (token: ITokenObject, data?: any) => {
-        this.setMapStatus('approve', data.key, ApprovalStatus.NONE);
-        this.setMapStatus('swap', data.key, ApprovalStatus.TO_BE_APPROVED);
+        if (this.isCrossChain) {
+          this.crossChainApprovalStatus = ApprovalStatus.NONE;
+        } else {
+          this.setMapStatus('approve', data.key, ApprovalStatus.NONE);
+          this.setMapStatus('swap', data.key, ApprovalStatus.TO_BE_APPROVED);
+        }
         this.updateSwapButtonCaption();
         const enabled = !this.isSwapButtonDisabled();
         this.swapBtn.enabled = enabled;
       },
       onApproving: async (token: ITokenObject, receipt?: string, data?: any) => {
-        this.setMapStatus('approve', data.key, ApprovalStatus.APPROVING);
+        if (this.isCrossChain) {
+          this.crossChainApprovalStatus = ApprovalStatus.APPROVING;
+        } else {
+          this.setMapStatus('approve', data.key, ApprovalStatus.APPROVING);
+        }
         this.updateSwapButtonCaption();
         this.showResultMessage('success', receipt);
-        if (this.isApprovingRouter && !this.swapBtn.rightIcon.visible)
+        if ((this.isApprovingRouter || this.isCrossChain) && !this.swapBtn.rightIcon.visible)
           this.swapBtn.rightIcon.visible = true;
       },
       onApproved: async (token: ITokenObject, data?: any) => {
-        this.setMapStatus('approve', data.key, ApprovalStatus.NONE);
+        if (this.isCrossChain) {
+          this.crossChainApprovalStatus = ApprovalStatus.NONE;
+        } else {
+          this.setMapStatus('approve', data.key, ApprovalStatus.NONE);
+        }
         this.updateSwapButtonCaption();
         if (this.swapBtn.rightIcon.visible)
           this.swapBtn.rightIcon.visible = false;
@@ -895,6 +1031,7 @@ export default class ScomSwap extends Module {
       },
       onApprovingError: async (token: ITokenObject, err: Error) => {
         this.showResultMessage('error', err);
+        this.crossChainApprovalStatus = ApprovalStatus.TO_BE_APPROVED;
         if (this.swapBtn.rightIcon.visible)
           this.swapBtn.rightIcon.visible = false;
       },
@@ -903,7 +1040,7 @@ export default class ScomSwap extends Module {
         this.onSwapConfirming(data.key);
       },
       onPaid: async (data?: any) => {
-        this.onSwapConfirmed({ key: data.key });
+        this.onSwapConfirmed({ key: data.key, isCrossChain: this.isCrossChain });
         await this.updateBalance();
         application.EventBus.dispatch(EventId.Paid, { data: data ?? null, id: this.id });
       },
@@ -914,6 +1051,7 @@ export default class ScomSwap extends Module {
   }
 
   private async onRevertSwap() {
+    if (this.isCrossChain) return;
     this.onUpdateEstimatedPosition(!this.isEstimated('from'), true);
     [this.fromToken, this.toToken] = [this.toToken, this.fromToken];
     const enabled = !this.isMaxDisabled();
@@ -934,14 +1072,70 @@ export default class ScomSwap extends Module {
     return this.fromInputValue;
   }
 
+  private setupCrossChainPopup() {
+    const arrows = this.swapModal.querySelectorAll('i-icon.arrow-down');
+    if (!this.isCrossChain) {
+      arrows.forEach((arrow: Element) => {
+        arrow.classList.remove('arrow-down--chain');
+      });
+    } else {
+      arrows.forEach((arrow: Element) => {
+        arrow.classList.add('arrow-down--chain');
+      });
+    }
+    this.lbReminderRejected?.classList.add('hidden');
+    if (this.isCrossChain && this.srcChain && this.desChain) {
+      this.srcChainFirstPanel.classList.remove('hidden');
+      this.targetChainFirstPanel.classList.remove('hidden');
+      this.srcChainTokenImage.url = this.srcChain.image;
+      this.srcChainTokenLabel.caption = this.srcChain.chainName;
+      this.targetChainTokenImage.url = this.desChain.image;
+      this.targetChainTokenLabel.caption = this.desChain.chainName;
+      const { sourceVaultToken, targetVaultToken, sourceRouteObj, vaultTokenFromSourceChain, vaultTokenToTargetChain } = this.record;
+      if (sourceVaultToken && sourceRouteObj) {
+        this.srcChainSecondPanel.classList.remove('hidden');
+        this.srcChainVaultImage.url = this.srcChain.image;
+        this.srcChainVaultLabel.caption = this.srcChain.chainName;
+        this.srcVaultTokenImage.url = tokenAssets.getTokenIconPath(sourceVaultToken, this.srcChain.chainId);
+        this.srcVaultTokenLabel.caption = sourceVaultToken.symbol;
+        this.srcVaultTokenValue.caption = formatNumber(vaultTokenFromSourceChain);
+        this.lbReminderRejected?.classList.remove('hidden');
+        this.lbReminderRejected.caption = `If the order is not executed in the target chain, the estimated withdrawalble amount is <b class="text-pink">${formatNumber(vaultTokenFromSourceChain)} ${sourceVaultToken?.symbol}</b>`;
+      } else {
+        this.srcChainSecondPanel.classList.add('hidden');
+      }
+      if (targetVaultToken && targetVaultToken.symbol !== this.toToken?.symbol) {
+        this.targetChainSecondPanel.classList.remove('hidden');
+        this.targetChainVaultImage.url = this.desChain.image;
+        this.targetChainVaultLabel.caption = this.desChain.chainName;
+        this.targetVaultTokenImage.url = tokenAssets.getTokenIconPath(targetVaultToken, this.desChain.chainId);
+        this.targetVaultTokenLabel.caption = targetVaultToken.symbol;
+        this.targetVaultTokenValue.caption = formatNumber(vaultTokenToTargetChain);
+        // Hide vault info at toToken
+        this.crossChainVaultInfoVstack.classList.add('hidden');
+      } else {
+        this.targetChainSecondPanel.classList.add('hidden');
+        // Show vault info at the end if vaultTokenSymbol same as toToken
+        this.crossChainVaultInfoVstack.classList.remove('hidden');
+      }
+    } else {
+      this.srcChainFirstPanel.classList.add('hidden');
+      this.targetChainFirstPanel.classList.add('hidden');
+      this.srcChainSecondPanel.classList.add('hidden');
+      this.targetChainSecondPanel.classList.add('hidden');
+      this.crossChainVaultInfoVstack.classList.add('hidden');
+    }
+  }
+
   private handleSwapPopup() {
     if (!this.record) return;
+    this.setupCrossChainPopup();
     const currentChainId = this.state.getChainId();
     const slippageTolerance = this.state.slippageTolerance;
     this.fromTokenImage.url = tokenAssets.tokenPath(this.fromToken, currentChainId);
     this.fromTokenLabel.caption = this.fromToken?.symbol ?? '';
     this.fromTokenValue.caption = formatNumber(this.totalAmount(), 4);
-    this.toTokenImage.url = tokenAssets.tokenPath(this.toToken, currentChainId);
+    this.toTokenImage.url = tokenAssets.tokenPath(this.toToken, this.isCrossChain ? this.desChain?.chainId : currentChainId);
     this.toTokenLabel.caption = this.toToken?.symbol ?? '';
     this.toTokenValue.caption = formatNumber(this.toInputValue, 4);
     const minimumReceived = this.getMinReceivedMaxSold();
@@ -978,7 +1172,7 @@ export default class ScomSwap extends Module {
 
   private async onUpdateToken(token: ITokenObject, isFrom: boolean) {
     if (!token) return;
-    const balance = this.getBalance(token);
+    const balance = this.getBalance(token, !isFrom && this.isCrossChain);
     if (isFrom) {
       this.fromToken = token;
       const enabled = !this.isMaxDisabled();
@@ -987,7 +1181,7 @@ export default class ScomSwap extends Module {
         const limit = limitDecimals(this.fromInputValue.toFixed(), token.decimals || 18);
         if (!this.fromInputValue.eq(limit)) {
           if (this.firstTokenInput) {
-            this.firstTokenInput = limit === '0' ? '' : limit;
+            this.firstTokenInput.value = limit === '0' ? '' : limit;
           }
           this.fromInputValue = new BigNumber(limit);
         }
@@ -1034,7 +1228,9 @@ export default class ScomSwap extends Module {
     if (!item) return;
     const market = this.state.getProviderByKey(item.provider)?.key || '';
     if (this.approvalModelAction) {
-      if (this._data.campaignId !== undefined) {
+      if (this.isCrossChain && item.contractAddress) {
+        setApprovalModalSpenderAddress(this.state, market, item.contractAddress);
+      } else if (this._data.campaignId !== undefined) {
         this.contractAddress = this.state.getProxyAddress();
         setApprovalModalSpenderAddress(this.state, market, this.contractAddress);
       } else {
@@ -1071,6 +1267,14 @@ export default class ScomSwap extends Module {
     }
 
     this.record = item;
+    if (this.isCrossChain && this.fromToken && !this.fromToken.isNative && this.state.isRpcWalletConnected()) {
+      try {
+        this.setApprovalSpenderAddress();
+        await this.approvalModelAction.checkAllowance(this.fromToken, this.fromInputValue.toFixed());
+      } catch (e) {
+        console.log('Cannot check the Approval status (Cross Chain)', e);
+      }
+    }
     const isButtonLoading = this.isButtonLoading();
     if (this.swapBtn.rightIcon.visible != isButtonLoading) {
       this.swapBtn.rightIcon.visible = isButtonLoading;
@@ -1147,14 +1351,135 @@ export default class ScomSwap extends Module {
     let listRouting: any[] = [];
     const useAPI = this._data.category === 'aggregator';
     this.updateContractAddress();
-    listRouting = await getAllRoutesData(this.state, this.fromToken, this.toToken, this.fromInputValue, this.toInputValue, this.isFrom, useAPI);
-    listRouting = listRouting.map((v: any) => {
-      // const config = ProviderConfigMap[v.provider];
-      return {
-        ...v,
-        isHybrid: false // config.marketCode == Market.HYBRID,
+    if (!this.isCrossChain) {
+      listRouting = await getAllRoutesData(this.state, this.fromToken, this.toToken, this.fromInputValue, this.toInputValue, this.isFrom, useAPI);
+      listRouting = listRouting.map((v: any) => {
+        return {
+          ...v,
+          isHybrid: false // market == Market.HYBRID,
+        }
+      });
+    } else if (this.srcChain && this.desChain) {
+      const tokenIn = Object.assign({}, this.fromToken);
+      const tokenOut = Object.assign({}, this.toToken);
+      listRouting = await getCrossChainRouteOptions(this.state, {
+        fromChainId: this.srcChain.chainId,
+        toChainId: this.desChain.chainId,
+        tokenIn: tokenIn,
+        tokenOut: tokenOut,
+        amountIn: this.fromInputValue
+      })
+      listRouting = listRouting.map((v: any) => {
+        let route: any = {};
+        if (v.sourceRouteObj) {
+          const amountOut = v.targetRouteObj ? v.targetRouteObj.amountOut : v.sourceRouteObj.amountOut;
+          route = {
+            ...v,
+            ...v.sourceRouteObj,
+            tradeFee: v.tradeFee,
+            price: v.price,
+            amountOut: new BigNumber(amountOut),
+          };
+          if (v.targetRouteObj) {
+            const market = this.state.getProviderByKey(v.targetRouteObj.provider)?.key || '';
+            if (market) {
+              route.targetRouteObj = {
+                ...route.targetRouteObj,
+                route: v.targetRouteObj.bestRoute,
+                isHybrid: false //market == Market.HYBRID,
+              }
+            } else {
+              route.targetRouteObj = undefined;
+            }
+          }
+        } else {
+          route = {
+            ...v,
+            ...v.targetRouteObj,
+            tradeFee: v.tradeFee,
+            price: v.price,
+          };
+        }
+        return { ...route, fromAmount: new BigNumber(route.fromAmount) };
+      });
+      if (listRouting.length) {
+        this.minSwapHintLabel?.classList.add('hidden');
+      } else {
+        this.minSwapHintLabel?.classList.remove('hidden');
       }
-    });
+    }
+    if (listRouting[0] && this.isCrossChain) {
+      const assetSymbol = listRouting[0].targetVaultToken.symbol;
+      const { vaultAddress, vaultRegistryAddress, tokenAddress: vaultTokenAddress, softCap } = bridgeVaultConstantMap[assetSymbol === 'USDT.e' ? 'USDT' : assetSymbol][this.desChain!.chainId];
+      const [vault, vaultAssetBalance, bonds, oraclePriceMap] = await Promise.all([
+        getBridgeVault(this.desChain!.chainId, vaultAddress),
+        getVaultAssetBalance(this.desChain!.chainId, vaultAddress),
+        getBondsInBridgeVault(this.state, this.desChain!.chainId, vaultRegistryAddress),
+        getOraclePriceMap(this.desChain!.chainId)
+      ]);
+      const assetBalance = vaultAssetBalance ?? 0;
+      const assetDecimal = listRouting[0].targetVaultToken.decimals;
+      const targetVaultAssetBalance = (new BigNumber(assetBalance)).shiftedBy(-assetDecimal);
+      const targetVaultBondBalance = bonds.reduce((acc, cur) => {
+        if (cur.chainId !== this.desChain?.chainId) return acc;
+        acc = acc.plus((new BigNumber(cur.bond)).shiftedBy(-18));
+        return acc;
+      }, new BigNumber(0));
+      const vaultTokenToTargetChain: BigNumber = new BigNumber(listRouting[0].vaultTokenToTargetChain);
+      const vaultToUsdPrice = oraclePriceMap[vaultTokenAddress.toLowerCase()]; // This will be the vaultToken -> USD Price
+      const oswapToUsdPrice = oraclePriceMap[bridgeVaultConstantMap['OSWAP'][this.desChain!.chainId].tokenAddress.toLowerCase()];
+      const vaultToOswapPrice = vaultToUsdPrice.div(oswapToUsdPrice); // This will vaultToken -> oswap price;
+      this.targetVaultAssetBalanceLabel1.caption = `Vault Asset Balance: ${formatNumber(targetVaultAssetBalance.toNumber(), 4)} ${assetSymbol}`;
+      this.targetVaultAssetBalanceLabel2.caption = `Vault Asset Balance: ${formatNumber(targetVaultAssetBalance.toNumber(), 4)} ${assetSymbol}`;
+      if (!vault.vaultGroup) {
+        this.targetVaultBondBalanceLabel1.caption = `Vault Bond Balance: ${formatNumber(targetVaultBondBalance.toNumber(), 4)} ${assetSymbol}`;
+        this.targetVaultBondBalanceLabel2.caption = `Vault Bond Balance: ${formatNumber(targetVaultBondBalance.toNumber(), 4)} ${assetSymbol}`;
+      } else if (vault.vaultGroup === 'OSWAP') {
+        this.targetVaultBondBalanceLabel1.caption = `Vault Bond Balance: ${formatNumber(targetVaultBondBalance.toNumber(), 4)} OSWAP`;
+        this.targetVaultBondBalanceLabel2.caption = `Vault Bond Balance: ${formatNumber(targetVaultBondBalance.toNumber(), 4)} OSWAP`;
+      } else {
+        this.targetVaultBondBalanceLabel1.caption = `Vault Bond Balance: ${formatNumber(targetVaultBondBalance.toNumber(), 4)} OSWAP &#8776; ${formatNumber(targetVaultBondBalance.div(vaultToOswapPrice).toNumber(), 4)} ${assetSymbol}`;
+        this.targetVaultBondBalanceLabel2.caption = `Vault Bond Balance: ${formatNumber(targetVaultBondBalance.toNumber(), 4)} OSWAP &#8776; ${formatNumber(targetVaultBondBalance.div(vaultToOswapPrice).toNumber(), 4)} ${assetSymbol}`;
+      }
+      this.crossChainSoftCapLabel1.caption = softCap ? `Cap: ${formatNumber(softCap)} ${assetSymbol}` : "-";
+      this.crossChainSoftCapLabel2.caption = softCap ? `Cap: ${formatNumber(softCap)} ${assetSymbol}` : "-";
+      const minValue = BigNumber.min(targetVaultAssetBalance, targetVaultBondBalance, softCap);
+      if (minValue.eq(targetVaultAssetBalance)) {
+        this.targetVaultAssetBalanceLabel1.classList.add('text--limit');
+        this.targetVaultAssetBalanceLabel2.classList.add('text--limit');
+        this.targetVaultBondBalanceLabel1.classList.remove('text--limit');
+        this.targetVaultBondBalanceLabel2.classList.remove('text--limit');
+        this.crossChainSoftCapLabel1.classList.remove('text--limit');
+        this.crossChainSoftCapLabel2.classList.remove('text--limit');
+      } else if (minValue.eq(targetVaultBondBalance)) {
+        this.targetVaultAssetBalanceLabel1.classList.remove('text--limit');
+        this.targetVaultAssetBalanceLabel2.classList.remove('text--limit');
+        this.targetVaultBondBalanceLabel1.classList.add('text--limit');
+        this.targetVaultBondBalanceLabel2.classList.add('text--limit');
+        this.crossChainSoftCapLabel1.classList.remove('text--limit');
+        this.crossChainSoftCapLabel2.classList.remove('text--limit');
+      } else {
+        this.targetVaultAssetBalanceLabel1.classList.remove('text--limit');
+        this.targetVaultAssetBalanceLabel2.classList.remove('text--limit');
+        this.targetVaultBondBalanceLabel1.classList.remove('text--limit');
+        this.targetVaultBondBalanceLabel2.classList.remove('text--limit');
+        this.crossChainSoftCapLabel1.classList.add('text--limit');
+        this.crossChainSoftCapLabel2.classList.add('text--limit');
+      }
+      if (softCap && vaultTokenToTargetChain.toNumber() >= softCap) {
+        this.swapModalConfirmBtn.caption = 'Cap Reached';
+        this.swapModalConfirmBtn.enabled = false;
+      } else if (vaultTokenToTargetChain.gt(targetVaultAssetBalance) || vaultTokenToTargetChain.multipliedBy(vaultToOswapPrice).gt(targetVaultBondBalance)) {
+        this.swapModalConfirmBtn.caption = 'Exceed Vault Asset Balance or Bond Balance';
+        this.swapModalConfirmBtn.enabled = false;
+      } else {
+        this.swapModalConfirmBtn.enabled = true;
+      }
+      this.crossChainApprovalStatus = listRouting[0].isApproveButtonShown ? ApprovalStatus.TO_BE_APPROVED : ApprovalStatus.NONE;
+    }
+    this.disableSelectChain(false);
+    this.disableSelectChain(false, true);
+
     this.swapModalConfirmBtn.caption = 'Confirm Swap';
     this.swapModalConfirmBtn.enabled = true;
     this.record = listRouting[0] || null;
@@ -1226,11 +1551,21 @@ export default class ScomSwap extends Module {
     const value = this.isPriceToggled ? this.record?.priceSwap : this.record?.price;
     let fromSymbol = this.fromToken?.symbol;
     let toSymbol = this.toToken?.symbol;
+    if (this.isCrossChain) {
+      const srcName = this.srcChain?.chainName;
+      const desName = this.desChain?.chainName;
+      if (srcName) {
+        fromSymbol = `${fromSymbol} (${srcName})`;
+      }
+      if (desName) {
+        toSymbol = `${toSymbol} (${desName})`;
+      }
+    }
     if (value || value == 0) {
       if (this.isPriceToggled) {
-        return `1 ${fromSymbol} ≈ ${formatNumber(value)} ${toSymbol}`;
+        return `1 ${fromSymbol} &#8776; ${formatNumber(value)} ${toSymbol}`;
       }
-      return `1 ${toSymbol} ≈ ${formatNumber(value)} ${fromSymbol}`;
+      return `1 ${toSymbol} &#8776; ${formatNumber(value)} ${fromSymbol}`;
     }
     return '-';
   }
@@ -1252,22 +1587,59 @@ export default class ScomSwap extends Module {
     return '-';
   }
   private getTradeFeeExactAmount() {
-    const tradeFee = this.record?.fromAmount.times(this.record?.tradeFee).toNumber();
+    const tradeFee = this.isCrossChain ? this.record?.tradeFee : this.record?.fromAmount.times(this.record?.tradeFee).toNumber();
     if (tradeFee || tradeFee == 0) {
       return `${formatNumber(tradeFee)} ${this.fromToken?.symbol}`;
     }
     return '-';
   }
   private getFeeDetails() {
-    if (this.record) {
+    if (this.isCrossChain && this.record) {
+      let record: ICrossChainRouteResult = this.record
+      let detail = [
+        {
+          title: "Source Chain Liquidity Fee",
+          description: "This fee is paid to the AMM Liquidity Providers on the Source Chain.",
+          value: record.fees.sourceRouteLiquidityFee,
+          isHidden: record.fees.sourceRouteLiquidityFee == 0
+        },
+        {
+          title: "Target Chain Liquidity Fee",
+          description: "This fee is paid to the AMM Liquidity Providers on the Target Chain.",
+          value: record.fees.targetRouteLiquidityFee,
+          isHidden: record.targetRouteObj.pairs.length == 0
+        },
+        {
+          title: "Base Fee",
+          description: "This fee is paid to the trolls to cover gas fee on the Target Chain",
+          value: record.fees.baseFee,
+        },
+        {
+          title: "Bridge Vault Liquidity Fee",
+          description: "This fee is paid to the Bridge Vault Liquidity Provider on Target Chain",
+          value: record.fees.transactionFee,
+        },
+        {
+          title: "Protocol Fee",
+          description: "This fee is paid to the troll owners on the Cross Chain Network",
+          value: record.fees.protocolFee,
+        },
+        {
+          title: "Imbalance Fee",
+          description: "This fee is acted as an incentive to balance the vault.",
+          value: record.fees.imbalanceFee,
+        }
+      ]
+      return detail.filter(v => !v.isHidden)
+    }
+    if (!this.isCrossChain && this.record) {
       return [{
         title: "Liquidity Provider Fee",
         description: "This fee is paid to the AMM Liquidity Provider.",
         value: this.record.tradeFee
       }]
-    } else {
-      return []
     }
+    return []
   }
   private getPriceInfo() {
     const rate = this.getRate();
@@ -1293,7 +1665,7 @@ export default class ScomSwap extends Module {
       {
         title: "Price Impact",
         value: this.isValidToken ? priceImpact : '-',
-        isHidden: false,
+        isHidden: this.isCrossChain,
       },
       {
         title: this.isFrom ? "Maximum Sold" : "Minimum Received",
@@ -1308,7 +1680,7 @@ export default class ScomSwap extends Module {
       {
         title: "Estimated Time",
         value: this.isValidToken && this.record ? '30 seconds' : '-',
-        isHidden: true,
+        isHidden: !this.isCrossChain
       }
     ];
     return info.filter((f: any) => !f.isHidden);
@@ -1327,10 +1699,15 @@ export default class ScomSwap extends Module {
       return false;
     }
   };
-  private getBalance(token?: ITokenObject) {
+  private getBalance(token?: ITokenObject, isCrossChain?: boolean) {
     if (token && this.allTokenBalancesMap) {
       const address = token.address || '';
-      let balance = address ? this.allTokenBalancesMap[address.toLowerCase()] ?? 0 : this.allTokenBalancesMap[token.symbol] || 0;
+      let balance: number = 0;
+      if (isCrossChain) {
+        balance = Number(token.isNative ? this.targetChainTokenBalances[token.symbol] : this.targetChainTokenBalances[address.toLowerCase()]) || 0;
+      } else {
+        balance = address ? this.allTokenBalancesMap[address.toLowerCase()] ?? 0 : this.allTokenBalancesMap[token.symbol] || 0;
+      }
       return balance
     }
     return 0;
@@ -1338,6 +1715,7 @@ export default class ScomSwap extends Module {
   private async updateBalance() {
     const rpcWallet = this.state.getRpcWallet();
     if (rpcWallet.address) {
+      if (this.isCrossChain) await this.updateTargetChainBalances();
       if (this.hasData) await tokenStore.updateAllTokenBalances(rpcWallet);
       this.allTokenBalancesMap = tokenStore.tokenBalances;
     }
@@ -1345,15 +1723,23 @@ export default class ScomSwap extends Module {
       this.allTokenBalancesMap = {};
     }
     if (this.fromToken) {
-      const balance = this.getBalance(this.fromToken);
+      const balance = this.getBalance(this.fromToken, this.isCrossChain);
       this.payBalance.caption = `Balance: ${formatNumber(balance, 4)} ${this.fromToken.symbol}`;
     }
     if (this.toToken) {
-      const balance = this.getBalance(this.toToken);
+      const balance = this.getBalance(this.toToken, this.isCrossChain);
       this.receiveBalance.caption = `Balance: ${formatNumber(balance, 4)} ${this.toToken.symbol}`;
     }
     const enabled = !this.isMaxDisabled();
     this.maxButton.enabled = enabled;
+  }
+
+  async updateTargetChainBalances() {
+    const targetChainId = this.desChain?.chainId || this.targetChainId;
+    if (targetChainId) {
+      const tokenBalanceObj = await getTargetChainTokenInfoObj(targetChainId);
+      this.targetChainTokenBalances = isClientWalletConnected() ? tokenBalanceObj.balances : [];
+    }
   }
 
   private updateSwapButtonCaption() {
@@ -1363,7 +1749,7 @@ export default class ScomSwap extends Module {
   }
 
   private determineSwapButtonCaption() {
-    const isApproveButtonShown = this.isApproveButtonShown;
+    const isApproveButtonShown = this.isCrossChain ? this.crossChainApprovalStatus !== ApprovalStatus.NONE : this.isApproveButtonShown;
     if (!isClientWalletConnected()) {
       return "Connect Wallet";
     }
@@ -1371,7 +1757,7 @@ export default class ScomSwap extends Module {
       return "Switch Network";
     }
     if (isApproveButtonShown) {
-      const status = this.approveButtonStatus;
+      const status = this.isCrossChain ? this.crossChainApprovalStatus : this.approveButtonStatus;
       switch (status) {
         case ApprovalStatus.APPROVING:
           return "Approving";
@@ -1381,10 +1767,13 @@ export default class ScomSwap extends Module {
       return '';
     } else {
       if (this.isSwapping) {
-        return "Swapping";
+        return this.isCrossChain ? "Creating Order" : "Swapping";
       }
       if (this.isInsufficientBalance) {
         return `Insufficient ${this.fromToken?.symbol} balance`;
+      }
+      if (this.isCrossChain) {
+        return "Create Order";
       }
       if (this.isPriceImpactTooHigh) {
         return "Turn on Expert Mode"
@@ -1419,7 +1808,7 @@ export default class ScomSwap extends Module {
       this.approveButtonStatusMap = {
         ...mapStatus
       };
-    } 
+    }
     else {
       let mapStatus = this.swapButtonStatusMap;
       mapStatus[key] = status;
@@ -1435,20 +1824,26 @@ export default class ScomSwap extends Module {
       this.swapBtn.rightIcon.visible = true;
   }
   private onSwapConfirmed = async (data: any) => {
-    const { key } = data;
+    const { key, isCrossChain } = data;
     this.setMapStatus('swap', key, ApprovalStatus.TO_BE_APPROVED);
     this.updateSwapButtonCaption();
     if (this.swapBtn.rightIcon.visible)
       this.swapBtn.rightIcon.visible = false;
     await this.handleAddRoute();
+    if (isCrossChain) {
+      this.showViewOrderModal();
+    }
   }
   private isButtonLoading() {
-    if (this.isApproveButtonShown) {
+    if (this.isApproveButtonShown || (this.isCrossChain && this.crossChainApprovalStatus === ApprovalStatus.APPROVING)) {
       return this.isApprovingRouter;
     }
     return this.isSwapping;
   }
   private isSwapButtonDisabled() {
+    if (isClientWalletConnected() && this.state.isRpcWalletConnected() && !this.record) {
+      return true;
+    }
     const warningMessageText = this.getWarningMessageText();
     return (this.state.isRpcWalletConnected() && (warningMessageText != '' && !this.isPriceImpactTooHigh));
   }
@@ -1471,7 +1866,7 @@ export default class ScomSwap extends Module {
     }
     if (!this.record || this.isSwapButtonDisabled()) return;
 
-    const isApproveButtonShown = this.isApproveButtonShown;
+    const isApproveButtonShown = this.isCrossChain ? this.crossChainApprovalStatus !== ApprovalStatus.NONE : this.isApproveButtonShown;
     if (isApproveButtonShown) {
       this.onApproveRouterMax();
       return;
@@ -1486,6 +1881,24 @@ export default class ScomSwap extends Module {
     try {
       this.swapModal.visible = false;
       this.showResultMessage('warning', `Swapping ${formatNumber(this.totalAmount(), 4)} ${this.fromToken?.symbol} to ${formatNumber(this.toInputValue, 4)} ${this.toToken?.symbol}`);
+      if (this.isCrossChain) {
+        if (this.toToken && this.fromToken && this.desChain) {
+          this.record.minReceivedMaxSold = this.getMinReceivedMaxSold()
+          const { error } = await createBridgeVaultOrder(this.state, {
+            vaultAddress: this.record.vaultAddress,
+            targetChainId: this.desChain.chainId,
+            tokenIn: this.fromToken,
+            tokenOut: this.toToken,
+            amountIn: this.record.fromAmount,
+            minAmountOut: this.record.minReceivedMaxSold,
+            sourceRouteInfo: this.record.sourceRouteObj ? { amountOut: this.record.sourceRouteObj.amountOut, pairs: this.record.sourceRouteObj.pairs } : undefined
+          })
+          if (error) {
+            this.showResultMessage('error', error as any);
+          }
+        }
+        return;
+      }
       const route = this.record.bestRoute ? this.record.bestRoute : [this.fromToken, this.toToken];
       const swapData = {
         provider: this.record.provider,
@@ -1557,7 +1970,291 @@ export default class ScomSwap extends Module {
     this.priceInfoContainer.appendChild(this.priceInfo2);
   }
 
-  private showModalFees = () => {
+  get chainId() {
+    return this.state.getChainId();
+  }
+
+  // Cross Chain
+  private get isCrossChainSwap() {
+    return this._data.category === 'cross-chain-swap';
+  }
+
+  private get isCrossChainEnabled() {
+    let chainId = this.state.getChainId();
+
+    if (!this.supportedChainList.some((v: INetworkConfig) => v.chainId == chainId) || !this.isCrossChainSwap) {
+      this.srcChainBox?.classList.add('hidden');
+      this.desChainBox?.classList.add('hidden');
+      return false;
+    }
+    this.srcChainBox?.classList.remove('hidden');
+    if (crossChainSupportedChainIds.some(v => v.chainId === this.srcChain?.chainId)) {
+      this.desChainBox?.classList.remove('hidden');
+    } else {
+      this.desChainBox?.classList.add('hidden');
+    }
+    return true;
+  };
+
+  get isCrossChain() {
+    const srcChainId = this.srcChain?.chainId;
+    const desChainId = this.desChain?.chainId;
+    if (this.isCrossChainEnabled && crossChainSupportedChainIds.some(v => v.chainId === srcChainId) && srcChainId != desChainId) {
+      return true;
+    }
+    this.minSwapHintLabel?.classList.add('hidden');
+    return false;
+  };
+
+  get fromTokenToVaultMap() {
+    let map: { [key: string]: any } = {};
+    for (const vaultGroup of BridgeVaultGroupList) {
+      if (vaultGroup.deprecated) continue;
+      const vaults: { [key: string]: any } = vaultGroup.vaults;
+      if (!vaults[this.chainId] || Object.keys(vaults).length < 2) continue;
+      const currentChainTokenAddress = vaults[this.chainId].tokenAddress.toLowerCase();
+      map[currentChainTokenAddress] = vaults;
+    }
+    return map;
+  };
+
+  get isMetaMask() {
+    return Wallet.getClientInstance().clientSideProvider?.name === WalletPlugin.MetaMask;
+  }
+
+  getSupportedChainList = () => {
+    const list = this.networks;
+    const testnetSupportedList = list.filter(v => crossChainSupportedChainIds.some(s => s.chainId === v.chainId && s.isTestnet));
+    const mainnetSupportedList = list.filter(v => !crossChainSupportedChainIds.some(s => s.chainId === v.chainId && s.isTestnet));
+    const isMainnet = mainnetSupportedList.some((item: any) => item.chainId == this.chainId);
+    this.supportedChainList = isMainnet ? mainnetSupportedList : testnetSupportedList;
+  }
+
+  private disableSelectChain = (disabled: boolean, isDes?: boolean) => {
+    const chains = isDes ? this.desChainList : this.srcChainList;
+    const imgs = chains.querySelectorAll('i-image');
+    imgs.forEach((elm: Element) => {
+      const img = elm as Image;
+      img.enabled = !disabled;
+      if (disabled) {
+        img.classList.add('.cursor-default');
+      } else {
+        img.classList.remove('.cursor-default');
+      }
+    });
+  }
+
+  private selectSourceChain = async (obj: INetwork, img?: Image) => {
+    if ((this.srcChain && this.srcChain.chainId != obj.chainId) || !this.srcChain) {
+      const rpcWallet = this.state.getRpcWallet();
+      await rpcWallet.switchNetwork(obj.chainId);
+      if (!crossChainSupportedChainIds.some(v => v.chainId === obj.chainId)) {
+        this.selectDestinationChain(obj, img);
+      }
+      this.srcChain = obj;
+      this.srcChainLabel.caption = this.srcChain.chainName;
+      const selected = this.srcChainList.querySelector('.icon-selected');
+      if (selected) {
+        selected.classList.remove('icon-selected');
+      }
+      if (img) {
+        img.classList.add('icon-selected');
+      } else {
+        this.srcChainList.firstElementChild?.classList.add('icon-selected');
+      }
+    }
+  };
+
+  private selectDestinationChain = async (obj: INetwork, img?: Image) => {
+    if (!this.isCrossChainEnabled) return;
+    this.disableSelectChain(true, true);
+    const selected = this.desChainList.querySelector('.icon-selected');
+    if (selected) {
+      selected.classList.remove('icon-selected');
+    }
+    const oldDestination = this.desChain;
+    try {
+      this.desChain = obj;
+      this.targetChainId = this.desChain.chainId;
+      await this.updateTargetChainBalances();
+      if (img) {
+        img.classList.add('icon-selected');
+      } else {
+        const currentNetwork = getNetworkInfo(this.supportedChainList.find((f: INetwork) => f.chainId == obj.chainId)?.chainId);
+        const img = this.desChainList.querySelector(`[data-tooltip="${currentNetwork?.chainName}"]`);
+        if (img) {
+          img.classList.add('icon-selected');
+        }
+      }
+    } catch (err) {
+      console.log('err', err)
+      if (oldDestination) {
+        this.desChain = oldDestination;
+        if (selected) {
+          selected.classList.add('icon-selected');
+        }
+      } else {
+        this.desChain = getNetworkInfo(this.supportedChainList[0]?.chainId);
+        this.desChainList.firstElementChild?.classList.add('icon-selected');
+      }
+    }
+    if (this.desChain) {
+      this.targetChainId = this.desChain.chainId;
+      this.desChainLabel.caption = this.desChain.chainName;
+    }
+    this.setTargetTokenList();
+    this.disableSelectChain(false, true);
+  };
+
+  private setTargetTokenList = (isDisabled?: boolean) => {
+    if (crossChainSupportedChainIds.some(v => v.chainId === this.srcChain?.chainId) && !isDisabled) {
+      const targetChainId = this.desChain?.chainId || this.chainId;
+      if (this.secondTokenInput.chainId !== targetChainId) {
+        this.secondTokenInput.chainId = targetChainId;
+      }
+      this.secondTokenInput.tokenBalancesMapProp = this.targetChainTokenBalances;
+      this.secondTokenInput.tokenDataListProp = getSupportedTokens(this._data.tokens || [], targetChainId);
+    } else {
+      const srcChainId = this.srcChain?.chainId || this.chainId;
+      if (this.secondTokenInput.chainId !== srcChainId) {
+        this.secondTokenInput.chainId = srcChainId;
+      }
+      this.secondTokenInput.tokenDataListProp = getSupportedTokens(this._data.tokens || [], srcChainId);
+    }
+  }
+
+  private onSourceChainChanged = () => {
+    const selected = this.srcChainList.querySelector('.icon-selected');
+    if (selected) {
+      selected.classList.remove('icon-selected');
+    }
+    this.getSupportedChainList();
+    // if (!this.chainId) this.chainId = this.supportedChainList[0].chainId;
+    const currentNetwork = getNetworkInfo(this.supportedChainList.find((f: INetwork) => f.chainId == this.chainId)?.chainId);
+    this.srcChain = currentNetwork;
+    this.srcChainLabel.caption = this.srcChain?.chainName || '-';
+    const img = this.srcChainList.querySelector(`[network-name="${currentNetwork?.chainName}"]`);
+    if (img) {
+      img.classList.add('icon-selected');
+    }
+  }
+
+  private onSelectSourceChain = async (obj: INetwork, img?: Image) => {
+    if (this.isMetaMask || !isClientWalletConnected()) {
+      await this.selectSourceChain(obj, img);
+      this.initializeWidgetConfig();
+    }
+  }
+
+  private onSelectDestinationChain = async (obj: INetwork, img?: Image) => {
+    if (obj.chainId === this.desChain?.chainId) return;
+    await this.selectDestinationChain(obj, img);
+    this.initializeWidgetConfig();
+  }
+
+  private setDefaultChain = async () => {
+    if (this.supportedChainList && this.supportedChainList.length) {
+      let obj = this.supportedChainList.find((f: INetwork) => f.chainId == this.chainId);
+      if (!obj)
+        obj = this.supportedChainList[0];
+      if (!this.srcChain && obj) {
+        await this.selectSourceChain(getNetworkInfo(obj.chainId));
+      }
+      this.onSourceChainChanged();
+      const targetChain = this.supportedChainList.find((f: INetwork) => f.chainId == this.targetChainId);
+      const isSupported = crossChainSupportedChainIds.some(v => v.chainId === targetChain?.chainId);
+      if (!this.desChain && isSupported) {
+        await this.selectDestinationChain(getNetworkInfo(targetChain.chainId));
+      } else if (!isSupported && obj) {
+        await this.selectDestinationChain(getNetworkInfo(obj.chainId));
+      } else {
+        if (this.isCrossChain) await this.updateTargetChainBalances();
+        if (this.toToken) {
+          const balance = this.getBalance(this.toToken, this.isCrossChain);
+          this.receiveBalance.caption = `Balance: ${formatNumber(balance, 4)} ${this.toToken.symbol}`;
+        }
+        this.setTargetTokenList();
+      }
+      this.desChainLabel.caption = this.desChain?.chainName || '-';
+    } else {
+      this.setTargetTokenList(true);
+    }
+  };
+
+  private initChainIcon = (network: INetwork, isDes?: boolean) => {
+    const img = new Image();
+    img.url = network.image;
+    img.tooltip.content = network.chainName;
+    img.classList.add('chain-icon');
+    img.setAttribute('data-tooltip', network.chainName); // for query
+    if (isDes) {
+      img.onClick = () => this.onSelectDestinationChain(network, img);
+      this.desChainList.appendChild(img);
+    } else {
+      if (!this.isMetaMask) {
+        img.tooltip.content = `Swap supports this network ${network.chainName} (${network.chainId}), please switch network in the connected wallet.`;
+        img.classList.add('icon-disabled');
+      }
+      img.setAttribute('network-name', network.chainName);
+      img.setAttribute('chain-id', `${network.chainId}`);
+      img.onClick = () => this.onSelectSourceChain(network, img);
+      this.srcChainList.appendChild(img);
+    }
+  };
+
+  private updateSrcChainIconList = () => {
+    const listElm = this.srcChainList.querySelectorAll('i-image');
+    for (const elm of listElm) {
+      const networkName = elm.getAttribute('network-name');
+      const chainId = elm.getAttribute('chain-id');
+      const tooltip = this.isMetaMask ? networkName : `Swap supports this network ${networkName} (${chainId}), please switch network in the connected wallet.`
+      if (tooltip) {
+        (elm as Image).tooltip.content = tooltip;
+      }
+      if (this.isMetaMask) {
+        elm.classList.remove('icon-disabled');
+      } else {
+        elm.classList.add('icon-disabled');
+      }
+    }
+  };
+
+  private onRenderChainList = async () => {
+    this.oldSupportedChainList = this.supportedChainList.map(v => getNetworkInfo(v.chainId));
+    this.getSupportedChainList();
+    if (this.oldSupportedChainList[0]?.chainId == this.supportedChainList[0]?.chainId) {
+      this.updateSrcChainIconList();
+      await this.setDefaultChain();
+      return;
+    };
+    this.srcChainList.innerHTML = '';
+    this.desChainList.innerHTML = '';
+    this.srcChain = undefined;
+    this.desChain = undefined;
+    this.supportedChainList.forEach((v: INetworkConfig) => {
+      const network = getNetworkInfo(v.chainId);
+      this.initChainIcon(network);
+      if (crossChainSupportedChainIds.some(v => v.chainId === network.chainId)) {
+        this.initChainIcon(network, true);
+      }
+    });
+    await this.setDefaultChain();
+  };
+
+  showViewOrderModal = () => {
+    this.modalViewOrder.visible = true;
+  }
+
+  closeViewOrderModal = () => {
+    this.modalViewOrder.visible = false;
+  }
+
+  onViewOrder = () => {
+    this.modalViewOrder.visible = false;
+    window.open('https://www.openswap.xyz/#/cross-chain-bridge-record');
+  }
+
+  showModalFees = () => {
     const fees = this.getFeeDetails();
     this.feesInfo.clearInnerHTML();
     fees.forEach((fee) => {
@@ -1593,7 +2290,7 @@ export default class ScomSwap extends Module {
     this.modalFees.visible = true;
   }
 
-  private closeModalFees = () => {
+  closeModalFees = () => {
     this.modalFees.visible = false;
   }
 
@@ -1726,7 +2423,14 @@ export default class ScomSwap extends Module {
               <i-panel class="content-swap">
                 <i-hstack id="wrapperSwap" gap={10}>
                   <i-vstack gap={5} minWidth={230} width="calc(100% - 25px)">
-                    <i-panel class="token-box">
+                    <i-vstack id="srcChainBox" width="100%" margin={{ top: 8, bottom: 8 }}>
+                      <i-hstack gap={8} horizontalAlignment="space-between">
+                        <i-label opacity={0.8} caption="Source Chain" minWidth="7rem" />
+                        <i-label id="srcChainLabel" class="chain-text" margin={{ left: 'auto' }} caption="-" />
+                      </i-hstack>
+                      <i-hstack id="srcChainList" wrap="wrap" verticalAlignment="center" maxWidth="100%" />
+                    </i-vstack>
+                    <i-panel class="token-box" minHeight={120} margin={{ top: 'auto' }}>
                       <i-vstack class="input--token-container" gap={8}>
                         <i-vstack class="balance-info" width="100%" gap={8}>
                           <i-vstack width="100%">
@@ -1764,11 +2468,18 @@ export default class ScomSwap extends Module {
                       <i-label id="lbYouPayValue" caption="0" font={{ size: '1rem' }}></i-label>
                     </i-hstack>
                   </i-vstack>
-                  <i-panel class="toggle-reverse">
+                  <i-hstack class="toggle-reverse" alignItems="end">
                     <i-icon id="toggleReverseImage" position="relative" width={32} height={32} class="icon-swap rounded-icon custom-ic--swap" name="arrows-alt-v" onClick={this.onRevertSwap.bind(this)} />
-                  </i-panel>
+                  </i-hstack>
                   <i-vstack gap={5} minWidth={230} width="calc(100% - 25px)">
-                    <i-panel class="token-box" height="100%">
+                    <i-vstack id="desChainBox" width="100%" margin={{ top: 8, bottom: 8 }}>
+                      <i-hstack gap={8} horizontalAlignment="space-between">
+                        <i-label opacity={0.8} caption="Destination Chain" minWidth="7rem"/>
+                        <i-label id="desChainLabel" class="chain-text" margin={{ left: 'auto' }} caption="-" />
+                      </i-hstack>
+                      <i-hstack id="desChainList" wrap="wrap" verticalAlignment="center" maxWidth="100%" />
+                    </i-vstack>
+                    <i-panel class="token-box" height="100%" minHeight={120} margin={{ top: 'auto' }}>
                       <i-vstack class="input--token-container" height="100%" gap={8}>
                         <i-vstack class="balance-info" width="100%" gap={8}>
                           <i-vstack width="100%">
@@ -1806,6 +2517,10 @@ export default class ScomSwap extends Module {
                   </i-vstack>
                 </i-hstack>
               </i-panel>
+              <i-panel id="minSwapHintLabel" class="hints">
+                <i-icon name="star" fill={Theme.colors.primary.main} width={13} height={13} />
+                <i-label caption="No crosschain routes are found. You may try updating the input amount or selecting another token." font={{ color: Theme.colors.primary.main }} />
+              </i-panel>
               <i-panel id="pnlPriceInfo" />
               <i-vstack class="swap-btn-container" horizontalAlignment="center" width="100%">
                 <i-button
@@ -1821,6 +2536,11 @@ export default class ScomSwap extends Module {
             </i-panel>
             <i-modal id="swapModal" class="custom-modal" title="Confirm Swap" closeIcon={{ name: 'times' }}>
               <i-hstack verticalAlignment='center' horizontalAlignment='start'>
+                <i-panel id="srcChainFirstPanel" class="row-chain">
+                  <i-image id="srcChainTokenImage" width="30px" height="30px" url="#" />
+                  <i-label id="srcChainTokenLabel" class="token-name" caption="" />
+                  <i-icon name="minus" class="custom-icon--fill" width={28} height={10} />
+                </i-panel>
                 <i-panel class="row-chain">
                   <i-image id="fromTokenImage" width="30px" height="30px" url="#" />
                   <i-label id="fromTokenLabel" class="token-name" caption=""></i-label>
@@ -1828,13 +2548,58 @@ export default class ScomSwap extends Module {
                 <i-label id="fromTokenValue" class="token-value" caption=" - "></i-label>
               </i-hstack>
               <i-icon name="arrow-down" class="arrow-down custom-icon--fill" width={28} height={28} />
+              <i-panel id="srcChainSecondPanel">
+                <i-hstack verticalAlignment='center' horizontalAlignment='start'>
+                  <i-panel class="row-chain">
+                    <i-image id="srcChainVaultImage" width="30px" height="30px" url="#" />
+                    <i-label id="srcChainVaultLabel" class="token-name" caption="" />
+                    <i-icon name="minus" class="custom-icon--fill" width={28} height={10} />
+                  </i-panel>
+                  <i-panel class="row-chain">
+                    <i-image id="srcVaultTokenImage" fallbackUrl={tokenAssets.fallbackUrl} width="30px" height="30px" url="#" />
+                    <i-label id="srcVaultTokenLabel" class="token-name" caption="" />
+                  </i-panel>
+                  <i-label id="srcVaultTokenValue" class="token-value" caption="-" />
+                </i-hstack>
+                <i-icon name="arrow-down" class="arrow-down custom-icon--fill" width={28} height={28} />
+              </i-panel>
+              <i-panel id="targetChainSecondPanel">
+                <i-hstack verticalAlignment='center' horizontalAlignment='start'>
+                  <i-panel class="row-chain">
+                    <i-image id="targetChainVaultImage" width="30px" height="30px" url="#" />
+                    <i-label id="targetChainVaultLabel" class="token-name" caption="" />
+                    <i-icon name="minus" class="custom-icon--fill" width={28} height={10} />
+                  </i-panel>
+                  <i-panel class="row-chain">
+                    <i-image id="targetVaultTokenImage" fallbackUrl={tokenAssets.fallbackUrl} width="30px" height="30px" url="#" />
+                    <i-label id="targetVaultTokenLabel" class="token-name" caption="" />
+                  </i-panel>
+                  <i-label id="targetVaultTokenValue" class="token-value" caption="-" />
+                </i-hstack>
+                <i-vstack class="text-right">
+                  <i-label id="crossChainSoftCapLabel1" class="text--grey ml-auto"></i-label>
+                  <i-label id="targetVaultAssetBalanceLabel1" class="text--grey ml-auto" caption="Vault Asset Balance: 0"></i-label>
+                  <i-label id="targetVaultBondBalanceLabel1" class="text--grey ml-auto" caption="Vault Bond Balance: 0"></i-label>
+                </i-vstack>
+                <i-icon name="arrow-down" class="arrow-down custom-icon--fill" width={28} height={28} />
+              </i-panel>
               <i-hstack class="mb-1" verticalAlignment='center' horizontalAlignment='start'>
+                <i-panel id="targetChainFirstPanel" class="row-chain">
+                  <i-image id="targetChainTokenImage" fallbackUrl={tokenAssets.fallbackUrl} width="30px" height="30px" url="#" />
+                  <i-label id="targetChainTokenLabel" class="token-name" caption="" />
+                  <i-icon name="minus" class="custom-icon--fill" width={28} height={10} />
+                </i-panel>
                 <i-panel class="row-chain">
                   <i-image id="toTokenImage" width="30px" height="30px" url="#" />
                   <i-label id="toTokenLabel" class="token-name" caption=""></i-label>
                 </i-panel>
                 <i-label id="toTokenValue" class="token-value text-primary bold" caption=" - "></i-label>
               </i-hstack>
+              <i-vstack id="crossChainVaultInfoVstack" class="text-right">
+                <i-label id="crossChainSoftCapLabel2" class="text--grey ml-auto"></i-label>
+                <i-label id="targetVaultAssetBalanceLabel2" class="text--grey ml-auto" caption="Vault Asset Balance: 0"></i-label>
+                <i-label id="targetVaultBondBalanceLabel2" class="text--grey ml-auto" caption="Vault Bond Balance: 0"></i-label>
+              </i-vstack>
               <i-panel class="mb-1">
                 <i-label id="lbEstimate"></i-label>
               </i-panel>
@@ -1862,8 +2627,36 @@ export default class ScomSwap extends Module {
                   <i-hstack verticalAlignment="center" horizontalAlignment="center" margin={{ top: 16, bottom: 8 }}>
                     <i-button
                       caption="Close"
-                      class="btn-os btn-submit"
+                      class="btn-os"
+                      font={{ color: Theme.colors.primary.contrastText }}
                       onClick={() => this.closeModalFees()}
+                    />
+                  </i-hstack>
+                </i-panel>
+              </i-panel>
+            </i-modal>
+
+            <i-modal
+              id="modalViewOrder"
+              class="bg-modal custom-modal custom-md--view"
+              title="Cross Chain"
+              closeIcon={{ name: 'times' }}
+            >
+              <i-panel class="i-modal_content">
+                <i-panel class="mt-1">
+                  <i-hstack verticalAlignment='center' horizontalAlignment='center' class="mb-1">
+                    <i-image width={50} height={50} url={assets.fullPath('img/success-icon.svg')} />
+                  </i-hstack>
+                  <i-hstack verticalAlignment='center' class="flex-col">
+                    <i-label caption="The order was created successfully!" />
+                    <i-label caption="Do you want to view the record?" />
+                  </i-hstack>
+                  <i-hstack verticalAlignment='center' horizontalAlignment='center' class="mt-1">
+                    <i-button
+                      caption="View Order"
+                      class="btn-os"
+                      font={{ color: Theme.colors.primary.contrastText }}
+                      onClick={() => this.onViewOrder()}
                     />
                   </i-hstack>
                 </i-panel>
@@ -1883,7 +2676,8 @@ export default class ScomSwap extends Module {
                     caption="Close"
                     width={150}
                     padding={{ top: 4, bottom: 4 }}
-                    class="btn-os btn-submit text-center"
+                    class="btn-os"
+                    font={{ color: Theme.colors.primary.contrastText }}
                     onClick={() => this.closeNetworkErrModal()}
                   />
                 </i-hstack>

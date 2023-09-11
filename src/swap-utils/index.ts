@@ -14,6 +14,7 @@ import {
 } from "../global/index";
 
 import {
+  crossChainSupportedChainIds,
   getNetworkInfo,
   State
 } from "../store/index";
@@ -22,13 +23,14 @@ import {
   WETHByChainId,
   ChainNativeTokenByChainId
 } from '@scom/scom-token-list';
-interface TradeFee {
-  fee: string
-  base: string
-}
-interface TradeFeeMap {
-  [key: string]: TradeFee
-}
+import {
+  GetAvailableRouteOptionsParams,
+  getAvailableRouteOptions as getAvailableRouteOptionsForCrossChain,
+  createBridgeVaultOrder as createBridgeVaultOrderForCrossChain,
+  NewOrderParams,
+  TradeFeeMap
+} from "../crosschain-utils/index";
+
 interface AvailableRoute {
   pair: string,
   market: string,
@@ -126,7 +128,7 @@ async function getBestAmountInRouteFromAPI(state: State, tokenIn: ITokenObject, 
   chainId = state.getChainId();
   let wrappedTokenAddress = getWETH(chainId);
   let network = chainId ? getNetworkInfo(chainId) : null;
-  let api = network?.isTestnet || network?.isDisabled ? newRouteAPI : routeAPI;
+  let api = crossChainSupportedChainIds.some(v => v.chainId === chainId && v.isTestnet) || network?.isDisabled ? newRouteAPI : routeAPI;
   let routeObjArr = await getAPI(api, {
     chainId,
     tokenIn: tokenIn.address ? tokenIn.address : wrappedTokenAddress,
@@ -143,7 +145,7 @@ async function getBestAmountOutRouteFromAPI(state: State, tokenIn: ITokenObject,
   chainId = state.getChainId();
   let wrappedTokenAddress = getWETH(chainId);
   let network = chainId ? getNetworkInfo(chainId) : null;
-  let api = network?.isTestnet || network?.isDisabled ? newRouteAPI : routeAPI;
+  let api = crossChainSupportedChainIds.some(v => v.chainId === chainId && v.isTestnet) || network?.isDisabled ? newRouteAPI : routeAPI;
   let routeObjArr = await getAPI(api, {
     chainId,
     tokenIn: tokenIn.address ? tokenIn.address : wrappedTokenAddress,
@@ -519,6 +521,7 @@ async function getExtendedRouteObjData(bestRouteObj: any, tradeFeeMap: TradeFeeM
 
   let fee = new BigNumber(1).minus(bestRouteObj.market.map((market: number) => {
     let tradeFeeObj = tradeFeeMap[market]
+    if (!tradeFeeObj) return new BigNumber(0);
     let tradeFee = new BigNumber(tradeFeeObj.fee).div(tradeFeeObj.base);
     return new BigNumber(1).minus(tradeFee)
   }).reduce((a: any, b: any) => a.times(b)));
@@ -900,6 +903,15 @@ const getCommissionRate = async (state: State, campaignId: number) => {
   return Utils.fromDecimals(commissionRate, 6).toFixed();
 }
 
+const getCrossChainRouteOptions = async (state: State, params: GetAvailableRouteOptionsParams) => {
+  return await getAvailableRouteOptionsForCrossChain(state, params, getTradeFeeMap, getExtendedRouteObjData);
+}
+
+const createBridgeVaultOrder: (state: State, newOrderParams: NewOrderParams) => Promise<{
+  receipt: TransactionReceipt | null;
+  error: Record<string, string> | null;
+}> = async (state: State, newOrderParams: NewOrderParams) => createBridgeVaultOrderForCrossChain(state, { ...newOrderParams });
+
 export {
   getExtendedRouteObjData,
   getTradeFeeMap,
@@ -911,5 +923,7 @@ export {
   getRouterAddress,
   setApprovalModalSpenderAddress,
   getProviderProxySelectors,
-  getCommissionRate
+  getCommissionRate,
+  getCrossChainRouteOptions,
+  createBridgeVaultOrder
 }

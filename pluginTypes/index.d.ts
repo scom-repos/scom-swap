@@ -20,7 +20,7 @@ declare module "@scom/scom-swap/global/utils/helper.ts" {
 declare module "@scom/scom-swap/global/utils/swapInterface.ts" {
     import { IWalletPlugin } from "@scom/scom-wallet-modal";
     import { ITokenObject } from '@scom/scom-token-list';
-    export type Category = 'fixed-pair' | 'aggregator';
+    export type Category = 'fixed-pair' | 'fixed-protocal' | 'aggregator' | 'cross-chain-swap';
     export interface ISwapConfig {
         category: Category;
         providers: IProvider[];
@@ -141,12 +141,287 @@ declare module "@scom/scom-swap/store/utils.ts" {
     export const getChainNativeToken: (chainId: number) => ITokenObject;
     export function getClientWallet(): import("@ijstech/eth-wallet").IClientWallet;
 }
+/// <amd-module name="@scom/scom-swap/store/cross-chain.ts" />
+declare module "@scom/scom-swap/store/cross-chain.ts" {
+    const baseRoute = "https://route.openswap.xyz";
+    const crossChainNativeTokenList: {
+        [chainId: number]: {
+            address: string;
+            decimals: number;
+            symbol: string;
+            name: string;
+            isNative: boolean;
+            wethAddress: string;
+        };
+    };
+    enum VaultType {
+        Project = "Project",
+        Exchange = "Exchange"
+    }
+    interface BridgeVaultConstant {
+        tokenAddress: string;
+        vaultRegistryAddress: string;
+        vaultAddress: string;
+        vaultDecimals?: number;
+        softCap?: number;
+        fixedStakingApr?: string;
+    }
+    interface BridgeVaultGroup {
+        name: string;
+        vaultType: VaultType;
+        vaults: {
+            [key: string]: BridgeVaultConstant;
+        };
+        deprecated?: boolean;
+    }
+    const BridgeVaultGroupList: BridgeVaultGroup[];
+    const CrossChainAddressMap: {
+        [chainId: number]: {
+            wrapperAddress: string;
+        };
+    };
+    const MockOracleMap: {
+        [chainId: number]: {
+            [token: string]: string;
+        };
+    };
+    const crossChainSupportedChainIds: ({
+        chainId: number;
+        isTestnet?: undefined;
+    } | {
+        chainId: number;
+        isTestnet: boolean;
+    })[];
+    interface ProviderConfig {
+        key: string;
+        dexId?: number;
+        supportedChains?: number[];
+    }
+    const ProviderConfigMap: {
+        [key: string]: ProviderConfig;
+    };
+    const getBridgeVaultVersion: (chainId: number) => string;
+    const bridgeVaultConstantMap: {
+        [assetSymbol: string]: {
+            [chainId: string]: BridgeVaultConstant;
+        };
+    };
+    export { baseRoute, BridgeVaultGroupList, CrossChainAddressMap, crossChainNativeTokenList, crossChainSupportedChainIds, ProviderConfig, ProviderConfigMap, MockOracleMap, getBridgeVaultVersion, bridgeVaultConstantMap };
+}
 /// <amd-module name="@scom/scom-swap/store/index.ts" />
 declare module "@scom/scom-swap/store/index.ts" {
     import { ITokenObject } from '@scom/scom-token-list';
     export const getWETH: (chainId: number) => ITokenObject;
     export const getSupportedTokens: (tokens: ITokenObject[], chainId: number) => ITokenObject[];
     export * from "@scom/scom-swap/store/utils.ts";
+    export * from "@scom/scom-swap/store/cross-chain.ts";
+}
+/// <amd-module name="@scom/scom-swap/crosschain-utils/crosschain-utils.types.ts" />
+declare module "@scom/scom-swap/crosschain-utils/crosschain-utils.types.ts" {
+    import { BigNumber } from "@ijstech/eth-wallet";
+    import { ITokenObject } from "@scom/scom-token-list";
+    export interface IBridgeVaultBond {
+        vaultTrollRegistry: string;
+        chainId: number;
+        trollId: string;
+        shareHolder: string;
+        bond: string;
+        shares: string;
+        sharesPendingWithdrawal: string;
+        sharesApprovedWithdrawal: string;
+        version: string;
+    }
+    export interface IBridgeVault {
+        chainId: number;
+        address: string;
+        asset: string;
+        configStore: string;
+        baseFee: string;
+        protocolFee: string;
+        transactionFee: string;
+        imbalanceFee: string;
+        lpAssetBalance: string;
+        imbalance: string;
+        vaultType: string;
+        vaultGroup: string;
+        version: string;
+    }
+    export interface CreateBridgeVaultOrderParams {
+        vaultAddress: string;
+        targetChainId: number;
+        tokenIn: ITokenObject;
+        tokenOut: ITokenObject;
+        amountIn: string;
+        minAmountOut: string;
+        sourceRouteInfo?: {
+            amountOut: string;
+            pairs: string[];
+        };
+    }
+    export interface Order {
+        peerChain: number | BigNumber;
+        inAmount: number | BigNumber;
+        outToken: string;
+        minOutAmount: number | BigNumber;
+        to: string;
+        expire: number | BigNumber;
+    }
+    export interface SwapExactETHForTokensParams {
+        pair: string[];
+        vault: string;
+        deadline: number | BigNumber;
+        order: Order;
+    }
+    export interface SwapExactTokensForTokensParams {
+        pair: string[];
+        vault: string;
+        amountIn: number | BigNumber;
+        deadline: number | BigNumber;
+        order: Order;
+    }
+    export interface GetAvailableRouteOptionsParams {
+        fromChainId: number;
+        toChainId: number;
+        tokenIn: ITokenObject;
+        tokenOut: ITokenObject;
+        amountIn: number | BigNumber;
+    }
+    export interface IBridgeFees {
+        baseFee: BigNumber | number;
+        protocolFee: BigNumber | number;
+        transactionFee: BigNumber | number;
+        imbalanceFee: BigNumber | number;
+        sourceRouteLiquidityFee?: BigNumber | number;
+        targetRouteLiquidityFee?: BigNumber | number;
+    }
+    export interface ICrossChainRouteResult {
+        contractAddress: string;
+        vaultAddress: string;
+        fromAmount: BigNumber;
+        toAmount: BigNumber;
+        fees: IBridgeFees;
+        price: number;
+        priceSwap: number;
+        priceImpact: number;
+        sourceRouteObj?: IRoutesResult | null;
+        sourceVaultToken?: ITokenObject | null;
+        targetRouteObj: IRoutesResult;
+        targetVaultToken: ITokenObject;
+        vaultTokenToTargetChain: string;
+        vaultTokenFromSourceChain: BigNumber;
+        isApproveButtonShown?: boolean;
+        tardeFee: number;
+    }
+    export interface IRoutesResult {
+        amountOut: BigNumber;
+        bestRoutes: ITokenObject[];
+        bestSmartRoute: IBestSmartRoute[];
+        key: string;
+        market: number[];
+        pairs: string[];
+        price: number;
+        priceImpact: number;
+        provider: string;
+        queueType: number;
+        tradeFee: string;
+    }
+    export interface IBestSmartRoute {
+        caption: string;
+        fromToken: ITokenObject;
+        toToken: ITokenObject;
+        pairAddress: string;
+        provider: string;
+    }
+    export interface ICrossChainRouteFromAPI {
+        vault: string;
+        sourceRoute: IRoutesAPI;
+        targetRoute: IRoutesAPI;
+        fees: IBridgeFees;
+    }
+    export interface IRoutesAPI {
+        amountOut: string;
+        dexId: number;
+        queueType?: number;
+        isDirectRoute: boolean;
+        route: IRouteAPI[];
+        tokens: {
+            address: string;
+            decimals: number;
+            name: string;
+            symbol: string;
+        }[];
+        tradeFees: {
+            fee: string;
+            base: string;
+        }[];
+    }
+    export interface IRouteAPI {
+        address: string;
+        dexId: number;
+        reserves: {
+            reserve0: string;
+            reserve1: string;
+        };
+        boostReserves?: {
+            boostReserveIn: string;
+            boostReserveOut: string;
+        };
+        queueType?: number;
+        orderIds?: string[];
+    }
+    export interface NewOrderParams {
+        vaultAddress: string;
+        targetChainId: number;
+        tokenIn: ITokenObject;
+        tokenOut: ITokenObject;
+        amountIn: string;
+        minAmountOut: string;
+        sourceRouteInfo?: {
+            amountOut: string;
+            pairs: string[];
+        };
+    }
+    export interface TradeFee {
+        fee: string;
+        base: string;
+    }
+    export interface TradeFeeMap {
+        [market: number]: TradeFee;
+    }
+}
+/// <amd-module name="@scom/scom-swap/crosschain-utils/API.ts" />
+declare module "@scom/scom-swap/crosschain-utils/API.ts" {
+    import { State } from "@scom/scom-swap/store/index.ts";
+    import { BigNumber, TransactionReceipt } from "@ijstech/eth-wallet";
+    import { CreateBridgeVaultOrderParams, GetAvailableRouteOptionsParams, IBridgeVault, IBridgeVaultBond, ICrossChainRouteResult } from "@scom/scom-swap/crosschain-utils/crosschain-utils.types.ts";
+    import { ITokenObject } from "@scom/scom-token-list";
+    const getTokenByVaultAddress: (chainId: number, vaultAddress: string) => ITokenObject;
+    const getTargetChainTokenMap: (chainId: number) => {
+        [key: string]: ITokenObject;
+    };
+    const getTargetChainTokenInfoObj: (chainId: number) => Promise<{
+        tokenMap: {
+            [key: string]: ITokenObject;
+        };
+        balances: {};
+    }>;
+    const getBridgeVault: (chainId: number, vaultAddress: string) => Promise<IBridgeVault>;
+    const getBondsInBridgeVault: (state: State, chainId: number, vaultTrollRegistry: string, version?: string) => Promise<IBridgeVaultBond[]>;
+    const createBridgeVaultOrder: (state: State, params: CreateBridgeVaultOrderParams) => Promise<{
+        receipt: TransactionReceipt | null;
+        error: Record<string, string> | null;
+    }>;
+    const getAvailableRouteOptions: (state: State, params: GetAvailableRouteOptionsParams, getTradeFeeMap: Function, getExtendedRouteObjData: Function) => Promise<ICrossChainRouteResult[]>;
+    const getVaultAssetBalance: (chainId: number, vaultAddress: string) => Promise<BigNumber>;
+    const getOraclePriceMap: (chainId: number) => Promise<{
+        [key: string]: BigNumber;
+    }>;
+    export { getTokenByVaultAddress, getTargetChainTokenMap, getTargetChainTokenInfoObj, createBridgeVaultOrder, getAvailableRouteOptions, ICrossChainRouteResult, getBridgeVault, getBondsInBridgeVault, getVaultAssetBalance, getOraclePriceMap };
+}
+/// <amd-module name="@scom/scom-swap/crosschain-utils/index.ts" />
+declare module "@scom/scom-swap/crosschain-utils/index.ts" {
+    export { getTokenByVaultAddress, getTargetChainTokenMap, getTargetChainTokenInfoObj, getBridgeVault, getBondsInBridgeVault, createBridgeVaultOrder, getAvailableRouteOptions, ICrossChainRouteResult, getVaultAssetBalance, getOraclePriceMap } from "@scom/scom-swap/crosschain-utils/API.ts";
+    export { GetAvailableRouteOptionsParams, NewOrderParams, TradeFee, TradeFeeMap } from "@scom/scom-swap/crosschain-utils/crosschain-utils.types.ts";
 }
 /// <amd-module name="@scom/scom-swap/swap-utils/index.ts" />
 declare module "@scom/scom-swap/swap-utils/index.ts" {
@@ -154,13 +429,7 @@ declare module "@scom/scom-swap/swap-utils/index.ts" {
     import { ITokenObject } from '@scom/scom-token-list';
     import { IProviderUI } from "@scom/scom-swap/global/index.ts";
     import { State } from "@scom/scom-swap/store/index.ts";
-    interface TradeFee {
-        fee: string;
-        base: string;
-    }
-    interface TradeFeeMap {
-        [key: string]: TradeFee;
-    }
+    import { GetAvailableRouteOptionsParams, NewOrderParams, TradeFeeMap } from "@scom/scom-swap/crosschain-utils/index.ts";
     const getChainNativeToken: (chainId: number) => ITokenObject;
     function getRouterAddress(state: State, key: string): string;
     function getTradeFeeMap(state: State): TradeFeeMap;
@@ -186,7 +455,12 @@ declare module "@scom/scom-swap/swap-utils/index.ts" {
     }>;
     const setApprovalModalSpenderAddress: (state: State, market: string, contractAddress?: string) => void;
     const getCommissionRate: (state: State, campaignId: number) => Promise<string>;
-    export { getExtendedRouteObjData, getTradeFeeMap, getAllRoutesData, getPair, SwapData, executeSwap, getChainNativeToken, getRouterAddress, setApprovalModalSpenderAddress, getProviderProxySelectors, getCommissionRate };
+    const getCrossChainRouteOptions: (state: State, params: GetAvailableRouteOptionsParams) => Promise<import("@scom/scom-swap/crosschain-utils/crosschain-utils.types.ts").ICrossChainRouteResult[]>;
+    const createBridgeVaultOrder: (state: State, newOrderParams: NewOrderParams) => Promise<{
+        receipt: TransactionReceipt | null;
+        error: Record<string, string> | null;
+    }>;
+    export { getExtendedRouteObjData, getTradeFeeMap, getAllRoutesData, getPair, SwapData, executeSwap, getChainNativeToken, getRouterAddress, setApprovalModalSpenderAddress, getProviderProxySelectors, getCommissionRate, getCrossChainRouteOptions, createBridgeVaultOrder };
 }
 /// <amd-module name="@scom/scom-swap/price-info/priceInfo.css.ts" />
 declare module "@scom/scom-swap/price-info/priceInfo.css.ts" { }
@@ -564,6 +838,15 @@ declare module "@scom/scom-swap/formSchema.ts" {
         };
     };
 }
+/// <amd-module name="@scom/scom-swap/assets.ts" />
+declare module "@scom/scom-swap/assets.ts" {
+    function fullPath(path: string): string;
+    const _default_2: {
+        logo: string;
+        fullPath: typeof fullPath;
+    };
+    export default _default_2;
+}
 /// <amd-module name="@scom/scom-swap" />
 declare module "@scom/scom-swap" {
     import { Module, Container, ControlElement } from '@ijstech/components';
@@ -662,6 +945,46 @@ declare module "@scom/scom-swap" {
         private supportedNetworksElm;
         private contractAddress;
         private clientEvents;
+        private crossChainApprovalStatus;
+        private oldSupportedChainList;
+        private targetChainTokenBalances;
+        private minSwapHintLabel;
+        private srcChainBox;
+        private desChainBox;
+        private srcChainLabel;
+        private srcChainList;
+        private desChainLabel;
+        private desChainList;
+        private srcChain;
+        private desChain;
+        private targetChainId;
+        private srcChainFirstPanel;
+        private targetChainFirstPanel;
+        private srcChainTokenImage;
+        private srcChainTokenLabel;
+        private targetChainTokenImage;
+        private targetChainTokenLabel;
+        private srcChainSecondPanel;
+        private srcChainVaultImage;
+        private srcChainVaultLabel;
+        private srcVaultTokenImage;
+        private srcVaultTokenLabel;
+        private srcVaultTokenValue;
+        private targetChainSecondPanel;
+        private targetChainVaultImage;
+        private targetChainVaultLabel;
+        private targetVaultTokenImage;
+        private targetVaultTokenLabel;
+        private targetVaultTokenValue;
+        private targetVaultAssetBalanceLabel1;
+        private targetVaultBondBalanceLabel1;
+        private crossChainSoftCapLabel1;
+        private targetVaultAssetBalanceLabel2;
+        private targetVaultBondBalanceLabel2;
+        private crossChainSoftCapLabel2;
+        private crossChainVaultInfoVstack;
+        private modalViewOrder;
+        private lbReminderRejected;
         static create(options?: ScomSwapElement, parent?: Container): Promise<ScomSwap>;
         removeRpcWalletEvents(): void;
         onHide(): void;
@@ -780,6 +1103,7 @@ declare module "@scom/scom-swap" {
         private initApprovalModelAction;
         private onRevertSwap;
         private totalAmount;
+        private setupCrossChainPopup;
         private handleSwapPopup;
         private doSwap;
         private getMinReceivedMaxSold;
@@ -805,6 +1129,7 @@ declare module "@scom/scom-swap" {
         private isEstimated;
         private getBalance;
         private updateBalance;
+        updateTargetChainBalances(): Promise<void>;
         private updateSwapButtonCaption;
         private determineSwapButtonCaption;
         private getWarningMessageText;
@@ -819,8 +1144,31 @@ declare module "@scom/scom-swap" {
         private onSetMaxBalance;
         private isMaxDisabled;
         private onRenderPriceInfo;
-        private showModalFees;
-        private closeModalFees;
+        get chainId(): number;
+        private get isCrossChainSwap();
+        private get isCrossChainEnabled();
+        get isCrossChain(): boolean;
+        get fromTokenToVaultMap(): {
+            [key: string]: any;
+        };
+        get isMetaMask(): boolean;
+        getSupportedChainList: () => void;
+        private disableSelectChain;
+        private selectSourceChain;
+        private selectDestinationChain;
+        private setTargetTokenList;
+        private onSourceChainChanged;
+        private onSelectSourceChain;
+        private onSelectDestinationChain;
+        private setDefaultChain;
+        private initChainIcon;
+        private updateSrcChainIconList;
+        private onRenderChainList;
+        showViewOrderModal: () => void;
+        closeViewOrderModal: () => void;
+        onViewOrder: () => void;
+        showModalFees: () => void;
+        closeModalFees: () => void;
         private showResultMessage;
         private initExpertModal;
         private closeNetworkErrModal;

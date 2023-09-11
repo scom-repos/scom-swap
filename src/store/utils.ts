@@ -110,7 +110,7 @@ export class State {
 
   getChainId() {
     const rpcWallet = this.getRpcWallet();
-    return rpcWallet.chainId;
+    return rpcWallet?.chainId;
   }
 
   toggleExpertMode() {

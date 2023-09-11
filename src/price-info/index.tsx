@@ -63,7 +63,7 @@ export class PriceInfo extends Module {
       }
 
       const valueLabel = new Label(row, { caption: item.value });
-      valueLabel.classList.add("ml-auto");
+      valueLabel.classList.add('ml-auto', 'text-right');
       row.appendChild(valueLabel);
 
       if (item.isToggleShown) {
