@@ -1042,7 +1042,7 @@ export default class ScomSwap extends Module {
       onPaid: async (data?: any) => {
         this.onSwapConfirmed({ key: data.key, isCrossChain: this.isCrossChain });
         await this.updateBalance();
-        application.EventBus.dispatch(EventId.Paid, 'onPaid');
+        application.EventBus.dispatch(EventId.Paid, { data: data ?? null, id: this.id });
       },
       onPayingError: async (err: Error) => {
         this.showResultMessage('error', err);

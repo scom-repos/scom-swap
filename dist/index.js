@@ -4442,7 +4442,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                 onPaid: async (data) => {
                     this.onSwapConfirmed({ key: data.key, isCrossChain: this.isCrossChain });
                     await this.updateBalance();
-                    components_8.application.EventBus.dispatch("Paid" /* EventId.Paid */, 'onPaid');
+                    components_8.application.EventBus.dispatch("Paid" /* EventId.Paid */, { data: data !== null && data !== void 0 ? data : null, id: this.id });
                 },
                 onPayingError: async (err) => {
                     this.showResultMessage('error', err);
