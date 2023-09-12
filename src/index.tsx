@@ -890,8 +890,9 @@ export default class ScomSwap extends Module {
     if (providers && providers.length) {
       let fromTokenKey = this.getTokenKey(currentChainTokens[0]);
       let toTokenKey = this.getTokenKey(currentChainTokens[1]);
-      this.fromToken = tokenStore.tokenMap[fromTokenKey];
-      this.toToken = tokenStore.tokenMap[toTokenKey];
+      let tokenMap = tokenStore.getTokenMapByChainId(currentChainId);
+      this.fromToken = tokenMap[fromTokenKey];
+      this.toToken = tokenMap[toTokenKey];
       this.fromTokenSymbol = this.fromToken?.symbol;
       this.toTokenSymbol = this.toToken?.symbol;
       this.fromInputValue = new BigNumber(defaultInput);
@@ -1214,7 +1215,8 @@ export default class ScomSwap extends Module {
     if (token.isNew && this.state.isRpcWalletConnected()) {
       const rpcWallet = this.state.getRpcWallet();
       await tokenStore.updateAllTokenBalances(rpcWallet);
-      this.allTokenBalancesMap = tokenStore.tokenBalances;
+      let tokenBalances = tokenStore.getTokenBalancesByChainId(this.chainId);
+      this.allTokenBalancesMap = tokenBalances;
     }
     await this.onUpdateToken(token, isFrom);
     this.redirectToken();
@@ -1717,7 +1719,8 @@ export default class ScomSwap extends Module {
     if (rpcWallet.address) {
       if (this.isCrossChain) await this.updateTargetChainBalances();
       if (this.hasData) await tokenStore.updateAllTokenBalances(rpcWallet);
-      this.allTokenBalancesMap = tokenStore.tokenBalances;
+      let tokenBalances = tokenStore.getTokenBalancesByChainId(this.chainId);
+      this.allTokenBalancesMap = tokenBalances;
     }
     else {
       this.allTokenBalancesMap = {};

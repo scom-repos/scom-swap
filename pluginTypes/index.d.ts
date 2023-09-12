@@ -141,6 +141,18 @@ declare module "@scom/scom-swap/store/utils.ts" {
     export const getChainNativeToken: (chainId: number) => ITokenObject;
     export function getClientWallet(): import("@ijstech/eth-wallet").IClientWallet;
 }
+/// <amd-module name="@scom/scom-swap/store/providers.ts" />
+declare module "@scom/scom-swap/store/providers.ts" {
+    interface ProviderConfig {
+        key: string;
+        dexId?: number;
+        supportedChains?: number[];
+    }
+    const ProviderConfigMap: {
+        [key: string]: ProviderConfig;
+    };
+    export { ProviderConfig, ProviderConfigMap };
+}
 /// <amd-module name="@scom/scom-swap/store/cross-chain.ts" />
 declare module "@scom/scom-swap/store/cross-chain.ts" {
     const baseRoute = "https://route.openswap.xyz";
@@ -192,21 +204,13 @@ declare module "@scom/scom-swap/store/cross-chain.ts" {
         chainId: number;
         isTestnet: boolean;
     })[];
-    interface ProviderConfig {
-        key: string;
-        dexId?: number;
-        supportedChains?: number[];
-    }
-    const ProviderConfigMap: {
-        [key: string]: ProviderConfig;
-    };
     const getBridgeVaultVersion: (chainId: number) => string;
     const bridgeVaultConstantMap: {
         [assetSymbol: string]: {
             [chainId: string]: BridgeVaultConstant;
         };
     };
-    export { baseRoute, BridgeVaultGroupList, CrossChainAddressMap, crossChainNativeTokenList, crossChainSupportedChainIds, ProviderConfig, ProviderConfigMap, MockOracleMap, getBridgeVaultVersion, bridgeVaultConstantMap };
+    export { baseRoute, BridgeVaultGroupList, CrossChainAddressMap, crossChainNativeTokenList, crossChainSupportedChainIds, MockOracleMap, getBridgeVaultVersion, bridgeVaultConstantMap };
 }
 /// <amd-module name="@scom/scom-swap/store/index.ts" />
 declare module "@scom/scom-swap/store/index.ts" {
@@ -214,6 +218,7 @@ declare module "@scom/scom-swap/store/index.ts" {
     export const getWETH: (chainId: number) => ITokenObject;
     export const getSupportedTokens: (tokens: ITokenObject[], chainId: number) => ITokenObject[];
     export * from "@scom/scom-swap/store/utils.ts";
+    export * from "@scom/scom-swap/store/providers.ts";
     export * from "@scom/scom-swap/store/cross-chain.ts";
 }
 /// <amd-module name="@scom/scom-swap/crosschain-utils/crosschain-utils.types.ts" />

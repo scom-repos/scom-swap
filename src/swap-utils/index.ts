@@ -16,6 +16,7 @@ import {
 import {
   crossChainSupportedChainIds,
   getNetworkInfo,
+  ProviderConfigMap,
   State
 } from "../store/index";
 
@@ -41,7 +42,7 @@ interface AvailableRoute {
 }
 
 const routeAPI = 'https://route.openswap.xyz/trading/v1/route';
-const newRouteAPI = 'https://indexer.ijs.dev/trading/v1/route'
+// const newRouteAPI = 'https://indexer.ijs.dev/trading/v1/route'
 
 const getChainNativeToken = (chainId: number): ITokenObject => {
   return ChainNativeTokenByChainId[chainId]
@@ -124,20 +125,77 @@ function getTradeFeeMap(state: State) {
   return tradeFeeMap;
 }
 
+async function calculateAPIBestRouteObjArr(state: State, tokenIn: ITokenObject, tokenOut: ITokenObject, routeObjArr: any) {
+  let bestRouteObjArr: any[] = [];
+  let providerConfigByDexId: any = {};
+  let chainId = state.getChainId();
+  Object.values(ProviderConfigMap).filter(v => !!v.supportedChains && v.supportedChains.includes(chainId)).forEach((v, i) => {
+    if (v.dexId == undefined) return;
+    providerConfigByDexId[v.dexId] = v;
+  });
+  for (let i = 0; i < routeObjArr.length; i++) {
+    let routeObj = routeObjArr[i];
+    routeObj.tokens[0] = tokenIn;
+    routeObj.tokens[routeObj.tokens.length - 1] = tokenOut;
+    let dexId = [5, 6].includes(routeObj.dexId) ? 5 : routeObj.dexId;
+    if (!providerConfigByDexId[dexId]) continue;
+    let bestRouteObj = {
+      pairs: routeObj.route.map(v => v.address),
+      isRegistered: routeObj.route.map(v => v.isRegistered),
+      market: routeObj.route.map(v => {
+        let dexId = [5, 6].includes(v.dexId) ? 5 : v.dexId;
+        return providerConfigByDexId[dexId].key;
+      }),
+      route: routeObj.tokens,
+      customDataList: routeObj.route.map(v => {
+        return {
+          queueType: v.queueType,
+          orderIds: v.orderIds,
+          reserveA: v.reserves.reserve0,
+          reserveB: v.reserves.reserve1
+        }
+      })
+    };
+
+    let amountIn = new BigNumber(routeObj.amountIn).shiftedBy(-tokenIn.decimals);
+    let amountOut = new BigNumber(routeObj.amountOut).shiftedBy(-tokenOut.decimals);
+    let swapPrice = new BigNumber(amountIn).div(amountOut);
+    let isHybridOrQueue = providerConfigByDexId[dexId].key == 'Hybrid' || routeObj.queueType;
+    let tradeFeeMap = getTradeFeeMap(state);
+    let extendedData = await getExtendedRouteObjData(bestRouteObj, tradeFeeMap, swapPrice, isHybridOrQueue);
+    let provider = providerConfigByDexId[dexId].key;
+    let key = provider + '|' + (routeObj.isDirectRoute ? '0' : '1');
+    let extendedBestRouteObj = {
+      ...extendedData,
+      provider,
+      key,
+      queueType: routeObj.queueType,
+      amountIn,
+      amountOut
+    }
+    bestRouteObjArr.push(extendedBestRouteObj);
+  }
+  return bestRouteObjArr;
+}
+
 async function getBestAmountInRouteFromAPI(state: State, tokenIn: ITokenObject, tokenOut: ITokenObject, amountOut: string, chainId?: number) {
   chainId = state.getChainId();
   let wrappedTokenAddress = getWETH(chainId);
   let network = chainId ? getNetworkInfo(chainId) : null;
-  let api = crossChainSupportedChainIds.some(v => v.chainId === chainId && v.isTestnet) || network?.isDisabled ? newRouteAPI : routeAPI;
-  let routeObjArr = await getAPI(api, {
+  let api = crossChainSupportedChainIds.some(v => v.chainId === chainId && v.isTestnet) || network?.isDisabled ? routeAPI : routeAPI;
+  let amountOutDecimals =  Utils.toDecimals(amountOut, tokenOut.decimals).toFixed();
+  let routeObjArr: any[] = await getAPI(api, {
     chainId,
     tokenIn: tokenIn.address ? tokenIn.address : wrappedTokenAddress,
     tokenOut: tokenOut.address ? tokenOut.address : wrappedTokenAddress,
-    amountOut: new BigNumber(amountOut).shiftedBy(tokenOut.decimals).toFixed(),
+    amountOut: amountOutDecimals,
     ignoreHybrid: 1
   })
   if (!routeObjArr) return [];
-  let bestRouteObjArr: any[] = [];
+  let bestRouteObjArr: any[] = await calculateAPIBestRouteObjArr(state, tokenIn, tokenOut, routeObjArr.map(v => ({
+    ...v,
+    amountOut: amountOutDecimals
+  })));
   return bestRouteObjArr;
 }
 
@@ -145,16 +203,20 @@ async function getBestAmountOutRouteFromAPI(state: State, tokenIn: ITokenObject,
   chainId = state.getChainId();
   let wrappedTokenAddress = getWETH(chainId);
   let network = chainId ? getNetworkInfo(chainId) : null;
-  let api = crossChainSupportedChainIds.some(v => v.chainId === chainId && v.isTestnet) || network?.isDisabled ? newRouteAPI : routeAPI;
-  let routeObjArr = await getAPI(api, {
+  let api = crossChainSupportedChainIds.some(v => v.chainId === chainId && v.isTestnet) || network?.isDisabled ? routeAPI : routeAPI;
+  let amountInDecimals =  Utils.toDecimals(amountIn, tokenIn.decimals).toFixed();
+  let routeObjArr: any[] = await getAPI(api, {
     chainId,
     tokenIn: tokenIn.address ? tokenIn.address : wrappedTokenAddress,
     tokenOut: tokenOut.address ? tokenOut.address : wrappedTokenAddress,
-    amountIn: new BigNumber(amountIn).shiftedBy(tokenIn.decimals).toFixed(),
+    amountIn: amountInDecimals,
     ignoreHybrid: 1
   })
   if (!routeObjArr) return [];
-  let bestRouteObjArr = [];
+  let bestRouteObjArr: any[] = await calculateAPIBestRouteObjArr(state, tokenIn, tokenOut, routeObjArr.map(v => ({
+    ...v,
+    amountIn: amountInDecimals
+  })));
   return bestRouteObjArr;
 }
 
