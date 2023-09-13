@@ -178,8 +178,8 @@ async function calculateAPIBestRouteObjArr(state: State, tokenIn: ITokenObject, 
   return bestRouteObjArr;
 }
 
-async function getBestAmountInRouteFromAPI(state: State, tokenIn: ITokenObject, tokenOut: ITokenObject, amountOut: string, chainId?: number) {
-  chainId = state.getChainId();
+async function getBestAmountInRouteFromAPI(state: State, tokenIn: ITokenObject, tokenOut: ITokenObject, amountOut: string) {
+  let chainId = state.getChainId();
   let wrappedTokenAddress = getWETH(chainId);
   let network = chainId ? getNetworkInfo(chainId) : null;
   let api = crossChainSupportedChainIds.some(v => v.chainId === chainId && v.isTestnet) || network?.isDisabled ? routeAPI : routeAPI;
@@ -199,8 +199,8 @@ async function getBestAmountInRouteFromAPI(state: State, tokenIn: ITokenObject, 
   return bestRouteObjArr;
 }
 
-async function getBestAmountOutRouteFromAPI(state: State, tokenIn: ITokenObject, tokenOut: ITokenObject, amountIn: string, chainId?: number) {
-  chainId = state.getChainId();
+async function getBestAmountOutRouteFromAPI(state: State, tokenIn: ITokenObject, tokenOut: ITokenObject, amountIn: string) {
+  let chainId = state.getChainId();
   let wrappedTokenAddress = getWETH(chainId);
   let network = chainId ? getNetworkInfo(chainId) : null;
   let api = crossChainSupportedChainIds.some(v => v.chainId === chainId && v.isTestnet) || network?.isDisabled ? routeAPI : routeAPI;

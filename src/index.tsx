@@ -63,7 +63,6 @@ export { ISwapWidgetData };
 
 const Theme = Styles.Theme.ThemeVars;
 const priceImpactTooHighMsg = 'Price Impact Too High. If you want to bypass this check, please turn on Expert Mode';
-const defaultInput = '1';
 type StatusMapType = 'approve' | 'swap';
 
 interface ScomSwapElement extends ControlElement {
@@ -79,6 +78,8 @@ interface ScomSwapElement extends ControlElement {
   commissions?: ICommissionInfo[];
   logo?: string;
   title?: string;
+  defaultInputValue?: string;
+  defaultOutputValue?: string;
 }
 
 declare global {
@@ -871,11 +872,11 @@ export default class ScomSwap extends Module {
         this.onUpdateToken(this.toToken as ITokenObject, false);
         this.firstTokenInput.token = this.fromToken;
         this.secondTokenInput.token = this.toToken;
-        this.fromInputValue = this.fromInputValue || new BigNumber(defaultInput);
+        this.fromInputValue = this.fromInputValue || new BigNumber(this._data.defaultInputValue);
       } else {
         let firstDefaultToken = currentChainTokens[0];
         let secondDefaultToken = targetChainTokens[0];
-        const fromAmount = parseFloat(defaultInput);
+        const fromAmount = parseFloat(this._data.defaultInputValue);
         this.fromInputValue = new BigNumber(fromAmount);
         this.onUpdateToken(firstDefaultToken, true);
         this.onUpdateToken(secondDefaultToken, false);
@@ -895,7 +896,8 @@ export default class ScomSwap extends Module {
       this.toToken = tokenMap[toTokenKey];
       this.fromTokenSymbol = this.fromToken?.symbol;
       this.toTokenSymbol = this.toToken?.symbol;
-      this.fromInputValue = new BigNumber(defaultInput);
+      this.fromInputValue = new BigNumber(this._data.defaultInputValue);
+      this.toInputValue = new BigNumber(this._data.defaultOutputValue);
       this.onUpdateToken(this.fromToken, true);
       this.onUpdateToken(this.toToken, false);
       this.firstTokenInput.token = this.fromToken;
@@ -959,10 +961,11 @@ export default class ScomSwap extends Module {
         }
         this.toggleReverseImage.classList.remove('cursor-default');
       }
-      if (this.fromInputValue.isGreaterThanOrEqualTo(0)) {
+      if (this.fromInputValue.isGreaterThan(0)) {
         this.onUpdateEstimatedPosition(false, true);
         this.firstTokenInput.value = this.fixedNumber(this.fromInputValue);
-      } else if (this.toInputValue.isGreaterThanOrEqualTo(0)) {
+      } 
+      else if (this.toInputValue.isGreaterThan(0)) {
         this.onUpdateEstimatedPosition(true, true);
         this.secondTokenInput.value = this.fixedNumber(this.toInputValue);
       }
@@ -2399,7 +2402,9 @@ export default class ScomSwap extends Module {
       const showHeader = this.getAttribute('showHeader', true);
       const title = this.getAttribute('title', true);
       const logo = this.getAttribute('logo', true);
-      let data = { campaignId, category, providers, commissions, tokens, defaultChainId, networks, wallets, showHeader, title, logo };
+      const defaultInputValue = this.getAttribute('defaultInputValue', true);
+      const defaultOutputValue = this.getAttribute('defaultOutputValue', true);
+      let data = { campaignId, category, providers, commissions, tokens, defaultChainId, networks, wallets, showHeader, title, logo, defaultInputValue, defaultOutputValue };
       if (!this.isEmptyData(data)) {
         await this.setData(data);
       }

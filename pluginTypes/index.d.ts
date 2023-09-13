@@ -62,6 +62,8 @@ declare module "@scom/scom-swap/global/utils/swapInterface.ts" {
         showHeader?: boolean;
         logo?: string;
         title?: string;
+        defaultInputValue?: string;
+        defaultOutputValue?: string;
     }
 }
 /// <amd-module name="@scom/scom-swap/global/utils/index.ts" />
@@ -875,6 +877,8 @@ declare module "@scom/scom-swap" {
         commissions?: ICommissionInfo[];
         logo?: string;
         title?: string;
+        defaultInputValue?: string;
+        defaultOutputValue?: string;
     }
     global {
         namespace JSX {
@@ -1066,6 +1070,8 @@ declare module "@scom/scom-swap" {
                 showHeader?: boolean;
                 logo?: string;
                 title?: string;
+                defaultInputValue?: string;
+                defaultOutputValue?: string;
             }>;
             setData: (properties: ISwapWidgetData, linkParams?: Record<string, any>) => Promise<void>;
             getTag: any;

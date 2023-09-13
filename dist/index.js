@@ -1635,8 +1635,8 @@ define("@scom/scom-swap/swap-utils/index.ts", ["require", "exports", "@ijstech/e
         }
         return bestRouteObjArr;
     }
-    async function getBestAmountInRouteFromAPI(state, tokenIn, tokenOut, amountOut, chainId) {
-        chainId = state.getChainId();
+    async function getBestAmountInRouteFromAPI(state, tokenIn, tokenOut, amountOut) {
+        let chainId = state.getChainId();
         let wrappedTokenAddress = getWETH(chainId);
         let network = chainId ? (0, index_5.getNetworkInfo)(chainId) : null;
         let api = index_5.crossChainSupportedChainIds.some(v => v.chainId === chainId && v.isTestnet) || (network === null || network === void 0 ? void 0 : network.isDisabled) ? routeAPI : routeAPI;
@@ -1653,8 +1653,8 @@ define("@scom/scom-swap/swap-utils/index.ts", ["require", "exports", "@ijstech/e
         let bestRouteObjArr = await calculateAPIBestRouteObjArr(state, tokenIn, tokenOut, routeObjArr.map(v => (Object.assign(Object.assign({}, v), { amountOut: amountOutDecimals }))));
         return bestRouteObjArr;
     }
-    async function getBestAmountOutRouteFromAPI(state, tokenIn, tokenOut, amountIn, chainId) {
-        chainId = state.getChainId();
+    async function getBestAmountOutRouteFromAPI(state, tokenIn, tokenOut, amountIn) {
+        let chainId = state.getChainId();
         let wrappedTokenAddress = getWETH(chainId);
         let network = chainId ? (0, index_5.getNetworkInfo)(chainId) : null;
         let api = index_5.crossChainSupportedChainIds.some(v => v.chainId === chainId && v.isTestnet) || (network === null || network === void 0 ? void 0 : network.isDisabled) ? routeAPI : routeAPI;
@@ -3254,7 +3254,6 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
     Object.defineProperty(exports, "__esModule", { value: true });
     const Theme = components_8.Styles.Theme.ThemeVars;
     const priceImpactTooHighMsg = 'Price Impact Too High. If you want to bypass this check, please turn on Expert Mode';
-    const defaultInput = '1';
     let ScomSwap = class ScomSwap extends components_8.Module {
         static async create(options, parent) {
             let self = new this(parent, options);
@@ -3879,11 +3878,11 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                         }
                         this.toggleReverseImage.classList.remove('cursor-default');
                     }
-                    if (this.fromInputValue.isGreaterThanOrEqualTo(0)) {
+                    if (this.fromInputValue.isGreaterThan(0)) {
                         this.onUpdateEstimatedPosition(false, true);
                         this.firstTokenInput.value = this.fixedNumber(this.fromInputValue);
                     }
-                    else if (this.toInputValue.isGreaterThanOrEqualTo(0)) {
+                    else if (this.toInputValue.isGreaterThan(0)) {
                         this.onUpdateEstimatedPosition(true, true);
                         this.secondTokenInput.value = this.fixedNumber(this.toInputValue);
                     }
@@ -4401,12 +4400,12 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                     this.onUpdateToken(this.toToken, false);
                     this.firstTokenInput.token = this.fromToken;
                     this.secondTokenInput.token = this.toToken;
-                    this.fromInputValue = this.fromInputValue || new eth_wallet_5.BigNumber(defaultInput);
+                    this.fromInputValue = this.fromInputValue || new eth_wallet_5.BigNumber(this._data.defaultInputValue);
                 }
                 else {
                     let firstDefaultToken = currentChainTokens[0];
                     let secondDefaultToken = targetChainTokens[0];
-                    const fromAmount = parseFloat(defaultInput);
+                    const fromAmount = parseFloat(this._data.defaultInputValue);
                     this.fromInputValue = new eth_wallet_5.BigNumber(fromAmount);
                     this.onUpdateToken(firstDefaultToken, true);
                     this.onUpdateToken(secondDefaultToken, false);
@@ -4426,7 +4425,8 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                 this.toToken = tokenMap[toTokenKey];
                 this.fromTokenSymbol = (_b = this.fromToken) === null || _b === void 0 ? void 0 : _b.symbol;
                 this.toTokenSymbol = (_c = this.toToken) === null || _c === void 0 ? void 0 : _c.symbol;
-                this.fromInputValue = new eth_wallet_5.BigNumber(defaultInput);
+                this.fromInputValue = new eth_wallet_5.BigNumber(this._data.defaultInputValue);
+                this.toInputValue = new eth_wallet_5.BigNumber(this._data.defaultOutputValue);
                 this.onUpdateToken(this.fromToken, true);
                 this.onUpdateToken(this.toToken, false);
                 this.firstTokenInput.token = this.fromToken;
@@ -5462,7 +5462,9 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                 const showHeader = this.getAttribute('showHeader', true);
                 const title = this.getAttribute('title', true);
                 const logo = this.getAttribute('logo', true);
-                let data = { campaignId, category, providers, commissions, tokens, defaultChainId, networks, wallets, showHeader, title, logo };
+                const defaultInputValue = this.getAttribute('defaultInputValue', true);
+                const defaultOutputValue = this.getAttribute('defaultOutputValue', true);
+                let data = { campaignId, category, providers, commissions, tokens, defaultChainId, networks, wallets, showHeader, title, logo, defaultInputValue, defaultOutputValue };
                 if (!this.isEmptyData(data)) {
                     await this.setData(data);
                 }

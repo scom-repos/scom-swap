@@ -50,4 +50,6 @@ export interface ISwapWidgetData {
   showHeader?: boolean;
   logo?: string;
   title?: string;
+  defaultInputValue?: string;
+  defaultOutputValue?: string;
 }
