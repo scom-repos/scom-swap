@@ -1,5 +1,5 @@
 import { Module, Panel, Button, Label, VStack, Image, Container, IEventBus, application, customModule, Modal, Input, Control, customElements, ControlElement, Styles, HStack, Icon } from '@ijstech/components';
-import { BigNumber, Constants, INetwork, Wallet, IERC20ApprovalAction } from '@ijstech/eth-wallet';
+import { BigNumber, Constants, INetwork, Wallet, IERC20ApprovalAction, TransactionReceipt } from '@ijstech/eth-wallet';
 import './index.css';
 import {
   isClientWalletConnected,
@@ -1043,10 +1043,14 @@ export default class ScomSwap extends Module {
         this.showResultMessage('success', receipt);
         this.onSwapConfirming(data.key);
       },
-      onPaid: async (data?: any) => {
+      onPaid: async (data?: any, receipt?: TransactionReceipt) => {
         this.onSwapConfirmed({ key: data.key, isCrossChain: this.isCrossChain });
         await this.updateBalance();
-        application.EventBus.dispatch(EventId.Paid, { data: data ?? null, id: this.id });
+        application.EventBus.dispatch(EventId.Paid, { 
+          data: data ?? null, 
+          id: this.id,
+          receipt: receipt
+        });
       },
       onPayingError: async (err: Error) => {
         this.showResultMessage('error', err);

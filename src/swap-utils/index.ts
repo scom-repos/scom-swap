@@ -180,14 +180,14 @@ async function calculateAPIBestRouteObjArr(state: State, tokenIn: ITokenObject, 
 
 async function getBestAmountInRouteFromAPI(state: State, tokenIn: ITokenObject, tokenOut: ITokenObject, amountOut: string) {
   let chainId = state.getChainId();
-  let wrappedTokenAddress = getWETH(chainId);
+  let wrappedToken = getWETH(chainId);
   let network = chainId ? getNetworkInfo(chainId) : null;
   let api = crossChainSupportedChainIds.some(v => v.chainId === chainId && v.isTestnet) || network?.isDisabled ? routeAPI : routeAPI;
   let amountOutDecimals =  Utils.toDecimals(amountOut, tokenOut.decimals).toFixed();
   let routeObjArr: any[] = await getAPI(api, {
     chainId,
-    tokenIn: tokenIn.address ? tokenIn.address : wrappedTokenAddress,
-    tokenOut: tokenOut.address ? tokenOut.address : wrappedTokenAddress,
+    tokenIn: tokenIn.address ? tokenIn.address : wrappedToken.address,
+    tokenOut: tokenOut.address ? tokenOut.address : wrappedToken.address,
     amountOut: amountOutDecimals,
     ignoreHybrid: 1
   })
@@ -201,14 +201,14 @@ async function getBestAmountInRouteFromAPI(state: State, tokenIn: ITokenObject, 
 
 async function getBestAmountOutRouteFromAPI(state: State, tokenIn: ITokenObject, tokenOut: ITokenObject, amountIn: string) {
   let chainId = state.getChainId();
-  let wrappedTokenAddress = getWETH(chainId);
+  let wrappedToken = getWETH(chainId);
   let network = chainId ? getNetworkInfo(chainId) : null;
   let api = crossChainSupportedChainIds.some(v => v.chainId === chainId && v.isTestnet) || network?.isDisabled ? routeAPI : routeAPI;
   let amountInDecimals =  Utils.toDecimals(amountIn, tokenIn.decimals).toFixed();
   let routeObjArr: any[] = await getAPI(api, {
     chainId,
-    tokenIn: tokenIn.address ? tokenIn.address : wrappedTokenAddress,
-    tokenOut: tokenOut.address ? tokenOut.address : wrappedTokenAddress,
+    tokenIn: tokenIn.address ? tokenIn.address : wrappedToken.address,
+    tokenOut: tokenOut.address ? tokenOut.address : wrappedToken.address,
     amountIn: amountInDecimals,
     ignoreHybrid: 1
   })

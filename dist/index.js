@@ -1637,14 +1637,14 @@ define("@scom/scom-swap/swap-utils/index.ts", ["require", "exports", "@ijstech/e
     }
     async function getBestAmountInRouteFromAPI(state, tokenIn, tokenOut, amountOut) {
         let chainId = state.getChainId();
-        let wrappedTokenAddress = getWETH(chainId);
+        let wrappedToken = getWETH(chainId);
         let network = chainId ? (0, index_5.getNetworkInfo)(chainId) : null;
         let api = index_5.crossChainSupportedChainIds.some(v => v.chainId === chainId && v.isTestnet) || (network === null || network === void 0 ? void 0 : network.isDisabled) ? routeAPI : routeAPI;
         let amountOutDecimals = eth_wallet_4.Utils.toDecimals(amountOut, tokenOut.decimals).toFixed();
         let routeObjArr = await (0, index_4.getAPI)(api, {
             chainId,
-            tokenIn: tokenIn.address ? tokenIn.address : wrappedTokenAddress,
-            tokenOut: tokenOut.address ? tokenOut.address : wrappedTokenAddress,
+            tokenIn: tokenIn.address ? tokenIn.address : wrappedToken.address,
+            tokenOut: tokenOut.address ? tokenOut.address : wrappedToken.address,
             amountOut: amountOutDecimals,
             ignoreHybrid: 1
         });
@@ -1655,14 +1655,14 @@ define("@scom/scom-swap/swap-utils/index.ts", ["require", "exports", "@ijstech/e
     }
     async function getBestAmountOutRouteFromAPI(state, tokenIn, tokenOut, amountIn) {
         let chainId = state.getChainId();
-        let wrappedTokenAddress = getWETH(chainId);
+        let wrappedToken = getWETH(chainId);
         let network = chainId ? (0, index_5.getNetworkInfo)(chainId) : null;
         let api = index_5.crossChainSupportedChainIds.some(v => v.chainId === chainId && v.isTestnet) || (network === null || network === void 0 ? void 0 : network.isDisabled) ? routeAPI : routeAPI;
         let amountInDecimals = eth_wallet_4.Utils.toDecimals(amountIn, tokenIn.decimals).toFixed();
         let routeObjArr = await (0, index_4.getAPI)(api, {
             chainId,
-            tokenIn: tokenIn.address ? tokenIn.address : wrappedTokenAddress,
-            tokenOut: tokenOut.address ? tokenOut.address : wrappedTokenAddress,
+            tokenIn: tokenIn.address ? tokenIn.address : wrappedToken.address,
+            tokenOut: tokenOut.address ? tokenOut.address : wrappedToken.address,
             amountIn: amountInDecimals,
             ignoreHybrid: 1
         });
@@ -4496,10 +4496,14 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                     this.showResultMessage('success', receipt);
                     this.onSwapConfirming(data.key);
                 },
-                onPaid: async (data) => {
+                onPaid: async (data, receipt) => {
                     this.onSwapConfirmed({ key: data.key, isCrossChain: this.isCrossChain });
                     await this.updateBalance();
-                    components_8.application.EventBus.dispatch("Paid" /* EventId.Paid */, { data: data !== null && data !== void 0 ? data : null, id: this.id });
+                    components_8.application.EventBus.dispatch("Paid" /* EventId.Paid */, {
+                        data: data !== null && data !== void 0 ? data : null,
+                        id: this.id,
+                        receipt: receipt
+                    });
                 },
                 onPayingError: async (err) => {
                     this.showResultMessage('error', err);
