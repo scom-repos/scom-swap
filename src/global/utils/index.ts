@@ -1,8 +1,6 @@
 export {
   getAPI,
   formatNumber,
-  formatNumberWithSeparators,
-  limitDecimals,
   isInvalidInput
 } from './helper';
 

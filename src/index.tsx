@@ -1,4 +1,4 @@
-import { Module, Panel, Button, Label, VStack, Image, Container, IEventBus, application, customModule, Modal, Input, Control, customElements, ControlElement, Styles, HStack, Icon } from '@ijstech/components';
+import { Module, Panel, Button, Label, VStack, Image, Container, IEventBus, application, customModule, Modal, Input, Control, customElements, ControlElement, Styles, HStack, Icon, FormatUtils } from '@ijstech/components';
 import { BigNumber, Constants, INetwork, Wallet, IERC20ApprovalAction, TransactionReceipt } from '@ijstech/eth-wallet';
 import './index.css';
 import {
@@ -33,10 +33,9 @@ import {
 } from './crosschain-utils/index';
 import { ITokenObject } from '@scom/scom-token-list';
 import {
-  formatNumber,
   ApprovalStatus,
   EventId,
-  limitDecimals,
+  formatNumber,
   isInvalidInput,
   IProvider,
   ISwapWidgetData,
@@ -1186,7 +1185,7 @@ export default class ScomSwap extends Module {
       const enabled = !this.isMaxDisabled();
       this.maxButton.enabled = enabled;
       if (this.fromInputValue.gt(0)) {
-        const limit = limitDecimals(this.fromInputValue.toFixed(), token.decimals || 18);
+        const limit = FormatUtils.limitDecimals(this.fromInputValue.toFixed(), token.decimals || 18);
         if (!this.fromInputValue.eq(limit)) {
           if (this.firstTokenInput) {
             this.firstTokenInput.value = limit === '0' ? '' : limit;
@@ -1201,7 +1200,7 @@ export default class ScomSwap extends Module {
     } else {
       this.toToken = token;
       if (this.toInputValue.gt(0)) {
-        const limit = limitDecimals(this.toInputValue.toFixed(), token.decimals || 18);
+        const limit = FormatUtils.limitDecimals(this.toInputValue.toFixed(), token.decimals || 18);
         if (!this.toInputValue.eq(limit)) {
           if (this.secondTokenInput) {
             this.secondTokenInput.value = limit === '0' ? '' : limit;;
@@ -1252,7 +1251,7 @@ export default class ScomSwap extends Module {
     const token = isFrom ? this.fromToken : this.toToken;
     const value = isFrom ? this.fromInputValue : this.toInputValue;
     if (!value || value.isNaN()) return '';
-    return limitDecimals(value.toFixed(), token?.decimals || 18);
+    return FormatUtils.limitDecimals(value.toFixed(), token?.decimals || 18);
   }
 
   private async updateTokenInput(isFrom: boolean, init?: boolean) {
@@ -1308,7 +1307,7 @@ export default class ScomSwap extends Module {
         return;
       }
       const limit = isFrom ? this.fromToken?.decimals : this.toToken?.decimals;
-      const value = new BigNumber(limitDecimals(amount, limit || 18));
+      const value = new BigNumber(FormatUtils.limitDecimals(amount, limit || 18));
       if (!value.gt(0)) {
         this.resetValuesByInput();
         if (isFrom && toInput) {
@@ -1951,7 +1950,7 @@ export default class ScomSwap extends Module {
     }
     if (inputVal.eq(this.fromInputValue)) return;
     this.fromInputValue = inputVal;
-    this.firstTokenInput.value = limitDecimals(this.fromInputValue.toFixed(), this.fromToken?.decimals || 18);
+    this.firstTokenInput.value = FormatUtils.limitDecimals(this.fromInputValue.toFixed(), this.fromToken?.decimals || 18);
     this.redirectToken();
     await this.handleAddRoute();
   }

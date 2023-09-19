@@ -495,46 +495,27 @@ define("@scom/scom-swap/index.css.ts", ["require", "exports", "@ijstech/componen
         }
     });
 });
-define("@scom/scom-swap/global/utils/helper.ts", ["require", "exports", "@ijstech/eth-wallet"], function (require, exports, eth_wallet_1) {
+define("@scom/scom-swap/global/utils/helper.ts", ["require", "exports", "@ijstech/components", "@ijstech/eth-wallet"], function (require, exports, components_2, eth_wallet_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.getAPI = exports.limitDecimals = exports.isInvalidInput = exports.formatNumberWithSeparators = exports.formatNumber = void 0;
+    exports.getAPI = exports.isInvalidInput = exports.formatNumber = void 0;
     const formatNumber = (value, decimals) => {
-        let val = value;
-        const minValue = '0.0000001';
-        if (typeof value === 'string') {
-            val = new eth_wallet_1.BigNumber(value).toNumber();
+        // let val = value;
+        // const minValue = '0.0000001';
+        // if (typeof value === 'string') {
+        //   val = new BigNumber(value).toNumber();
+        // } else if (typeof value === 'object') {
+        //   val = value.toNumber();
+        // }
+        // if (val != 0 && new BigNumber(val).lt(minValue)) {
+        //   return `<${minValue}`;
+        // }
+        if (typeof value === 'object') {
+            value = value.toString();
         }
-        else if (typeof value === 'object') {
-            val = value.toNumber();
-        }
-        if (val != 0 && new eth_wallet_1.BigNumber(val).lt(minValue)) {
-            return `<${minValue}`;
-        }
-        return (0, exports.formatNumberWithSeparators)(val, decimals || 4);
+        return components_2.FormatUtils.formatNumberWithSeparators(value, decimals || 4);
     };
     exports.formatNumber = formatNumber;
-    const formatNumberWithSeparators = (value, precision) => {
-        if (!value)
-            value = 0;
-        if (precision) {
-            let outputStr = '';
-            if (value >= 1) {
-                const unit = Math.pow(10, precision);
-                const rounded = Math.floor(value * unit) / unit;
-                outputStr = rounded.toLocaleString('en-US', { maximumFractionDigits: precision });
-            }
-            else {
-                outputStr = value.toLocaleString('en-US', { maximumSignificantDigits: precision });
-            }
-            if (outputStr.length > 18) {
-                outputStr = outputStr.substring(0, 18) + '...';
-            }
-            return outputStr;
-        }
-        return value.toLocaleString('en-US');
-    };
-    exports.formatNumberWithSeparators = formatNumberWithSeparators;
     const isInvalidInput = (val) => {
         const value = new eth_wallet_1.BigNumber(val);
         if (value.lt(0))
@@ -542,29 +523,26 @@ define("@scom/scom-swap/global/utils/helper.ts", ["require", "exports", "@ijstec
         return (val || '').toString().substring(0, 2) === '00' || val === '-';
     };
     exports.isInvalidInput = isInvalidInput;
-    const limitDecimals = (value, decimals) => {
-        let val = value;
-        if (typeof value !== 'string') {
-            val = val.toString();
-        }
-        let chart;
-        if (val.includes('.')) {
-            chart = '.';
-        }
-        else if (val.includes(',')) {
-            chart = ',';
-        }
-        else {
-            return value;
-        }
-        const parts = val.split(chart);
-        let decimalsPart = parts[1];
-        if (decimalsPart && decimalsPart.length > decimals) {
-            parts[1] = decimalsPart.substr(0, decimals);
-        }
-        return parts.join(chart);
-    };
-    exports.limitDecimals = limitDecimals;
+    // export const limitDecimals = (value: any, decimals: number) => {
+    //   let val = value;
+    //   if (typeof value !== 'string') {
+    //     val = val.toString();
+    //   }
+    //   let chart;
+    //   if (val.includes('.')) {
+    //     chart = '.';
+    //   } else if (val.includes(',')) {
+    //     chart = ',';
+    //   } else {
+    //     return value;
+    //   }
+    //   const parts = val.split(chart);
+    //   let decimalsPart = parts[1];
+    //   if (decimalsPart && decimalsPart.length > decimals) {
+    //     parts[1] = decimalsPart.substr(0, decimals);
+    //   }
+    //   return parts.join(chart);
+    // }
     async function getAPI(url, paramsObj) {
         let queries = '';
         if (paramsObj) {
@@ -593,11 +571,9 @@ define("@scom/scom-swap/global/utils/swapInterface.ts", ["require", "exports"], 
 define("@scom/scom-swap/global/utils/index.ts", ["require", "exports", "@scom/scom-swap/global/utils/helper.ts"], function (require, exports, helper_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.isInvalidInput = exports.limitDecimals = exports.formatNumberWithSeparators = exports.formatNumber = exports.getAPI = void 0;
+    exports.isInvalidInput = exports.formatNumber = exports.getAPI = void 0;
     Object.defineProperty(exports, "getAPI", { enumerable: true, get: function () { return helper_1.getAPI; } });
     Object.defineProperty(exports, "formatNumber", { enumerable: true, get: function () { return helper_1.formatNumber; } });
-    Object.defineProperty(exports, "formatNumberWithSeparators", { enumerable: true, get: function () { return helper_1.formatNumberWithSeparators; } });
-    Object.defineProperty(exports, "limitDecimals", { enumerable: true, get: function () { return helper_1.limitDecimals; } });
     Object.defineProperty(exports, "isInvalidInput", { enumerable: true, get: function () { return helper_1.isInvalidInput; } });
 });
 define("@scom/scom-swap/global/index.ts", ["require", "exports", "@scom/scom-swap/global/utils/index.ts"], function (require, exports, index_1) {
@@ -612,7 +588,7 @@ define("@scom/scom-swap/global/index.ts", ["require", "exports", "@scom/scom-swa
     })(ApprovalStatus = exports.ApprovalStatus || (exports.ApprovalStatus = {}));
     __exportStar(index_1, exports);
 });
-define("@scom/scom-swap/store/utils.ts", ["require", "exports", "@ijstech/components", "@ijstech/eth-wallet", "@scom/scom-token-list", "@scom/scom-network-list"], function (require, exports, components_2, eth_wallet_2, scom_token_list_1, scom_network_list_1) {
+define("@scom/scom-swap/store/utils.ts", ["require", "exports", "@ijstech/components", "@ijstech/eth-wallet", "@scom/scom-token-list", "@scom/scom-network-list"], function (require, exports, components_3, eth_wallet_2, scom_token_list_1, scom_network_list_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.getClientWallet = exports.getChainNativeToken = exports.hasMetaMask = exports.isClientWalletConnected = exports.getNetworkInfo = exports.State = exports.WalletPlugin = void 0;
@@ -642,12 +618,12 @@ define("@scom/scom-swap/store/utils.ts", ["require", "exports", "@ijstech/compon
                 return this.rpcWalletId;
             }
             const clientWallet = eth_wallet_2.Wallet.getClientInstance();
-            const networkList = Object.values(((_a = components_2.application.store) === null || _a === void 0 ? void 0 : _a.networkMap) || []);
+            const networkList = Object.values(((_a = components_3.application.store) === null || _a === void 0 ? void 0 : _a.networkMap) || []);
             const instanceId = clientWallet.initRpcWallet({
                 networks: networkList,
                 defaultChainId,
-                infuraId: (_b = components_2.application.store) === null || _b === void 0 ? void 0 : _b.infuraId,
-                multicalls: (_c = components_2.application.store) === null || _c === void 0 ? void 0 : _c.multicalls
+                infuraId: (_b = components_3.application.store) === null || _b === void 0 ? void 0 : _b.infuraId,
+                multicalls: (_c = components_3.application.store) === null || _c === void 0 ? void 0 : _c.multicalls
             });
             this.rpcWalletId = instanceId;
             if (clientWallet.address) {
@@ -757,7 +733,7 @@ define("@scom/scom-swap/store/utils.ts", ["require", "exports", "@ijstech/compon
     }
     exports.State = State;
     const getNetworkInfo = (chainId) => {
-        const networkMap = components_2.application.store["networkMap"];
+        const networkMap = components_3.application.store["networkMap"];
         return networkMap[chainId];
     };
     exports.getNetworkInfo = getNetworkInfo;
@@ -2344,11 +2320,11 @@ define("@scom/scom-swap/swap-utils/index.ts", ["require", "exports", "@ijstech/e
     const createBridgeVaultOrder = async (state, newOrderParams) => (0, index_6.createBridgeVaultOrder)(state, Object.assign({}, newOrderParams));
     exports.createBridgeVaultOrder = createBridgeVaultOrder;
 });
-define("@scom/scom-swap/price-info/priceInfo.css.ts", ["require", "exports", "@ijstech/components"], function (require, exports, components_3) {
+define("@scom/scom-swap/price-info/priceInfo.css.ts", ["require", "exports", "@ijstech/components"], function (require, exports, components_4) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    const Theme = components_3.Styles.Theme.ThemeVars;
-    components_3.Styles.cssRule('.price-info', {
+    const Theme = components_4.Styles.Theme.ThemeVars;
+    components_4.Styles.cssRule('.price-info', {
         display: 'flex',
         flexDirection: 'column',
         $nest: {
@@ -2376,16 +2352,16 @@ define("@scom/scom-swap/price-info/priceInfo.css.ts", ["require", "exports", "@i
         }
     });
 });
-define("@scom/scom-swap/price-info/index.tsx", ["require", "exports", "@ijstech/components", "@scom/scom-swap/price-info/priceInfo.css.ts"], function (require, exports, components_4) {
+define("@scom/scom-swap/price-info/index.tsx", ["require", "exports", "@ijstech/components", "@scom/scom-swap/price-info/priceInfo.css.ts"], function (require, exports, components_5) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.PriceInfo = void 0;
     ;
-    let PriceInfo = class PriceInfo extends components_4.Module {
+    let PriceInfo = class PriceInfo extends components_5.Module {
         constructor(parent, options) {
             super(parent, options);
             this.onRenderToggleBtn = (parent) => {
-                const image = new components_4.Icon(parent, {
+                const image = new components_5.Icon(parent, {
                     width: 18,
                     height: 18,
                     name: 'arrows-alt-v'
@@ -2401,7 +2377,7 @@ define("@scom/scom-swap/price-info/index.tsx", ["require", "exports", "@ijstech/
                 return image;
             };
             this.renderIconTooltip = async (parent, item) => {
-                const iconTooltip = await components_4.Icon.create();
+                const iconTooltip = await components_5.Icon.create();
                 iconTooltip.classList.add('icon-tooltip');
                 iconTooltip.name = 'question-circle';
                 iconTooltip.width = 15;
@@ -2477,20 +2453,20 @@ define("@scom/scom-swap/price-info/index.tsx", ["require", "exports", "@ijstech/
             this.priceContent.innerHTML = '';
             for (let i = 0; i < this.Items.length; i++) {
                 const item = this.Items[i];
-                const row = new components_4.HStack();
+                const row = new components_5.HStack();
                 row.horizontalAlignment = "space-between";
                 row.verticalAlignment = "center";
                 row.padding = { top: '0.25rem', bottom: '0.25rem', left: 0, right: 0 };
                 if (item.isHidden) {
                     row.classList.add('hidden');
                 }
-                const titleLabel = new components_4.Label(row, { caption: item.title });
+                const titleLabel = new components_5.Label(row, { caption: item.title });
                 row.appendChild(titleLabel);
                 if (item.tooltip) {
                     const iconTooltip = this.renderIconTooltip(row, item);
                     row.appendChild(await iconTooltip);
                 }
-                const valueLabel = new components_4.Label(row, { caption: item.value });
+                const valueLabel = new components_5.Label(row, { caption: item.value });
                 valueLabel.classList.add('ml-auto', 'text-right');
                 row.appendChild(valueLabel);
                 if (item.isToggleShown) {
@@ -2509,15 +2485,15 @@ define("@scom/scom-swap/price-info/index.tsx", ["require", "exports", "@ijstech/
         }
     };
     PriceInfo = __decorate([
-        (0, components_4.customElements)('i-scom-swap-price-info')
+        (0, components_5.customElements)('i-scom-swap-price-info')
     ], PriceInfo);
     exports.PriceInfo = PriceInfo;
 });
-define("@scom/scom-swap/expert-mode-settings/index.css.ts", ["require", "exports", "@ijstech/components"], function (require, exports, components_5) {
+define("@scom/scom-swap/expert-mode-settings/index.css.ts", ["require", "exports", "@ijstech/components"], function (require, exports, components_6) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    const Theme = components_5.Styles.Theme.ThemeVars;
-    exports.default = components_5.Styles.style({
+    const Theme = components_6.Styles.Theme.ThemeVars;
+    exports.default = components_6.Styles.style({
         textAlign: 'center',
         $nest: {
             // 'i-label': {
@@ -2576,16 +2552,16 @@ define("@scom/scom-swap/expert-mode-settings/index.css.ts", ["require", "exports
         }
     });
 });
-define("@scom/scom-swap/expert-mode-settings/index.tsx", ["require", "exports", "@ijstech/components", "@scom/scom-swap/expert-mode-settings/index.css.ts"], function (require, exports, components_6, index_css_1) {
+define("@scom/scom-swap/expert-mode-settings/index.tsx", ["require", "exports", "@ijstech/components", "@scom/scom-swap/expert-mode-settings/index.css.ts"], function (require, exports, components_7, index_css_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.ExpertModeSettings = void 0;
     ;
-    let ExpertModeSettings = class ExpertModeSettings extends components_6.Module {
+    let ExpertModeSettings = class ExpertModeSettings extends components_7.Module {
         constructor(state, parent, options) {
             super(parent, options);
             this.state = state;
-            this.$eventBus = components_6.application.EventBus;
+            this.$eventBus = components_7.application.EventBus;
         }
         ;
         async init() {
@@ -2613,8 +2589,8 @@ define("@scom/scom-swap/expert-mode-settings/index.tsx", ["require", "exports", 
         }
     };
     ExpertModeSettings = __decorate([
-        components_6.customModule,
-        (0, components_6.customElements)('i-scom-swap-expert-mode-settings')
+        components_7.customModule,
+        (0, components_7.customElements)('i-scom-swap-expert-mode-settings')
     ], ExpertModeSettings);
     exports.ExpertModeSettings = ExpertModeSettings;
     ;
@@ -3236,10 +3212,10 @@ define("@scom/scom-swap/formSchema.ts", ["require", "exports", "@scom/scom-netwo
     }
     exports.getProjectOwnerSchema = getProjectOwnerSchema;
 });
-define("@scom/scom-swap/assets.ts", ["require", "exports", "@ijstech/components"], function (require, exports, components_7) {
+define("@scom/scom-swap/assets.ts", ["require", "exports", "@ijstech/components"], function (require, exports, components_8) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    const moduleDir = components_7.application.currentModuleDir;
+    const moduleDir = components_8.application.currentModuleDir;
     function fullPath(path) {
         return `${moduleDir}/${path}`;
     }
@@ -3249,12 +3225,12 @@ define("@scom/scom-swap/assets.ts", ["require", "exports", "@ijstech/components"
         fullPath
     };
 });
-define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstech/eth-wallet", "@scom/scom-swap/store/index.ts", "@scom/scom-token-list", "@scom/scom-swap/swap-utils/index.ts", "@scom/scom-swap/crosschain-utils/index.ts", "@scom/scom-swap/global/index.ts", "@scom/scom-swap/expert-mode-settings/index.tsx", "@scom/scom-swap/data.json.ts", "@scom/scom-swap/formSchema.ts", "@scom/scom-dex-list", "@scom/scom-commission-fee-setup", "@scom/scom-swap/index.css.ts", "@scom/scom-swap/assets.ts", "@scom/scom-swap/index.css.ts"], function (require, exports, components_8, eth_wallet_5, index_7, scom_token_list_5, index_8, index_9, index_10, index_11, data_json_1, formSchema_1, scom_dex_list_2, scom_commission_fee_setup_1, index_css_2, assets_1) {
+define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstech/eth-wallet", "@scom/scom-swap/store/index.ts", "@scom/scom-token-list", "@scom/scom-swap/swap-utils/index.ts", "@scom/scom-swap/crosschain-utils/index.ts", "@scom/scom-swap/global/index.ts", "@scom/scom-swap/expert-mode-settings/index.tsx", "@scom/scom-swap/data.json.ts", "@scom/scom-swap/formSchema.ts", "@scom/scom-dex-list", "@scom/scom-commission-fee-setup", "@scom/scom-swap/index.css.ts", "@scom/scom-swap/assets.ts", "@scom/scom-swap/index.css.ts"], function (require, exports, components_9, eth_wallet_5, index_7, scom_token_list_5, index_8, index_9, index_10, index_11, data_json_1, formSchema_1, scom_dex_list_2, scom_commission_fee_setup_1, index_css_2, assets_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    const Theme = components_8.Styles.Theme.ThemeVars;
+    const Theme = components_9.Styles.Theme.ThemeVars;
     const priceImpactTooHighMsg = 'Price Impact Too High. If you want to bypass this check, please turn on Expert Mode';
-    let ScomSwap = class ScomSwap extends components_8.Module {
+    let ScomSwap = class ScomSwap extends components_9.Module {
         static async create(options, parent) {
             let self = new this(parent, options);
             await self.ready();
@@ -3393,17 +3369,17 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                     },
                     customUI: {
                         render: async (data, onConfirm) => {
-                            const vstack = new components_8.VStack();
+                            const vstack = new components_9.VStack();
                             await self.loadCommissionFee();
                             const config = new scom_commission_fee_setup_1.default(null, {
                                 commissions: self._data.commissions || [],
                                 fee: self.state.embedderCommissionFee,
                                 networks: self._data.networks
                             });
-                            const hstack = new components_8.HStack(null, {
+                            const hstack = new components_9.HStack(null, {
                                 verticalAlignment: 'center',
                             });
-                            const button = new components_8.Button(hstack, {
+                            const button = new components_9.Button(hstack, {
                                 caption: 'Confirm',
                                 width: '100%',
                                 height: 40,
@@ -4025,7 +4001,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                 if (inputVal.eq(this.fromInputValue))
                     return;
                 this.fromInputValue = inputVal;
-                this.firstTokenInput.value = (0, index_10.limitDecimals)(this.fromInputValue.toFixed(), ((_d = this.fromToken) === null || _d === void 0 ? void 0 : _d.decimals) || 18);
+                this.firstTokenInput.value = components_9.FormatUtils.limitDecimals(this.fromInputValue.toFixed(), ((_d = this.fromToken) === null || _d === void 0 ? void 0 : _d.decimals) || 18);
                 this.redirectToken();
                 await this.handleAddRoute();
             };
@@ -4204,7 +4180,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                 }
             };
             this.initChainIcon = (network, isDes) => {
-                const img = new components_8.Image();
+                const img = new components_9.Image();
                 img.url = network.image;
                 img.tooltip.content = network.chainName;
                 img.classList.add('chain-icon');
@@ -4499,7 +4475,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                 onPaid: async (data, receipt) => {
                     this.onSwapConfirmed({ key: data.key, isCrossChain: this.isCrossChain });
                     await this.updateBalance();
-                    components_8.application.EventBus.dispatch("Paid" /* EventId.Paid */, {
+                    components_9.application.EventBus.dispatch("Paid" /* EventId.Paid */, {
                         data: data !== null && data !== void 0 ? data : null,
                         id: this.id,
                         receipt: receipt
@@ -4624,7 +4600,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                 const enabled = !this.isMaxDisabled();
                 this.maxButton.enabled = enabled;
                 if (this.fromInputValue.gt(0)) {
-                    const limit = (0, index_10.limitDecimals)(this.fromInputValue.toFixed(), token.decimals || 18);
+                    const limit = components_9.FormatUtils.limitDecimals(this.fromInputValue.toFixed(), token.decimals || 18);
                     if (!this.fromInputValue.eq(limit)) {
                         if (this.firstTokenInput) {
                             this.firstTokenInput.value = limit === '0' ? '' : limit;
@@ -4641,7 +4617,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
             else {
                 this.toToken = token;
                 if (this.toInputValue.gt(0)) {
-                    const limit = (0, index_10.limitDecimals)(this.toInputValue.toFixed(), token.decimals || 18);
+                    const limit = components_9.FormatUtils.limitDecimals(this.toInputValue.toFixed(), token.decimals || 18);
                     if (!this.toInputValue.eq(limit)) {
                         if (this.secondTokenInput) {
                             this.secondTokenInput.value = limit === '0' ? '' : limit;
@@ -4698,7 +4674,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
             const value = isFrom ? this.fromInputValue : this.toInputValue;
             if (!value || value.isNaN())
                 return '';
-            return (0, index_10.limitDecimals)(value.toFixed(), (token === null || token === void 0 ? void 0 : token.decimals) || 18);
+            return components_9.FormatUtils.limitDecimals(value.toFixed(), (token === null || token === void 0 ? void 0 : token.decimals) || 18);
         }
         async updateTokenInput(isFrom, init) {
             const inputEl = isFrom ? this.firstTokenInput : this.secondTokenInput;
@@ -4754,7 +4730,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                     return;
                 }
                 const limit = isFrom ? (_c = this.fromToken) === null || _c === void 0 ? void 0 : _c.decimals : (_d = this.toToken) === null || _d === void 0 ? void 0 : _d.decimals;
-                const value = new eth_wallet_5.BigNumber((0, index_10.limitDecimals)(amount, limit || 18));
+                const value = new eth_wallet_5.BigNumber(components_9.FormatUtils.limitDecimals(amount, limit || 18));
                 if (!value.gt(0)) {
                     this.resetValuesByInput();
                     if (isFrom && toInput) {
@@ -5283,7 +5259,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
         async onClickSwapButton() {
             if (!(0, index_7.isClientWalletConnected)()) {
                 if (this.mdWallet) {
-                    await components_8.application.loadPackage('@scom/scom-wallet-modal', '*');
+                    await components_9.application.loadPackage('@scom/scom-wallet-modal', '*');
                     this.mdWallet.networks = this.networks;
                     this.mdWallet.wallets = this.wallets;
                     this.mdWallet.showModal();
@@ -5437,7 +5413,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
             this.toInputValue = new eth_wallet_5.BigNumber(0);
             this.swapButtonStatusMap = {};
             this.approveButtonStatusMap = {};
-            this.$eventBus = components_8.application.EventBus;
+            this.$eventBus = components_9.application.EventBus;
             this.registerEvent();
             this.updateSwapButtonCaption();
             this.initExpertModal();
@@ -5624,8 +5600,8 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
         }
     };
     ScomSwap = __decorate([
-        components_8.customModule,
-        (0, components_8.customElements)('i-scom-swap')
+        components_9.customModule,
+        (0, components_9.customElements)('i-scom-swap')
     ], ScomSwap);
     exports.default = ScomSwap;
 });

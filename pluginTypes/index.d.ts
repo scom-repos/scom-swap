@@ -10,10 +10,9 @@ declare module "@scom/scom-swap/index.css.ts" {
 }
 /// <amd-module name="@scom/scom-swap/global/utils/helper.ts" />
 declare module "@scom/scom-swap/global/utils/helper.ts" {
-    export const formatNumber: (value: any, decimals?: number) => string;
-    export const formatNumberWithSeparators: (value: number, precision?: number) => string;
+    import { BigNumber } from "@ijstech/eth-wallet";
+    export const formatNumber: (value: number | string | BigNumber, decimals?: number) => string;
     export const isInvalidInput: (val: any) => boolean;
-    export const limitDecimals: (value: any, decimals: number) => any;
     export function getAPI(url: string, paramsObj?: any): Promise<any>;
 }
 /// <amd-module name="@scom/scom-swap/global/utils/swapInterface.ts" />
@@ -68,7 +67,7 @@ declare module "@scom/scom-swap/global/utils/swapInterface.ts" {
 }
 /// <amd-module name="@scom/scom-swap/global/utils/index.ts" />
 declare module "@scom/scom-swap/global/utils/index.ts" {
-    export { getAPI, formatNumber, formatNumberWithSeparators, limitDecimals, isInvalidInput } from "@scom/scom-swap/global/utils/helper.ts";
+    export { getAPI, formatNumber, isInvalidInput } from "@scom/scom-swap/global/utils/helper.ts";
     export { IContractInfo, IProvider, ISwapConfig, ISwapWidgetData, IProviderUI, Category, ICommissionInfo, INetworkConfig } from "@scom/scom-swap/global/utils/swapInterface.ts";
 }
 /// <amd-module name="@scom/scom-swap/global/index.ts" />
