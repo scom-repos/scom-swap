@@ -499,7 +499,7 @@ define("@scom/scom-swap/global/utils/helper.ts", ["require", "exports", "@ijstec
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.getAPI = exports.isInvalidInput = exports.formatNumber = void 0;
-    const formatNumber = (value, decimals) => {
+    const formatNumber = (value, decimalFigures) => {
         // let val = value;
         // const minValue = '0.0000001';
         // if (typeof value === 'string') {
@@ -513,7 +513,8 @@ define("@scom/scom-swap/global/utils/helper.ts", ["require", "exports", "@ijstec
         if (typeof value === 'object') {
             value = value.toString();
         }
-        return components_2.FormatUtils.formatNumberWithSeparators(value, decimals || 4);
+        return components_2.FormatUtils.formatNumberWithSeparators(value, decimalFigures || 4);
+        // TODO: FormatUtils.formatNumber(value, {decimalFigures: decimalFigures || 4});
     };
     exports.formatNumber = formatNumber;
     const isInvalidInput = (val) => {
@@ -523,26 +524,6 @@ define("@scom/scom-swap/global/utils/helper.ts", ["require", "exports", "@ijstec
         return (val || '').toString().substring(0, 2) === '00' || val === '-';
     };
     exports.isInvalidInput = isInvalidInput;
-    // export const limitDecimals = (value: any, decimals: number) => {
-    //   let val = value;
-    //   if (typeof value !== 'string') {
-    //     val = val.toString();
-    //   }
-    //   let chart;
-    //   if (val.includes('.')) {
-    //     chart = '.';
-    //   } else if (val.includes(',')) {
-    //     chart = ',';
-    //   } else {
-    //     return value;
-    //   }
-    //   const parts = val.split(chart);
-    //   let decimalsPart = parts[1];
-    //   if (decimalsPart && decimalsPart.length > decimals) {
-    //     parts[1] = decimalsPart.substr(0, decimals);
-    //   }
-    //   return parts.join(chart);
-    // }
     async function getAPI(url, paramsObj) {
         let queries = '';
         if (paramsObj) {
@@ -4001,7 +3982,8 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                 if (inputVal.eq(this.fromInputValue))
                     return;
                 this.fromInputValue = inputVal;
-                this.firstTokenInput.value = components_9.FormatUtils.limitDecimals(this.fromInputValue.toFixed(), ((_d = this.fromToken) === null || _d === void 0 ? void 0 : _d.decimals) || 18);
+                const decimals = ((_d = this.fromToken) === null || _d === void 0 ? void 0 : _d.decimals) || 18;
+                this.firstTokenInput.value = (0, index_10.formatNumber)(this.fromInputValue, decimals);
                 this.redirectToken();
                 await this.handleAddRoute();
             };
@@ -4600,12 +4582,12 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                 const enabled = !this.isMaxDisabled();
                 this.maxButton.enabled = enabled;
                 if (this.fromInputValue.gt(0)) {
-                    const limit = components_9.FormatUtils.limitDecimals(this.fromInputValue.toFixed(), token.decimals || 18);
-                    if (!this.fromInputValue.eq(limit)) {
+                    const formattedValue = new eth_wallet_5.BigNumber(this.fromInputValue).dp(token.decimals || 18).toString();
+                    if (!this.fromInputValue.eq(formattedValue)) {
                         if (this.firstTokenInput) {
-                            this.firstTokenInput.value = limit === '0' ? '' : limit;
+                            this.firstTokenInput.value = formattedValue === '0' ? '' : formattedValue;
                         }
-                        this.fromInputValue = new eth_wallet_5.BigNumber(limit);
+                        this.fromInputValue = new eth_wallet_5.BigNumber(formattedValue);
                     }
                 }
                 else if (this.fromInputValue.isZero()) {
@@ -4617,13 +4599,12 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
             else {
                 this.toToken = token;
                 if (this.toInputValue.gt(0)) {
-                    const limit = components_9.FormatUtils.limitDecimals(this.toInputValue.toFixed(), token.decimals || 18);
-                    if (!this.toInputValue.eq(limit)) {
+                    const formattedValue = new eth_wallet_5.BigNumber(this.toInputValue).dp(token.decimals || 18).toString();
+                    if (!this.toInputValue.eq(formattedValue)) {
                         if (this.secondTokenInput) {
-                            this.secondTokenInput.value = limit === '0' ? '' : limit;
-                            ;
+                            this.secondTokenInput.value = formattedValue === '0' ? '' : formattedValue;
                         }
-                        this.toInputValue = new eth_wallet_5.BigNumber(limit);
+                        this.toInputValue = new eth_wallet_5.BigNumber(formattedValue);
                     }
                 }
                 else if (this.toInputValue.isZero()) {
@@ -4674,7 +4655,8 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
             const value = isFrom ? this.fromInputValue : this.toInputValue;
             if (!value || value.isNaN())
                 return '';
-            return components_9.FormatUtils.limitDecimals(value.toFixed(), (token === null || token === void 0 ? void 0 : token.decimals) || 18);
+            const newValue = value.dp((token === null || token === void 0 ? void 0 : token.decimals) || 18).toString();
+            return newValue;
         }
         async updateTokenInput(isFrom, init) {
             const inputEl = isFrom ? this.firstTokenInput : this.secondTokenInput;
@@ -4729,8 +4711,8 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                         toInput.value = '0';
                     return;
                 }
-                const limit = isFrom ? (_c = this.fromToken) === null || _c === void 0 ? void 0 : _c.decimals : (_d = this.toToken) === null || _d === void 0 ? void 0 : _d.decimals;
-                const value = new eth_wallet_5.BigNumber(components_9.FormatUtils.limitDecimals(amount, limit || 18));
+                const limit = (isFrom ? (_c = this.fromToken) === null || _c === void 0 ? void 0 : _c.decimals : (_d = this.toToken) === null || _d === void 0 ? void 0 : _d.decimals) || 18;
+                const value = new eth_wallet_5.BigNumber(new eth_wallet_5.BigNumber((0, index_10.formatNumber)(amount)).dp(limit));
                 if (!value.gt(0)) {
                     this.resetValuesByInput();
                     if (isFrom && toInput) {
