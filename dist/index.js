@@ -500,21 +500,11 @@ define("@scom/scom-swap/global/utils/helper.ts", ["require", "exports", "@ijstec
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.getAPI = exports.isInvalidInput = exports.formatNumber = void 0;
     const formatNumber = (value, decimalFigures) => {
-        // let val = value;
-        // const minValue = '0.0000001';
-        // if (typeof value === 'string') {
-        //   val = new BigNumber(value).toNumber();
-        // } else if (typeof value === 'object') {
-        //   val = value.toNumber();
-        // }
-        // if (val != 0 && new BigNumber(val).lt(minValue)) {
-        //   return `<${minValue}`;
-        // }
         if (typeof value === 'object') {
             value = value.toString();
         }
-        return components_2.FormatUtils.formatNumberWithSeparators(value, decimalFigures || 4);
-        // TODO: FormatUtils.formatNumber(value, {decimalFigures: decimalFigures || 4});
+        const minValue = '0.0000001';
+        return components_2.FormatUtils.formatNumber(value, { decimalFigures: decimalFigures || 4, minValue });
     };
     exports.formatNumber = formatNumber;
     const isInvalidInput = (val) => {
@@ -4725,7 +4715,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                     return;
                 }
                 const limit = (isFrom ? (_c = this.fromToken) === null || _c === void 0 ? void 0 : _c.decimals : (_d = this.toToken) === null || _d === void 0 ? void 0 : _d.decimals) || 18;
-                const value = new eth_wallet_5.BigNumber(new eth_wallet_5.BigNumber((0, index_10.formatNumber)(amount)).dp(limit));
+                const value = new eth_wallet_5.BigNumber(new eth_wallet_5.BigNumber(amount).dp(limit));
                 if (!value.gt(0)) {
                     this.resetValuesByInput();
                     if (isFrom && toInput) {
