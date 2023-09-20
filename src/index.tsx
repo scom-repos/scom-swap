@@ -1308,7 +1308,7 @@ export default class ScomSwap extends Module {
         return;
       }
       const limit = (isFrom ? this.fromToken?.decimals : this.toToken?.decimals) || 18;
-      const value = new BigNumber(new BigNumber(formatNumber(amount)).dp(limit));
+      const value = new BigNumber(new BigNumber(amount).dp(limit));
       if (!value.gt(0)) {
         this.resetValuesByInput();
         if (isFrom && toInput) {
