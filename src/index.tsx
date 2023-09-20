@@ -1,5 +1,5 @@
-import { Module, Panel, Button, Label, VStack, Image, Container, IEventBus, application, customModule, Modal, Input, Control, customElements, ControlElement, Styles, HStack, Icon, FormatUtils } from '@ijstech/components';
-import { BigNumber, Constants, INetwork, Wallet, IERC20ApprovalAction, TransactionReceipt } from '@ijstech/eth-wallet';
+import { Module, Panel, Button, Label, VStack, Image, Container, IEventBus, application, customModule, Modal, Input, Control, customElements, ControlElement, Styles, HStack, Icon } from '@ijstech/components';
+import { BigNumber, Constants, INetwork, Wallet, IERC20ApprovalAction, TransactionReceipt, Utils } from '@ijstech/eth-wallet';
 import './index.css';
 import {
   isClientWalletConnected,
@@ -1185,12 +1185,12 @@ export default class ScomSwap extends Module {
       const enabled = !this.isMaxDisabled();
       this.maxButton.enabled = enabled;
       if (this.fromInputValue.gt(0)) {
-        const limit = FormatUtils.limitDecimals(this.fromInputValue.toFixed(), token.decimals || 18);
-        if (!this.fromInputValue.eq(limit)) {
+        const formattedValue = new BigNumber(this.fromInputValue).dp(token.decimals || 18).toString();
+        if (!this.fromInputValue.eq(formattedValue)) {
           if (this.firstTokenInput) {
-            this.firstTokenInput.value = limit === '0' ? '' : limit;
+            this.firstTokenInput.value = formattedValue === '0' ? '' : formattedValue;
           }
-          this.fromInputValue = new BigNumber(limit);
+          this.fromInputValue = new BigNumber(formattedValue);
         }
       } else if (this.fromInputValue.isZero()) {
         this.onUpdateEstimatedPosition(true);
@@ -1200,12 +1200,12 @@ export default class ScomSwap extends Module {
     } else {
       this.toToken = token;
       if (this.toInputValue.gt(0)) {
-        const limit = FormatUtils.limitDecimals(this.toInputValue.toFixed(), token.decimals || 18);
-        if (!this.toInputValue.eq(limit)) {
+        const formattedValue = new BigNumber(this.toInputValue).dp(token.decimals || 18).toString();
+        if (!this.toInputValue.eq(formattedValue)) {
           if (this.secondTokenInput) {
-            this.secondTokenInput.value = limit === '0' ? '' : limit;;
+            this.secondTokenInput.value = formattedValue === '0' ? '' : formattedValue;
           }
-          this.toInputValue = new BigNumber(limit);
+          this.toInputValue = new BigNumber(formattedValue);
         }
       } else if (this.toInputValue.isZero()) {
         this.onUpdateEstimatedPosition(false);
@@ -1251,7 +1251,8 @@ export default class ScomSwap extends Module {
     const token = isFrom ? this.fromToken : this.toToken;
     const value = isFrom ? this.fromInputValue : this.toInputValue;
     if (!value || value.isNaN()) return '';
-    return FormatUtils.limitDecimals(value.toFixed(), token?.decimals || 18);
+    const newValue = value.dp(token?.decimals || 18).toString()
+    return newValue;
   }
 
   private async updateTokenInput(isFrom: boolean, init?: boolean) {
@@ -1306,8 +1307,8 @@ export default class ScomSwap extends Module {
           toInput.value = '0';
         return;
       }
-      const limit = isFrom ? this.fromToken?.decimals : this.toToken?.decimals;
-      const value = new BigNumber(FormatUtils.limitDecimals(amount, limit || 18));
+      const limit = (isFrom ? this.fromToken?.decimals : this.toToken?.decimals) || 18;
+      const value = new BigNumber(new BigNumber(formatNumber(amount)).dp(limit));
       if (!value.gt(0)) {
         this.resetValuesByInput();
         if (isFrom && toInput) {
@@ -1950,7 +1951,8 @@ export default class ScomSwap extends Module {
     }
     if (inputVal.eq(this.fromInputValue)) return;
     this.fromInputValue = inputVal;
-    this.firstTokenInput.value = FormatUtils.limitDecimals(this.fromInputValue.toFixed(), this.fromToken?.decimals || 18);
+    const decimals = this.fromToken?.decimals || 18;
+    this.firstTokenInput.value = formatNumber(this.fromInputValue, decimals);
     this.redirectToken();
     await this.handleAddRoute();
   }

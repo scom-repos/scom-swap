@@ -11,7 +11,7 @@ declare module "@scom/scom-swap/index.css.ts" {
 /// <amd-module name="@scom/scom-swap/global/utils/helper.ts" />
 declare module "@scom/scom-swap/global/utils/helper.ts" {
     import { BigNumber } from "@ijstech/eth-wallet";
-    export const formatNumber: (value: number | string | BigNumber, decimals?: number) => string;
+    export const formatNumber: (value: number | string | BigNumber, decimalFigures?: number) => string;
     export const isInvalidInput: (val: any) => boolean;
     export function getAPI(url: string, paramsObj?: any): Promise<any>;
 }
