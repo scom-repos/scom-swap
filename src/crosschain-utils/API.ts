@@ -31,10 +31,6 @@ import {
 import { DefaultTokens, ITokenObject, tokenStore } from "@scom/scom-token-list";
 import { nullAddress } from "@ijstech/eth-contract";
 
-const routeAPI = baseRoute + '/trading/v1/cross-chain-route';
-const GetBridgeVaultAPI = baseRoute + '/trading/v1/bridge-vault';
-const GetBondsInBridgeVaultAPI = baseRoute + '/trading/v1/bonds-by-chain-id-and-vault-troll-registry';
-
 const getTokenByVaultAddress = (chainId: number, vaultAddress: string) => {
   if (!chainId) return null;
   let vaultTokenMap = getVaultTokenMap();
@@ -134,13 +130,15 @@ const getVaultTokenMap = () => {
   return vaultTokenMap;
 }
 
-const getBridgeVault = async (chainId: number, vaultAddress: string): Promise<IBridgeVault> => {
-  let res = await getAPI(GetBridgeVaultAPI, { chainId, address: vaultAddress });
+const getBridgeVault = async (state: State, chainId: number, vaultAddress: string): Promise<IBridgeVault> => {
+  const bridgeVaultAPIEndpoint = state.getAPIEndpoint('bridgeVault');
+  let res = await getAPI(bridgeVaultAPIEndpoint, { chainId, address: vaultAddress });
   return res;
 }
 
 const getBondsInBridgeVault = async (state: State, chainId: number, vaultTrollRegistry: string, version: string = getBridgeVaultVersion(state.getChainId())): Promise<IBridgeVaultBond[]> => {
-  let res = await getAPI(GetBondsInBridgeVaultAPI, { version, chainId, vaultTrollRegistry });
+  const bondsAPIEndpoint = state.getAPIEndpoint('bonds');
+  let res = await getAPI(bondsAPIEndpoint, { version, chainId, vaultTrollRegistry });
   return Array.isArray(res) ? res : [];
 }
 
@@ -308,7 +306,8 @@ const getAvailableRouteOptions = async (state: State, params: GetAvailableRouteO
 
   const tradeFeeMap = await getTradeFeeMap(state);
   
-  const routeObjArr: { routes: ICrossChainRouteFromAPI[] } = await getAPI(routeAPI, {
+  const bridgeRoutingAPIEndpoint = state.getAPIEndpoint('bridgeRouting');
+  const routeObjArr: { routes: ICrossChainRouteFromAPI[] } = await getAPI(bridgeRoutingAPIEndpoint, {
     fromChainId,
     toChainId,
     tokenIn: tokenIn.address,

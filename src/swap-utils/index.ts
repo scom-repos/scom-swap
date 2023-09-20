@@ -41,9 +41,6 @@ interface AvailableRoute {
   reserveB: BigNumber,
 }
 
-const routeAPI = 'https://route.openswap.xyz/trading/v1/route';
-// const newRouteAPI = 'https://indexer.ijs.dev/trading/v1/route'
-
 const getChainNativeToken = (chainId: number): ITokenObject => {
   return ChainNativeTokenByChainId[chainId]
 };
@@ -181,16 +178,16 @@ async function calculateAPIBestRouteObjArr(state: State, tokenIn: ITokenObject, 
 async function getBestAmountInRouteFromAPI(state: State, tokenIn: ITokenObject, tokenOut: ITokenObject, amountOut: string) {
   let chainId = state.getChainId();
   let wrappedToken = getWETH(chainId);
-  let network = chainId ? getNetworkInfo(chainId) : null;
-  let api = crossChainSupportedChainIds.some(v => v.chainId === chainId && v.isTestnet) || network?.isDisabled ? routeAPI : routeAPI;
+  const tradingRoutingAPIEndpoint = state.getAPIEndpoint('tradingRouting');
   let amountOutDecimals =  Utils.toDecimals(amountOut, tokenOut.decimals).toFixed();
-  let routeObjArr: any[] = await getAPI(api, {
+  let APIResult = await getAPI(tradingRoutingAPIEndpoint, {
     chainId,
     tokenIn: tokenIn.address ? tokenIn.address : wrappedToken.address,
     tokenOut: tokenOut.address ? tokenOut.address : wrappedToken.address,
     amountOut: amountOutDecimals,
     ignoreHybrid: 1
   })
+  let routeObjArr: any[] = Array.isArray(APIResult) ? APIResult : APIResult.data; //Backward compatibility
   if (!routeObjArr) return [];
   let bestRouteObjArr: any[] = await calculateAPIBestRouteObjArr(state, tokenIn, tokenOut, routeObjArr.map(v => ({
     ...v,
@@ -202,16 +199,16 @@ async function getBestAmountInRouteFromAPI(state: State, tokenIn: ITokenObject, 
 async function getBestAmountOutRouteFromAPI(state: State, tokenIn: ITokenObject, tokenOut: ITokenObject, amountIn: string) {
   let chainId = state.getChainId();
   let wrappedToken = getWETH(chainId);
-  let network = chainId ? getNetworkInfo(chainId) : null;
-  let api = crossChainSupportedChainIds.some(v => v.chainId === chainId && v.isTestnet) || network?.isDisabled ? routeAPI : routeAPI;
+  const tradingRoutingAPIEndpoint = state.getAPIEndpoint('tradingRouting');
   let amountInDecimals =  Utils.toDecimals(amountIn, tokenIn.decimals).toFixed();
-  let routeObjArr: any[] = await getAPI(api, {
+  let APIResult = await getAPI(tradingRoutingAPIEndpoint, {
     chainId,
     tokenIn: tokenIn.address ? tokenIn.address : wrappedToken.address,
     tokenOut: tokenOut.address ? tokenOut.address : wrappedToken.address,
     amountIn: amountInDecimals,
     ignoreHybrid: 1
   })
+  let routeObjArr: any[] = Array.isArray(APIResult) ? APIResult : APIResult.data; //Backward compatibility
   if (!routeObjArr) return [];
   let bestRouteObjArr: any[] = await calculateAPIBestRouteObjArr(state, tokenIn, tokenOut, routeObjArr.map(v => ({
     ...v,

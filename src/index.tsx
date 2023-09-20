@@ -79,6 +79,7 @@ interface ScomSwapElement extends ControlElement {
   title?: string;
   defaultInputValue?: string;
   defaultOutputValue?: string;
+  apiEndpoints?: Record<string, string>;
 }
 
 declare global {
@@ -619,6 +620,9 @@ export default class ScomSwap extends Module {
 
   private async setData(value: ISwapWidgetData) {
     this._data = value;
+    if (this._data.apiEndpoints) {
+      this.state.setAPIEnpoints(this._data.apiEndpoints);
+    }
     await this.resetRpcWallet();
     this.updateContractAddress();
     await this.refreshUI();
@@ -1421,7 +1425,7 @@ export default class ScomSwap extends Module {
       const assetSymbol = listRouting[0].targetVaultToken.symbol;
       const { vaultAddress, vaultRegistryAddress, tokenAddress: vaultTokenAddress, softCap } = bridgeVaultConstantMap[assetSymbol === 'USDT.e' ? 'USDT' : assetSymbol][this.desChain!.chainId];
       const [vault, vaultAssetBalance, bonds, oraclePriceMap] = await Promise.all([
-        getBridgeVault(this.desChain!.chainId, vaultAddress),
+        getBridgeVault(this.state, this.desChain!.chainId, vaultAddress),
         getVaultAssetBalance(this.desChain!.chainId, vaultAddress),
         getBondsInBridgeVault(this.state, this.desChain!.chainId, vaultRegistryAddress),
         getOraclePriceMap(this.desChain!.chainId)
@@ -2409,7 +2413,8 @@ export default class ScomSwap extends Module {
       const logo = this.getAttribute('logo', true);
       const defaultInputValue = this.getAttribute('defaultInputValue', true);
       const defaultOutputValue = this.getAttribute('defaultOutputValue', true);
-      let data = { campaignId, category, providers, commissions, tokens, defaultChainId, networks, wallets, showHeader, title, logo, defaultInputValue, defaultOutputValue };
+      const apiEndpoints = this.getAttribute('apiEndpoints', true);
+      let data = { campaignId, category, providers, commissions, tokens, defaultChainId, networks, wallets, showHeader, title, logo, defaultInputValue, defaultOutputValue, apiEndpoints };
       if (!this.isEmptyData(data)) {
         await this.setData(data);
       }

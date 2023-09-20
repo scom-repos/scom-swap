@@ -588,7 +588,7 @@ define("@scom/scom-swap/store/utils.ts", ["require", "exports", "@ijstech/compon
             this.dexInfoList = [];
             this.providerList = [];
             this.proxyAddresses = {};
-            this.apiGatewayUrls = {};
+            this.apiEndpoints = {};
             this.rpcWalletId = "";
             this.networkMap = (0, scom_network_list_1.default)();
             this.initData(options);
@@ -679,9 +679,15 @@ define("@scom/scom-swap/store/utils.ts", ["require", "exports", "@ijstech/compon
             if (options.proxyAddresses) {
                 this.proxyAddresses = options.proxyAddresses;
             }
-            if (options.apiGatewayUrls) {
-                this.apiGatewayUrls = options.apiGatewayUrls;
+            if (options.apiEndpoints) {
+                this.setAPIEnpoints(options.apiEndpoints);
             }
+        }
+        setAPIEnpoints(apiEndpoints) {
+            this.apiEndpoints = apiEndpoints;
+        }
+        getAPIEndpoint(key) {
+            return this.apiEndpoints[key];
         }
         setNetworkList(networkList, infuraId) {
             const wallet = eth_wallet_2.Wallet.getClientInstance();
@@ -1060,9 +1066,6 @@ define("@scom/scom-swap/crosschain-utils/API.ts", ["require", "exports", "@scom/
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.getOraclePriceMap = exports.getVaultAssetBalance = exports.getBondsInBridgeVault = exports.getBridgeVault = exports.getAvailableRouteOptions = exports.createBridgeVaultOrder = exports.getTargetChainTokenInfoObj = exports.getTargetChainTokenMap = exports.getTokenByVaultAddress = void 0;
-    const routeAPI = index_3.baseRoute + '/trading/v1/cross-chain-route';
-    const GetBridgeVaultAPI = index_3.baseRoute + '/trading/v1/bridge-vault';
-    const GetBondsInBridgeVaultAPI = index_3.baseRoute + '/trading/v1/bonds-by-chain-id-and-vault-troll-registry';
     const getTokenByVaultAddress = (chainId, vaultAddress) => {
         if (!chainId)
             return null;
@@ -1168,13 +1171,15 @@ define("@scom/scom-swap/crosschain-utils/API.ts", ["require", "exports", "@scom/
         });
         return vaultTokenMap;
     };
-    const getBridgeVault = async (chainId, vaultAddress) => {
-        let res = await (0, index_2.getAPI)(GetBridgeVaultAPI, { chainId, address: vaultAddress });
+    const getBridgeVault = async (state, chainId, vaultAddress) => {
+        const bridgeVaultAPIEndpoint = state.getAPIEndpoint('bridgeVault');
+        let res = await (0, index_2.getAPI)(bridgeVaultAPIEndpoint, { chainId, address: vaultAddress });
         return res;
     };
     exports.getBridgeVault = getBridgeVault;
     const getBondsInBridgeVault = async (state, chainId, vaultTrollRegistry, version = (0, index_3.getBridgeVaultVersion)(state.getChainId())) => {
-        let res = await (0, index_2.getAPI)(GetBondsInBridgeVaultAPI, { version, chainId, vaultTrollRegistry });
+        const bondsAPIEndpoint = state.getAPIEndpoint('bonds');
+        let res = await (0, index_2.getAPI)(bondsAPIEndpoint, { version, chainId, vaultTrollRegistry });
         return Array.isArray(res) ? res : [];
     };
     exports.getBondsInBridgeVault = getBondsInBridgeVault;
@@ -1322,7 +1327,8 @@ define("@scom/scom-swap/crosschain-utils/API.ts", ["require", "exports", "@scom/
             tokenOut.address = index_3.crossChainNativeTokenList[toChainId].wethAddress;
         }
         const tradeFeeMap = await getTradeFeeMap(state);
-        const routeObjArr = await (0, index_2.getAPI)(routeAPI, {
+        const bridgeRoutingAPIEndpoint = state.getAPIEndpoint('bridgeRouting');
+        const routeObjArr = await (0, index_2.getAPI)(bridgeRoutingAPIEndpoint, {
             fromChainId,
             toChainId,
             tokenIn: tokenIn.address,
@@ -1462,8 +1468,6 @@ define("@scom/scom-swap/swap-utils/index.ts", ["require", "exports", "@ijstech/e
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.createBridgeVaultOrder = exports.getCrossChainRouteOptions = exports.getCommissionRate = exports.getProviderProxySelectors = exports.setApprovalModalSpenderAddress = exports.getRouterAddress = exports.getChainNativeToken = exports.executeSwap = exports.getPair = exports.getAllRoutesData = exports.getTradeFeeMap = exports.getExtendedRouteObjData = void 0;
-    const routeAPI = 'https://route.openswap.xyz/trading/v1/route';
-    // const newRouteAPI = 'https://indexer.ijs.dev/trading/v1/route'
     const getChainNativeToken = (chainId) => {
         return scom_token_list_4.ChainNativeTokenByChainId[chainId];
     };
@@ -1595,16 +1599,16 @@ define("@scom/scom-swap/swap-utils/index.ts", ["require", "exports", "@ijstech/e
     async function getBestAmountInRouteFromAPI(state, tokenIn, tokenOut, amountOut) {
         let chainId = state.getChainId();
         let wrappedToken = getWETH(chainId);
-        let network = chainId ? (0, index_5.getNetworkInfo)(chainId) : null;
-        let api = index_5.crossChainSupportedChainIds.some(v => v.chainId === chainId && v.isTestnet) || (network === null || network === void 0 ? void 0 : network.isDisabled) ? routeAPI : routeAPI;
+        const tradingRoutingAPIEndpoint = state.getAPIEndpoint('tradingRouting');
         let amountOutDecimals = eth_wallet_4.Utils.toDecimals(amountOut, tokenOut.decimals).toFixed();
-        let routeObjArr = await (0, index_4.getAPI)(api, {
+        let APIResult = await (0, index_4.getAPI)(tradingRoutingAPIEndpoint, {
             chainId,
             tokenIn: tokenIn.address ? tokenIn.address : wrappedToken.address,
             tokenOut: tokenOut.address ? tokenOut.address : wrappedToken.address,
             amountOut: amountOutDecimals,
             ignoreHybrid: 1
         });
+        let routeObjArr = Array.isArray(APIResult) ? APIResult : APIResult.data; //Backward compatibility
         if (!routeObjArr)
             return [];
         let bestRouteObjArr = await calculateAPIBestRouteObjArr(state, tokenIn, tokenOut, routeObjArr.map(v => (Object.assign(Object.assign({}, v), { amountOut: amountOutDecimals }))));
@@ -1613,16 +1617,16 @@ define("@scom/scom-swap/swap-utils/index.ts", ["require", "exports", "@ijstech/e
     async function getBestAmountOutRouteFromAPI(state, tokenIn, tokenOut, amountIn) {
         let chainId = state.getChainId();
         let wrappedToken = getWETH(chainId);
-        let network = chainId ? (0, index_5.getNetworkInfo)(chainId) : null;
-        let api = index_5.crossChainSupportedChainIds.some(v => v.chainId === chainId && v.isTestnet) || (network === null || network === void 0 ? void 0 : network.isDisabled) ? routeAPI : routeAPI;
+        const tradingRoutingAPIEndpoint = state.getAPIEndpoint('tradingRouting');
         let amountInDecimals = eth_wallet_4.Utils.toDecimals(amountIn, tokenIn.decimals).toFixed();
-        let routeObjArr = await (0, index_4.getAPI)(api, {
+        let APIResult = await (0, index_4.getAPI)(tradingRoutingAPIEndpoint, {
             chainId,
             tokenIn: tokenIn.address ? tokenIn.address : wrappedToken.address,
             tokenOut: tokenOut.address ? tokenOut.address : wrappedToken.address,
             amountIn: amountInDecimals,
             ignoreHybrid: 1
         });
+        let routeObjArr = Array.isArray(APIResult) ? APIResult : APIResult.data; //Backward compatibility
         if (!routeObjArr)
             return [];
         let bestRouteObjArr = await calculateAPIBestRouteObjArr(state, tokenIn, tokenOut, routeObjArr.map(v => (Object.assign(Object.assign({}, v), { amountIn: amountInDecimals }))));
@@ -2591,6 +2595,12 @@ define("@scom/scom-swap/data.json.ts", ["require", "exports"], function (require
                 "chainId": 43113
             }
         ],
+        "apiEndpoints": {
+            "tradingRouting": "https://route.openswap.xyz/trading/v1/route",
+            "bridgeRouting": "https://route.openswap.xyz/trading/v1/cross-chain-route",
+            "bridgeVault": "https://route.openswap.xyz/trading/v1/bridge-vault",
+            "bonds": "https://route.openswap.xyz/trading/v1/bonds-by-chain-id-and-vault-troll-registry"
+        },
         "proxyAddresses": {
             "43113": "0x83aaf000f0a09f860564e894535cc18f5a50f627"
         },
@@ -3604,6 +3614,9 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
         }
         async setData(value) {
             this._data = value;
+            if (this._data.apiEndpoints) {
+                this.state.setAPIEnpoints(this._data.apiEndpoints);
+            }
             await this.resetRpcWallet();
             this.updateContractAddress();
             await this.refreshUI();
@@ -4820,7 +4833,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                 const assetSymbol = listRouting[0].targetVaultToken.symbol;
                 const { vaultAddress, vaultRegistryAddress, tokenAddress: vaultTokenAddress, softCap } = index_7.bridgeVaultConstantMap[assetSymbol === 'USDT.e' ? 'USDT' : assetSymbol][this.desChain.chainId];
                 const [vault, vaultAssetBalance, bonds, oraclePriceMap] = await Promise.all([
-                    (0, index_9.getBridgeVault)(this.desChain.chainId, vaultAddress),
+                    (0, index_9.getBridgeVault)(this.state, this.desChain.chainId, vaultAddress),
                     (0, index_9.getVaultAssetBalance)(this.desChain.chainId, vaultAddress),
                     (0, index_9.getBondsInBridgeVault)(this.state, this.desChain.chainId, vaultRegistryAddress),
                     (0, index_9.getOraclePriceMap)(this.desChain.chainId)
@@ -5426,7 +5439,8 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                 const logo = this.getAttribute('logo', true);
                 const defaultInputValue = this.getAttribute('defaultInputValue', true);
                 const defaultOutputValue = this.getAttribute('defaultOutputValue', true);
-                let data = { campaignId, category, providers, commissions, tokens, defaultChainId, networks, wallets, showHeader, title, logo, defaultInputValue, defaultOutputValue };
+                const apiEndpoints = this.getAttribute('apiEndpoints', true);
+                let data = { campaignId, category, providers, commissions, tokens, defaultChainId, networks, wallets, showHeader, title, logo, defaultInputValue, defaultOutputValue, apiEndpoints };
                 if (!this.isEmptyData(data)) {
                     await this.setData(data);
                 }
