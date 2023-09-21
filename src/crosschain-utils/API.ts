@@ -3,15 +3,15 @@ import {
 } from "../global/index";
 import {
   ProviderConfigMap,
-  baseRoute,
   BridgeVaultGroupList,
   getBridgeVaultVersion,
-  crossChainNativeTokenList,
   CrossChainAddressMap,
   getNetworkInfo,
   State,
   ProviderConfig,
-  MockOracleMap
+  MockOracleMap,
+  getWETH,
+  getChainNativeToken
 } from "../store/index";
 import { Wallet, BigNumber, Erc20, Utils, TransactionReceipt, Contracts } from "@ijstech/eth-wallet";
 import { Contracts as OpenSwapContracts } from "@scom/oswap-openswap-contract";
@@ -49,7 +49,7 @@ const getTargetChainTokenMap = (chainId: number) => {
   });
   let tokenMap: { [key: string]: ITokenObject } = {};
   Object.values(tokenList).forEach((v, i) => {
-    if (v.isNative) v = { ...crossChainNativeTokenList[chainId], chainId, isNative: true }
+    if (v.isNative) v = { ...getChainNativeToken(chainId), chainId, isNative: true }
     tokenMap["" + v.address] = v;
   });
   return tokenMap;
@@ -297,11 +297,11 @@ const getAvailableRouteOptions = async (state: State, params: GetAvailableRouteO
 
   if (tokenIn.isNative) {
     isTokenInNative = true
-    tokenIn.address = crossChainNativeTokenList[fromChainId].wethAddress;
+    tokenIn.address = getWETH(fromChainId).address;
   }
 
   if (tokenOut.isNative) {
-    tokenOut.address = crossChainNativeTokenList[toChainId].wethAddress;
+    tokenOut.address = getWETH(toChainId).address;
   }
 
   const tradeFeeMap = await getTradeFeeMap(state);

@@ -159,17 +159,6 @@ declare module "@scom/scom-swap/store/providers.ts" {
 }
 /// <amd-module name="@scom/scom-swap/store/cross-chain.ts" />
 declare module "@scom/scom-swap/store/cross-chain.ts" {
-    const baseRoute = "https://route.openswap.xyz";
-    const crossChainNativeTokenList: {
-        [chainId: number]: {
-            address: string;
-            decimals: number;
-            symbol: string;
-            name: string;
-            isNative: boolean;
-            wethAddress: string;
-        };
-    };
     enum VaultType {
         Project = "Project",
         Exchange = "Exchange"
@@ -214,7 +203,7 @@ declare module "@scom/scom-swap/store/cross-chain.ts" {
             [chainId: string]: BridgeVaultConstant;
         };
     };
-    export { baseRoute, BridgeVaultGroupList, CrossChainAddressMap, crossChainNativeTokenList, crossChainSupportedChainIds, MockOracleMap, getBridgeVaultVersion, bridgeVaultConstantMap };
+    export { BridgeVaultGroupList, CrossChainAddressMap, crossChainSupportedChainIds, MockOracleMap, getBridgeVaultVersion, bridgeVaultConstantMap };
 }
 /// <amd-module name="@scom/scom-swap/store/index.ts" />
 declare module "@scom/scom-swap/store/index.ts" {
@@ -1001,7 +990,6 @@ declare module "@scom/scom-swap" {
         private targetVaultBondBalanceLabel2;
         private crossChainSoftCapLabel2;
         private crossChainVaultInfoVstack;
-        private modalViewOrder;
         private lbReminderRejected;
         static create(options?: ScomSwapElement, parent?: Container): Promise<ScomSwap>;
         removeRpcWalletEvents(): void;
@@ -1183,9 +1171,6 @@ declare module "@scom/scom-swap" {
         private initChainIcon;
         private updateSrcChainIconList;
         private onRenderChainList;
-        showViewOrderModal: () => void;
-        closeViewOrderModal: () => void;
-        onViewOrder: () => void;
         showModalFees: () => void;
         closeModalFees: () => void;
         private showResultMessage;

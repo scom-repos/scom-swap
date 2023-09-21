@@ -213,7 +213,6 @@ export default class ScomSwap extends Module {
   private targetVaultBondBalanceLabel2: Label;
   private crossChainSoftCapLabel2: Label;
   private crossChainVaultInfoVstack: VStack;
-  private modalViewOrder: Modal;
   private lbReminderRejected: Label;
 
   static async create(options?: ScomSwapElement, parent?: Container) {
@@ -1050,6 +1049,7 @@ export default class ScomSwap extends Module {
         this.onSwapConfirmed({ key: data.key, isCrossChain: this.isCrossChain });
         await this.updateBalance();
         application.EventBus.dispatch(EventId.Paid, { 
+          isCrossChain: this.isCrossChain,
           data: data ?? null, 
           id: this.id,
           receipt: receipt
@@ -1844,9 +1844,6 @@ export default class ScomSwap extends Module {
     if (this.swapBtn.rightIcon.visible)
       this.swapBtn.rightIcon.visible = false;
     await this.handleAddRoute();
-    if (isCrossChain) {
-      this.showViewOrderModal();
-    }
   }
   private isButtonLoading() {
     if (this.isApproveButtonShown || (this.isCrossChain && this.crossChainApprovalStatus === ApprovalStatus.APPROVING)) {
@@ -2207,19 +2204,6 @@ export default class ScomSwap extends Module {
     this.srcChainBox.visible = true;
     this.desChainBox.visible = true;
   };
-
-  showViewOrderModal = () => {
-    this.modalViewOrder.visible = true;
-  }
-
-  closeViewOrderModal = () => {
-    this.modalViewOrder.visible = false;
-  }
-
-  onViewOrder = () => {
-    this.modalViewOrder.visible = false;
-    window.open('https://www.openswap.xyz/#/cross-chain-bridge-record');
-  }
 
   showModalFees = () => {
     const fees = this.getFeeDetails();
@@ -2605,34 +2589,6 @@ export default class ScomSwap extends Module {
                 </i-panel>
               </i-panel>
             </i-modal>
-
-            <i-modal
-              id="modalViewOrder"
-              class="bg-modal custom-modal custom-md--view"
-              title="Cross Chain"
-              closeIcon={{ name: 'times' }}
-            >
-              <i-panel class="i-modal_content">
-                <i-panel class="mt-1">
-                  <i-hstack verticalAlignment='center' horizontalAlignment='center' class="mb-1">
-                    <i-image width={50} height={50} url={assets.fullPath('img/success-icon.svg')} />
-                  </i-hstack>
-                  <i-hstack verticalAlignment='center' class="flex-col">
-                    <i-label caption="The order was created successfully!" />
-                    <i-label caption="Do you want to view the record?" />
-                  </i-hstack>
-                  <i-hstack verticalAlignment='center' horizontalAlignment='center' class="mt-1">
-                    <i-button
-                      caption="View Order"
-                      class="btn-os"
-                      font={{ color: Theme.colors.primary.contrastText }}
-                      onClick={() => this.onViewOrder()}
-                    />
-                  </i-hstack>
-                </i-panel>
-              </i-panel>
-            </i-modal>
-
             <i-modal
               id="networkErrModal"
               class="bg-modal custom-modal"

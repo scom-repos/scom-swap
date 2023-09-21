@@ -826,18 +826,8 @@ define("@scom/scom-swap/store/providers.ts", ["require", "exports"], function (r
 define("@scom/scom-swap/store/cross-chain.ts", ["require", "exports"], function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.bridgeVaultConstantMap = exports.getBridgeVaultVersion = exports.MockOracleMap = exports.crossChainSupportedChainIds = exports.crossChainNativeTokenList = exports.CrossChainAddressMap = exports.BridgeVaultGroupList = exports.baseRoute = void 0;
-    const baseRoute = 'https://route.openswap.xyz';
-    exports.baseRoute = baseRoute;
-    const crossChainNativeTokenList = {
-        42: { address: "ETH", decimals: 18, symbol: "ETH", name: 'ETH', isNative: true, wethAddress: "0xd0A1E359811322d97991E03f863a0C30C2cF029C" },
-        56: { address: "BNB", decimals: 18, symbol: "BNB", name: 'BNB', isNative: true, wethAddress: "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c" },
-        97: { address: "BNB", decimals: 18, symbol: "BNB", name: 'BNB', isNative: true, wethAddress: "0xae13d989dac2f0debff460ac112a837c89baa7cd" },
-        43113: { address: "AVAX", decimals: 18, symbol: "AVAX", name: 'AVAX', isNative: true, wethAddress: "0xd00ae08403B9bbb9124bB305C09058E32C39A48c" },
-        43114: { address: "AVAX", decimals: 18, symbol: "AVAX", name: 'AVAX', isNative: true, wethAddress: "0xB31f66AA3C1e785363F0875A1B74E27b85FD66c7" },
-        80001: { address: "MATIC", decimals: 18, symbol: "MATIC", name: 'MATIC', isNative: true, wethAddress: "0x9c3C9283D3e44854697Cd22D3Faa240Cfb032889" }
-    };
-    exports.crossChainNativeTokenList = crossChainNativeTokenList;
+    exports.bridgeVaultConstantMap = exports.getBridgeVaultVersion = exports.MockOracleMap = exports.crossChainSupportedChainIds = exports.CrossChainAddressMap = exports.BridgeVaultGroupList = void 0;
+    ///<amd-module name='@scom/scom-swap/store/cross-chain.ts'/> 
     var VaultType;
     (function (VaultType) {
         VaultType["Project"] = "Project";
@@ -1080,7 +1070,7 @@ define("@scom/scom-swap/crosschain-utils/API.ts", ["require", "exports", "@scom/
         let tokenMap = {};
         Object.values(tokenList).forEach((v, i) => {
             if (v.isNative)
-                v = Object.assign(Object.assign({}, index_3.crossChainNativeTokenList[chainId]), { chainId, isNative: true });
+                v = Object.assign(Object.assign({}, (0, index_3.getChainNativeToken)(chainId)), { chainId, isNative: true });
             tokenMap["" + v.address] = v;
         });
         return tokenMap;
@@ -1311,10 +1301,10 @@ define("@scom/scom-swap/crosschain-utils/API.ts", ["require", "exports", "@scom/
         let isTokenOutNative = false;
         if (tokenIn.isNative) {
             isTokenInNative = true;
-            tokenIn.address = index_3.crossChainNativeTokenList[fromChainId].wethAddress;
+            tokenIn.address = (0, index_3.getWETH)(fromChainId).address;
         }
         if (tokenOut.isNative) {
-            tokenOut.address = index_3.crossChainNativeTokenList[toChainId].wethAddress;
+            tokenOut.address = (0, index_3.getWETH)(toChainId).address;
         }
         const tradeFeeMap = await getTradeFeeMap(state);
         const bridgeRoutingAPIEndpoint = state.getAPIEndpoint('bridgeRouting');
@@ -3206,7 +3196,7 @@ define("@scom/scom-swap/assets.ts", ["require", "exports", "@ijstech/components"
         fullPath
     };
 });
-define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstech/eth-wallet", "@scom/scom-swap/store/index.ts", "@scom/scom-token-list", "@scom/scom-swap/swap-utils/index.ts", "@scom/scom-swap/crosschain-utils/index.ts", "@scom/scom-swap/global/index.ts", "@scom/scom-swap/expert-mode-settings/index.tsx", "@scom/scom-swap/data.json.ts", "@scom/scom-swap/formSchema.ts", "@scom/scom-dex-list", "@scom/scom-commission-fee-setup", "@scom/scom-swap/index.css.ts", "@scom/scom-swap/assets.ts", "@scom/scom-swap/index.css.ts"], function (require, exports, components_9, eth_wallet_5, index_7, scom_token_list_5, index_8, index_9, index_10, index_11, data_json_1, formSchema_1, scom_dex_list_2, scom_commission_fee_setup_1, index_css_2, assets_1) {
+define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstech/eth-wallet", "@scom/scom-swap/store/index.ts", "@scom/scom-token-list", "@scom/scom-swap/swap-utils/index.ts", "@scom/scom-swap/crosschain-utils/index.ts", "@scom/scom-swap/global/index.ts", "@scom/scom-swap/expert-mode-settings/index.tsx", "@scom/scom-swap/data.json.ts", "@scom/scom-swap/formSchema.ts", "@scom/scom-dex-list", "@scom/scom-commission-fee-setup", "@scom/scom-swap/index.css.ts", "@scom/scom-swap/index.css.ts"], function (require, exports, components_9, eth_wallet_5, index_7, scom_token_list_5, index_8, index_9, index_10, index_11, data_json_1, formSchema_1, scom_dex_list_2, scom_commission_fee_setup_1, index_css_2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     const Theme = components_9.Styles.Theme.ThemeVars;
@@ -3913,9 +3903,6 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                 if (this.swapBtn.rightIcon.visible)
                     this.swapBtn.rightIcon.visible = false;
                 await this.handleAddRoute();
-                if (isCrossChain) {
-                    this.showViewOrderModal();
-                }
             };
             this.onSubmit = async () => {
                 var _a, _b, _c, _d;
@@ -4182,16 +4169,6 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                 this.srcChainBox.visible = true;
                 this.desChainBox.visible = true;
             };
-            this.showViewOrderModal = () => {
-                this.modalViewOrder.visible = true;
-            };
-            this.closeViewOrderModal = () => {
-                this.modalViewOrder.visible = false;
-            };
-            this.onViewOrder = () => {
-                this.modalViewOrder.visible = false;
-                window.open('https://www.openswap.xyz/#/cross-chain-bridge-record');
-            };
             this.showModalFees = () => {
                 const fees = this.getFeeDetails();
                 this.feesInfo.clearInnerHTML();
@@ -4418,6 +4395,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                     this.onSwapConfirmed({ key: data.key, isCrossChain: this.isCrossChain });
                     await this.updateBalance();
                     components_9.application.EventBus.dispatch("Paid" /* EventId.Paid */, {
+                        isCrossChain: this.isCrossChain,
                         data: data !== null && data !== void 0 ? data : null,
                         id: this.id,
                         receipt: receipt
@@ -5513,16 +5491,6 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                                     this.$render("i-vstack", { id: "feesInfo" }),
                                     this.$render("i-hstack", { verticalAlignment: "center", horizontalAlignment: "center", margin: { top: 16, bottom: 8 } },
                                         this.$render("i-button", { caption: "Close", class: "btn-os", font: { color: Theme.colors.primary.contrastText }, onClick: () => this.closeModalFees() }))))),
-                        this.$render("i-modal", { id: "modalViewOrder", class: "bg-modal custom-modal custom-md--view", title: "Cross Chain", closeIcon: { name: 'times' } },
-                            this.$render("i-panel", { class: "i-modal_content" },
-                                this.$render("i-panel", { class: "mt-1" },
-                                    this.$render("i-hstack", { verticalAlignment: 'center', horizontalAlignment: 'center', class: "mb-1" },
-                                        this.$render("i-image", { width: 50, height: 50, url: assets_1.default.fullPath('img/success-icon.svg') })),
-                                    this.$render("i-hstack", { verticalAlignment: 'center', class: "flex-col" },
-                                        this.$render("i-label", { caption: "The order was created successfully!" }),
-                                        this.$render("i-label", { caption: "Do you want to view the record?" })),
-                                    this.$render("i-hstack", { verticalAlignment: 'center', horizontalAlignment: 'center', class: "mt-1" },
-                                        this.$render("i-button", { caption: "View Order", class: "btn-os", font: { color: Theme.colors.primary.contrastText }, onClick: () => this.onViewOrder() }))))),
                         this.$render("i-modal", { id: "networkErrModal", class: "bg-modal custom-modal", title: "Supported Networks", closeIcon: { name: 'times' } },
                             this.$render("i-panel", { class: "i-modal_content" },
                                 this.$render("i-vstack", { id: "supportedNetworksElm", gap: 10, verticalAlignment: "center" }),
