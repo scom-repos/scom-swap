@@ -234,15 +234,15 @@ const composeRouteObjBridge = async (routeObj: any, firstInput: BigNumber, vault
     // Fee Structure - in InToken
     let sourceRoutingPrice = routeObj.sourceRouteObj ? routeObj.sourceRouteObj.price : 1
     fees = {
-      sourceRouteLiquidityFee: routeObj.sourceRouteObj ? new BigNumber(routeObj.sourceRouteObj.tradeFee).times(fromAmount).toNumber() : 0,
-      targetRouteLiquidityFee: new BigNumber(routeObj.targetRouteObj.tradeFee).times(vaultTokenToTargetChain).times(sourceRoutingPrice).toNumber(),
-      baseFee: new BigNumber(bridgeFees.baseFee).times(sourceRoutingPrice).toNumber(),
-      transactionFee: new BigNumber(bridgeFees.transactionFee).times(sourceRoutingPrice).toNumber(),
-      protocolFee: new BigNumber(bridgeFees.protocolFee).times(sourceRoutingPrice).toNumber(),
-      imbalanceFee: new BigNumber(bridgeFees.imbalanceFee).times(sourceRoutingPrice).toNumber()
+      sourceRouteLiquidityFee: routeObj.sourceRouteObj ? new BigNumber(routeObj.sourceRouteObj.tradeFee).times(fromAmount) : new BigNumber(0),
+      targetRouteLiquidityFee: new BigNumber(routeObj.targetRouteObj.tradeFee).times(vaultTokenToTargetChain).times(sourceRoutingPrice),
+      baseFee: new BigNumber(bridgeFees.baseFee).times(sourceRoutingPrice),
+      transactionFee: new BigNumber(bridgeFees.transactionFee).times(sourceRoutingPrice),
+      protocolFee: new BigNumber(bridgeFees.protocolFee).times(sourceRoutingPrice),
+      imbalanceFee: new BigNumber(bridgeFees.imbalanceFee).times(sourceRoutingPrice)
     }
 
-    tradeFee = Object.values(fees).reduce((a, b) => a + b)
+    tradeFee = Object.values(fees).reduce((a: BigNumber, b: BigNumber) => a.plus(b))
 
   } catch (err) {
     console.log('err', err)

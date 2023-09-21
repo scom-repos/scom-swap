@@ -1,4 +1,4 @@
-import { Module, Panel, Button, Label, VStack, Image, Container, IEventBus, application, customModule, Modal, Input, Control, customElements, ControlElement, Styles, HStack, Icon } from '@ijstech/components';
+import { Module, Panel, Button, Label, VStack, Image, Container, IEventBus, application, customModule, Modal, Input, Control, customElements, ControlElement, Styles, HStack, Icon, FormatUtils } from '@ijstech/components';
 import { BigNumber, Constants, INetwork, Wallet, IERC20ApprovalAction, TransactionReceipt, Utils } from '@ijstech/eth-wallet';
 import './index.css';
 import {
@@ -1614,7 +1614,7 @@ export default class ScomSwap extends Module {
           title: "Source Chain Liquidity Fee",
           description: "This fee is paid to the AMM Liquidity Providers on the Source Chain.",
           value: record.fees.sourceRouteLiquidityFee,
-          isHidden: record.fees.sourceRouteLiquidityFee == 0
+          isHidden: record.fees.sourceRouteLiquidityFee?.isZero()
         },
         {
           title: "Target Chain Liquidity Fee",
@@ -2209,6 +2209,7 @@ export default class ScomSwap extends Module {
     const fees = this.getFeeDetails();
     this.feesInfo.clearInnerHTML();
     fees.forEach((fee) => {
+      const feeValue = FormatUtils.formatNumber(fee.value.toFixed(), { decimalFigures: 4});
       this.feesInfo.appendChild(
         <i-hstack
           horizontalAlignment="space-between" verticalAlignment="center" margin={{ top: 10 }}
@@ -2226,7 +2227,7 @@ export default class ScomSwap extends Module {
               data-placement="right"
             />
           </i-hstack>
-          <i-label class="ml-auto" caption={`${formatNumber(fee.value)} ${this.fromToken?.symbol}`} />
+          <i-label class="ml-auto" caption={`${feeValue} ${this.fromToken?.symbol}`} />
         </i-hstack>
       )
     })

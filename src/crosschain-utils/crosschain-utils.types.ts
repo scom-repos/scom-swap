@@ -76,12 +76,12 @@ export interface GetAvailableRouteOptionsParams {
 }
 
 export interface IBridgeFees {
-  baseFee: BigNumber | number;
-  protocolFee: BigNumber | number;
-  transactionFee: BigNumber | number;
-  imbalanceFee: BigNumber | number;
-  sourceRouteLiquidityFee?: BigNumber | number;
-  targetRouteLiquidityFee?: BigNumber | number;
+  baseFee: BigNumber;
+  protocolFee: BigNumber;
+  transactionFee: BigNumber;
+  imbalanceFee: BigNumber;
+  sourceRouteLiquidityFee?: BigNumber;
+  targetRouteLiquidityFee?: BigNumber;
 }
 
 export interface ICrossChainRouteResult {

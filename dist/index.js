@@ -1246,14 +1246,14 @@ define("@scom/scom-swap/crosschain-utils/API.ts", ["require", "exports", "@scom/
             // Fee Structure - in InToken
             let sourceRoutingPrice = routeObj.sourceRouteObj ? routeObj.sourceRouteObj.price : 1;
             fees = {
-                sourceRouteLiquidityFee: routeObj.sourceRouteObj ? new eth_wallet_3.BigNumber(routeObj.sourceRouteObj.tradeFee).times(fromAmount).toNumber() : 0,
-                targetRouteLiquidityFee: new eth_wallet_3.BigNumber(routeObj.targetRouteObj.tradeFee).times(vaultTokenToTargetChain).times(sourceRoutingPrice).toNumber(),
-                baseFee: new eth_wallet_3.BigNumber(bridgeFees.baseFee).times(sourceRoutingPrice).toNumber(),
-                transactionFee: new eth_wallet_3.BigNumber(bridgeFees.transactionFee).times(sourceRoutingPrice).toNumber(),
-                protocolFee: new eth_wallet_3.BigNumber(bridgeFees.protocolFee).times(sourceRoutingPrice).toNumber(),
-                imbalanceFee: new eth_wallet_3.BigNumber(bridgeFees.imbalanceFee).times(sourceRoutingPrice).toNumber()
+                sourceRouteLiquidityFee: routeObj.sourceRouteObj ? new eth_wallet_3.BigNumber(routeObj.sourceRouteObj.tradeFee).times(fromAmount) : new eth_wallet_3.BigNumber(0),
+                targetRouteLiquidityFee: new eth_wallet_3.BigNumber(routeObj.targetRouteObj.tradeFee).times(vaultTokenToTargetChain).times(sourceRoutingPrice),
+                baseFee: new eth_wallet_3.BigNumber(bridgeFees.baseFee).times(sourceRoutingPrice),
+                transactionFee: new eth_wallet_3.BigNumber(bridgeFees.transactionFee).times(sourceRoutingPrice),
+                protocolFee: new eth_wallet_3.BigNumber(bridgeFees.protocolFee).times(sourceRoutingPrice),
+                imbalanceFee: new eth_wallet_3.BigNumber(bridgeFees.imbalanceFee).times(sourceRoutingPrice)
             };
-            tradeFee = Object.values(fees).reduce((a, b) => a + b);
+            tradeFee = Object.values(fees).reduce((a, b) => a.plus(b));
         }
         catch (err) {
             console.log('err', err);
@@ -4174,11 +4174,12 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                 this.feesInfo.clearInnerHTML();
                 fees.forEach((fee) => {
                     var _a;
+                    const feeValue = components_9.FormatUtils.formatNumber(fee.value.toFixed(), { decimalFigures: 4 });
                     this.feesInfo.appendChild(this.$render("i-hstack", { horizontalAlignment: "space-between", verticalAlignment: "center", margin: { top: 10 }, border: { bottom: { color: Theme.background.main, width: '2px', style: 'solid' } }, padding: { bottom: 16 } },
                         this.$render("i-hstack", { verticalAlignment: "center" },
                             this.$render("i-label", { caption: fee.title, margin: { right: 4 } }),
                             this.$render("i-icon", { name: "question-circle", width: 15, height: 15, fill: Theme.text.primary, tooltip: { content: fee.description }, "data-placement": "right" })),
-                        this.$render("i-label", { class: "ml-auto", caption: `${(0, index_10.formatNumber)(fee.value)} ${(_a = this.fromToken) === null || _a === void 0 ? void 0 : _a.symbol}` })));
+                        this.$render("i-label", { class: "ml-auto", caption: `${feeValue} ${(_a = this.fromToken) === null || _a === void 0 ? void 0 : _a.symbol}` })));
                 });
                 this.feesInfo.appendChild(this.$render("i-hstack", { horizontalAlignment: "space-between", verticalAlignment: "center", margin: { top: 16 } },
                     this.$render("i-hstack", { verticalAlignment: "center" },
@@ -4952,6 +4953,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
             return '-';
         }
         getFeeDetails() {
+            var _a;
             if (this.isCrossChain && this.record) {
                 let record = this.record;
                 let detail = [
@@ -4959,7 +4961,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                         title: "Source Chain Liquidity Fee",
                         description: "This fee is paid to the AMM Liquidity Providers on the Source Chain.",
                         value: record.fees.sourceRouteLiquidityFee,
-                        isHidden: record.fees.sourceRouteLiquidityFee == 0
+                        isHidden: (_a = record.fees.sourceRouteLiquidityFee) === null || _a === void 0 ? void 0 : _a.isZero()
                     },
                     {
                         title: "Target Chain Liquidity Fee",

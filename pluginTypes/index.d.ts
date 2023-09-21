@@ -285,12 +285,12 @@ declare module "@scom/scom-swap/crosschain-utils/crosschain-utils.types.ts" {
         amountIn: number | BigNumber;
     }
     export interface IBridgeFees {
-        baseFee: BigNumber | number;
-        protocolFee: BigNumber | number;
-        transactionFee: BigNumber | number;
-        imbalanceFee: BigNumber | number;
-        sourceRouteLiquidityFee?: BigNumber | number;
-        targetRouteLiquidityFee?: BigNumber | number;
+        baseFee: BigNumber;
+        protocolFee: BigNumber;
+        transactionFee: BigNumber;
+        imbalanceFee: BigNumber;
+        sourceRouteLiquidityFee?: BigNumber;
+        targetRouteLiquidityFee?: BigNumber;
     }
     export interface ICrossChainRouteResult {
         contractAddress: string;
