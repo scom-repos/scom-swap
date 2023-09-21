@@ -1178,10 +1178,8 @@ declare module "@scom/scom-swap" {
         private selectSourceChain;
         private selectDestinationChain;
         private setTargetTokenList;
-        private onSourceChainChanged;
         private onSelectSourceChain;
         private onSelectDestinationChain;
-        private setDefaultChain;
         private initChainIcon;
         private updateSrcChainIconList;
         private onRenderChainList;

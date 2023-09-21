@@ -4102,22 +4102,6 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                     this.secondTokenInput.tokenDataListProp = (0, index_7.getSupportedTokens)(this._data.tokens || [], srcChainId);
                 }
             };
-            this.onSourceChainChanged = () => {
-                var _a, _b;
-                const selected = this.srcChainList.querySelector('.icon-selected');
-                if (selected) {
-                    selected.classList.remove('icon-selected');
-                }
-                this.getSupportedChainList();
-                // if (!this.chainId) this.chainId = this.supportedChainList[0].chainId;
-                const currentNetwork = (0, index_7.getNetworkInfo)((_a = this.supportedChainList.find((f) => f.chainId == this.chainId)) === null || _a === void 0 ? void 0 : _a.chainId);
-                this.srcChain = currentNetwork;
-                this.srcChainLabel.caption = ((_b = this.srcChain) === null || _b === void 0 ? void 0 : _b.chainName) || '-';
-                const img = this.srcChainList.querySelector(`[network-name="${currentNetwork === null || currentNetwork === void 0 ? void 0 : currentNetwork.chainName}"]`);
-                if (img) {
-                    img.classList.add('icon-selected');
-                }
-            };
             this.onSelectSourceChain = async (obj, img) => {
                 if (this.isMetaMask || !(0, index_7.isClientWalletConnected)()) {
                     await this.selectSourceChain(obj, img);
@@ -4130,39 +4114,6 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                     return;
                 await this.selectDestinationChain(obj, img);
                 this.initializeWidgetConfig();
-            };
-            this.setDefaultChain = async () => {
-                var _a;
-                if (this.supportedChainList && this.supportedChainList.length) {
-                    let obj = this.supportedChainList.find((f) => f.chainId == this.chainId);
-                    if (!obj)
-                        obj = this.supportedChainList[0];
-                    if (!this.srcChain && obj) {
-                        await this.selectSourceChain((0, index_7.getNetworkInfo)(obj.chainId));
-                    }
-                    this.onSourceChainChanged();
-                    const targetChain = this.supportedChainList.find((f) => f.chainId == this.targetChainId);
-                    const isSupported = index_7.crossChainSupportedChainIds.some(v => v.chainId === (targetChain === null || targetChain === void 0 ? void 0 : targetChain.chainId));
-                    if (!this.desChain && isSupported) {
-                        await this.selectDestinationChain((0, index_7.getNetworkInfo)(targetChain.chainId));
-                    }
-                    else if (!isSupported && obj) {
-                        await this.selectDestinationChain((0, index_7.getNetworkInfo)(obj.chainId));
-                    }
-                    else {
-                        if (this.isCrossChain)
-                            await this.updateTargetChainBalances();
-                        if (this.toToken) {
-                            const balance = this.getBalance(this.toToken, this.isCrossChain);
-                            this.receiveBalance.caption = `Balance: ${(0, index_10.formatNumber)(balance, 4)} ${this.toToken.symbol}`;
-                        }
-                        this.setTargetTokenList();
-                    }
-                    this.desChainLabel.caption = ((_a = this.desChain) === null || _a === void 0 ? void 0 : _a.chainName) || '-';
-                }
-                else {
-                    this.setTargetTokenList(true);
-                }
             };
             this.initChainIcon = (network, isDes) => {
                 const img = new components_9.Image();
@@ -4203,12 +4154,13 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                 }
             };
             this.onRenderChainList = async () => {
-                var _a, _b;
+                var _a, _b, _c, _d;
+                if (!this.isCrossChainSwap)
+                    return;
                 this.oldSupportedChainList = this.supportedChainList.map(v => (0, index_7.getNetworkInfo)(v.chainId));
                 this.getSupportedChainList();
                 if (((_a = this.oldSupportedChainList[0]) === null || _a === void 0 ? void 0 : _a.chainId) == ((_b = this.supportedChainList[0]) === null || _b === void 0 ? void 0 : _b.chainId)) {
                     this.updateSrcChainIconList();
-                    await this.setDefaultChain();
                     return;
                 }
                 ;
@@ -4218,12 +4170,17 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                 this.desChain = undefined;
                 this.supportedChainList.forEach((v) => {
                     const network = (0, index_7.getNetworkInfo)(v.chainId);
-                    this.initChainIcon(network);
-                    if (index_7.crossChainSupportedChainIds.some(v => v.chainId === network.chainId)) {
-                        this.initChainIcon(network, true);
-                    }
+                    this.initChainIcon(network, false);
+                    this.initChainIcon(network, true);
                 });
-                await this.setDefaultChain();
+                if (this.supportedChainList.length > 1) {
+                    const firstNetwork = (0, index_7.getNetworkInfo)((_c = this.supportedChainList[0]) === null || _c === void 0 ? void 0 : _c.chainId);
+                    const secondNetwork = (0, index_7.getNetworkInfo)((_d = this.supportedChainList[1]) === null || _d === void 0 ? void 0 : _d.chainId);
+                    await this.selectSourceChain(firstNetwork);
+                    await this.selectDestinationChain(secondNetwork);
+                }
+                this.srcChainBox.visible = true;
+                this.desChainBox.visible = true;
             };
             this.showViewOrderModal = () => {
                 this.modalViewOrder.visible = true;
@@ -5295,19 +5252,9 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
             return this._data.category === 'cross-chain-swap';
         }
         get isCrossChainEnabled() {
-            var _a, _b, _c, _d, _e;
             let chainId = this.state.getChainId();
             if (!this.supportedChainList.some((v) => v.chainId == chainId) || !this.isCrossChainSwap) {
-                (_a = this.srcChainBox) === null || _a === void 0 ? void 0 : _a.classList.add('hidden');
-                (_b = this.desChainBox) === null || _b === void 0 ? void 0 : _b.classList.add('hidden');
                 return false;
-            }
-            (_c = this.srcChainBox) === null || _c === void 0 ? void 0 : _c.classList.remove('hidden');
-            if (index_7.crossChainSupportedChainIds.some(v => { var _a; return v.chainId === ((_a = this.srcChain) === null || _a === void 0 ? void 0 : _a.chainId); })) {
-                (_d = this.desChainBox) === null || _d === void 0 ? void 0 : _d.classList.remove('hidden');
-            }
-            else {
-                (_e = this.desChainBox) === null || _e === void 0 ? void 0 : _e.classList.add('hidden');
             }
             return true;
         }
@@ -5454,7 +5401,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                             this.$render("i-panel", { class: "content-swap" },
                                 this.$render("i-hstack", { id: "wrapperSwap", gap: 10 },
                                     this.$render("i-vstack", { gap: 5, minWidth: 230, width: "calc(100% - 25px)" },
-                                        this.$render("i-vstack", { id: "srcChainBox", width: "100%", margin: { top: 8, bottom: 8 } },
+                                        this.$render("i-vstack", { id: "srcChainBox", width: "100%", margin: { top: 8, bottom: 8 }, visible: false },
                                             this.$render("i-hstack", { gap: 8, horizontalAlignment: "space-between" },
                                                 this.$render("i-label", { opacity: 0.8, caption: "Source Chain", minWidth: "7rem" }),
                                                 this.$render("i-label", { id: "srcChainLabel", class: "chain-text", margin: { left: 'auto' }, caption: "-" })),
@@ -5477,7 +5424,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                                     this.$render("i-hstack", { class: "toggle-reverse", alignItems: "end" },
                                         this.$render("i-icon", { id: "toggleReverseImage", position: "relative", width: 32, height: 32, class: "icon-swap rounded-icon custom-ic--swap", name: "arrows-alt-v", onClick: this.onRevertSwap.bind(this) })),
                                     this.$render("i-vstack", { gap: 5, minWidth: 230, width: "calc(100% - 25px)" },
-                                        this.$render("i-vstack", { id: "desChainBox", width: "100%", margin: { top: 8, bottom: 8 } },
+                                        this.$render("i-vstack", { id: "desChainBox", width: "100%", margin: { top: 8, bottom: 8 }, visible: false },
                                             this.$render("i-hstack", { gap: 8, horizontalAlignment: "space-between" },
                                                 this.$render("i-label", { opacity: 0.8, caption: "Destination Chain", minWidth: "7rem" }),
                                                 this.$render("i-label", { id: "desChainLabel", class: "chain-text", margin: { left: 'auto' }, caption: "-" })),

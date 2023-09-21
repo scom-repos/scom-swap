@@ -1996,17 +1996,8 @@ export default class ScomSwap extends Module {
 
   private get isCrossChainEnabled() {
     let chainId = this.state.getChainId();
-
     if (!this.supportedChainList.some((v: INetworkConfig) => v.chainId == chainId) || !this.isCrossChainSwap) {
-      this.srcChainBox?.classList.add('hidden');
-      this.desChainBox?.classList.add('hidden');
       return false;
-    }
-    this.srcChainBox?.classList.remove('hidden');
-    if (crossChainSupportedChainIds.some(v => v.chainId === this.srcChain?.chainId)) {
-      this.desChainBox?.classList.remove('hidden');
-    } else {
-      this.desChainBox?.classList.add('hidden');
     }
     return true;
   };
@@ -2138,22 +2129,6 @@ export default class ScomSwap extends Module {
     }
   }
 
-  private onSourceChainChanged = () => {
-    const selected = this.srcChainList.querySelector('.icon-selected');
-    if (selected) {
-      selected.classList.remove('icon-selected');
-    }
-    this.getSupportedChainList();
-    // if (!this.chainId) this.chainId = this.supportedChainList[0].chainId;
-    const currentNetwork = getNetworkInfo(this.supportedChainList.find((f: INetwork) => f.chainId == this.chainId)?.chainId);
-    this.srcChain = currentNetwork;
-    this.srcChainLabel.caption = this.srcChain?.chainName || '-';
-    const img = this.srcChainList.querySelector(`[network-name="${currentNetwork?.chainName}"]`);
-    if (img) {
-      img.classList.add('icon-selected');
-    }
-  }
-
   private onSelectSourceChain = async (obj: INetwork, img?: Image) => {
     if (this.isMetaMask || !isClientWalletConnected()) {
       await this.selectSourceChain(obj, img);
@@ -2166,35 +2141,6 @@ export default class ScomSwap extends Module {
     await this.selectDestinationChain(obj, img);
     this.initializeWidgetConfig();
   }
-
-  private setDefaultChain = async () => {
-    if (this.supportedChainList && this.supportedChainList.length) {
-      let obj = this.supportedChainList.find((f: INetwork) => f.chainId == this.chainId);
-      if (!obj)
-        obj = this.supportedChainList[0];
-      if (!this.srcChain && obj) {
-        await this.selectSourceChain(getNetworkInfo(obj.chainId));
-      }
-      this.onSourceChainChanged();
-      const targetChain = this.supportedChainList.find((f: INetwork) => f.chainId == this.targetChainId);
-      const isSupported = crossChainSupportedChainIds.some(v => v.chainId === targetChain?.chainId);
-      if (!this.desChain && isSupported) {
-        await this.selectDestinationChain(getNetworkInfo(targetChain.chainId));
-      } else if (!isSupported && obj) {
-        await this.selectDestinationChain(getNetworkInfo(obj.chainId));
-      } else {
-        if (this.isCrossChain) await this.updateTargetChainBalances();
-        if (this.toToken) {
-          const balance = this.getBalance(this.toToken, this.isCrossChain);
-          this.receiveBalance.caption = `Balance: ${formatNumber(balance, 4)} ${this.toToken.symbol}`;
-        }
-        this.setTargetTokenList();
-      }
-      this.desChainLabel.caption = this.desChain?.chainName || '-';
-    } else {
-      this.setTargetTokenList(true);
-    }
-  };
 
   private initChainIcon = (network: INetwork, isDes?: boolean) => {
     const img = new Image();
@@ -2235,11 +2181,11 @@ export default class ScomSwap extends Module {
   };
 
   private onRenderChainList = async () => {
+    if (!this.isCrossChainSwap) return;
     this.oldSupportedChainList = this.supportedChainList.map(v => getNetworkInfo(v.chainId));
     this.getSupportedChainList();
     if (this.oldSupportedChainList[0]?.chainId == this.supportedChainList[0]?.chainId) {
       this.updateSrcChainIconList();
-      await this.setDefaultChain();
       return;
     };
     this.srcChainList.innerHTML = '';
@@ -2248,12 +2194,18 @@ export default class ScomSwap extends Module {
     this.desChain = undefined;
     this.supportedChainList.forEach((v: INetworkConfig) => {
       const network = getNetworkInfo(v.chainId);
-      this.initChainIcon(network);
-      if (crossChainSupportedChainIds.some(v => v.chainId === network.chainId)) {
-        this.initChainIcon(network, true);
-      }
+      this.initChainIcon(network, false);
+      this.initChainIcon(network, true);
     });
-    await this.setDefaultChain();
+    
+    if (this.supportedChainList.length > 1) {
+      const firstNetwork = getNetworkInfo(this.supportedChainList[0]?.chainId);
+      const secondNetwork = getNetworkInfo(this.supportedChainList[1]?.chainId);
+      await this.selectSourceChain(firstNetwork);
+      await this.selectDestinationChain(secondNetwork);
+    }
+    this.srcChainBox.visible = true;
+    this.desChainBox.visible = true;
   };
 
   showViewOrderModal = () => {
@@ -2441,7 +2393,7 @@ export default class ScomSwap extends Module {
               <i-panel class="content-swap">
                 <i-hstack id="wrapperSwap" gap={10}>
                   <i-vstack gap={5} minWidth={230} width="calc(100% - 25px)">
-                    <i-vstack id="srcChainBox" width="100%" margin={{ top: 8, bottom: 8 }}>
+                    <i-vstack id="srcChainBox" width="100%" margin={{ top: 8, bottom: 8 }} visible={false}>
                       <i-hstack gap={8} horizontalAlignment="space-between">
                         <i-label opacity={0.8} caption="Source Chain" minWidth="7rem" />
                         <i-label id="srcChainLabel" class="chain-text" margin={{ left: 'auto' }} caption="-" />
@@ -2490,7 +2442,7 @@ export default class ScomSwap extends Module {
                     <i-icon id="toggleReverseImage" position="relative" width={32} height={32} class="icon-swap rounded-icon custom-ic--swap" name="arrows-alt-v" onClick={this.onRevertSwap.bind(this)} />
                   </i-hstack>
                   <i-vstack gap={5} minWidth={230} width="calc(100% - 25px)">
-                    <i-vstack id="desChainBox" width="100%" margin={{ top: 8, bottom: 8 }}>
+                    <i-vstack id="desChainBox" width="100%" margin={{ top: 8, bottom: 8 }} visible={false}>
                       <i-hstack gap={8} horizontalAlignment="space-between">
                         <i-label opacity={0.8} caption="Destination Chain" minWidth="7rem"/>
                         <i-label id="desChainLabel" class="chain-text" margin={{ left: 'auto' }} caption="-" />
