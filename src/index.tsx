@@ -153,8 +153,7 @@ export default class ScomSwap extends Module {
   private timeout: any; // NodeJS.Timeout;
   private isPriceToggled: boolean;
   private record: any;
-  private allTokenBalancesMap: any;
-  // private availableMarkets: any;
+
   private supportedChainIds: number[];
   private swapButtonStatusMap: any;
   private approveButtonStatusMap: any;
@@ -1227,8 +1226,6 @@ export default class ScomSwap extends Module {
     if (token.isNew && this.state.isRpcWalletConnected()) {
       const rpcWallet = this.state.getRpcWallet();
       await tokenStore.updateAllTokenBalances(rpcWallet);
-      let tokenBalances = tokenStore.getTokenBalancesByChainId(this.chainId);
-      this.allTokenBalancesMap = tokenBalances;
     }
     await this.onUpdateToken(token, isFrom);
     this.redirectToken();
@@ -1715,28 +1712,25 @@ export default class ScomSwap extends Module {
     }
   };
   private getBalance(token?: ITokenObject, isCrossChain?: boolean) {
-    if (token && this.allTokenBalancesMap) {
-      const address = token.address || '';
-      let balance: number = 0;
-      if (isCrossChain) {
-        balance = Number(token.isNative ? this.targetChainTokenBalances[token.symbol] : this.targetChainTokenBalances[address.toLowerCase()]) || 0;
-      } else {
-        balance = address ? this.allTokenBalancesMap[address.toLowerCase()] ?? 0 : this.allTokenBalancesMap[token.symbol] || 0;
-      }
-      return balance
+    if (!token) return '0';
+    let tokenBalances = tokenStore.getTokenBalancesByChainId(token.chainId);
+    if (!tokenBalances) return '0';
+    const address = token.address || '';
+    let balance = '0';
+    if (isCrossChain) {
+      balance = token.isNative ? this.targetChainTokenBalances[token.symbol] : this.targetChainTokenBalances[address.toLowerCase()] || '0';
+    } else {
+      balance = address ? tokenBalances[address.toLowerCase()] ?? '0' : tokenBalances[token.symbol] || '0';
     }
-    return 0;
+    return balance
   }
   private async updateBalance() {
     const rpcWallet = this.state.getRpcWallet();
     if (rpcWallet.address) {
       if (this.isCrossChain) await this.updateTargetChainBalances();
       if (this.hasData) await tokenStore.updateAllTokenBalances(rpcWallet);
-      let tokenBalances = tokenStore.getTokenBalancesByChainId(this.chainId);
-      this.allTokenBalancesMap = tokenBalances;
     }
     else {
-      this.allTokenBalancesMap = {};
     }
     if (this.fromToken) {
       const balance = this.getBalance(this.fromToken, this.isCrossChain);
@@ -1962,7 +1956,7 @@ export default class ScomSwap extends Module {
   private isMaxDisabled = (): boolean => {
     const address = this.fromToken?.address || this.fromToken?.symbol;
     let balance = this.getBalance(this.fromToken);
-    return !address || balance <= 0
+    return !address || new BigNumber(balance).isLessThanOrEqualTo(0)
   }
 
   private onRenderPriceInfo() {

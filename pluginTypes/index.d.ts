@@ -934,7 +934,6 @@ declare module "@scom/scom-swap" {
         private timeout;
         private isPriceToggled;
         private record;
-        private allTokenBalancesMap;
         private supportedChainIds;
         private swapButtonStatusMap;
         private approveButtonStatusMap;

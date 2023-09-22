@@ -3980,7 +3980,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                 var _a, _b;
                 const address = ((_a = this.fromToken) === null || _a === void 0 ? void 0 : _a.address) || ((_b = this.fromToken) === null || _b === void 0 ? void 0 : _b.symbol);
                 let balance = this.getBalance(this.fromToken);
-                return !address || balance <= 0;
+                return !address || new eth_wallet_5.BigNumber(balance).isLessThanOrEqualTo(0);
             };
             this.getSupportedChainList = () => {
                 const list = this.networks;
@@ -4560,8 +4560,6 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
             if (token.isNew && this.state.isRpcWalletConnected()) {
                 const rpcWallet = this.state.getRpcWallet();
                 await scom_token_list_5.tokenStore.updateAllTokenBalances(rpcWallet);
-                let tokenBalances = scom_token_list_5.tokenStore.getTokenBalancesByChainId(this.chainId);
-                this.allTokenBalancesMap = tokenBalances;
             }
             await this.onUpdateToken(token, isFrom);
             this.redirectToken();
@@ -5046,18 +5044,20 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
         }
         getBalance(token, isCrossChain) {
             var _a;
-            if (token && this.allTokenBalancesMap) {
-                const address = token.address || '';
-                let balance = 0;
-                if (isCrossChain) {
-                    balance = Number(token.isNative ? this.targetChainTokenBalances[token.symbol] : this.targetChainTokenBalances[address.toLowerCase()]) || 0;
-                }
-                else {
-                    balance = address ? (_a = this.allTokenBalancesMap[address.toLowerCase()]) !== null && _a !== void 0 ? _a : 0 : this.allTokenBalancesMap[token.symbol] || 0;
-                }
-                return balance;
+            if (!token)
+                return '0';
+            let tokenBalances = scom_token_list_5.tokenStore.getTokenBalancesByChainId(token.chainId);
+            if (!tokenBalances)
+                return '0';
+            const address = token.address || '';
+            let balance = '0';
+            if (isCrossChain) {
+                balance = token.isNative ? this.targetChainTokenBalances[token.symbol] : this.targetChainTokenBalances[address.toLowerCase()] || '0';
             }
-            return 0;
+            else {
+                balance = address ? (_a = tokenBalances[address.toLowerCase()]) !== null && _a !== void 0 ? _a : '0' : tokenBalances[token.symbol] || '0';
+            }
+            return balance;
         }
         async updateBalance() {
             const rpcWallet = this.state.getRpcWallet();
@@ -5066,11 +5066,8 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                     await this.updateTargetChainBalances();
                 if (this.hasData)
                     await scom_token_list_5.tokenStore.updateAllTokenBalances(rpcWallet);
-                let tokenBalances = scom_token_list_5.tokenStore.getTokenBalancesByChainId(this.chainId);
-                this.allTokenBalancesMap = tokenBalances;
             }
             else {
-                this.allTokenBalancesMap = {};
             }
             if (this.fromToken) {
                 const balance = this.getBalance(this.fromToken, this.isCrossChain);
