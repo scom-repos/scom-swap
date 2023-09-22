@@ -63,6 +63,7 @@ export { ISwapWidgetData };
 const Theme = Styles.Theme.ThemeVars;
 const priceImpactTooHighMsg = 'Price Impact Too High. If you want to bypass this check, please turn on Expert Mode';
 type StatusMapType = 'approve' | 'swap';
+const ROUNDING_NUMBER = BigNumber.ROUND_DOWN;
 
 interface ScomSwapElement extends ControlElement {
   campaignId?: number;
@@ -836,13 +837,14 @@ export default class ScomSwap extends Module {
   private fixedNumber = (value: BigNumber | string | number) => {
     const val = typeof value === 'object' ? value : new BigNumber(value);
     if (val.isNaN() || val.isZero()) return '';
-    let formatted = '';
-    if (val.gte(1)) {
-      formatted = val.toNumber().toLocaleString('en-US', { maximumFractionDigits: 4 });
-    } else {
-      formatted = val.toNumber().toLocaleString('en-US', { maximumSignificantDigits: 4 });
-    }
-    return formatted.replace(/,/g, '');
+    // let formatted = '';
+    // if (val.gte(1)) {
+    //   formatted = val.toNumber().toLocaleString('en-US', { maximumFractionDigits: 4 });
+    // } else {
+    //   formatted = val.toNumber().toLocaleString('en-US', { maximumSignificantDigits: 4 });
+    // }
+    // const format1 = formatted.replace(/,/g, '');
+    return FormatUtils.formatNumber(val.toFixed(), {decimalFigures: 4, useSeparators: false});
   }
 
   private getTokenKey(token: ITokenObject) {
@@ -1189,7 +1191,7 @@ export default class ScomSwap extends Module {
       const enabled = !this.isMaxDisabled();
       this.maxButton.enabled = enabled;
       if (this.fromInputValue.gt(0)) {
-        const formattedValue = new BigNumber(this.fromInputValue).dp(token.decimals || 18).toString();
+        const formattedValue = new BigNumber(this.fromInputValue).dp(token.decimals || 18, ROUNDING_NUMBER).toFixed();
         if (!this.fromInputValue.eq(formattedValue)) {
           if (this.firstTokenInput) {
             this.firstTokenInput.value = formattedValue === '0' ? '' : formattedValue;
@@ -1204,7 +1206,7 @@ export default class ScomSwap extends Module {
     } else {
       this.toToken = token;
       if (this.toInputValue.gt(0)) {
-        const formattedValue = new BigNumber(this.toInputValue).dp(token.decimals || 18).toString();
+        const formattedValue = new BigNumber(this.toInputValue).dp(token.decimals || 18, ROUNDING_NUMBER).toFixed();
         if (!this.toInputValue.eq(formattedValue)) {
           if (this.secondTokenInput) {
             this.secondTokenInput.value = formattedValue === '0' ? '' : formattedValue;
@@ -1255,7 +1257,7 @@ export default class ScomSwap extends Module {
     const token = isFrom ? this.fromToken : this.toToken;
     const value = isFrom ? this.fromInputValue : this.toInputValue;
     if (!value || value.isNaN()) return '';
-    const newValue = value.dp(token?.decimals || 18).toString()
+    const newValue = value.dp(token?.decimals || 18, ROUNDING_NUMBER).toFixed()
     return newValue;
   }
 
@@ -1312,7 +1314,7 @@ export default class ScomSwap extends Module {
         return;
       }
       const limit = (isFrom ? this.fromToken?.decimals : this.toToken?.decimals) || 18;
-      const value = new BigNumber(new BigNumber(amount).dp(limit));
+      const value = new BigNumber(amount).dp(limit, ROUNDING_NUMBER);
       if (!value.gt(0)) {
         this.resetValuesByInput();
         if (isFrom && toInput) {
@@ -1600,8 +1602,8 @@ export default class ScomSwap extends Module {
     return '-';
   }
   private getTradeFeeExactAmount() {
-    const tradeFee = this.isCrossChain ? this.record?.tradeFee : this.record?.fromAmount.times(this.record?.tradeFee).toNumber();
-    if (tradeFee || tradeFee == 0) {
+    const tradeFee = this.isCrossChain ? new BigNumber(this.record?.tradeFee) : this.record?.fromAmount.times(this.record?.tradeFee);
+    if (tradeFee && !tradeFee.isNaN()) {
       return `${formatNumber(tradeFee)} ${this.fromToken?.symbol}`;
     }
     return '-';
@@ -1953,7 +1955,7 @@ export default class ScomSwap extends Module {
     if (inputVal.eq(this.fromInputValue)) return;
     this.fromInputValue = inputVal;
     const decimals = this.fromToken?.decimals || 18;
-    this.firstTokenInput.value = formatNumber(this.fromInputValue, decimals);
+    this.firstTokenInput.value = this.fromInputValue.dp(decimals, ROUNDING_NUMBER).toFixed();
     this.redirectToken();
     await this.handleAddRoute();
   }
