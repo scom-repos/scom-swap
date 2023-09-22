@@ -500,11 +500,9 @@ define("@scom/scom-swap/global/utils/helper.ts", ["require", "exports", "@ijstec
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.getAPI = exports.isInvalidInput = exports.formatNumber = void 0;
     const formatNumber = (value, decimalFigures) => {
-        if (typeof value === 'object') {
-            value = value.toString();
-        }
+        const newValue = (typeof value === 'object') ? value.toFixed() : value;
         const minValue = '0.0000001';
-        return components_2.FormatUtils.formatNumber(value, { decimalFigures: decimalFigures || 4, minValue });
+        return components_2.FormatUtils.formatNumber(newValue, { decimalFigures: decimalFigures || 4, minValue });
     };
     exports.formatNumber = formatNumber;
     const isInvalidInput = (val) => {
@@ -3201,6 +3199,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
     Object.defineProperty(exports, "__esModule", { value: true });
     const Theme = components_9.Styles.Theme.ThemeVars;
     const priceImpactTooHighMsg = 'Price Impact Too High. If you want to bypass this check, please turn on Expert Mode';
+    const ROUNDING_NUMBER = eth_wallet_5.BigNumber.ROUND_DOWN;
     let ScomSwap = class ScomSwap extends components_9.Module {
         static async create(options, parent) {
             let self = new this(parent, options);
@@ -3761,14 +3760,14 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                 const val = typeof value === 'object' ? value : new eth_wallet_5.BigNumber(value);
                 if (val.isNaN() || val.isZero())
                     return '';
-                let formatted = '';
-                if (val.gte(1)) {
-                    formatted = val.toNumber().toLocaleString('en-US', { maximumFractionDigits: 4 });
-                }
-                else {
-                    formatted = val.toNumber().toLocaleString('en-US', { maximumSignificantDigits: 4 });
-                }
-                return formatted.replace(/,/g, '');
+                // let formatted = '';
+                // if (val.gte(1)) {
+                //   formatted = val.toNumber().toLocaleString('en-US', { maximumFractionDigits: 4 });
+                // } else {
+                //   formatted = val.toNumber().toLocaleString('en-US', { maximumSignificantDigits: 4 });
+                // }
+                // const format1 = formatted.replace(/,/g, '');
+                return components_9.FormatUtils.formatNumber(val.toFixed(), { decimalFigures: 4, useSeparators: false });
             };
             this.initWallet = async () => {
                 try {
@@ -3973,7 +3972,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                     return;
                 this.fromInputValue = inputVal;
                 const decimals = ((_d = this.fromToken) === null || _d === void 0 ? void 0 : _d.decimals) || 18;
-                this.firstTokenInput.value = (0, index_10.formatNumber)(this.fromInputValue, decimals);
+                this.firstTokenInput.value = this.fromInputValue.dp(decimals, ROUNDING_NUMBER).toFixed();
                 this.redirectToken();
                 await this.handleAddRoute();
             };
@@ -4572,7 +4571,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                 const enabled = !this.isMaxDisabled();
                 this.maxButton.enabled = enabled;
                 if (this.fromInputValue.gt(0)) {
-                    const formattedValue = new eth_wallet_5.BigNumber(this.fromInputValue).dp(token.decimals || 18).toString();
+                    const formattedValue = new eth_wallet_5.BigNumber(this.fromInputValue).dp(token.decimals || 18, ROUNDING_NUMBER).toFixed();
                     if (!this.fromInputValue.eq(formattedValue)) {
                         if (this.firstTokenInput) {
                             this.firstTokenInput.value = formattedValue === '0' ? '' : formattedValue;
@@ -4589,7 +4588,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
             else {
                 this.toToken = token;
                 if (this.toInputValue.gt(0)) {
-                    const formattedValue = new eth_wallet_5.BigNumber(this.toInputValue).dp(token.decimals || 18).toString();
+                    const formattedValue = new eth_wallet_5.BigNumber(this.toInputValue).dp(token.decimals || 18, ROUNDING_NUMBER).toFixed();
                     if (!this.toInputValue.eq(formattedValue)) {
                         if (this.secondTokenInput) {
                             this.secondTokenInput.value = formattedValue === '0' ? '' : formattedValue;
@@ -4645,7 +4644,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
             const value = isFrom ? this.fromInputValue : this.toInputValue;
             if (!value || value.isNaN())
                 return '';
-            const newValue = value.dp((token === null || token === void 0 ? void 0 : token.decimals) || 18).toString();
+            const newValue = value.dp((token === null || token === void 0 ? void 0 : token.decimals) || 18, ROUNDING_NUMBER).toFixed();
             return newValue;
         }
         async updateTokenInput(isFrom, init) {
@@ -4702,7 +4701,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                     return;
                 }
                 const limit = (isFrom ? (_c = this.fromToken) === null || _c === void 0 ? void 0 : _c.decimals : (_d = this.toToken) === null || _d === void 0 ? void 0 : _d.decimals) || 18;
-                const value = new eth_wallet_5.BigNumber(new eth_wallet_5.BigNumber(amount).dp(limit));
+                const value = new eth_wallet_5.BigNumber(amount).dp(limit, ROUNDING_NUMBER);
                 if (!value.gt(0)) {
                     this.resetValuesByInput();
                     if (isFrom && toInput) {
@@ -4997,8 +4996,8 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
         }
         getTradeFeeExactAmount() {
             var _a, _b, _c, _d;
-            const tradeFee = this.isCrossChain ? (_a = this.record) === null || _a === void 0 ? void 0 : _a.tradeFee : (_b = this.record) === null || _b === void 0 ? void 0 : _b.fromAmount.times((_c = this.record) === null || _c === void 0 ? void 0 : _c.tradeFee).toNumber();
-            if (tradeFee || tradeFee == 0) {
+            const tradeFee = this.isCrossChain ? new eth_wallet_5.BigNumber((_a = this.record) === null || _a === void 0 ? void 0 : _a.tradeFee) : (_b = this.record) === null || _b === void 0 ? void 0 : _b.fromAmount.times((_c = this.record) === null || _c === void 0 ? void 0 : _c.tradeFee);
+            if (tradeFee && !tradeFee.isNaN()) {
                 return `${(0, index_10.formatNumber)(tradeFee)} ${(_d = this.fromToken) === null || _d === void 0 ? void 0 : _d.symbol}`;
             }
             return '-';

@@ -2,11 +2,9 @@ import { FormatUtils } from "@ijstech/components";
 import { BigNumber } from "@ijstech/eth-wallet";
 
 export const formatNumber = (value: number | string | BigNumber, decimalFigures?: number) => {
-  if (typeof value === 'object') {
-    value = value.toString();
-  }
+  const newValue = (typeof value === 'object') ? value.toFixed() : value;
   const minValue = '0.0000001';
-  return FormatUtils.formatNumber(value, {decimalFigures: decimalFigures || 4, minValue});
+  return FormatUtils.formatNumber(newValue, {decimalFigures: decimalFigures || 4, minValue});
 };
 
 export const isInvalidInput = (val: any) => {
