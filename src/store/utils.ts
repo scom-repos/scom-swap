@@ -22,7 +22,7 @@ export class State {
   dexInfoList: IDexInfo[] = [];
   providerList: IProvider[] = [];
   proxyAddresses: ProxyAddresses = {};
-  apiGatewayUrls: Record<string, string> = {};
+  apiEndpoints: Record<string, string> = {};
   embedderCommissionFee: string;
   rpcWalletId: string = "";
   approvalModel: ERC20ApprovalModel;
@@ -127,9 +127,17 @@ export class State {
     if (options.proxyAddresses) {
       this.proxyAddresses = options.proxyAddresses;
     }
-    if (options.apiGatewayUrls) {
-      this.apiGatewayUrls = options.apiGatewayUrls;
+    if (options.apiEndpoints) {
+      this.setAPIEnpoints(options.apiEndpoints);
     }
+  }
+
+  setAPIEnpoints(apiEndpoints: Record<string, string>) {
+    this.apiEndpoints = apiEndpoints;
+  }
+
+  getAPIEndpoint(key: string) {
+    return this.apiEndpoints[key];
   }
 
   private setNetworkList(networkList: INetwork[], infuraId?: string) {

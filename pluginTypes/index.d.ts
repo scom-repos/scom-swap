@@ -63,6 +63,7 @@ declare module "@scom/scom-swap/global/utils/swapInterface.ts" {
         title?: string;
         defaultInputValue?: string;
         defaultOutputValue?: string;
+        apiEndpoints?: Record<string, string>;
     }
 }
 /// <amd-module name="@scom/scom-swap/global/utils/index.ts" />
@@ -113,7 +114,7 @@ declare module "@scom/scom-swap/store/utils.ts" {
         dexInfoList: IDexInfo[];
         providerList: IProvider[];
         proxyAddresses: ProxyAddresses;
-        apiGatewayUrls: Record<string, string>;
+        apiEndpoints: Record<string, string>;
         embedderCommissionFee: string;
         rpcWalletId: string;
         approvalModel: ERC20ApprovalModel;
@@ -133,6 +134,8 @@ declare module "@scom/scom-swap/store/utils.ts" {
         getChainId(): number;
         toggleExpertMode(): void;
         private initData;
+        setAPIEnpoints(apiEndpoints: Record<string, string>): void;
+        getAPIEndpoint(key: string): string;
         private setNetworkList;
         setApprovalModelAction(options: IERC20ApprovalEventOptions): Promise<import("@ijstech/eth-wallet").IERC20ApprovalAction>;
     }
@@ -156,17 +159,6 @@ declare module "@scom/scom-swap/store/providers.ts" {
 }
 /// <amd-module name="@scom/scom-swap/store/cross-chain.ts" />
 declare module "@scom/scom-swap/store/cross-chain.ts" {
-    const baseRoute = "https://route.openswap.xyz";
-    const crossChainNativeTokenList: {
-        [chainId: number]: {
-            address: string;
-            decimals: number;
-            symbol: string;
-            name: string;
-            isNative: boolean;
-            wethAddress: string;
-        };
-    };
     enum VaultType {
         Project = "Project",
         Exchange = "Exchange"
@@ -211,7 +203,7 @@ declare module "@scom/scom-swap/store/cross-chain.ts" {
             [chainId: string]: BridgeVaultConstant;
         };
     };
-    export { baseRoute, BridgeVaultGroupList, CrossChainAddressMap, crossChainNativeTokenList, crossChainSupportedChainIds, MockOracleMap, getBridgeVaultVersion, bridgeVaultConstantMap };
+    export { BridgeVaultGroupList, CrossChainAddressMap, crossChainSupportedChainIds, MockOracleMap, getBridgeVaultVersion, bridgeVaultConstantMap };
 }
 /// <amd-module name="@scom/scom-swap/store/index.ts" />
 declare module "@scom/scom-swap/store/index.ts" {
@@ -293,12 +285,12 @@ declare module "@scom/scom-swap/crosschain-utils/crosschain-utils.types.ts" {
         amountIn: number | BigNumber;
     }
     export interface IBridgeFees {
-        baseFee: BigNumber | number;
-        protocolFee: BigNumber | number;
-        transactionFee: BigNumber | number;
-        imbalanceFee: BigNumber | number;
-        sourceRouteLiquidityFee?: BigNumber | number;
-        targetRouteLiquidityFee?: BigNumber | number;
+        baseFee: BigNumber;
+        protocolFee: BigNumber;
+        transactionFee: BigNumber;
+        imbalanceFee: BigNumber;
+        sourceRouteLiquidityFee?: BigNumber;
+        targetRouteLiquidityFee?: BigNumber;
     }
     export interface ICrossChainRouteResult {
         contractAddress: string;
@@ -411,7 +403,7 @@ declare module "@scom/scom-swap/crosschain-utils/API.ts" {
         };
         balances: {};
     }>;
-    const getBridgeVault: (chainId: number, vaultAddress: string) => Promise<IBridgeVault>;
+    const getBridgeVault: (state: State, chainId: number, vaultAddress: string) => Promise<IBridgeVault>;
     const getBondsInBridgeVault: (state: State, chainId: number, vaultTrollRegistry: string, version?: string) => Promise<IBridgeVaultBond[]>;
     const createBridgeVaultOrder: (state: State, params: CreateBridgeVaultOrderParams) => Promise<{
         receipt: TransactionReceipt | null;
@@ -533,6 +525,12 @@ declare module "@scom/scom-swap/data.json.ts" {
         networks: {
             chainId: number;
         }[];
+        apiEndpoints: {
+            tradingRouting: string;
+            bridgeRouting: string;
+            bridgeVault: string;
+            bonds: string;
+        };
         proxyAddresses: {
             "43113": string;
         };
@@ -878,6 +876,7 @@ declare module "@scom/scom-swap" {
         title?: string;
         defaultInputValue?: string;
         defaultOutputValue?: string;
+        apiEndpoints?: Record<string, string>;
     }
     global {
         namespace JSX {
@@ -991,7 +990,6 @@ declare module "@scom/scom-swap" {
         private targetVaultBondBalanceLabel2;
         private crossChainSoftCapLabel2;
         private crossChainVaultInfoVstack;
-        private modalViewOrder;
         private lbReminderRejected;
         static create(options?: ScomSwapElement, parent?: Container): Promise<ScomSwap>;
         removeRpcWalletEvents(): void;
@@ -1071,6 +1069,7 @@ declare module "@scom/scom-swap" {
                 title?: string;
                 defaultInputValue?: string;
                 defaultOutputValue?: string;
+                apiEndpoints?: Record<string, string>;
             }>;
             setData: (properties: ISwapWidgetData, linkParams?: Record<string, any>) => Promise<void>;
             getTag: any;
@@ -1167,16 +1166,11 @@ declare module "@scom/scom-swap" {
         private selectSourceChain;
         private selectDestinationChain;
         private setTargetTokenList;
-        private onSourceChainChanged;
         private onSelectSourceChain;
         private onSelectDestinationChain;
-        private setDefaultChain;
         private initChainIcon;
         private updateSrcChainIconList;
         private onRenderChainList;
-        showViewOrderModal: () => void;
-        closeViewOrderModal: () => void;
-        onViewOrder: () => void;
         showModalFees: () => void;
         closeModalFees: () => void;
         private showResultMessage;

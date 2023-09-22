@@ -3,15 +3,15 @@ import {
 } from "../global/index";
 import {
   ProviderConfigMap,
-  baseRoute,
   BridgeVaultGroupList,
   getBridgeVaultVersion,
-  crossChainNativeTokenList,
   CrossChainAddressMap,
   getNetworkInfo,
   State,
   ProviderConfig,
-  MockOracleMap
+  MockOracleMap,
+  getWETH,
+  getChainNativeToken
 } from "../store/index";
 import { Wallet, BigNumber, Erc20, Utils, TransactionReceipt, Contracts } from "@ijstech/eth-wallet";
 import { Contracts as OpenSwapContracts } from "@scom/oswap-openswap-contract";
@@ -31,10 +31,6 @@ import {
 import { DefaultTokens, ITokenObject, tokenStore } from "@scom/scom-token-list";
 import { nullAddress } from "@ijstech/eth-contract";
 
-const routeAPI = baseRoute + '/trading/v1/cross-chain-route';
-const GetBridgeVaultAPI = baseRoute + '/trading/v1/bridge-vault';
-const GetBondsInBridgeVaultAPI = baseRoute + '/trading/v1/bonds-by-chain-id-and-vault-troll-registry';
-
 const getTokenByVaultAddress = (chainId: number, vaultAddress: string) => {
   if (!chainId) return null;
   let vaultTokenMap = getVaultTokenMap();
@@ -53,7 +49,7 @@ const getTargetChainTokenMap = (chainId: number) => {
   });
   let tokenMap: { [key: string]: ITokenObject } = {};
   Object.values(tokenList).forEach((v, i) => {
-    if (v.isNative) v = { ...crossChainNativeTokenList[chainId], chainId, isNative: true }
+    if (v.isNative) v = { ...getChainNativeToken(chainId), chainId, isNative: true }
     tokenMap["" + v.address] = v;
   });
   return tokenMap;
@@ -134,13 +130,15 @@ const getVaultTokenMap = () => {
   return vaultTokenMap;
 }
 
-const getBridgeVault = async (chainId: number, vaultAddress: string): Promise<IBridgeVault> => {
-  let res = await getAPI(GetBridgeVaultAPI, { chainId, address: vaultAddress });
+const getBridgeVault = async (state: State, chainId: number, vaultAddress: string): Promise<IBridgeVault> => {
+  const bridgeVaultAPIEndpoint = state.getAPIEndpoint('bridgeVault');
+  let res = await getAPI(bridgeVaultAPIEndpoint, { chainId, address: vaultAddress });
   return res;
 }
 
 const getBondsInBridgeVault = async (state: State, chainId: number, vaultTrollRegistry: string, version: string = getBridgeVaultVersion(state.getChainId())): Promise<IBridgeVaultBond[]> => {
-  let res = await getAPI(GetBondsInBridgeVaultAPI, { version, chainId, vaultTrollRegistry });
+  const bondsAPIEndpoint = state.getAPIEndpoint('bonds');
+  let res = await getAPI(bondsAPIEndpoint, { version, chainId, vaultTrollRegistry });
   return Array.isArray(res) ? res : [];
 }
 
@@ -236,15 +234,15 @@ const composeRouteObjBridge = async (routeObj: any, firstInput: BigNumber, vault
     // Fee Structure - in InToken
     let sourceRoutingPrice = routeObj.sourceRouteObj ? routeObj.sourceRouteObj.price : 1
     fees = {
-      sourceRouteLiquidityFee: routeObj.sourceRouteObj ? new BigNumber(routeObj.sourceRouteObj.tradeFee).times(fromAmount).toNumber() : 0,
-      targetRouteLiquidityFee: new BigNumber(routeObj.targetRouteObj.tradeFee).times(vaultTokenToTargetChain).times(sourceRoutingPrice).toNumber(),
-      baseFee: new BigNumber(bridgeFees.baseFee).times(sourceRoutingPrice).toNumber(),
-      transactionFee: new BigNumber(bridgeFees.transactionFee).times(sourceRoutingPrice).toNumber(),
-      protocolFee: new BigNumber(bridgeFees.protocolFee).times(sourceRoutingPrice).toNumber(),
-      imbalanceFee: new BigNumber(bridgeFees.imbalanceFee).times(sourceRoutingPrice).toNumber()
+      sourceRouteLiquidityFee: routeObj.sourceRouteObj ? new BigNumber(routeObj.sourceRouteObj.tradeFee).times(fromAmount) : new BigNumber(0),
+      targetRouteLiquidityFee: new BigNumber(routeObj.targetRouteObj.tradeFee).times(vaultTokenToTargetChain).times(sourceRoutingPrice),
+      baseFee: new BigNumber(bridgeFees.baseFee).times(sourceRoutingPrice),
+      transactionFee: new BigNumber(bridgeFees.transactionFee).times(sourceRoutingPrice),
+      protocolFee: new BigNumber(bridgeFees.protocolFee).times(sourceRoutingPrice),
+      imbalanceFee: new BigNumber(bridgeFees.imbalanceFee).times(sourceRoutingPrice)
     }
 
-    tradeFee = Object.values(fees).reduce((a, b) => a + b)
+    tradeFee = Object.values(fees).reduce((a: BigNumber, b: BigNumber) => a.plus(b))
 
   } catch (err) {
     console.log('err', err)
@@ -299,16 +297,17 @@ const getAvailableRouteOptions = async (state: State, params: GetAvailableRouteO
 
   if (tokenIn.isNative) {
     isTokenInNative = true
-    tokenIn.address = crossChainNativeTokenList[fromChainId].wethAddress;
+    tokenIn.address = getWETH(fromChainId).address;
   }
 
   if (tokenOut.isNative) {
-    tokenOut.address = crossChainNativeTokenList[toChainId].wethAddress;
+    tokenOut.address = getWETH(toChainId).address;
   }
 
   const tradeFeeMap = await getTradeFeeMap(state);
   
-  const routeObjArr: { routes: ICrossChainRouteFromAPI[] } = await getAPI(routeAPI, {
+  const bridgeRoutingAPIEndpoint = state.getAPIEndpoint('bridgeRouting');
+  const routeObjArr: { routes: ICrossChainRouteFromAPI[] } = await getAPI(bridgeRoutingAPIEndpoint, {
     fromChainId,
     toChainId,
     tokenIn: tokenIn.address,

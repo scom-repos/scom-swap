@@ -1,15 +1,3 @@
-import { DefaultERC20Tokens } from "@scom/scom-token-list";
-const baseRoute = 'https://route.openswap.xyz';
-
-const crossChainNativeTokenList: { [chainId: number]: { address: string, decimals: number, symbol: string, name: string, isNative: boolean, wethAddress: string } } = {
-  42: { address: "ETH", decimals: 18, symbol: "ETH", name: 'ETH', isNative: true, wethAddress: "0xd0A1E359811322d97991E03f863a0C30C2cF029C" },
-  56: { address: "BNB", decimals: 18, symbol: "BNB", name: 'BNB', isNative: true, wethAddress: "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c" },
-  97: { address: "BNB", decimals: 18, symbol: "BNB", name: 'BNB', isNative: true, wethAddress: "0xae13d989dac2f0debff460ac112a837c89baa7cd" },
-  43113: { address: "AVAX", decimals: 18, symbol: "AVAX", name: 'AVAX', isNative: true, wethAddress: "0xd00ae08403B9bbb9124bB305C09058E32C39A48c" },
-  43114: { address: "AVAX", decimals: 18, symbol: "AVAX", name: 'AVAX', isNative: true, wethAddress: "0xB31f66AA3C1e785363F0875A1B74E27b85FD66c7" },
-  80001: { address: "MATIC", decimals: 18, symbol: "MATIC", name: 'MATIC', isNative: true, wethAddress: "0x9c3C9283D3e44854697Cd22D3Faa240Cfb032889" }
-}
-
 enum VaultType {
   Project = 'Project',
   Exchange = 'Exchange',
@@ -217,10 +205,8 @@ const bridgeVaultConstantMap = BridgeVaultGroupList.reduce((acc, cur) => {
 }, {} as { [assetSymbol: string]: { [chainId: string]: BridgeVaultConstant } });
 
 export {
-  baseRoute,
   BridgeVaultGroupList,
   CrossChainAddressMap,
-  crossChainNativeTokenList,
   crossChainSupportedChainIds,
   MockOracleMap,
   getBridgeVaultVersion,

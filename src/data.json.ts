@@ -10,6 +10,12 @@ export default {
       "chainId": 43113
     }       
   ],
+  "apiEndpoints": {
+    "tradingRouting": "https://route.openswap.xyz/trading/v1/route",
+    "bridgeRouting": "https://route.openswap.xyz/trading/v1/cross-chain-route",
+    "bridgeVault": "https://route.openswap.xyz/trading/v1/bridge-vault",
+    "bonds": "https://route.openswap.xyz/trading/v1/bonds-by-chain-id-and-vault-troll-registry"
+  },
   "proxyAddresses": {
     "43113": "0x83aaf000f0a09f860564e894535cc18f5a50f627"
   },

@@ -80,6 +80,7 @@ interface ScomSwapElement extends ControlElement {
   title?: string;
   defaultInputValue?: string;
   defaultOutputValue?: string;
+  apiEndpoints?: Record<string, string>;
 }
 
 declare global {
@@ -213,7 +214,6 @@ export default class ScomSwap extends Module {
   private targetVaultBondBalanceLabel2: Label;
   private crossChainSoftCapLabel2: Label;
   private crossChainVaultInfoVstack: VStack;
-  private modalViewOrder: Modal;
   private lbReminderRejected: Label;
 
   static async create(options?: ScomSwapElement, parent?: Container) {
@@ -620,6 +620,9 @@ export default class ScomSwap extends Module {
 
   private async setData(value: ISwapWidgetData) {
     this._data = value;
+    if (this._data.apiEndpoints) {
+      this.state.setAPIEnpoints(this._data.apiEndpoints);
+    }
     await this.resetRpcWallet();
     this.updateContractAddress();
     await this.refreshUI();
@@ -1048,6 +1051,7 @@ export default class ScomSwap extends Module {
         this.onSwapConfirmed({ key: data.key, isCrossChain: this.isCrossChain });
         await this.updateBalance();
         application.EventBus.dispatch(EventId.Paid, { 
+          isCrossChain: this.isCrossChain,
           data: data ?? null, 
           id: this.id,
           receipt: receipt
@@ -1423,7 +1427,7 @@ export default class ScomSwap extends Module {
       const assetSymbol = listRouting[0].targetVaultToken.symbol;
       const { vaultAddress, vaultRegistryAddress, tokenAddress: vaultTokenAddress, softCap } = bridgeVaultConstantMap[assetSymbol === 'USDT.e' ? 'USDT' : assetSymbol][this.desChain!.chainId];
       const [vault, vaultAssetBalance, bonds, oraclePriceMap] = await Promise.all([
-        getBridgeVault(this.desChain!.chainId, vaultAddress),
+        getBridgeVault(this.state, this.desChain!.chainId, vaultAddress),
         getVaultAssetBalance(this.desChain!.chainId, vaultAddress),
         getBondsInBridgeVault(this.state, this.desChain!.chainId, vaultRegistryAddress),
         getOraclePriceMap(this.desChain!.chainId)
@@ -1612,7 +1616,7 @@ export default class ScomSwap extends Module {
           title: "Source Chain Liquidity Fee",
           description: "This fee is paid to the AMM Liquidity Providers on the Source Chain.",
           value: record.fees.sourceRouteLiquidityFee,
-          isHidden: record.fees.sourceRouteLiquidityFee == 0
+          isHidden: record.fees.sourceRouteLiquidityFee?.isZero()
         },
         {
           title: "Target Chain Liquidity Fee",
@@ -1842,9 +1846,6 @@ export default class ScomSwap extends Module {
     if (this.swapBtn.rightIcon.visible)
       this.swapBtn.rightIcon.visible = false;
     await this.handleAddRoute();
-    if (isCrossChain) {
-      this.showViewOrderModal();
-    }
   }
   private isButtonLoading() {
     if (this.isApproveButtonShown || (this.isCrossChain && this.crossChainApprovalStatus === ApprovalStatus.APPROVING)) {
@@ -1994,17 +1995,8 @@ export default class ScomSwap extends Module {
 
   private get isCrossChainEnabled() {
     let chainId = this.state.getChainId();
-
     if (!this.supportedChainList.some((v: INetworkConfig) => v.chainId == chainId) || !this.isCrossChainSwap) {
-      this.srcChainBox?.classList.add('hidden');
-      this.desChainBox?.classList.add('hidden');
       return false;
-    }
-    this.srcChainBox?.classList.remove('hidden');
-    if (crossChainSupportedChainIds.some(v => v.chainId === this.srcChain?.chainId)) {
-      this.desChainBox?.classList.remove('hidden');
-    } else {
-      this.desChainBox?.classList.add('hidden');
     }
     return true;
   };
@@ -2136,22 +2128,6 @@ export default class ScomSwap extends Module {
     }
   }
 
-  private onSourceChainChanged = () => {
-    const selected = this.srcChainList.querySelector('.icon-selected');
-    if (selected) {
-      selected.classList.remove('icon-selected');
-    }
-    this.getSupportedChainList();
-    // if (!this.chainId) this.chainId = this.supportedChainList[0].chainId;
-    const currentNetwork = getNetworkInfo(this.supportedChainList.find((f: INetwork) => f.chainId == this.chainId)?.chainId);
-    this.srcChain = currentNetwork;
-    this.srcChainLabel.caption = this.srcChain?.chainName || '-';
-    const img = this.srcChainList.querySelector(`[network-name="${currentNetwork?.chainName}"]`);
-    if (img) {
-      img.classList.add('icon-selected');
-    }
-  }
-
   private onSelectSourceChain = async (obj: INetwork, img?: Image) => {
     if (this.isMetaMask || !isClientWalletConnected()) {
       await this.selectSourceChain(obj, img);
@@ -2164,35 +2140,6 @@ export default class ScomSwap extends Module {
     await this.selectDestinationChain(obj, img);
     this.initializeWidgetConfig();
   }
-
-  private setDefaultChain = async () => {
-    if (this.supportedChainList && this.supportedChainList.length) {
-      let obj = this.supportedChainList.find((f: INetwork) => f.chainId == this.chainId);
-      if (!obj)
-        obj = this.supportedChainList[0];
-      if (!this.srcChain && obj) {
-        await this.selectSourceChain(getNetworkInfo(obj.chainId));
-      }
-      this.onSourceChainChanged();
-      const targetChain = this.supportedChainList.find((f: INetwork) => f.chainId == this.targetChainId);
-      const isSupported = crossChainSupportedChainIds.some(v => v.chainId === targetChain?.chainId);
-      if (!this.desChain && isSupported) {
-        await this.selectDestinationChain(getNetworkInfo(targetChain.chainId));
-      } else if (!isSupported && obj) {
-        await this.selectDestinationChain(getNetworkInfo(obj.chainId));
-      } else {
-        if (this.isCrossChain) await this.updateTargetChainBalances();
-        if (this.toToken) {
-          const balance = this.getBalance(this.toToken, this.isCrossChain);
-          this.receiveBalance.caption = `Balance: ${formatNumber(balance, 4)} ${this.toToken.symbol}`;
-        }
-        this.setTargetTokenList();
-      }
-      this.desChainLabel.caption = this.desChain?.chainName || '-';
-    } else {
-      this.setTargetTokenList(true);
-    }
-  };
 
   private initChainIcon = (network: INetwork, isDes?: boolean) => {
     const img = new Image();
@@ -2233,11 +2180,11 @@ export default class ScomSwap extends Module {
   };
 
   private onRenderChainList = async () => {
+    if (!this.isCrossChainSwap) return;
     this.oldSupportedChainList = this.supportedChainList.map(v => getNetworkInfo(v.chainId));
     this.getSupportedChainList();
     if (this.oldSupportedChainList[0]?.chainId == this.supportedChainList[0]?.chainId) {
       this.updateSrcChainIconList();
-      await this.setDefaultChain();
       return;
     };
     this.srcChainList.innerHTML = '';
@@ -2246,31 +2193,25 @@ export default class ScomSwap extends Module {
     this.desChain = undefined;
     this.supportedChainList.forEach((v: INetworkConfig) => {
       const network = getNetworkInfo(v.chainId);
-      this.initChainIcon(network);
-      if (crossChainSupportedChainIds.some(v => v.chainId === network.chainId)) {
-        this.initChainIcon(network, true);
-      }
+      this.initChainIcon(network, false);
+      this.initChainIcon(network, true);
     });
-    await this.setDefaultChain();
+    
+    if (this.supportedChainList.length > 1) {
+      const firstNetwork = getNetworkInfo(this.supportedChainList[0]?.chainId);
+      const secondNetwork = getNetworkInfo(this.supportedChainList[1]?.chainId);
+      await this.selectSourceChain(firstNetwork);
+      await this.selectDestinationChain(secondNetwork);
+    }
+    this.srcChainBox.visible = true;
+    this.desChainBox.visible = true;
   };
-
-  showViewOrderModal = () => {
-    this.modalViewOrder.visible = true;
-  }
-
-  closeViewOrderModal = () => {
-    this.modalViewOrder.visible = false;
-  }
-
-  onViewOrder = () => {
-    this.modalViewOrder.visible = false;
-    window.open('https://www.openswap.xyz/#/cross-chain-bridge-record');
-  }
 
   showModalFees = () => {
     const fees = this.getFeeDetails();
     this.feesInfo.clearInnerHTML();
     fees.forEach((fee) => {
+      const feeValue = FormatUtils.formatNumber(fee.value.toFixed(), { decimalFigures: 4});
       this.feesInfo.appendChild(
         <i-hstack
           horizontalAlignment="space-between" verticalAlignment="center" margin={{ top: 10 }}
@@ -2288,7 +2229,7 @@ export default class ScomSwap extends Module {
               data-placement="right"
             />
           </i-hstack>
-          <i-label class="ml-auto" caption={`${formatNumber(fee.value)} ${this.fromToken?.symbol}`} />
+          <i-label class="ml-auto" caption={`${feeValue} ${this.fromToken?.symbol}`} />
         </i-hstack>
       )
     })
@@ -2411,7 +2352,8 @@ export default class ScomSwap extends Module {
       const logo = this.getAttribute('logo', true);
       const defaultInputValue = this.getAttribute('defaultInputValue', true);
       const defaultOutputValue = this.getAttribute('defaultOutputValue', true);
-      let data = { campaignId, category, providers, commissions, tokens, defaultChainId, networks, wallets, showHeader, title, logo, defaultInputValue, defaultOutputValue };
+      const apiEndpoints = this.getAttribute('apiEndpoints', true);
+      let data = { campaignId, category, providers, commissions, tokens, defaultChainId, networks, wallets, showHeader, title, logo, defaultInputValue, defaultOutputValue, apiEndpoints };
       if (!this.isEmptyData(data)) {
         await this.setData(data);
       }
@@ -2438,7 +2380,7 @@ export default class ScomSwap extends Module {
               <i-panel class="content-swap">
                 <i-hstack id="wrapperSwap" gap={10}>
                   <i-vstack gap={5} minWidth={230} width="calc(100% - 25px)">
-                    <i-vstack id="srcChainBox" width="100%" margin={{ top: 8, bottom: 8 }}>
+                    <i-vstack id="srcChainBox" width="100%" margin={{ top: 8, bottom: 8 }} visible={false}>
                       <i-hstack gap={8} horizontalAlignment="space-between">
                         <i-label opacity={0.8} caption="Source Chain" minWidth="7rem" />
                         <i-label id="srcChainLabel" class="chain-text" margin={{ left: 'auto' }} caption="-" />
@@ -2487,7 +2429,7 @@ export default class ScomSwap extends Module {
                     <i-icon id="toggleReverseImage" position="relative" width={32} height={32} class="icon-swap rounded-icon custom-ic--swap" name="arrows-alt-v" onClick={this.onRevertSwap.bind(this)} />
                   </i-hstack>
                   <i-vstack gap={5} minWidth={230} width="calc(100% - 25px)">
-                    <i-vstack id="desChainBox" width="100%" margin={{ top: 8, bottom: 8 }}>
+                    <i-vstack id="desChainBox" width="100%" margin={{ top: 8, bottom: 8 }} visible={false}>
                       <i-hstack gap={8} horizontalAlignment="space-between">
                         <i-label opacity={0.8} caption="Destination Chain" minWidth="7rem"/>
                         <i-label id="desChainLabel" class="chain-text" margin={{ left: 'auto' }} caption="-" />
@@ -2650,34 +2592,6 @@ export default class ScomSwap extends Module {
                 </i-panel>
               </i-panel>
             </i-modal>
-
-            <i-modal
-              id="modalViewOrder"
-              class="bg-modal custom-modal custom-md--view"
-              title="Cross Chain"
-              closeIcon={{ name: 'times' }}
-            >
-              <i-panel class="i-modal_content">
-                <i-panel class="mt-1">
-                  <i-hstack verticalAlignment='center' horizontalAlignment='center' class="mb-1">
-                    <i-image width={50} height={50} url={assets.fullPath('img/success-icon.svg')} />
-                  </i-hstack>
-                  <i-hstack verticalAlignment='center' class="flex-col">
-                    <i-label caption="The order was created successfully!" />
-                    <i-label caption="Do you want to view the record?" />
-                  </i-hstack>
-                  <i-hstack verticalAlignment='center' horizontalAlignment='center' class="mt-1">
-                    <i-button
-                      caption="View Order"
-                      class="btn-os"
-                      font={{ color: Theme.colors.primary.contrastText }}
-                      onClick={() => this.onViewOrder()}
-                    />
-                  </i-hstack>
-                </i-panel>
-              </i-panel>
-            </i-modal>
-
             <i-modal
               id="networkErrModal"
               class="bg-modal custom-modal"
