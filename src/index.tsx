@@ -2044,23 +2044,25 @@ export default class ScomSwap extends Module {
   }
 
   private selectSourceChain = async (obj: INetwork, img?: Image) => {
-    if ((this.srcChain && this.srcChain.chainId != obj.chainId) || !this.srcChain) {
-      const rpcWallet = this.state.getRpcWallet();
-      await rpcWallet.switchNetwork(obj.chainId);
-      if (!crossChainSupportedChainIds.some(v => v.chainId === obj.chainId)) {
-        this.selectDestinationChain(obj, img);
+    const rpcWallet = this.state.getRpcWallet();
+    await rpcWallet.switchNetwork(obj.chainId);
+    if (!crossChainSupportedChainIds.some(v => v.chainId === obj.chainId)) {
+      this.selectDestinationChain(obj, img);
+    }
+    this.srcChain = obj;
+    this.srcChainLabel.caption = this.srcChain.chainName;
+    const selected = this.srcChainList.querySelector('.icon-selected');
+    if (selected) {
+      selected.classList.remove('icon-selected');
+    }
+    if (img) {
+      img.classList.add('icon-selected');
+    } else {
+      const element = this.srcChainList.querySelector(`[chain-id="${obj.chainId}"]`);
+      if (element) {
+        element.classList.add('icon-selected');
       }
-      this.srcChain = obj;
-      this.srcChainLabel.caption = this.srcChain.chainName;
-      const selected = this.srcChainList.querySelector('.icon-selected');
-      if (selected) {
-        selected.classList.remove('icon-selected');
-      }
-      if (img) {
-        img.classList.add('icon-selected');
-      } else {
-        this.srcChainList.firstElementChild?.classList.add('icon-selected');
-      }
+      // this.srcChainList.firstElementChild?.classList.add('icon-selected');
     }
   };
 
@@ -2192,8 +2194,10 @@ export default class ScomSwap extends Module {
     });
     
     if (this.supportedChainList.length > 1) {
-      const firstNetwork = getNetworkInfo(this.supportedChainList[0]?.chainId);
-      const secondNetwork = getNetworkInfo(this.supportedChainList[1]?.chainId);
+      const firstChainId = this.defaultChainId;
+      const secondChainId = this.supportedChainList.find((v: INetworkConfig) => v.chainId != firstChainId)?.chainId;
+      const firstNetwork = getNetworkInfo(firstChainId);
+      const secondNetwork = getNetworkInfo(secondChainId);
       await this.selectSourceChain(firstNetwork);
       await this.selectDestinationChain(secondNetwork);
     }
