@@ -1,7 +1,7 @@
 import { application } from '@ijstech/components';
 import { INetwork, Wallet, ERC20ApprovalModel, IERC20ApprovalEventOptions } from '@ijstech/eth-wallet';
-import { ITokenObject } from '@scom/scom-token-list';
-import { IProvider } from '../global/index';
+import { ITokenObject, tokenStore } from '@scom/scom-token-list';
+import { IProvider, ITokenConfig } from '../global/index';
 import { ChainNativeTokenByChainId } from '@scom/scom-token-list';
 import getNetworkList from '@scom/scom-network-list'
 import { IDexDetail, IDexInfo } from '@scom/scom-dex-list';
@@ -179,6 +179,19 @@ export class State {
 export const getNetworkInfo = (chainId: number) => {
   const networkMap = application.store["networkMap"];
   return networkMap[chainId];
+}
+
+export const getTokenObjArr = (tokens: ITokenConfig[]) => {
+  let tokenObjArr: ITokenObject[] = [];
+  for (let token of tokens) {
+    let tokenMap = tokenStore.getTokenMapByChainId(token.chainId);
+    const tokenAddress = token.address?.startsWith('0x') ? token.address.toLowerCase() : ChainNativeTokenByChainId[token.chainId].symbol;
+    const tokenObj = tokenMap[tokenAddress];
+    if (tokenObj) {
+      tokenObjArr.push({...tokenObj, chainId: token.chainId});
+    }
+  }
+  return tokenObjArr;
 }
 
 // wallet

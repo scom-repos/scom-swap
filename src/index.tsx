@@ -10,8 +10,9 @@ import {
   WalletPlugin,
   getNetworkInfo,
   bridgeVaultConstantMap,
+  getTokenObjArr,
 } from "./store/index";
-import { tokenStore, DefaultERC20Tokens, ChainNativeTokenByChainId, assets as tokenAssets } from '@scom/scom-token-list';
+import { tokenStore, assets as tokenAssets } from '@scom/scom-token-list';
 
 import {
   getAllRoutesData,
@@ -42,7 +43,8 @@ import {
   IProviderUI,
   Category,
   ICommissionInfo,
-  INetworkConfig
+  INetworkConfig,
+  ITokenConfig
 } from './global/index';
 
 import { PriceInfo } from './price-info/index';
@@ -70,7 +72,7 @@ interface ScomSwapElement extends ControlElement {
   lazyLoad?: boolean;
   category: Category;
   providers: IProviderUI[];
-  tokens?: ITokenObject[];
+  tokens?: ITokenConfig[];
   defaultChainId: number;
   networks: INetworkConfig[];
   wallets: IWalletPlugin[];
@@ -105,7 +107,7 @@ export default class ScomSwap extends Module {
     networks: []
   };
   tag: any = {};
-  defaultEdit: boolean = true
+  private _tokens: ITokenObject[] = [];
 
   private pnlBranding: VStack;
   private imgLogo: Image;
@@ -427,19 +429,10 @@ export default class ScomSwap extends Module {
               this._data.defaultChainId = this._data.networks[0].chainId;
               this._data.category = generalSettings.category;
               this._data.providers = generalSettings.providers;
-              this._data.tokens = [];
+              this._tokens = this._data.tokens = [];
               if (generalSettings.tokens) {
-                for (let inputToken of generalSettings.tokens) {
-                  if (!inputToken.address || !(inputToken.address).toLowerCase().startsWith('0x')) {
-                    const nativeToken = ChainNativeTokenByChainId[inputToken.chainId];
-                    if (nativeToken) this._data.tokens.push({ ...nativeToken, chainId: inputToken.chainId });
-                  }
-                  else {
-                    const tokens = DefaultERC20Tokens[inputToken.chainId]
-                    const token = tokens.find(v => v.address === inputToken.address);
-                    if (token) this._data.tokens.push({ ...token, chainId: inputToken.chainId });
-                  }
-                }
+                this._data.tokens = generalSettings.tokens;
+                this._tokens = getTokenObjArr(generalSettings.tokens);
               }
               await this.resetRpcWallet();
               this.updateContractAddress();
@@ -622,6 +615,10 @@ export default class ScomSwap extends Module {
     if (this._data.apiEndpoints) {
       this.state.setAPIEnpoints(this._data.apiEndpoints);
     }
+    for (let network of this._data.networks) {
+      tokenStore.updateTokenMapData(network.chainId);
+    }
+    this._tokens = getTokenObjArr(this._data.tokens);
     await this.resetRpcWallet();
     this.updateContractAddress();
     await this.refreshUI();
@@ -855,9 +852,9 @@ export default class ScomSwap extends Module {
 
   private initializeDefaultTokenPair() {
     const currentChainId = this.state.getChainId();
-    let currentChainTokens = getSupportedTokens(this._data.tokens || [], currentChainId);
+    let currentChainTokens = getSupportedTokens(this._tokens, currentChainId);
     if (this.isCrossChain) {
-      let targetChainTokens = getSupportedTokens(this._data.tokens || [], this.desChain.chainId);
+      let targetChainTokens = getSupportedTokens(this._tokens, this.desChain.chainId);
       if (this.fromTokenSymbol && this.toTokenSymbol) {
         const firstObj = currentChainTokens.find(item => this.fromTokenSymbol === item.symbol || this.fromTokenSymbol === item.address);
         if (firstObj) {
@@ -922,7 +919,6 @@ export default class ScomSwap extends Module {
   private initializeWidgetConfig = async (_chainId?: number) => {
     setTimeout(async () => {
       const currentChainId = this.state.getChainId();
-      tokenStore.updateTokenMapData(currentChainId);
       this.closeNetworkErrModal();
       await this.initWallet();
       await this.updateBalance();
@@ -972,7 +968,7 @@ export default class ScomSwap extends Module {
         this.onUpdateEstimatedPosition(true, true);
         this.secondTokenInput.value = this.fixedNumber(this.toInputValue);
       }
-      const tokens = getSupportedTokens(this._data.tokens || [], currentChainId);
+      const tokens = getSupportedTokens(this._tokens, currentChainId);
       this.firstTokenInput.tokenDataListProp = tokens;
       if (!this.isCrossChain) {
         this.secondTokenInput.tokenDataListProp = tokens;
@@ -2114,13 +2110,13 @@ export default class ScomSwap extends Module {
         this.secondTokenInput.chainId = targetChainId;
       }
       this.secondTokenInput.tokenBalancesMapProp = this.targetChainTokenBalances;
-      this.secondTokenInput.tokenDataListProp = getSupportedTokens(this._data.tokens || [], targetChainId);
+      this.secondTokenInput.tokenDataListProp = getSupportedTokens(this._tokens, targetChainId);
     } else {
       const srcChainId = this.srcChain?.chainId || this.chainId;
       if (this.secondTokenInput.chainId !== srcChainId) {
         this.secondTokenInput.chainId = srcChainId;
       }
-      this.secondTokenInput.tokenDataListProp = getSupportedTokens(this._data.tokens || [], srcChainId);
+      this.secondTokenInput.tokenDataListProp = getSupportedTokens(this._tokens, srcChainId);
     }
   }
 

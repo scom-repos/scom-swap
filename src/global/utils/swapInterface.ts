@@ -38,12 +38,17 @@ export interface INetworkConfig {
   chainId: number;
 }
 
+export interface ITokenConfig {
+  chainId: number;
+  address?: string;
+}
+
 export interface ISwapWidgetData {
   campaignId?: number;
   category: Category;
   providers: IProviderUI[];
   commissions?: ICommissionInfo[];
-  tokens?: ITokenObject[];
+  tokens?: ITokenConfig[];
   defaultChainId: number;
   wallets: IWalletPlugin[];
   networks: INetworkConfig[];

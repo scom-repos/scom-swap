@@ -557,10 +557,10 @@ define("@scom/scom-swap/global/index.ts", ["require", "exports", "@scom/scom-swa
     })(ApprovalStatus = exports.ApprovalStatus || (exports.ApprovalStatus = {}));
     __exportStar(index_1, exports);
 });
-define("@scom/scom-swap/store/utils.ts", ["require", "exports", "@ijstech/components", "@ijstech/eth-wallet", "@scom/scom-token-list", "@scom/scom-network-list"], function (require, exports, components_3, eth_wallet_2, scom_token_list_1, scom_network_list_1) {
+define("@scom/scom-swap/store/utils.ts", ["require", "exports", "@ijstech/components", "@ijstech/eth-wallet", "@scom/scom-token-list", "@scom/scom-token-list", "@scom/scom-network-list"], function (require, exports, components_3, eth_wallet_2, scom_token_list_1, scom_token_list_2, scom_network_list_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.getClientWallet = exports.getChainNativeToken = exports.hasMetaMask = exports.isClientWalletConnected = exports.getNetworkInfo = exports.State = exports.WalletPlugin = void 0;
+    exports.getClientWallet = exports.getChainNativeToken = exports.hasMetaMask = exports.isClientWalletConnected = exports.getTokenObjArr = exports.getNetworkInfo = exports.State = exports.WalletPlugin = void 0;
     var WalletPlugin;
     (function (WalletPlugin) {
         WalletPlugin["MetaMask"] = "metamask";
@@ -712,6 +712,20 @@ define("@scom/scom-swap/store/utils.ts", ["require", "exports", "@ijstech/compon
         return networkMap[chainId];
     };
     exports.getNetworkInfo = getNetworkInfo;
+    const getTokenObjArr = (tokens) => {
+        var _a;
+        let tokenObjArr = [];
+        for (let token of tokens) {
+            let tokenMap = scom_token_list_1.tokenStore.getTokenMapByChainId(token.chainId);
+            const tokenAddress = ((_a = token.address) === null || _a === void 0 ? void 0 : _a.startsWith('0x')) ? token.address.toLowerCase() : scom_token_list_2.ChainNativeTokenByChainId[token.chainId].symbol;
+            const tokenObj = tokenMap[tokenAddress];
+            if (tokenObj) {
+                tokenObjArr.push(Object.assign(Object.assign({}, tokenObj), { chainId: token.chainId }));
+            }
+        }
+        return tokenObjArr;
+    };
+    exports.getTokenObjArr = getTokenObjArr;
     // wallet
     function isClientWalletConnected() {
         const wallet = eth_wallet_2.Wallet.getClientInstance();
@@ -725,7 +739,7 @@ define("@scom/scom-swap/store/utils.ts", ["require", "exports", "@ijstech/compon
     };
     exports.hasMetaMask = hasMetaMask;
     const getChainNativeToken = (chainId) => {
-        return scom_token_list_1.ChainNativeTokenByChainId[chainId];
+        return scom_token_list_2.ChainNativeTokenByChainId[chainId];
     };
     exports.getChainNativeToken = getChainNativeToken;
     function getClientWallet() {
@@ -1019,12 +1033,12 @@ define("@scom/scom-swap/store/cross-chain.ts", ["require", "exports"], function 
     }, {});
     exports.bridgeVaultConstantMap = bridgeVaultConstantMap;
 });
-define("@scom/scom-swap/store/index.ts", ["require", "exports", "@scom/scom-token-list", "@scom/scom-swap/store/utils.ts", "@scom/scom-swap/store/providers.ts", "@scom/scom-swap/store/cross-chain.ts"], function (require, exports, scom_token_list_2, utils_1, providers_1, cross_chain_1) {
+define("@scom/scom-swap/store/index.ts", ["require", "exports", "@scom/scom-token-list", "@scom/scom-swap/store/utils.ts", "@scom/scom-swap/store/providers.ts", "@scom/scom-swap/store/cross-chain.ts"], function (require, exports, scom_token_list_3, utils_1, providers_1, cross_chain_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.getSupportedTokens = exports.getWETH = void 0;
     const getWETH = (chainId) => {
-        let wrappedToken = scom_token_list_2.WETHByChainId[chainId];
+        let wrappedToken = scom_token_list_3.WETHByChainId[chainId];
         return wrappedToken;
     };
     exports.getWETH = getWETH;
@@ -1040,7 +1054,7 @@ define("@scom/scom-swap/crosschain-utils/crosschain-utils.types.ts", ["require",
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
 });
-define("@scom/scom-swap/crosschain-utils/API.ts", ["require", "exports", "@scom/scom-swap/global/index.ts", "@scom/scom-swap/store/index.ts", "@ijstech/eth-wallet", "@scom/oswap-openswap-contract", "@scom/oswap-cross-chain-bridge-contract", "@scom/oswap-chainlink-contract", "@scom/scom-token-list", "@ijstech/eth-contract"], function (require, exports, index_2, index_3, eth_wallet_3, oswap_openswap_contract_1, oswap_cross_chain_bridge_contract_1, oswap_chainlink_contract_1, scom_token_list_3, eth_contract_1) {
+define("@scom/scom-swap/crosschain-utils/API.ts", ["require", "exports", "@scom/scom-swap/global/index.ts", "@scom/scom-swap/store/index.ts", "@ijstech/eth-wallet", "@scom/oswap-openswap-contract", "@scom/oswap-cross-chain-bridge-contract", "@scom/oswap-chainlink-contract", "@scom/scom-token-list", "@ijstech/eth-contract"], function (require, exports, index_2, index_3, eth_wallet_3, oswap_openswap_contract_1, oswap_cross_chain_bridge_contract_1, oswap_chainlink_contract_1, scom_token_list_4, eth_contract_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.getOraclePriceMap = exports.getVaultAssetBalance = exports.getBondsInBridgeVault = exports.getBridgeVault = exports.getAvailableRouteOptions = exports.createBridgeVaultOrder = exports.getTargetChainTokenInfoObj = exports.getTargetChainTokenMap = exports.getTokenByVaultAddress = void 0;
@@ -1055,7 +1069,7 @@ define("@scom/scom-swap/crosschain-utils/API.ts", ["require", "exports", "@scom/
     };
     exports.getTokenByVaultAddress = getTokenByVaultAddress;
     const getTargetChainTokenMap = (chainId) => {
-        let tokenList = scom_token_list_3.tokenStore.getTokenList(chainId);
+        let tokenList = scom_token_list_4.tokenStore.getTokenList(chainId);
         tokenList = tokenList.map(v => v = Object.assign(Object.assign({}, v), { address: v.address ? v.address.toLowerCase() : undefined })).sort((a, b) => {
             if (a.symbol.toLowerCase() < b.symbol.toLowerCase()) {
                 return -1;
@@ -1085,9 +1099,9 @@ define("@scom/scom-swap/crosschain-utils/API.ts", ["require", "exports", "@scom/
         let targetChainWallet = initCrossChainWallet(chainId);
         let balances = {};
         let tokenMap = getTargetChainTokenMap(chainId);
-        if (!chainId || !scom_token_list_3.DefaultTokens[chainId])
+        if (!chainId || !scom_token_list_4.DefaultTokens[chainId])
             return { tokenMap, balances };
-        const tokenList = scom_token_list_3.tokenStore.getTokenList(chainId).filter((token) => token.address);
+        const tokenList = scom_token_list_4.tokenStore.getTokenList(chainId).filter((token) => token.address);
         const erc20TokenList = tokenList.filter(token => token.address);
         const nativeToken = tokenList.find(token => !token.address);
         try {
@@ -1442,16 +1456,16 @@ define("@scom/scom-swap/crosschain-utils/index.ts", ["require", "exports", "@sco
     Object.defineProperty(exports, "getVaultAssetBalance", { enumerable: true, get: function () { return API_1.getVaultAssetBalance; } });
     Object.defineProperty(exports, "getOraclePriceMap", { enumerable: true, get: function () { return API_1.getOraclePriceMap; } });
 });
-define("@scom/scom-swap/swap-utils/index.ts", ["require", "exports", "@ijstech/eth-wallet", "@scom/oswap-openswap-contract", "@scom/scom-commission-proxy-contract", "@scom/scom-dex-list", "@scom/scom-swap/global/index.ts", "@scom/scom-swap/store/index.ts", "@scom/scom-token-list", "@scom/scom-swap/crosschain-utils/index.ts"], function (require, exports, eth_wallet_4, oswap_openswap_contract_2, scom_commission_proxy_contract_1, scom_dex_list_1, index_4, index_5, scom_token_list_4, index_6) {
+define("@scom/scom-swap/swap-utils/index.ts", ["require", "exports", "@ijstech/eth-wallet", "@scom/oswap-openswap-contract", "@scom/scom-commission-proxy-contract", "@scom/scom-dex-list", "@scom/scom-swap/global/index.ts", "@scom/scom-swap/store/index.ts", "@scom/scom-token-list", "@scom/scom-swap/crosschain-utils/index.ts"], function (require, exports, eth_wallet_4, oswap_openswap_contract_2, scom_commission_proxy_contract_1, scom_dex_list_1, index_4, index_5, scom_token_list_5, index_6) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.createBridgeVaultOrder = exports.getCrossChainRouteOptions = exports.getCommissionRate = exports.getProviderProxySelectors = exports.setApprovalModalSpenderAddress = exports.getRouterAddress = exports.getChainNativeToken = exports.executeSwap = exports.getPair = exports.getAllRoutesData = exports.getTradeFeeMap = exports.getExtendedRouteObjData = void 0;
     const getChainNativeToken = (chainId) => {
-        return scom_token_list_4.ChainNativeTokenByChainId[chainId];
+        return scom_token_list_5.ChainNativeTokenByChainId[chainId];
     };
     exports.getChainNativeToken = getChainNativeToken;
     const getWETH = (chainId) => {
-        return scom_token_list_4.WETHByChainId[chainId];
+        return scom_token_list_5.WETHByChainId[chainId];
     };
     const getWrappedTokenAddress = (chainId) => {
         return getWETH(chainId).address;
@@ -2596,31 +2610,19 @@ define("@scom/scom-swap/data.json.ts", ["require", "exports"], function (require
             "category": "fixed-pair",
             "tokens": [
                 {
-                    "name": "USDT",
                     "address": "0x29386B60e0A9A1a30e1488ADA47256577ca2C385",
-                    "symbol": "USDT",
-                    "decimals": 6,
                     "chainId": 97
                 },
                 {
-                    "name": "OpenSwap",
                     "address": "0x45eee762aaeA4e5ce317471BDa8782724972Ee19",
-                    "symbol": "OSWAP",
-                    "decimals": 18,
                     "chainId": 97
                 },
                 {
-                    "name": "Tether USD",
                     "address": "0xb9C31Ea1D475c25E58a1bE1a46221db55E5A7C6e",
-                    "symbol": "USDT.e",
-                    "decimals": 6,
                     "chainId": 43113
                 },
                 {
-                    "name": "OpenSwap",
                     "address": "0x78d9D80E67bC80A11efbf84B7c8A65Da51a8EF3C",
-                    "symbol": "OSWAP",
-                    "decimals": 18,
                     "chainId": 43113
                 }
             ],
@@ -3194,7 +3196,7 @@ define("@scom/scom-swap/assets.ts", ["require", "exports", "@ijstech/components"
         fullPath
     };
 });
-define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstech/eth-wallet", "@scom/scom-swap/store/index.ts", "@scom/scom-token-list", "@scom/scom-swap/swap-utils/index.ts", "@scom/scom-swap/crosschain-utils/index.ts", "@scom/scom-swap/global/index.ts", "@scom/scom-swap/expert-mode-settings/index.tsx", "@scom/scom-swap/data.json.ts", "@scom/scom-swap/formSchema.ts", "@scom/scom-dex-list", "@scom/scom-commission-fee-setup", "@scom/scom-swap/index.css.ts", "@scom/scom-swap/index.css.ts"], function (require, exports, components_9, eth_wallet_5, index_7, scom_token_list_5, index_8, index_9, index_10, index_11, data_json_1, formSchema_1, scom_dex_list_2, scom_commission_fee_setup_1, index_css_2) {
+define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstech/eth-wallet", "@scom/scom-swap/store/index.ts", "@scom/scom-token-list", "@scom/scom-swap/swap-utils/index.ts", "@scom/scom-swap/crosschain-utils/index.ts", "@scom/scom-swap/global/index.ts", "@scom/scom-swap/expert-mode-settings/index.tsx", "@scom/scom-swap/data.json.ts", "@scom/scom-swap/formSchema.ts", "@scom/scom-dex-list", "@scom/scom-commission-fee-setup", "@scom/scom-swap/index.css.ts", "@scom/scom-swap/index.css.ts"], function (require, exports, components_9, eth_wallet_5, index_7, scom_token_list_6, index_8, index_9, index_10, index_11, data_json_1, formSchema_1, scom_dex_list_2, scom_commission_fee_setup_1, index_css_2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     const Theme = components_9.Styles.Theme.ThemeVars;
@@ -3398,21 +3400,10 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                                 this._data.defaultChainId = this._data.networks[0].chainId;
                                 this._data.category = generalSettings.category;
                                 this._data.providers = generalSettings.providers;
-                                this._data.tokens = [];
+                                this._tokens = this._data.tokens = [];
                                 if (generalSettings.tokens) {
-                                    for (let inputToken of generalSettings.tokens) {
-                                        if (!inputToken.address || !(inputToken.address).toLowerCase().startsWith('0x')) {
-                                            const nativeToken = scom_token_list_5.ChainNativeTokenByChainId[inputToken.chainId];
-                                            if (nativeToken)
-                                                this._data.tokens.push(Object.assign(Object.assign({}, nativeToken), { chainId: inputToken.chainId }));
-                                        }
-                                        else {
-                                            const tokens = scom_token_list_5.DefaultERC20Tokens[inputToken.chainId];
-                                            const token = tokens.find(v => v.address === inputToken.address);
-                                            if (token)
-                                                this._data.tokens.push(Object.assign(Object.assign({}, token), { chainId: inputToken.chainId }));
-                                        }
-                                    }
+                                    this._data.tokens = generalSettings.tokens;
+                                    this._tokens = (0, index_7.getTokenObjArr)(generalSettings.tokens);
                                 }
                                 await this.resetRpcWallet();
                                 this.updateContractAddress();
@@ -3596,6 +3587,10 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
             if (this._data.apiEndpoints) {
                 this.state.setAPIEnpoints(this._data.apiEndpoints);
             }
+            for (let network of this._data.networks) {
+                scom_token_list_6.tokenStore.updateTokenMapData(network.chainId);
+            }
+            this._tokens = (0, index_7.getTokenObjArr)(this._data.tokens);
             await this.resetRpcWallet();
             this.updateContractAddress();
             await this.refreshUI();
@@ -3719,7 +3714,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                 networks: []
             };
             this.tag = {};
-            this.defaultEdit = true;
+            this._tokens = [];
             this.isInited = false;
             this.supportedChainList = [];
             this.clientEvents = [];
@@ -3786,7 +3781,6 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                 setTimeout(async () => {
                     var _a;
                     const currentChainId = this.state.getChainId();
-                    scom_token_list_5.tokenStore.updateTokenMapData(currentChainId);
                     this.closeNetworkErrModal();
                     await this.initWallet();
                     await this.updateBalance();
@@ -3835,7 +3829,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                         this.onUpdateEstimatedPosition(true, true);
                         this.secondTokenInput.value = this.fixedNumber(this.toInputValue);
                     }
-                    const tokens = (0, index_7.getSupportedTokens)(this._data.tokens || [], currentChainId);
+                    const tokens = (0, index_7.getSupportedTokens)(this._tokens, currentChainId);
                     this.firstTokenInput.tokenDataListProp = tokens;
                     if (!this.isCrossChain) {
                         this.secondTokenInput.tokenDataListProp = tokens;
@@ -4079,14 +4073,14 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                         this.secondTokenInput.chainId = targetChainId;
                     }
                     this.secondTokenInput.tokenBalancesMapProp = this.targetChainTokenBalances;
-                    this.secondTokenInput.tokenDataListProp = (0, index_7.getSupportedTokens)(this._data.tokens || [], targetChainId);
+                    this.secondTokenInput.tokenDataListProp = (0, index_7.getSupportedTokens)(this._tokens, targetChainId);
                 }
                 else {
                     const srcChainId = ((_b = this.srcChain) === null || _b === void 0 ? void 0 : _b.chainId) || this.chainId;
                     if (this.secondTokenInput.chainId !== srcChainId) {
                         this.secondTokenInput.chainId = srcChainId;
                     }
-                    this.secondTokenInput.tokenDataListProp = (0, index_7.getSupportedTokens)(this._data.tokens || [], srcChainId);
+                    this.secondTokenInput.tokenDataListProp = (0, index_7.getSupportedTokens)(this._tokens, srcChainId);
                 }
             };
             this.onSelectSourceChain = async (obj, img) => {
@@ -4165,8 +4159,6 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                     const secondChainId = (_c = this.supportedChainList.find((v) => v.chainId != firstChainId)) === null || _c === void 0 ? void 0 : _c.chainId;
                     const firstNetwork = (0, index_7.getNetworkInfo)(firstChainId);
                     const secondNetwork = (0, index_7.getNetworkInfo)(secondChainId);
-                    console.log('firstNetwork', firstNetwork);
-                    console.log('secondNetwork', secondNetwork);
                     await this.selectSourceChain(firstNetwork);
                     await this.selectDestinationChain(secondNetwork);
                 }
@@ -4278,10 +4270,9 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
         initializeDefaultTokenPair() {
             var _a, _b, _c;
             const currentChainId = this.state.getChainId();
-            console.log('this._data.tokens', this._data.tokens);
-            let currentChainTokens = (0, index_7.getSupportedTokens)(this._data.tokens || [], currentChainId);
+            let currentChainTokens = (0, index_7.getSupportedTokens)(this._tokens, currentChainId);
             if (this.isCrossChain) {
-                let targetChainTokens = (0, index_7.getSupportedTokens)(this._data.tokens || [], this.desChain.chainId);
+                let targetChainTokens = (0, index_7.getSupportedTokens)(this._tokens, this.desChain.chainId);
                 if (this.fromTokenSymbol && this.toTokenSymbol) {
                     const firstObj = currentChainTokens.find(item => this.fromTokenSymbol === item.symbol || this.fromTokenSymbol === item.address);
                     if (firstObj) {
@@ -4304,8 +4295,6 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                     this.fromInputValue = this.fromInputValue || new eth_wallet_5.BigNumber(this._data.defaultInputValue);
                 }
                 else {
-                    console.log('currentChainTokens', currentChainTokens);
-                    console.log('targetChainTokens', targetChainTokens);
                     let firstDefaultToken = currentChainTokens[0];
                     let secondDefaultToken = targetChainTokens[0];
                     const fromAmount = parseFloat(this._data.defaultInputValue);
@@ -4323,7 +4312,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
             if (providers && providers.length) {
                 let fromTokenKey = this.getTokenKey(currentChainTokens[0]);
                 let toTokenKey = this.getTokenKey(currentChainTokens[1]);
-                let tokenMap = scom_token_list_5.tokenStore.getTokenMapByChainId(currentChainId);
+                let tokenMap = scom_token_list_6.tokenStore.getTokenMapByChainId(currentChainId);
                 this.fromToken = tokenMap[fromTokenKey];
                 this.toToken = tokenMap[toTokenKey];
                 this.fromTokenSymbol = (_b = this.fromToken) === null || _b === void 0 ? void 0 : _b.symbol;
@@ -4457,7 +4446,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                     this.srcChainSecondPanel.classList.remove('hidden');
                     this.srcChainVaultImage.url = this.srcChain.image;
                     this.srcChainVaultLabel.caption = this.srcChain.chainName;
-                    this.srcVaultTokenImage.url = scom_token_list_5.assets.getTokenIconPath(sourceVaultToken, this.srcChain.chainId);
+                    this.srcVaultTokenImage.url = scom_token_list_6.assets.getTokenIconPath(sourceVaultToken, this.srcChain.chainId);
                     this.srcVaultTokenLabel.caption = sourceVaultToken.symbol;
                     this.srcVaultTokenValue.caption = (0, index_10.formatNumber)(vaultTokenFromSourceChain);
                     (_b = this.lbReminderRejected) === null || _b === void 0 ? void 0 : _b.classList.remove('hidden');
@@ -4470,7 +4459,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                     this.targetChainSecondPanel.classList.remove('hidden');
                     this.targetChainVaultImage.url = this.desChain.image;
                     this.targetChainVaultLabel.caption = this.desChain.chainName;
-                    this.targetVaultTokenImage.url = scom_token_list_5.assets.getTokenIconPath(targetVaultToken, this.desChain.chainId);
+                    this.targetVaultTokenImage.url = scom_token_list_6.assets.getTokenIconPath(targetVaultToken, this.desChain.chainId);
                     this.targetVaultTokenLabel.caption = targetVaultToken.symbol;
                     this.targetVaultTokenValue.caption = (0, index_10.formatNumber)(vaultTokenToTargetChain);
                     // Hide vault info at toToken
@@ -4497,10 +4486,10 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
             this.setupCrossChainPopup();
             const currentChainId = this.state.getChainId();
             const slippageTolerance = this.state.slippageTolerance;
-            this.fromTokenImage.url = scom_token_list_5.assets.tokenPath(this.fromToken, currentChainId);
+            this.fromTokenImage.url = scom_token_list_6.assets.tokenPath(this.fromToken, currentChainId);
             this.fromTokenLabel.caption = (_b = (_a = this.fromToken) === null || _a === void 0 ? void 0 : _a.symbol) !== null && _b !== void 0 ? _b : '';
             this.fromTokenValue.caption = (0, index_10.formatNumber)(this.totalAmount(), 4);
-            this.toTokenImage.url = scom_token_list_5.assets.tokenPath(this.toToken, this.isCrossChain ? (_c = this.desChain) === null || _c === void 0 ? void 0 : _c.chainId : currentChainId);
+            this.toTokenImage.url = scom_token_list_6.assets.tokenPath(this.toToken, this.isCrossChain ? (_c = this.desChain) === null || _c === void 0 ? void 0 : _c.chainId : currentChainId);
             this.toTokenLabel.caption = (_e = (_d = this.toToken) === null || _d === void 0 ? void 0 : _d.symbol) !== null && _e !== void 0 ? _e : '';
             this.toTokenValue.caption = (0, index_10.formatNumber)(this.toInputValue, 4);
             const minimumReceived = this.getMinReceivedMaxSold();
@@ -4567,7 +4556,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
             this.secondTokenInput.enabled = false;
             if (token.isNew && this.state.isRpcWalletConnected()) {
                 const rpcWallet = this.state.getRpcWallet();
-                await scom_token_list_5.tokenStore.updateAllTokenBalances(rpcWallet);
+                await scom_token_list_6.tokenStore.updateAllTokenBalances(rpcWallet);
             }
             await this.onUpdateToken(token, isFrom);
             this.redirectToken();
@@ -5054,7 +5043,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
             var _a;
             if (!token)
                 return '0';
-            let tokenBalances = scom_token_list_5.tokenStore.getTokenBalancesByChainId(token.chainId);
+            let tokenBalances = scom_token_list_6.tokenStore.getTokenBalancesByChainId(token.chainId);
             if (!tokenBalances)
                 return '0';
             const address = token.address || '';
@@ -5073,7 +5062,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                 if (this.isCrossChain)
                     await this.updateTargetChainBalances();
                 if (this.hasData)
-                    await scom_token_list_5.tokenStore.updateAllTokenBalances(rpcWallet);
+                    await scom_token_list_6.tokenStore.updateAllTokenBalances(rpcWallet);
             }
             else {
             }
@@ -5450,7 +5439,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                                         this.$render("i-label", { id: "srcChainVaultLabel", class: "token-name", caption: "" }),
                                         this.$render("i-icon", { name: "minus", class: "custom-icon--fill", width: 28, height: 10 })),
                                     this.$render("i-panel", { class: "row-chain" },
-                                        this.$render("i-image", { id: "srcVaultTokenImage", fallbackUrl: scom_token_list_5.assets.fallbackUrl, width: "30px", height: "30px", url: "#" }),
+                                        this.$render("i-image", { id: "srcVaultTokenImage", fallbackUrl: scom_token_list_6.assets.fallbackUrl, width: "30px", height: "30px", url: "#" }),
                                         this.$render("i-label", { id: "srcVaultTokenLabel", class: "token-name", caption: "" })),
                                     this.$render("i-label", { id: "srcVaultTokenValue", class: "token-value", caption: "-" })),
                                 this.$render("i-icon", { name: "arrow-down", class: "arrow-down custom-icon--fill", width: 28, height: 28 })),
@@ -5461,7 +5450,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                                         this.$render("i-label", { id: "targetChainVaultLabel", class: "token-name", caption: "" }),
                                         this.$render("i-icon", { name: "minus", class: "custom-icon--fill", width: 28, height: 10 })),
                                     this.$render("i-panel", { class: "row-chain" },
-                                        this.$render("i-image", { id: "targetVaultTokenImage", fallbackUrl: scom_token_list_5.assets.fallbackUrl, width: "30px", height: "30px", url: "#" }),
+                                        this.$render("i-image", { id: "targetVaultTokenImage", fallbackUrl: scom_token_list_6.assets.fallbackUrl, width: "30px", height: "30px", url: "#" }),
                                         this.$render("i-label", { id: "targetVaultTokenLabel", class: "token-name", caption: "" })),
                                     this.$render("i-label", { id: "targetVaultTokenValue", class: "token-value", caption: "-" })),
                                 this.$render("i-vstack", { class: "text-right" },
@@ -5471,7 +5460,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                                 this.$render("i-icon", { name: "arrow-down", class: "arrow-down custom-icon--fill", width: 28, height: 28 })),
                             this.$render("i-hstack", { class: "mb-1", verticalAlignment: 'center', horizontalAlignment: 'start' },
                                 this.$render("i-panel", { id: "targetChainFirstPanel", class: "row-chain" },
-                                    this.$render("i-image", { id: "targetChainTokenImage", fallbackUrl: scom_token_list_5.assets.fallbackUrl, width: "30px", height: "30px", url: "#" }),
+                                    this.$render("i-image", { id: "targetChainTokenImage", fallbackUrl: scom_token_list_6.assets.fallbackUrl, width: "30px", height: "30px", url: "#" }),
                                     this.$render("i-label", { id: "targetChainTokenLabel", class: "token-name", caption: "" }),
                                     this.$render("i-icon", { name: "minus", class: "custom-icon--fill", width: 28, height: 10 })),
                                 this.$render("i-panel", { class: "row-chain" },

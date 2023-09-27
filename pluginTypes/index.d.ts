@@ -18,7 +18,6 @@ declare module "@scom/scom-swap/global/utils/helper.ts" {
 /// <amd-module name="@scom/scom-swap/global/utils/swapInterface.ts" />
 declare module "@scom/scom-swap/global/utils/swapInterface.ts" {
     import { IWalletPlugin } from "@scom/scom-wallet-modal";
-    import { ITokenObject } from '@scom/scom-token-list';
     export type Category = 'fixed-pair' | 'fixed-protocal' | 'aggregator' | 'cross-chain-swap';
     export interface ISwapConfig {
         category: Category;
@@ -49,12 +48,16 @@ declare module "@scom/scom-swap/global/utils/swapInterface.ts" {
         chainName?: string;
         chainId: number;
     }
+    export interface ITokenConfig {
+        chainId: number;
+        address?: string;
+    }
     export interface ISwapWidgetData {
         campaignId?: number;
         category: Category;
         providers: IProviderUI[];
         commissions?: ICommissionInfo[];
-        tokens?: ITokenObject[];
+        tokens?: ITokenConfig[];
         defaultChainId: number;
         wallets: IWalletPlugin[];
         networks: INetworkConfig[];
@@ -69,7 +72,7 @@ declare module "@scom/scom-swap/global/utils/swapInterface.ts" {
 /// <amd-module name="@scom/scom-swap/global/utils/index.ts" />
 declare module "@scom/scom-swap/global/utils/index.ts" {
     export { getAPI, formatNumber, isInvalidInput } from "@scom/scom-swap/global/utils/helper.ts";
-    export { IContractInfo, IProvider, ISwapConfig, ISwapWidgetData, IProviderUI, Category, ICommissionInfo, INetworkConfig } from "@scom/scom-swap/global/utils/swapInterface.ts";
+    export { IContractInfo, IProvider, ISwapConfig, ISwapWidgetData, IProviderUI, Category, ICommissionInfo, INetworkConfig, ITokenConfig } from "@scom/scom-swap/global/utils/swapInterface.ts";
 }
 /// <amd-module name="@scom/scom-swap/global/index.ts" />
 declare module "@scom/scom-swap/global/index.ts" {
@@ -94,7 +97,7 @@ declare module "@scom/scom-swap/global/index.ts" {
 declare module "@scom/scom-swap/store/utils.ts" {
     import { INetwork, ERC20ApprovalModel, IERC20ApprovalEventOptions } from '@ijstech/eth-wallet';
     import { ITokenObject } from '@scom/scom-token-list';
-    import { IProvider } from "@scom/scom-swap/global/index.ts";
+    import { IProvider, ITokenConfig } from "@scom/scom-swap/global/index.ts";
     import { IDexDetail, IDexInfo } from '@scom/scom-dex-list';
     export enum WalletPlugin {
         MetaMask = "metamask",
@@ -140,6 +143,7 @@ declare module "@scom/scom-swap/store/utils.ts" {
         setApprovalModelAction(options: IERC20ApprovalEventOptions): Promise<import("@ijstech/eth-wallet").IERC20ApprovalAction>;
     }
     export const getNetworkInfo: (chainId: number) => any;
+    export const getTokenObjArr: (tokens: ITokenConfig[]) => ITokenObject[];
     export function isClientWalletConnected(): boolean;
     export const hasMetaMask: () => boolean;
     export const getChainNativeToken: (chainId: number) => ITokenObject;
@@ -541,10 +545,7 @@ declare module "@scom/scom-swap/data.json.ts" {
             }[];
             category: string;
             tokens: {
-                name: string;
                 address: string;
-                symbol: string;
-                decimals: number;
                 chainId: number;
             }[];
             defaultChainId: number;
@@ -857,7 +858,7 @@ declare module "@scom/scom-swap" {
     import { BigNumber } from '@ijstech/eth-wallet';
     import "@scom/scom-swap/index.css.ts";
     import { ITokenObject } from '@scom/scom-token-list';
-    import { ISwapWidgetData, IProviderUI, Category, ICommissionInfo, INetworkConfig } from "@scom/scom-swap/global/index.ts";
+    import { ISwapWidgetData, IProviderUI, Category, ICommissionInfo, INetworkConfig, ITokenConfig } from "@scom/scom-swap/global/index.ts";
     import { IWalletPlugin } from '@scom/scom-wallet-modal';
     import ScomCommissionFeeSetup from '@scom/scom-commission-fee-setup';
     export { ISwapWidgetData };
@@ -866,7 +867,7 @@ declare module "@scom/scom-swap" {
         lazyLoad?: boolean;
         category: Category;
         providers: IProviderUI[];
-        tokens?: ITokenObject[];
+        tokens?: ITokenConfig[];
         defaultChainId: number;
         networks: INetworkConfig[];
         wallets: IWalletPlugin[];
@@ -889,7 +890,7 @@ declare module "@scom/scom-swap" {
         private state;
         private _data;
         tag: any;
-        defaultEdit: boolean;
+        private _tokens;
         private pnlBranding;
         private imgLogo;
         private lbTitle;
@@ -1059,7 +1060,7 @@ declare module "@scom/scom-swap" {
                 category: Category;
                 providers: IProviderUI[];
                 commissions?: ICommissionInfo[];
-                tokens?: ITokenObject[];
+                tokens?: ITokenConfig[];
                 defaultChainId: number;
                 wallets: IWalletPlugin[];
                 networks: INetworkConfig[];
