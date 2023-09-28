@@ -1129,7 +1129,7 @@ declare module "@scom/scom-swap" {
         private onUpdateEstimatedPosition;
         private isEstimated;
         private getBalance;
-        private updateBalance;
+        private updateBalances;
         private updateSwapButtonCaption;
         private determineSwapButtonCaption;
         private getWarningMessageText;

@@ -1339,7 +1339,6 @@ define("@scom/scom-swap/crosschain-utils/API.ts", ["require", "exports", "@scom/
                     };
                 })
             };
-            console.log('routeObj', routeObj);
             let amountOut = eth_wallet_3.Utils.fromDecimals(routeObj.amountOut, routeObj.tokens[routeObj.tokens.length - 1].decimals);
             let swapPrice = new eth_wallet_3.BigNumber(fromAmount).div(amountOut);
             let extendedData = bestRouteObj.pairs.length !== 0 ? await getExtendedRouteObjData(bestRouteObj, tradeFeeMap, swapPrice, true) : await getExtendedRouteObjDataForDirectRoute(bestRouteObj, swapPrice);
@@ -3757,8 +3756,8 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                     const currentChainId = this.state.getChainId();
                     this.closeNetworkErrModal();
                     await this.initWallet();
-                    await this.updateBalance();
                     await this.onRenderChainList();
+                    await this.updateBalances();
                     this.initializeDefaultTokenPair();
                     this.toggleReverseImage.enabled = !this.isFixedPair && !this.isCrossChain;
                     this.firstTokenInput.tokenReadOnly = this.isFixedPair;
@@ -4273,8 +4272,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                 else {
                     let firstDefaultToken = currentChainTokens[0];
                     let secondDefaultToken = targetChainTokens[0];
-                    const fromAmount = parseFloat(this._data.defaultInputValue);
-                    this.fromInputValue = new eth_wallet_5.BigNumber(fromAmount);
+                    this.fromInputValue = new eth_wallet_5.BigNumber(this._data.defaultInputValue);
                     this.onUpdateToken(firstDefaultToken, true);
                     this.onUpdateToken(secondDefaultToken, false);
                     this.firstTokenInput.token = this.fromToken;
@@ -4368,7 +4366,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                 },
                 onPaid: async (data, receipt) => {
                     this.onSwapConfirmed({ key: data.key, isCrossChain: this.isCrossChain });
-                    await this.updateBalance();
+                    await this.updateBalances();
                     components_9.application.EventBus.dispatch("Paid" /* EventId.Paid */, {
                         isCrossChain: this.isCrossChain,
                         data: data !== null && data !== void 0 ? data : null,
@@ -5028,13 +5026,10 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
             let balance = address ? (_a = tokenBalances[address.toLowerCase()]) !== null && _a !== void 0 ? _a : '0' : tokenBalances[token.symbol] || '0';
             return balance;
         }
-        async updateBalance() {
-            const rpcWallet = this.state.getRpcWallet();
-            if (rpcWallet.address) {
-                if (this.hasData)
-                    await scom_token_list_6.tokenStore.updateAllTokenBalances(rpcWallet);
-            }
-            else {
+        async updateBalances() {
+            await scom_token_list_6.tokenStore.updateTokenBalancesByChainId(this.chainId);
+            if (this.isCrossChainSwap && this.chainId != this.desChain.chainId) {
+                await scom_token_list_6.tokenStore.updateTokenBalancesByChainId(this.desChain.chainId);
             }
             if (this.fromToken) {
                 const balance = this.getBalance(this.fromToken);

@@ -357,7 +357,6 @@ const getAvailableRouteOptions = async (state: State, params: GetAvailableRouteO
       })
     };
 
-    console.log('routeObj', routeObj)
     let amountOut = Utils.fromDecimals(routeObj.amountOut, routeObj.tokens[routeObj.tokens.length - 1].decimals);
     let swapPrice = new BigNumber(fromAmount).div(amountOut);
     let extendedData = bestRouteObj.pairs.length !== 0 ? await getExtendedRouteObjData(bestRouteObj, tradeFeeMap, swapPrice, true) : await getExtendedRouteObjDataForDirectRoute(bestRouteObj, swapPrice);

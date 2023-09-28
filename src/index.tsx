@@ -866,8 +866,7 @@ export default class ScomSwap extends Module {
       } else {
         let firstDefaultToken = currentChainTokens[0];
         let secondDefaultToken = targetChainTokens[0];
-        const fromAmount = parseFloat(this._data.defaultInputValue);
-        this.fromInputValue = new BigNumber(fromAmount);
+        this.fromInputValue = new BigNumber(this._data.defaultInputValue);
         this.onUpdateToken(firstDefaultToken, true);
         this.onUpdateToken(secondDefaultToken, false);
         this.firstTokenInput.token = this.fromToken;
@@ -912,8 +911,8 @@ export default class ScomSwap extends Module {
       const currentChainId = this.state.getChainId();
       this.closeNetworkErrModal();
       await this.initWallet();
-      await this.updateBalance();
       await this.onRenderChainList();
+      await this.updateBalances();
       this.initializeDefaultTokenPair();
       this.toggleReverseImage.enabled = !this.isFixedPair && !this.isCrossChain;
       this.firstTokenInput.tokenReadOnly = this.isFixedPair;
@@ -1035,7 +1034,7 @@ export default class ScomSwap extends Module {
       },
       onPaid: async (data?: any, receipt?: TransactionReceipt) => {
         this.onSwapConfirmed({ key: data.key, isCrossChain: this.isCrossChain });
-        await this.updateBalance();
+        await this.updateBalances();
         application.EventBus.dispatch(EventId.Paid, { 
           isCrossChain: this.isCrossChain,
           data: data ?? null, 
@@ -1706,12 +1705,10 @@ export default class ScomSwap extends Module {
     let balance = address ? tokenBalances[address.toLowerCase()] ?? '0' : tokenBalances[token.symbol] || '0';
     return balance
   }
-  private async updateBalance() {
-    const rpcWallet = this.state.getRpcWallet();
-    if (rpcWallet.address) {
-      if (this.hasData) await tokenStore.updateAllTokenBalances(rpcWallet);
-    }
-    else {
+  private async updateBalances() {
+    await tokenStore.updateTokenBalancesByChainId(this.chainId);
+    if (this.isCrossChainSwap && this.chainId != this.desChain.chainId) {
+      await tokenStore.updateTokenBalancesByChainId(this.desChain.chainId);
     }
     if (this.fromToken) {
       const balance = this.getBalance(this.fromToken);
