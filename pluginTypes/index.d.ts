@@ -947,7 +947,6 @@ declare module "@scom/scom-swap" {
         private clientEvents;
         private crossChainApprovalStatus;
         private oldSupportedChainList;
-        private targetChainTokenBalances;
         private minSwapHintLabel;
         private srcChainBox;
         private desChainBox;
@@ -1131,7 +1130,6 @@ declare module "@scom/scom-swap" {
         private isEstimated;
         private getBalance;
         private updateBalance;
-        updateTargetChainBalances(): Promise<void>;
         private updateSwapButtonCaption;
         private determineSwapButtonCaption;
         private getWarningMessageText;

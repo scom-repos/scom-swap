@@ -4007,7 +4007,6 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                 try {
                     this.desChain = obj;
                     this.targetChainId = this.desChain.chainId;
-                    await this.updateTargetChainBalances();
                     if (img) {
                         img.classList.add('icon-selected');
                     }
@@ -4046,7 +4045,6 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                     if (this.secondTokenInput.chainId !== targetChainId) {
                         this.secondTokenInput.chainId = targetChainId;
                     }
-                    this.secondTokenInput.tokenBalancesMapProp = this.targetChainTokenBalances;
                     this.secondTokenInput.tokenDataListProp = (0, index_7.getSupportedTokens)(this._tokens, targetChainId);
                 }
                 else {
@@ -4534,10 +4532,10 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                 return;
             this.firstTokenInput.enabled = false;
             this.secondTokenInput.enabled = false;
-            if (token.isNew && this.state.isRpcWalletConnected()) {
-                const rpcWallet = this.state.getRpcWallet();
-                await scom_token_list_6.tokenStore.updateAllTokenBalances(rpcWallet);
-            }
+            // if (token.isNew && this.state.isRpcWalletConnected()) {
+            //   const rpcWallet = this.state.getRpcWallet();
+            //   await tokenStore.updateAllTokenBalances(rpcWallet);
+            // }
             await this.onUpdateToken(token, isFrom);
             this.redirectToken();
             await this.handleAddRoute();
@@ -5033,8 +5031,6 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
         async updateBalance() {
             const rpcWallet = this.state.getRpcWallet();
             if (rpcWallet.address) {
-                if (this.isCrossChain)
-                    await this.updateTargetChainBalances();
                 if (this.hasData)
                     await scom_token_list_6.tokenStore.updateAllTokenBalances(rpcWallet);
             }
@@ -5050,14 +5046,6 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
             }
             const enabled = !this.isMaxDisabled();
             this.maxButton.enabled = enabled;
-        }
-        async updateTargetChainBalances() {
-            var _a;
-            const targetChainId = ((_a = this.desChain) === null || _a === void 0 ? void 0 : _a.chainId) || this.targetChainId;
-            if (targetChainId) {
-                const tokenBalanceObj = await (0, index_9.getTargetChainTokenInfoObj)(targetChainId);
-                this.targetChainTokenBalances = (0, index_7.isClientWalletConnected)() ? tokenBalanceObj.balances : [];
-            }
         }
         updateSwapButtonCaption() {
             if (this.swapBtn && this.swapBtn.hasChildNodes()) {

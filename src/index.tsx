@@ -179,7 +179,6 @@ export default class ScomSwap extends Module {
   // Cross Chain
   private crossChainApprovalStatus: ApprovalStatus = ApprovalStatus.NONE;
   private oldSupportedChainList: INetwork[] = [];
-  private targetChainTokenBalances: Record<string, string>;
   private minSwapHintLabel: Label;
   private srcChainBox: Panel;
   private desChainBox: Panel;
@@ -1211,10 +1210,10 @@ export default class ScomSwap extends Module {
     if (!token) return
     this.firstTokenInput.enabled = false;
     this.secondTokenInput.enabled = false;
-    if (token.isNew && this.state.isRpcWalletConnected()) {
-      const rpcWallet = this.state.getRpcWallet();
-      await tokenStore.updateAllTokenBalances(rpcWallet);
-    }
+    // if (token.isNew && this.state.isRpcWalletConnected()) {
+    //   const rpcWallet = this.state.getRpcWallet();
+    //   await tokenStore.updateAllTokenBalances(rpcWallet);
+    // }
     await this.onUpdateToken(token, isFrom);
     this.redirectToken();
     await this.handleAddRoute();
@@ -1710,7 +1709,6 @@ export default class ScomSwap extends Module {
   private async updateBalance() {
     const rpcWallet = this.state.getRpcWallet();
     if (rpcWallet.address) {
-      if (this.isCrossChain) await this.updateTargetChainBalances();
       if (this.hasData) await tokenStore.updateAllTokenBalances(rpcWallet);
     }
     else {
@@ -1726,15 +1724,6 @@ export default class ScomSwap extends Module {
     const enabled = !this.isMaxDisabled();
     this.maxButton.enabled = enabled;
   }
-
-  async updateTargetChainBalances() {
-    const targetChainId = this.desChain?.chainId || this.targetChainId;
-    if (targetChainId) {
-      const tokenBalanceObj = await getTargetChainTokenInfoObj(targetChainId);
-      this.targetChainTokenBalances = isClientWalletConnected() ? tokenBalanceObj.balances : [];
-    }
-  }
-
   private updateSwapButtonCaption() {
     if (this.swapBtn && this.swapBtn.hasChildNodes()) {
       this.swapBtn.caption = this.determineSwapButtonCaption();
@@ -2060,7 +2049,6 @@ export default class ScomSwap extends Module {
     try {
       this.desChain = obj;
       this.targetChainId = this.desChain.chainId;
-      await this.updateTargetChainBalances();
       if (img) {
         img.classList.add('icon-selected');
       } else {
@@ -2096,7 +2084,6 @@ export default class ScomSwap extends Module {
       if (this.secondTokenInput.chainId !== targetChainId) {
         this.secondTokenInput.chainId = targetChainId;
       }
-      this.secondTokenInput.tokenBalancesMapProp = this.targetChainTokenBalances;
       this.secondTokenInput.tokenDataListProp = getSupportedTokens(this._tokens, targetChainId);
     } else {
       const srcChainId = this.srcChain?.chainId || this.chainId;
