@@ -3038,11 +3038,8 @@ define("@scom/scom-swap/formSchema.ts", ["require", "exports", "@scom/scom-netwo
                                 isBtnMaxShown: false,
                                 isInputShown: false
                             });
-                            tokenInputs[idx].rpcWalletId = rpcWalletId;
                             const chainId = (_b = (_a = networkPickers[idx]) === null || _a === void 0 ? void 0 : _a.selectedNetwork) === null || _b === void 0 ? void 0 : _b.chainId;
-                            if (chainId && tokenInputs[idx].chainId !== chainId) {
-                                tokenInputs[idx].chainId = chainId;
-                            }
+                            tokenInputs[idx].chainId = chainId;
                             return tokenInputs[idx];
                         },
                         getData: (control) => {

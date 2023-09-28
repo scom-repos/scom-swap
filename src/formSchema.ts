@@ -404,11 +404,8 @@ export function getBuilderSchema() {
                             isBtnMaxShown: false,
                             isInputShown: false
                         });
-                        tokenInputs[idx].rpcWalletId = rpcWalletId;
                         const chainId = networkPickers[idx]?.selectedNetwork?.chainId;
-                        if (chainId && tokenInputs[idx].chainId !== chainId) {
-                            tokenInputs[idx].chainId = chainId;
-                        }
+                        tokenInputs[idx].chainId = chainId;
                         return tokenInputs[idx];
                     },
                     getData: (control: ScomTokenInput) => {
