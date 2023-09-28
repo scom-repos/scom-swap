@@ -95,7 +95,7 @@ declare module "@scom/scom-swap/global/index.ts" {
 }
 /// <amd-module name="@scom/scom-swap/store/utils.ts" />
 declare module "@scom/scom-swap/store/utils.ts" {
-    import { INetwork, ERC20ApprovalModel, IERC20ApprovalEventOptions } from '@ijstech/eth-wallet';
+    import { ERC20ApprovalModel, IERC20ApprovalEventOptions } from '@ijstech/eth-wallet';
     import { ITokenObject } from '@scom/scom-token-list';
     import { IProvider, ITokenConfig } from "@scom/scom-swap/global/index.ts";
     import { IDexDetail, IDexInfo } from '@scom/scom-dex-list';
@@ -109,11 +109,9 @@ declare module "@scom/scom-swap/store/utils.ts" {
     export class State {
         isExpertMode: boolean;
         slippageTolerance: number;
-        transactionDeadline: number;
+        swapTransactionDeadline: number;
+        bridgeTransactionDeadline: number;
         infuraId: string;
-        networkMap: {
-            [key: number]: INetwork;
-        };
         dexInfoList: IDexInfo[];
         providerList: IProvider[];
         proxyAddresses: ProxyAddresses;
@@ -139,13 +137,11 @@ declare module "@scom/scom-swap/store/utils.ts" {
         private initData;
         setAPIEnpoints(apiEndpoints: Record<string, string>): void;
         getAPIEndpoint(key: string): string;
-        private setNetworkList;
         setApprovalModelAction(options: IERC20ApprovalEventOptions): Promise<import("@ijstech/eth-wallet").IERC20ApprovalAction>;
     }
     export const getNetworkInfo: (chainId: number) => any;
     export const getTokenObjArr: (tokens: ITokenConfig[]) => ITokenObject[];
     export function isClientWalletConnected(): boolean;
-    export const hasMetaMask: () => boolean;
     export const getChainNativeToken: (chainId: number) => ITokenObject;
     export function getClientWallet(): import("@ijstech/eth-wallet").IClientWallet;
 }
@@ -526,9 +522,6 @@ declare module "@scom/scom-swap/expert-mode-settings/index.tsx" {
 declare module "@scom/scom-swap/data.json.ts" {
     const _default_1: {
         infuraId: string;
-        networks: {
-            chainId: number;
-        }[];
         apiEndpoints: {
             tradingRouting: string;
             bridgeRouting: string;

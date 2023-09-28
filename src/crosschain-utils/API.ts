@@ -131,15 +131,27 @@ const getVaultTokenMap = () => {
 }
 
 const getBridgeVault = async (state: State, chainId: number, vaultAddress: string): Promise<IBridgeVault> => {
-  const bridgeVaultAPIEndpoint = state.getAPIEndpoint('bridgeVault');
-  let res = await getAPI(bridgeVaultAPIEndpoint, { chainId, address: vaultAddress });
-  return res;
+  try {
+    const bridgeVaultAPIEndpoint = state.getAPIEndpoint('bridgeVault');
+    let res = await getAPI(bridgeVaultAPIEndpoint, { chainId, address: vaultAddress });
+    return res.data ? res.data : res;
+  }
+  catch (err) {
+    console.log('err', err)
+  }
+  return null;
 }
 
 const getBondsInBridgeVault = async (state: State, chainId: number, vaultTrollRegistry: string, version: string = getBridgeVaultVersion(state.getChainId())): Promise<IBridgeVaultBond[]> => {
-  const bondsAPIEndpoint = state.getAPIEndpoint('bonds');
-  let res = await getAPI(bondsAPIEndpoint, { version, chainId, vaultTrollRegistry });
-  return Array.isArray(res) ? res : [];
+  try {
+    const bondsAPIEndpoint = state.getAPIEndpoint('bonds');
+    let res = await getAPI(bondsAPIEndpoint, { version, chainId, vaultTrollRegistry });
+    return Array.isArray(res) ? res : [];
+  }
+  catch (err) {
+    console.log('err', err)
+  }
+  return [];
 }
 
 // Bridge Swap
@@ -150,7 +162,7 @@ const createBridgeVaultOrder: (state: State, params: CreateBridgeVaultOrderParam
   try {
     const { vaultAddress, targetChainId, tokenIn, tokenOut, amountIn, minAmountOut, sourceRouteInfo } = params;
     const wallet = Wallet.getClientInstance();
-    const transactionDeadlineInMinutes = state.transactionDeadline;
+    const transactionDeadlineInMinutes = state.bridgeTransactionDeadline;
     const transactionDeadline = Math.floor(Date.now() / 1000 + (transactionDeadlineInMinutes * 60));
     const slippageTolerance = state.slippageTolerance;
 
@@ -307,16 +319,17 @@ const getAvailableRouteOptions = async (state: State, params: GetAvailableRouteO
   const tradeFeeMap = await getTradeFeeMap(state);
   
   const bridgeRoutingAPIEndpoint = state.getAPIEndpoint('bridgeRouting');
-  const routeObjArr: { routes: ICrossChainRouteFromAPI[] } = await getAPI(bridgeRoutingAPIEndpoint, {
+  const routeAPIResult = await getAPI(bridgeRoutingAPIEndpoint, {
     fromChainId,
     toChainId,
     tokenIn: tokenIn.address,
     tokenOut: tokenOut.address,
     amountIn: Utils.toDecimals(amountIn, tokenIn.decimals),
-    version: getBridgeVaultVersion(state.getChainId())
+    // version: getBridgeVaultVersion(state.getChainId())
   })
-
-  if (!routeObjArr || !routeObjArr.routes) return []
+  
+  if (!routeAPIResult) return [];
+  const routes: ICrossChainRouteFromAPI[] = routeAPIResult.routes || routeAPIResult.data;
 
   const composeRoutes = async (routeObj: ICrossChainRouteFromAPI['sourceRoute'] | ICrossChainRouteFromAPI['targetRoute'], chainId: number, fromAmount: string | BigNumber) => {
     const providerConfigByDexId = Object.values(ProviderConfigMap)
@@ -344,6 +357,7 @@ const getAvailableRouteOptions = async (state: State, params: GetAvailableRouteO
       })
     };
 
+    console.log('routeObj', routeObj)
     let amountOut = Utils.fromDecimals(routeObj.amountOut, routeObj.tokens[routeObj.tokens.length - 1].decimals);
     let swapPrice = new BigNumber(fromAmount).div(amountOut);
     let extendedData = bestRouteObj.pairs.length !== 0 ? await getExtendedRouteObjData(bestRouteObj, tradeFeeMap, swapPrice, true) : await getExtendedRouteObjDataForDirectRoute(bestRouteObj, swapPrice);
@@ -362,8 +376,8 @@ const getAvailableRouteOptions = async (state: State, params: GetAvailableRouteO
   let bestRouteObjArr: ICrossChainRouteResult[] = []
   let wrapperAddress = CrossChainAddressMap[fromChainId].wrapperAddress //TODO: Return from API
 
-  for (let i = 0; i < routeObjArr['routes'].length; i++) {
-    let routeObj: ICrossChainRouteFromAPI = routeObjArr['routes'][i];
+  for (let i = 0; i < routes.length; i++) {
+    let routeObj: ICrossChainRouteFromAPI = routes[i];
     let sourceVaultToken = getTokenByVaultAddress(fromChainId, routeObj.vault);
     let targetVaultAddresses = BridgeVaultGroupList.filter((v) => {
       if (v.deprecated) return false;
@@ -429,19 +443,30 @@ const getAvailableRouteOptions = async (state: State, params: GetAvailableRouteO
 
 // Return the current vault asset balance by given chainId and address
 const getVaultAssetBalance = async (chainId: number, vaultAddress: string) => {
-  let targetChainWallet = initCrossChainWallet(chainId);
-  const vault = new CrossChainContracts.OSWAP_BridgeVault(targetChainWallet, vaultAddress);
-  const asset = new Contracts.ERC20(targetChainWallet, await vault.asset());
-  return (await asset.balanceOf(vault.address));
+  try {
+    let targetChainWallet = initCrossChainWallet(chainId);
+    const vault = new CrossChainContracts.OSWAP_BridgeVault(targetChainWallet, vaultAddress);
+    const asset = new Contracts.ERC20(targetChainWallet, await vault.asset());
+    return (await asset.balanceOf(vault.address));
+  }
+  catch (err) {
+    console.log('err', err)
+  }
+  return null;
 }
 
 const getOraclePriceMap = async (chainId: number) => {
   const oraclePriceMap: { [key: string]: BigNumber } = {};
-  const wallet = initCrossChainWallet(chainId);
-  await Promise.all(Object.entries(MockOracleMap[chainId]).map(async ([token, oracle]) => {
-    let mockOracleContract = new SolidityContracts.AggregatorProxy(wallet, oracle)
-    oraclePriceMap[token.toLowerCase()] = (await mockOracleContract.latestAnswer()).shiftedBy(-18) // token -> USD 
-  }));
+  try {
+    const wallet = initCrossChainWallet(chainId);
+    await Promise.all(Object.entries(MockOracleMap[chainId]).map(async ([token, oracle]) => {
+      let mockOracleContract = new SolidityContracts.AggregatorProxy(wallet, oracle)
+      oraclePriceMap[token.toLowerCase()] = (await mockOracleContract.latestAnswer()).shiftedBy(-18) // token -> USD 
+    }));
+  }
+  catch (err) {
+    console.log('err', err)
+  }
   return oraclePriceMap;
 }
 

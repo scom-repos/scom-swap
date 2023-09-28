@@ -2,14 +2,6 @@ const InfuraId = "adc596bf88b648e2a8902bc9093930c5";
 
 export default {
   "infuraId": InfuraId,
-  "networks": [  
-    {
-      "chainId": 97
-    },    
-    {
-      "chainId": 43113
-    }       
-  ],
   "apiEndpoints": {
     "tradingRouting": "https://route.openswap.xyz/trading/v1/route",
     "bridgeRouting": "https://route.openswap.xyz/trading/v1/cross-chain-route",

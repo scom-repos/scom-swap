@@ -557,10 +557,10 @@ define("@scom/scom-swap/global/index.ts", ["require", "exports", "@scom/scom-swa
     })(ApprovalStatus = exports.ApprovalStatus || (exports.ApprovalStatus = {}));
     __exportStar(index_1, exports);
 });
-define("@scom/scom-swap/store/utils.ts", ["require", "exports", "@ijstech/components", "@ijstech/eth-wallet", "@scom/scom-token-list", "@scom/scom-token-list", "@scom/scom-network-list"], function (require, exports, components_3, eth_wallet_2, scom_token_list_1, scom_token_list_2, scom_network_list_1) {
+define("@scom/scom-swap/store/utils.ts", ["require", "exports", "@ijstech/components", "@ijstech/eth-wallet", "@scom/scom-token-list", "@scom/scom-token-list"], function (require, exports, components_3, eth_wallet_2, scom_token_list_1, scom_token_list_2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.getClientWallet = exports.getChainNativeToken = exports.hasMetaMask = exports.isClientWalletConnected = exports.getTokenObjArr = exports.getNetworkInfo = exports.State = exports.WalletPlugin = void 0;
+    exports.getClientWallet = exports.getChainNativeToken = exports.isClientWalletConnected = exports.getTokenObjArr = exports.getNetworkInfo = exports.State = exports.WalletPlugin = void 0;
     var WalletPlugin;
     (function (WalletPlugin) {
         WalletPlugin["MetaMask"] = "metamask";
@@ -570,15 +570,14 @@ define("@scom/scom-swap/store/utils.ts", ["require", "exports", "@ijstech/compon
         constructor(options) {
             this.isExpertMode = false;
             this.slippageTolerance = 0.5;
-            this.transactionDeadline = 30;
+            this.swapTransactionDeadline = 30;
+            this.bridgeTransactionDeadline = 120;
             this.infuraId = "";
-            this.networkMap = {};
             this.dexInfoList = [];
             this.providerList = [];
             this.proxyAddresses = {};
             this.apiEndpoints = {};
             this.rpcWalletId = "";
-            this.networkMap = (0, scom_network_list_1.default)();
             this.initData(options);
         }
         initRpcWallet(defaultChainId) {
@@ -661,9 +660,6 @@ define("@scom/scom-swap/store/utils.ts", ["require", "exports", "@ijstech/compon
             if (options.infuraId) {
                 this.infuraId = options.infuraId;
             }
-            if (options.networks) {
-                this.setNetworkList(options.networks, options.infuraId);
-            }
             if (options.proxyAddresses) {
                 this.proxyAddresses = options.proxyAddresses;
             }
@@ -676,27 +672,6 @@ define("@scom/scom-swap/store/utils.ts", ["require", "exports", "@ijstech/compon
         }
         getAPIEndpoint(key) {
             return this.apiEndpoints[key];
-        }
-        setNetworkList(networkList, infuraId) {
-            const wallet = eth_wallet_2.Wallet.getClientInstance();
-            this.networkMap = {};
-            const defaultNetworkList = (0, scom_network_list_1.default)();
-            const defaultNetworkMap = defaultNetworkList.reduce((acc, cur) => {
-                acc[cur.chainId] = cur;
-                return acc;
-            }, {});
-            for (let network of networkList) {
-                const networkInfo = defaultNetworkMap[network.chainId];
-                if (!networkInfo)
-                    continue;
-                if (infuraId && network.rpcUrls && network.rpcUrls.length > 0) {
-                    for (let i = 0; i < network.rpcUrls.length; i++) {
-                        network.rpcUrls[i] = network.rpcUrls[i].replace(/{InfuraId}/g, infuraId);
-                    }
-                }
-                this.networkMap[network.chainId] = Object.assign(Object.assign({}, networkInfo), network);
-                wallet.setNetworkInfo(this.networkMap[network.chainId]);
-            }
         }
         async setApprovalModelAction(options) {
             const approvalOptions = Object.assign(Object.assign({}, options), { spenderAddress: '' });
@@ -732,12 +707,6 @@ define("@scom/scom-swap/store/utils.ts", ["require", "exports", "@ijstech/compon
         return wallet.isConnected;
     }
     exports.isClientWalletConnected = isClientWalletConnected;
-    const hasMetaMask = function () {
-        var _a;
-        const wallet = eth_wallet_2.Wallet.getClientInstance();
-        return ((_a = wallet === null || wallet === void 0 ? void 0 : wallet.clientSideProvider) === null || _a === void 0 ? void 0 : _a.name) === WalletPlugin.MetaMask;
-    };
-    exports.hasMetaMask = hasMetaMask;
     const getChainNativeToken = (chainId) => {
         return scom_token_list_2.ChainNativeTokenByChainId[chainId];
     };
@@ -936,37 +905,40 @@ define("@scom/scom-swap/store/cross-chain.ts", ["require", "exports"], function 
             }
         },
         {
-            // DEPRECATED VAULT
-            "name": "OSWAP",
-            "deprecated": true,
+            "name": "PROJECT",
             "vaultType": VaultType.Project,
             "vaults": {
+                "97": {
+                    "tokenAddress": "0x3cb66f6057d80015D0cf7c4c4e00dfC79ff6c836",
+                    "vaultRegistryAddress": "0x6Be03Ad6151B7DD7dd5A8A860202e20691ab124b",
+                    "vaultAddress": "0x2B05599641f3f0d96d0D1F2eec4237406638fB8F",
+                    "softCap": 30000,
+                },
                 "43113": {
-                    "tokenAddress": "0x78d9D80E67bC80A11efbf84B7c8A65Da51a8EF3C",
-                    "vaultRegistryAddress": "0xc8fC05a8e9D6dA2FF6395202b28eEbA4e5B21004",
-                    "vaultAddress": "0x67565ACa8abcc5C94b3E934AdC5C6965b3ed7F89"
-                },
-                "43114": {
-                    "tokenAddress": "0xb32aC3C79A94aC1eb258f3C830bBDbc676483c93",
-                    "vaultRegistryAddress": "",
-                    "vaultAddress": "0x547C8B68Cb36410FFDceE6Ad4bA0c64FD21085Bb",
-                },
+                    "tokenAddress": "0x1B23B0dBB8D142596443999Dd0197299Fa17eb03",
+                    "vaultRegistryAddress": "0xB120481872288dF6bAEcc1D4eFEC61387ce1891c",
+                    "vaultAddress": "0x7E8c8155516fad72419BAd2dDaE48fC686b4590A",
+                    "softCap": 30000,
+                }
             }
-        },
+        }
     ];
     exports.BridgeVaultGroupList = BridgeVaultGroupList;
     const CrossChainAddressMap = {
-        // 42: {
-        //   wrapperAddress: '0x8ad7a50FA4647995126988c7fCEa242Bae2D832F'
-        // },
         56: {
             wrapperAddress: '0xce194324a8ddaf43e5c00f38593f37c9f21ed297',
         },
+        // 97: { //v9
+        //   wrapperAddress: '0x97ACbBCe88c6358496800893397ABf5d071Af3A3'
+        // },
+        // 43113: { //v89
+        //   wrapperAddress: '0xA8e373C6f31280eAFC93AF14df4a6663A56c09a5'
+        // },
         97: {
-            wrapperAddress: '0x97ACbBCe88c6358496800893397ABf5d071Af3A3'
+            wrapperAddress: '0x0a097c562B796203318783581B659EE8005C3988'
         },
         43113: {
-            wrapperAddress: '0xA8e373C6f31280eAFC93AF14df4a6663A56c09a5'
+            wrapperAddress: '0xa60c76A648018b5f4124984618355590Ed79c8B7'
         },
         43114: {
             wrapperAddress: '0xcD050070b53924E1965418d7D940fa2ABB4302f3',
@@ -978,19 +950,17 @@ define("@scom/scom-swap/store/cross-chain.ts", ["require", "exports"], function 
     exports.CrossChainAddressMap = CrossChainAddressMap;
     // Dependent
     const MockOracleMap = {
-        // 42: {
-        //   '0x28a6a9079fa8e041179cd13f4652af2b315b6fd8': '0x226021E3582c89eF9a338be069dEcFD43acF0269',  //OSWAP 
-        //   '0xdcdafd9461c2df544f6e2165481e8174e45febd8': '0xEF4Faa48Ee32E2D47503a821eb7E8607D52489AC', //USDT
-        // },
         56: {
             '0xb32aC3C79A94aC1eb258f3C830bBDbc676483c93': '0xd9df1285e2effbaaa580513b256bd21c041973f7',
             '0x55d398326f99059fF775485246999027B3197955': '0x6979c00cc49e0b5e77a920b25a0e16445b0f665a', // USDT
         },
         97: {
+            '0x3cb66f6057d80015D0cf7c4c4e00dfC79ff6c836': '0x50C41443c3F05d469644675235249F375a5AA622',
             '0x45eee762aaea4e5ce317471bda8782724972ee19': '0x50C41443c3F05d469644675235249F375a5AA622',
             '0x29386b60e0a9a1a30e1488ada47256577ca2c385': '0x6af1CdfBe372C922405C0CD9003CE7758250E8E5', //USDT
         },
         43113: {
+            '0x1B23B0dBB8D142596443999Dd0197299Fa17eb03': '0xe4dfc0E5772405483F71FE1c234290d62C102e02',
             '0x78d9d80e67bc80a11efbf84b7c8a65da51a8ef3c': '0xe4dfc0E5772405483F71FE1c234290d62C102e02',
             '0xb9c31ea1d475c25e58a1be1a46221db55e5a7c6e': '0xA79D4C012AaeafD45630af1298DC3e18596fF081', //USDT
         },
@@ -998,10 +968,10 @@ define("@scom/scom-swap/store/cross-chain.ts", ["require", "exports"], function 
             '0xb32aC3C79A94aC1eb258f3C830bBDbc676483c93': '0xd9df1285e2effbaaa580513b256bd21c041973f7',
             '0xc7198437980c041c805A1EDcbA50c1Ce5db95118': '0x6979c00cc49e0b5e77a920b25a0e16445b0f665a', // USDT
         },
-        80001: {
-            '0xA9d603421e2777b8BEa685272611A01fF3bc6523': '0x7d564Ca1A9fb5a6D2275e62A97333AdaA5d2Cbe6',
-            '0xf6bf7c1213fdce4aa92e7c91865cd586891b9cf6': '0xc2817961e17E24853856cC355E902C5D1B8f07E9', //USDT
-        }
+        // 80001: {
+        //   '0xA9d603421e2777b8BEa685272611A01fF3bc6523': '0x7d564Ca1A9fb5a6D2275e62A97333AdaA5d2Cbe6', //OSWAP
+        //   '0xf6bf7c1213fdce4aa92e7c91865cd586891b9cf6': '0xc2817961e17E24853856cC355E902C5D1B8f07E9', //USDT
+        // }
     };
     exports.MockOracleMap = MockOracleMap;
     const crossChainSupportedChainIds = [
@@ -1164,15 +1134,27 @@ define("@scom/scom-swap/crosschain-utils/API.ts", ["require", "exports", "@scom/
         return vaultTokenMap;
     };
     const getBridgeVault = async (state, chainId, vaultAddress) => {
-        const bridgeVaultAPIEndpoint = state.getAPIEndpoint('bridgeVault');
-        let res = await (0, index_2.getAPI)(bridgeVaultAPIEndpoint, { chainId, address: vaultAddress });
-        return res;
+        try {
+            const bridgeVaultAPIEndpoint = state.getAPIEndpoint('bridgeVault');
+            let res = await (0, index_2.getAPI)(bridgeVaultAPIEndpoint, { chainId, address: vaultAddress });
+            return res.data ? res.data : res;
+        }
+        catch (err) {
+            console.log('err', err);
+        }
+        return null;
     };
     exports.getBridgeVault = getBridgeVault;
     const getBondsInBridgeVault = async (state, chainId, vaultTrollRegistry, version = (0, index_3.getBridgeVaultVersion)(state.getChainId())) => {
-        const bondsAPIEndpoint = state.getAPIEndpoint('bonds');
-        let res = await (0, index_2.getAPI)(bondsAPIEndpoint, { version, chainId, vaultTrollRegistry });
-        return Array.isArray(res) ? res : [];
+        try {
+            const bondsAPIEndpoint = state.getAPIEndpoint('bonds');
+            let res = await (0, index_2.getAPI)(bondsAPIEndpoint, { version, chainId, vaultTrollRegistry });
+            return Array.isArray(res) ? res : [];
+        }
+        catch (err) {
+            console.log('err', err);
+        }
+        return [];
     };
     exports.getBondsInBridgeVault = getBondsInBridgeVault;
     // Bridge Swap
@@ -1180,7 +1162,7 @@ define("@scom/scom-swap/crosschain-utils/API.ts", ["require", "exports", "@scom/
         try {
             const { vaultAddress, targetChainId, tokenIn, tokenOut, amountIn, minAmountOut, sourceRouteInfo } = params;
             const wallet = eth_wallet_3.Wallet.getClientInstance();
-            const transactionDeadlineInMinutes = state.transactionDeadline;
+            const transactionDeadlineInMinutes = state.bridgeTransactionDeadline;
             const transactionDeadline = Math.floor(Date.now() / 1000 + (transactionDeadlineInMinutes * 60));
             const slippageTolerance = state.slippageTolerance;
             const amountInTokenAmount = eth_wallet_3.Utils.toDecimals(amountIn, tokenIn.decimals);
@@ -1320,16 +1302,17 @@ define("@scom/scom-swap/crosschain-utils/API.ts", ["require", "exports", "@scom/
         }
         const tradeFeeMap = await getTradeFeeMap(state);
         const bridgeRoutingAPIEndpoint = state.getAPIEndpoint('bridgeRouting');
-        const routeObjArr = await (0, index_2.getAPI)(bridgeRoutingAPIEndpoint, {
+        const routeAPIResult = await (0, index_2.getAPI)(bridgeRoutingAPIEndpoint, {
             fromChainId,
             toChainId,
             tokenIn: tokenIn.address,
             tokenOut: tokenOut.address,
             amountIn: eth_wallet_3.Utils.toDecimals(amountIn, tokenIn.decimals),
-            version: (0, index_3.getBridgeVaultVersion)(state.getChainId())
+            // version: getBridgeVaultVersion(state.getChainId())
         });
-        if (!routeObjArr || !routeObjArr.routes)
+        if (!routeAPIResult)
             return [];
+        const routes = routeAPIResult.routes || routeAPIResult.data;
         const composeRoutes = async (routeObj, chainId, fromAmount) => {
             const providerConfigByDexId = Object.values(index_3.ProviderConfigMap)
                 .filter(({ supportedChains }) => supportedChains === null || supportedChains === void 0 ? void 0 : supportedChains.includes(chainId))
@@ -1356,6 +1339,7 @@ define("@scom/scom-swap/crosschain-utils/API.ts", ["require", "exports", "@scom/
                     };
                 })
             };
+            console.log('routeObj', routeObj);
             let amountOut = eth_wallet_3.Utils.fromDecimals(routeObj.amountOut, routeObj.tokens[routeObj.tokens.length - 1].decimals);
             let swapPrice = new eth_wallet_3.BigNumber(fromAmount).div(amountOut);
             let extendedData = bestRouteObj.pairs.length !== 0 ? await getExtendedRouteObjData(bestRouteObj, tradeFeeMap, swapPrice, true) : await getExtendedRouteObjDataForDirectRoute(bestRouteObj, swapPrice);
@@ -1368,8 +1352,8 @@ define("@scom/scom-swap/crosschain-utils/API.ts", ["require", "exports", "@scom/
         };
         let bestRouteObjArr = [];
         let wrapperAddress = index_3.CrossChainAddressMap[fromChainId].wrapperAddress; //TODO: Return from API
-        for (let i = 0; i < routeObjArr['routes'].length; i++) {
-            let routeObj = routeObjArr['routes'][i];
+        for (let i = 0; i < routes.length; i++) {
+            let routeObj = routes[i];
             let sourceVaultToken = getTokenByVaultAddress(fromChainId, routeObj.vault);
             let targetVaultAddresses = (_b = (_a = index_3.BridgeVaultGroupList.filter((v) => {
                 if (v.deprecated)
@@ -1425,19 +1409,30 @@ define("@scom/scom-swap/crosschain-utils/API.ts", ["require", "exports", "@scom/
     exports.getAvailableRouteOptions = getAvailableRouteOptions;
     // Return the current vault asset balance by given chainId and address
     const getVaultAssetBalance = async (chainId, vaultAddress) => {
-        let targetChainWallet = initCrossChainWallet(chainId);
-        const vault = new oswap_cross_chain_bridge_contract_1.Contracts.OSWAP_BridgeVault(targetChainWallet, vaultAddress);
-        const asset = new eth_wallet_3.Contracts.ERC20(targetChainWallet, await vault.asset());
-        return (await asset.balanceOf(vault.address));
+        try {
+            let targetChainWallet = initCrossChainWallet(chainId);
+            const vault = new oswap_cross_chain_bridge_contract_1.Contracts.OSWAP_BridgeVault(targetChainWallet, vaultAddress);
+            const asset = new eth_wallet_3.Contracts.ERC20(targetChainWallet, await vault.asset());
+            return (await asset.balanceOf(vault.address));
+        }
+        catch (err) {
+            console.log('err', err);
+        }
+        return null;
     };
     exports.getVaultAssetBalance = getVaultAssetBalance;
     const getOraclePriceMap = async (chainId) => {
         const oraclePriceMap = {};
-        const wallet = initCrossChainWallet(chainId);
-        await Promise.all(Object.entries(index_3.MockOracleMap[chainId]).map(async ([token, oracle]) => {
-            let mockOracleContract = new oswap_chainlink_contract_1.Contracts.AggregatorProxy(wallet, oracle);
-            oraclePriceMap[token.toLowerCase()] = (await mockOracleContract.latestAnswer()).shiftedBy(-18); // token -> USD 
-        }));
+        try {
+            const wallet = initCrossChainWallet(chainId);
+            await Promise.all(Object.entries(index_3.MockOracleMap[chainId]).map(async ([token, oracle]) => {
+                let mockOracleContract = new oswap_chainlink_contract_1.Contracts.AggregatorProxy(wallet, oracle);
+                oraclePriceMap[token.toLowerCase()] = (await mockOracleContract.latestAnswer()).shiftedBy(-18); // token -> USD 
+            }));
+        }
+        catch (err) {
+            console.log('err', err);
+        }
         return oraclePriceMap;
     };
     exports.getOraclePriceMap = getOraclePriceMap;
@@ -2259,7 +2254,7 @@ define("@scom/scom-swap/swap-utils/index.ts", ["require", "exports", "@ijstech/e
         try {
             const toAddress = wallet.account.address;
             const slippageTolerance = state.slippageTolerance;
-            const transactionDeadlineInMinutes = state.transactionDeadline;
+            const transactionDeadlineInMinutes = state.swapTransactionDeadline;
             const transactionDeadline = Math.floor(Date.now() / 1000 + transactionDeadlineInMinutes * 60);
             const providerList = state.providerList;
             const market = ((_a = providerList.find(item => item.key === swapData.provider)) === null || _a === void 0 ? void 0 : _a.key) || '';
@@ -2579,14 +2574,6 @@ define("@scom/scom-swap/data.json.ts", ["require", "exports"], function (require
     const InfuraId = "adc596bf88b648e2a8902bc9093930c5";
     exports.default = {
         "infuraId": InfuraId,
-        "networks": [
-            {
-                "chainId": 97
-            },
-            {
-                "chainId": 43113
-            }
-        ],
         "apiEndpoints": {
             "tradingRouting": "https://route.openswap.xyz/trading/v1/route",
             "bridgeRouting": "https://route.openswap.xyz/trading/v1/cross-chain-route",
@@ -3566,12 +3553,6 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                 if ((_b = (_a = this.originalData) === null || _a === void 0 ? void 0 : _a.providers) === null || _b === void 0 ? void 0 : _b.length)
                     await this.initializeWidgetConfig();
             });
-            if (rpcWallet.instanceId) {
-                if (this.firstTokenInput)
-                    this.firstTokenInput.rpcWalletId = rpcWallet.instanceId;
-                if (this.secondTokenInput)
-                    this.secondTokenInput.rpcWalletId = rpcWallet.instanceId;
-            }
             const data = {
                 defaultChainId: this.defaultChainId,
                 wallets: this.wallets,
@@ -3758,13 +3739,6 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                 const val = typeof value === 'object' ? value : new eth_wallet_5.BigNumber(value);
                 if (val.isNaN() || val.isZero())
                     return '';
-                // let formatted = '';
-                // if (val.gte(1)) {
-                //   formatted = val.toNumber().toLocaleString('en-US', { maximumFractionDigits: 4 });
-                // } else {
-                //   formatted = val.toNumber().toLocaleString('en-US', { maximumSignificantDigits: 4 });
-                // }
-                // const format1 = formatted.replace(/,/g, '');
                 return components_9.FormatUtils.formatNumber(val.toFixed(), { decimalFigures: 4, useSeparators: false });
             };
             this.initWallet = async () => {
@@ -4084,6 +4058,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                 }
             };
             this.onSelectSourceChain = async (obj, img) => {
+                this.firstTokenInput.chainId = obj.chainId;
                 if (this.isMetaMask || !(0, index_7.isClientWalletConnected)()) {
                     await this.selectSourceChain(obj, img);
                     this.initializeWidgetConfig();
@@ -4091,6 +4066,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
             };
             this.onSelectDestinationChain = async (obj, img) => {
                 var _a;
+                this.secondTokenInput.chainId = obj.chainId;
                 if (obj.chainId === ((_a = this.desChain) === null || _a === void 0 ? void 0 : _a.chainId))
                     return;
                 await this.selectDestinationChain(obj, img);
@@ -4271,7 +4247,9 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
             var _a, _b, _c;
             const currentChainId = this.state.getChainId();
             let currentChainTokens = (0, index_7.getSupportedTokens)(this._tokens, currentChainId);
+            this.firstTokenInput.chainId = currentChainId;
             if (this.isCrossChain) {
+                this.secondTokenInput.chainId = this.desChain.chainId;
                 let targetChainTokens = (0, index_7.getSupportedTokens)(this._tokens, this.desChain.chainId);
                 if (this.fromTokenSymbol && this.toTokenSymbol) {
                     const firstObj = currentChainTokens.find(item => this.fromTokenSymbol === item.symbol || this.fromTokenSymbol === item.address);
@@ -4304,26 +4282,28 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                     this.firstTokenInput.token = this.fromToken;
                     this.secondTokenInput.token = this.toToken;
                 }
-                return;
             }
-            if (currentChainTokens.length < 2)
-                return;
-            const providers = (_a = this.originalData) === null || _a === void 0 ? void 0 : _a.providers;
-            if (providers && providers.length) {
-                let fromTokenKey = this.getTokenKey(currentChainTokens[0]);
-                let toTokenKey = this.getTokenKey(currentChainTokens[1]);
-                let tokenMap = scom_token_list_6.tokenStore.getTokenMapByChainId(currentChainId);
-                this.fromToken = tokenMap[fromTokenKey];
-                this.toToken = tokenMap[toTokenKey];
-                this.fromTokenSymbol = (_b = this.fromToken) === null || _b === void 0 ? void 0 : _b.symbol;
-                this.toTokenSymbol = (_c = this.toToken) === null || _c === void 0 ? void 0 : _c.symbol;
-                this.fromInputValue = new eth_wallet_5.BigNumber(this._data.defaultInputValue);
-                this.toInputValue = new eth_wallet_5.BigNumber(this._data.defaultOutputValue);
-                this.onUpdateToken(this.fromToken, true);
-                this.onUpdateToken(this.toToken, false);
-                this.firstTokenInput.token = this.fromToken;
-                this.secondTokenInput.token = this.toToken;
-                this.toggleReverseImage.classList.add('cursor-default');
+            else {
+                this.secondTokenInput.chainId = currentChainId;
+                if (currentChainTokens.length < 2)
+                    return;
+                const providers = (_a = this.originalData) === null || _a === void 0 ? void 0 : _a.providers;
+                if (providers && providers.length) {
+                    let fromTokenKey = this.getTokenKey(currentChainTokens[0]);
+                    let toTokenKey = this.getTokenKey(currentChainTokens[1]);
+                    let tokenMap = scom_token_list_6.tokenStore.getTokenMapByChainId(currentChainId);
+                    this.fromToken = tokenMap[fromTokenKey];
+                    this.toToken = tokenMap[toTokenKey];
+                    this.fromTokenSymbol = (_b = this.fromToken) === null || _b === void 0 ? void 0 : _b.symbol;
+                    this.toTokenSymbol = (_c = this.toToken) === null || _c === void 0 ? void 0 : _c.symbol;
+                    this.fromInputValue = new eth_wallet_5.BigNumber(this._data.defaultInputValue);
+                    this.toInputValue = new eth_wallet_5.BigNumber(this._data.defaultOutputValue);
+                    this.onUpdateToken(this.fromToken, true);
+                    this.onUpdateToken(this.toToken, false);
+                    this.firstTokenInput.token = this.fromToken;
+                    this.secondTokenInput.token = this.toToken;
+                    this.toggleReverseImage.classList.add('cursor-default');
+                }
             }
         }
         async initApprovalModelAction() {
@@ -4511,7 +4491,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
         async onUpdateToken(token, isFrom) {
             if (!token)
                 return;
-            const balance = this.getBalance(token, !isFrom && this.isCrossChain);
+            const balance = this.getBalance(token);
             if (isFrom) {
                 this.fromToken = token;
                 const enabled = !this.isMaxDisabled();
@@ -5039,7 +5019,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
             ];
             return info.filter((f) => !f.isHidden);
         }
-        getBalance(token, isCrossChain) {
+        getBalance(token) {
             var _a;
             if (!token)
                 return '0';
@@ -5047,13 +5027,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
             if (!tokenBalances)
                 return '0';
             const address = token.address || '';
-            let balance = '0';
-            if (isCrossChain) {
-                balance = token.isNative ? this.targetChainTokenBalances[token.symbol] : this.targetChainTokenBalances[address.toLowerCase()] || '0';
-            }
-            else {
-                balance = address ? (_a = tokenBalances[address.toLowerCase()]) !== null && _a !== void 0 ? _a : '0' : tokenBalances[token.symbol] || '0';
-            }
+            let balance = address ? (_a = tokenBalances[address.toLowerCase()]) !== null && _a !== void 0 ? _a : '0' : tokenBalances[token.symbol] || '0';
             return balance;
         }
         async updateBalance() {
@@ -5067,11 +5041,11 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
             else {
             }
             if (this.fromToken) {
-                const balance = this.getBalance(this.fromToken, this.isCrossChain);
+                const balance = this.getBalance(this.fromToken);
                 this.payBalance.caption = `Balance: ${(0, index_10.formatNumber)(balance, 4)} ${this.fromToken.symbol}`;
             }
             if (this.toToken) {
-                const balance = this.getBalance(this.toToken, this.isCrossChain);
+                const balance = this.getBalance(this.toToken);
                 this.receiveBalance.caption = `Balance: ${(0, index_10.formatNumber)(balance, 4)} ${this.toToken.symbol}`;
             }
             const enabled = !this.isMaxDisabled();

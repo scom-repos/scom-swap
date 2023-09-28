@@ -16,9 +16,9 @@ export type ProxyAddresses = { [key: number]: string };
 export class State {
   isExpertMode: boolean = false;
   slippageTolerance: number = 0.5;
-  transactionDeadline: number = 30;
+  swapTransactionDeadline: number = 30;
+  bridgeTransactionDeadline: number = 120;
   infuraId: string = "";
-  networkMap: { [key: number]: INetwork } = {};
   dexInfoList: IDexInfo[] = [];
   providerList: IProvider[] = [];
   proxyAddresses: ProxyAddresses = {};
@@ -28,7 +28,6 @@ export class State {
   approvalModel: ERC20ApprovalModel;
 
   constructor(options: any) {
-    this.networkMap = getNetworkList();
     this.initData(options);
   }
 
@@ -121,9 +120,6 @@ export class State {
     if (options.infuraId) {
       this.infuraId = options.infuraId;
     }
-    if (options.networks) {
-      this.setNetworkList(options.networks, options.infuraId)
-    }
     if (options.proxyAddresses) {
       this.proxyAddresses = options.proxyAddresses;
     }
@@ -138,30 +134,6 @@ export class State {
 
   getAPIEndpoint(key: string) {
     return this.apiEndpoints[key];
-  }
-
-  private setNetworkList(networkList: INetwork[], infuraId?: string) {
-    const wallet = Wallet.getClientInstance();
-    this.networkMap = {};
-    const defaultNetworkList = getNetworkList();
-    const defaultNetworkMap = defaultNetworkList.reduce((acc, cur) => {
-      acc[cur.chainId] = cur;
-      return acc;
-    }, {});
-    for (let network of networkList) {
-      const networkInfo = defaultNetworkMap[network.chainId];
-      if (!networkInfo) continue;
-      if (infuraId && network.rpcUrls && network.rpcUrls.length > 0) {
-        for (let i = 0; i < network.rpcUrls.length; i++) {
-          network.rpcUrls[i] = network.rpcUrls[i].replace(/{InfuraId}/g, infuraId);
-        }
-      }
-      this.networkMap[network.chainId] = {
-        ...networkInfo,
-        ...network
-      };
-      wallet.setNetworkInfo(this.networkMap[network.chainId]);
-    }
   }
 
   async setApprovalModelAction(options: IERC20ApprovalEventOptions) {
@@ -198,11 +170,6 @@ export const getTokenObjArr = (tokens: ITokenConfig[]) => {
 export function isClientWalletConnected() {
   const wallet = Wallet.getClientInstance();
   return wallet.isConnected;
-}
-
-export const hasMetaMask = function () {
-  const wallet = Wallet.getClientInstance();
-  return wallet?.clientSideProvider?.name === WalletPlugin.MetaMask;
 }
 
 export const getChainNativeToken = (chainId: number): ITokenObject => {

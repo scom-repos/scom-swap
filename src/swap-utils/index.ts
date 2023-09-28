@@ -903,7 +903,7 @@ const executeSwap: (state: State, swapData: SwapData) => Promise<{
   try {
     const toAddress = wallet.account.address;
     const slippageTolerance = state.slippageTolerance;
-    const transactionDeadlineInMinutes = state.transactionDeadline;
+    const transactionDeadlineInMinutes = state.swapTransactionDeadline;
     const transactionDeadline = Math.floor(
       Date.now() / 1000 + transactionDeadlineInMinutes * 60
     );

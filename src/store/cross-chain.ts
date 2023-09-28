@@ -110,37 +110,40 @@ const BridgeVaultGroupList: BridgeVaultGroup[] = [
     }
   },
   {
-    // DEPRECATED VAULT
-    "name": "OSWAP",
-    "deprecated": true,
+    "name": "PROJECT",
     "vaultType": VaultType.Project,
     "vaults": {
-      "43113": {
-        "tokenAddress": "0x78d9D80E67bC80A11efbf84B7c8A65Da51a8EF3C",
-        "vaultRegistryAddress": "0xc8fC05a8e9D6dA2FF6395202b28eEbA4e5B21004",
-        "vaultAddress": "0x67565ACa8abcc5C94b3E934AdC5C6965b3ed7F89"
+      "97": { 
+        "tokenAddress": "0x3cb66f6057d80015D0cf7c4c4e00dfC79ff6c836",
+        "vaultRegistryAddress": "0x6Be03Ad6151B7DD7dd5A8A860202e20691ab124b",
+        "vaultAddress": "0x2B05599641f3f0d96d0D1F2eec4237406638fB8F",
+        "softCap": 30000,
       },
-      "43114": {
-        "tokenAddress": "0xb32aC3C79A94aC1eb258f3C830bBDbc676483c93",
-        "vaultRegistryAddress": "",
-        "vaultAddress": "0x547C8B68Cb36410FFDceE6Ad4bA0c64FD21085Bb",
-      },
+      "43113": { 
+        "tokenAddress": "0x1B23B0dBB8D142596443999Dd0197299Fa17eb03",
+        "vaultRegistryAddress": "0xB120481872288dF6bAEcc1D4eFEC61387ce1891c",
+        "vaultAddress": "0x7E8c8155516fad72419BAd2dDaE48fC686b4590A",
+        "softCap": 30000,
+      }
     }
-  },
+  }
 ]
 
 const CrossChainAddressMap: { [chainId: number]: { wrapperAddress: string } } = {
-  // 42: {
-  //   wrapperAddress: '0x8ad7a50FA4647995126988c7fCEa242Bae2D832F'
-  // },
   56: {
     wrapperAddress: '0xce194324a8ddaf43e5c00f38593f37c9f21ed297',
   },
+  // 97: { //v9
+  //   wrapperAddress: '0x97ACbBCe88c6358496800893397ABf5d071Af3A3'
+  // },
+  // 43113: { //v89
+  //   wrapperAddress: '0xA8e373C6f31280eAFC93AF14df4a6663A56c09a5'
+  // },
   97: { //v9
-    wrapperAddress: '0x97ACbBCe88c6358496800893397ABf5d071Af3A3'
+    wrapperAddress: '0x0a097c562B796203318783581B659EE8005C3988'
   },
   43113: { //v89
-    wrapperAddress: '0xA8e373C6f31280eAFC93AF14df4a6663A56c09a5'
+    wrapperAddress: '0xa60c76A648018b5f4124984618355590Ed79c8B7'
   },
   43114: {
     wrapperAddress: '0xcD050070b53924E1965418d7D940fa2ABB4302f3',
@@ -152,19 +155,17 @@ const CrossChainAddressMap: { [chainId: number]: { wrapperAddress: string } } = 
 
 // Dependent
 const MockOracleMap: { [chainId: number]: { [token: string]: string } } = {
-  // 42: {
-  //   '0x28a6a9079fa8e041179cd13f4652af2b315b6fd8': '0x226021E3582c89eF9a338be069dEcFD43acF0269',  //OSWAP 
-  //   '0xdcdafd9461c2df544f6e2165481e8174e45febd8': '0xEF4Faa48Ee32E2D47503a821eb7E8607D52489AC', //USDT
-  // },
   56: {
     '0xb32aC3C79A94aC1eb258f3C830bBDbc676483c93': '0xd9df1285e2effbaaa580513b256bd21c041973f7', // OSWAP
     '0x55d398326f99059fF775485246999027B3197955': '0x6979c00cc49e0b5e77a920b25a0e16445b0f665a', // USDT
   },
   97: {
+    '0x3cb66f6057d80015D0cf7c4c4e00dfC79ff6c836': '0x50C41443c3F05d469644675235249F375a5AA622',  //PROJECT 
     '0x45eee762aaea4e5ce317471bda8782724972ee19': '0x50C41443c3F05d469644675235249F375a5AA622',  //OSWAP 
     '0x29386b60e0a9a1a30e1488ada47256577ca2c385': '0x6af1CdfBe372C922405C0CD9003CE7758250E8E5', //USDT
   },
   43113: {
+    '0x1B23B0dBB8D142596443999Dd0197299Fa17eb03': '0xe4dfc0E5772405483F71FE1c234290d62C102e02',  //PROJECT 
     '0x78d9d80e67bc80a11efbf84b7c8a65da51a8ef3c': '0xe4dfc0E5772405483F71FE1c234290d62C102e02', //OSWAP
     '0xb9c31ea1d475c25e58a1be1a46221db55e5a7c6e': '0xA79D4C012AaeafD45630af1298DC3e18596fF081', //USDT
   },
@@ -172,10 +173,10 @@ const MockOracleMap: { [chainId: number]: { [token: string]: string } } = {
     '0xb32aC3C79A94aC1eb258f3C830bBDbc676483c93': '0xd9df1285e2effbaaa580513b256bd21c041973f7', // OSWAP
     '0xc7198437980c041c805A1EDcbA50c1Ce5db95118': '0x6979c00cc49e0b5e77a920b25a0e16445b0f665a', // USDT
   },
-  80001: {
-    '0xA9d603421e2777b8BEa685272611A01fF3bc6523': '0x7d564Ca1A9fb5a6D2275e62A97333AdaA5d2Cbe6', //OSWAP
-    '0xf6bf7c1213fdce4aa92e7c91865cd586891b9cf6': '0xc2817961e17E24853856cC355E902C5D1B8f07E9', //USDT
-  }
+  // 80001: {
+  //   '0xA9d603421e2777b8BEa685272611A01fF3bc6523': '0x7d564Ca1A9fb5a6D2275e62A97333AdaA5d2Cbe6', //OSWAP
+  //   '0xf6bf7c1213fdce4aa92e7c91865cd586891b9cf6': '0xc2817961e17E24853856cC355E902C5D1B8f07E9', //USDT
+  // }
 }
 
 const crossChainSupportedChainIds = [
