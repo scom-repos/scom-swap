@@ -4674,7 +4674,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                 return;
             this.initRoutes();
             let listRouting = [];
-            const useAPI = this._data.category === 'aggregator';
+            const useAPI = this._data.category === 'aggregator' || this._data.category === 'cross-chain-swap';
             this.updateContractAddress();
             if (!this.isCrossChain) {
                 listRouting = await (0, index_8.getAllRoutesData)(this.state, this.fromToken, this.toToken, this.fromInputValue, this.toInputValue, this.isFrom, useAPI);

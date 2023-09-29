@@ -1347,7 +1347,7 @@ export default class ScomSwap extends Module {
     if (!this.fromToken || !this.toToken || !(this.fromInputValue.gt(0) || this.toInputValue.gt(0))) return;
     this.initRoutes();
     let listRouting: any[] = [];
-    const useAPI = this._data.category === 'aggregator';
+    const useAPI = this._data.category === 'aggregator' || this._data.category === 'cross-chain-swap';
     this.updateContractAddress();
     if (!this.isCrossChain) {
       listRouting = await getAllRoutesData(this.state, this.fromToken, this.toToken, this.fromInputValue, this.toInputValue, this.isFrom, useAPI);
