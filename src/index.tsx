@@ -25,7 +25,6 @@ import {
   createBridgeVaultOrder
 } from './swap-utils/index'
 import {
-  getTargetChainTokenInfoObj,
   ICrossChainRouteResult,
   getBridgeVault,
   getBondsInBridgeVault,
@@ -80,6 +79,8 @@ interface ScomSwapElement extends ControlElement {
   commissions?: ICommissionInfo[];
   logo?: string;
   title?: string;
+  defaultInputToken?: ITokenConfig;
+  defaultOutputToken?: ITokenConfig;
   defaultInputValue?: string;
   defaultOutputValue?: string;
   apiEndpoints?: Record<string, string>;
@@ -148,8 +149,6 @@ export default class ScomSwap extends Module {
   private isFrom: boolean;
   private fromToken?: ITokenObject;
   private toToken?: ITokenObject;
-  private fromTokenSymbol: string;
-  private toTokenSymbol: string;
   private fromInputValue: BigNumber;
   private toInputValue: BigNumber;
   private timeout: any; // NodeJS.Timeout;
@@ -188,7 +187,6 @@ export default class ScomSwap extends Module {
   private desChainList: HStack;
   private srcChain: INetwork | undefined;
   private desChain: INetwork | undefined;
-  private targetChainId: number | undefined;
   private srcChainFirstPanel: Panel;
   private targetChainFirstPanel: Panel;
   private srcChainTokenImage: Image;
@@ -796,35 +794,6 @@ export default class ScomSwap extends Module {
     return false;
   }
 
-  private redirectToken = () => {
-    const currentChainId = this.state.getChainId();
-    let queryRouter: any = {
-      chainId: currentChainId,
-      fromToken: this.fromToken?.symbol || this.fromTokenSymbol,
-      toToken: this.toToken?.symbol || this.toTokenSymbol,
-    };
-    if (this.isCrossChain) {
-      this.isFrom = false;
-    }
-    if (this.isFrom) {
-      queryRouter = {
-        ...queryRouter,
-        toAmount: this.toInputValue.toFixed(),
-      };
-    } else {
-      queryRouter = {
-        ...queryRouter,
-        fromAmount: this.fromInputValue.toFixed(),
-      };
-    }
-    this.fromTokenSymbol = queryRouter.fromToken;
-    this.toTokenSymbol = queryRouter.toToken;
-    this.targetChainId = queryRouter.toChainId;
-    if (!this.isCrossChainEnabled) {
-      delete queryRouter['toChainId'];
-    }
-  };
-
   private fixedNumber = (value: BigNumber | string | number) => {
     const val = typeof value === 'object' ? value : new BigNumber(value);
     if (val.isNaN() || val.isZero()) return '';
@@ -845,46 +814,50 @@ export default class ScomSwap extends Module {
     if (this.isCrossChain) {
       this.secondTokenInput.chainId = this.desChain.chainId;
       let targetChainTokens = getSupportedTokens(this._tokens, this.desChain.chainId);
-      if (this.fromTokenSymbol && this.toTokenSymbol) {
-        const firstObj = currentChainTokens.find(item => this.fromTokenSymbol === item.symbol || this.fromTokenSymbol === item.address);
-        if (firstObj) {
-          this.fromToken = firstObj;
-        } else {
-          this.fromToken = currentChainTokens[0];
-        }
-        const secondObj = targetChainTokens.find(item => this.toTokenSymbol === item.symbol || this.toTokenSymbol === item.address);
-        if (secondObj) {
-          this.toToken = secondObj;
-        } else {
-          this.toToken = targetChainTokens[0];
-        }
-        this.onUpdateToken(this.fromToken as ITokenObject, true);
-        this.onUpdateToken(this.toToken as ITokenObject, false);
-        this.firstTokenInput.token = this.fromToken;
-        this.secondTokenInput.token = this.toToken;
-        this.fromInputValue = this.fromInputValue || new BigNumber(this._data.defaultInputValue);
-      } else {
-        let firstDefaultToken = currentChainTokens[0];
-        let secondDefaultToken = targetChainTokens[0];
-        this.fromInputValue = new BigNumber(this._data.defaultInputValue);
-        this.onUpdateToken(firstDefaultToken, true);
-        this.onUpdateToken(secondDefaultToken, false);
-        this.firstTokenInput.token = this.fromToken;
-        this.secondTokenInput.token = this.toToken;
+      let firstDefaultToken: ITokenObject;
+      let secondDefaultToken: ITokenObject;
+      if (this._data.defaultInputToken) {
+        firstDefaultToken = currentChainTokens.find(v => v.chainId === this._data.defaultInputToken.chainId && v.address === this._data.defaultInputToken.address);
       }
+      else {
+        firstDefaultToken = currentChainTokens[0];
+      }
+      if (this._data.defaultOutputToken) {
+        secondDefaultToken = targetChainTokens.find(v => v.chainId === this._data.defaultOutputToken.chainId && v.address === this._data.defaultOutputToken.address);
+      }
+      else {
+        secondDefaultToken = targetChainTokens[0];
+      }
+      this.fromInputValue = new BigNumber(this._data.defaultInputValue);
+      this.onUpdateToken(firstDefaultToken, true);
+      this.onUpdateToken(secondDefaultToken, false);
+      this.firstTokenInput.token = this.fromToken;
+      this.secondTokenInput.token = this.toToken;
     }
     else {
       this.secondTokenInput.chainId = currentChainId;
       if (currentChainTokens.length < 2) return;
       const providers = this.originalData?.providers;
       if (providers && providers.length) {
-        let fromTokenKey = this.getTokenKey(currentChainTokens[0]);
-        let toTokenKey = this.getTokenKey(currentChainTokens[1]);
+        let firstDefaultToken: ITokenObject;
+        let secondDefaultToken: ITokenObject;
+        if (this._data.defaultInputToken) {
+          firstDefaultToken = currentChainTokens.find(v => v.chainId === this._data.defaultInputToken.chainId && v.address === this._data.defaultInputToken.address);
+        }
+        else {
+          firstDefaultToken = currentChainTokens[0];
+        }
+        if (this._data.defaultOutputToken) {
+          secondDefaultToken = currentChainTokens.find(v => v.chainId === this._data.defaultOutputToken.chainId && v.address === this._data.defaultOutputToken.address);
+        }
+        else {
+          secondDefaultToken = currentChainTokens[0];
+        }
+        let fromTokenKey = this.getTokenKey(firstDefaultToken);
+        let toTokenKey = this.getTokenKey(secondDefaultToken);
         let tokenMap = tokenStore.getTokenMapByChainId(currentChainId);
         this.fromToken = tokenMap[fromTokenKey];
         this.toToken = tokenMap[toTokenKey];
-        this.fromTokenSymbol = this.fromToken?.symbol;
-        this.toTokenSymbol = this.toToken?.symbol;
         this.fromInputValue = new BigNumber(this._data.defaultInputValue);
         this.toInputValue = new BigNumber(this._data.defaultOutputValue);
         this.onUpdateToken(this.fromToken, true);
@@ -969,7 +942,6 @@ export default class ScomSwap extends Module {
       if (!this.record)
         this.swapBtn.enabled = false;
       this.onRenderPriceInfo();
-      this.redirectToken();
       await this.handleAddRoute();
     });
   }
@@ -1056,12 +1028,10 @@ export default class ScomSwap extends Module {
     this.maxButton.enabled = enabled;
     [this.fromInputValue, this.toInputValue] = [this.toInputValue, this.fromInputValue];
     [this.payBalance.caption, this.receiveBalance.caption] = [this.receiveBalance.caption, this.payBalance.caption];
-    [this.fromTokenSymbol, this.toTokenSymbol] = [this.toTokenSymbol, this.fromTokenSymbol];
     this.firstTokenInput.token = this.fromToken;
     this.secondTokenInput.token = this.toToken;
     this.firstTokenInput.value = this.getInputValue(true);
     this.secondTokenInput.value = this.getInputValue(false);
-    this.redirectToken();
 
     await this.handleAddRoute();
   }
@@ -1214,7 +1184,6 @@ export default class ScomSwap extends Module {
     //   await tokenStore.updateAllTokenBalances(rpcWallet);
     // }
     await this.onUpdateToken(token, isFrom);
-    this.redirectToken();
     await this.handleAddRoute();
     this.firstTokenInput.enabled = true;
     this.secondTokenInput.enabled = true;
@@ -1325,7 +1294,6 @@ export default class ScomSwap extends Module {
           if (!isLastDot)
             toInput.value = value.toFixed();
         }
-        this.redirectToken();
         if (valueChanged) await this.handleAddRoute();
       }
 
@@ -1336,7 +1304,6 @@ export default class ScomSwap extends Module {
     if (this.priceInfo) this.priceInfo.setData(this.getPriceInfo());
     this.fromInputValue = new BigNumber(0);
     this.toInputValue = new BigNumber(0);
-    this.redirectToken();
   }
   private initRoutes() {
     this.record = null;
@@ -1919,7 +1886,6 @@ export default class ScomSwap extends Module {
     this.fromInputValue = inputVal;
     const decimals = this.fromToken?.decimals || 18;
     this.firstTokenInput.value = this.fromInputValue.dp(decimals, ROUNDING_NUMBER).toFixed();
-    this.redirectToken();
     await this.handleAddRoute();
   }
   private isMaxDisabled = (): boolean => {
@@ -2045,7 +2011,6 @@ export default class ScomSwap extends Module {
     const oldDestination = this.desChain;
     try {
       this.desChain = obj;
-      this.targetChainId = this.desChain.chainId;
       if (img) {
         img.classList.add('icon-selected');
       } else {
@@ -2068,7 +2033,6 @@ export default class ScomSwap extends Module {
       }
     }
     if (this.desChain) {
-      this.targetChainId = this.desChain.chainId;
       this.desChainLabel.caption = this.desChain.chainName;
     }
     this.setTargetTokenList();
@@ -2319,8 +2283,27 @@ export default class ScomSwap extends Module {
       const logo = this.getAttribute('logo', true);
       const defaultInputValue = this.getAttribute('defaultInputValue', true);
       const defaultOutputValue = this.getAttribute('defaultOutputValue', true);
+      const defaultInputToken = this.getAttribute('defaultInputToken', true);
+      const defaultOutputToken = this.getAttribute('defaultOutputToken', true);
       const apiEndpoints = this.getAttribute('apiEndpoints', true);
-      let data = { campaignId, category, providers, commissions, tokens, defaultChainId, networks, wallets, showHeader, title, logo, defaultInputValue, defaultOutputValue, apiEndpoints };
+      let data = { 
+        campaignId, 
+        category, 
+        providers, 
+        commissions, 
+        tokens, 
+        defaultChainId, 
+        networks, 
+        wallets, 
+        showHeader, 
+        title, 
+        logo, 
+        defaultInputValue, 
+        defaultOutputValue, 
+        defaultInputToken,
+        defaultOutputToken,
+        apiEndpoints 
+      };
       if (!this.isEmptyData(data)) {
         await this.setData(data);
       }

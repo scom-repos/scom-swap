@@ -55,6 +55,8 @@ export interface ISwapWidgetData {
   showHeader?: boolean;
   logo?: string;
   title?: string;
+  defaultInputToken?: ITokenConfig;
+  defaultOutputToken?: ITokenConfig;
   defaultInputValue?: string;
   defaultOutputValue?: string;
   apiEndpoints?: Record<string, string>;

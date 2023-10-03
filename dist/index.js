@@ -3707,30 +3707,6 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                 if ((_b = (_a = this.originalData) === null || _a === void 0 ? void 0 : _a.providers) === null || _b === void 0 ? void 0 : _b.length)
                     await this.initializeWidgetConfig();
             };
-            this.redirectToken = () => {
-                var _a, _b;
-                const currentChainId = this.state.getChainId();
-                let queryRouter = {
-                    chainId: currentChainId,
-                    fromToken: ((_a = this.fromToken) === null || _a === void 0 ? void 0 : _a.symbol) || this.fromTokenSymbol,
-                    toToken: ((_b = this.toToken) === null || _b === void 0 ? void 0 : _b.symbol) || this.toTokenSymbol,
-                };
-                if (this.isCrossChain) {
-                    this.isFrom = false;
-                }
-                if (this.isFrom) {
-                    queryRouter = Object.assign(Object.assign({}, queryRouter), { toAmount: this.toInputValue.toFixed() });
-                }
-                else {
-                    queryRouter = Object.assign(Object.assign({}, queryRouter), { fromAmount: this.fromInputValue.toFixed() });
-                }
-                this.fromTokenSymbol = queryRouter.fromToken;
-                this.toTokenSymbol = queryRouter.toToken;
-                this.targetChainId = queryRouter.toChainId;
-                if (!this.isCrossChainEnabled) {
-                    delete queryRouter['toChainId'];
-                }
-            };
             this.fixedNumber = (value) => {
                 const val = typeof value === 'object' ? value : new eth_wallet_5.BigNumber(value);
                 if (val.isNaN() || val.isZero())
@@ -3810,7 +3786,6 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                     if (!this.record)
                         this.swapBtn.enabled = false;
                     this.onRenderPriceInfo();
-                    this.redirectToken();
                     await this.handleAddRoute();
                 });
             };
@@ -3937,7 +3912,6 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                 this.fromInputValue = inputVal;
                 const decimals = ((_d = this.fromToken) === null || _d === void 0 ? void 0 : _d.decimals) || 18;
                 this.firstTokenInput.value = this.fromInputValue.dp(decimals, ROUNDING_NUMBER).toFixed();
-                this.redirectToken();
                 await this.handleAddRoute();
             };
             this.isMaxDisabled = () => {
@@ -4002,7 +3976,6 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                 const oldDestination = this.desChain;
                 try {
                     this.desChain = obj;
-                    this.targetChainId = this.desChain.chainId;
                     if (img) {
                         img.classList.add('icon-selected');
                     }
@@ -4028,7 +4001,6 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                     }
                 }
                 if (this.desChain) {
-                    this.targetChainId = this.desChain.chainId;
                     this.desChainLabel.caption = this.desChain.chainName;
                 }
                 this.setTargetTokenList();
@@ -4238,43 +4210,32 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
             return token.address.toLowerCase();
         }
         initializeDefaultTokenPair() {
-            var _a, _b, _c;
+            var _a;
             const currentChainId = this.state.getChainId();
             let currentChainTokens = (0, index_7.getSupportedTokens)(this._tokens, currentChainId);
             this.firstTokenInput.chainId = currentChainId;
             if (this.isCrossChain) {
                 this.secondTokenInput.chainId = this.desChain.chainId;
                 let targetChainTokens = (0, index_7.getSupportedTokens)(this._tokens, this.desChain.chainId);
-                if (this.fromTokenSymbol && this.toTokenSymbol) {
-                    const firstObj = currentChainTokens.find(item => this.fromTokenSymbol === item.symbol || this.fromTokenSymbol === item.address);
-                    if (firstObj) {
-                        this.fromToken = firstObj;
-                    }
-                    else {
-                        this.fromToken = currentChainTokens[0];
-                    }
-                    const secondObj = targetChainTokens.find(item => this.toTokenSymbol === item.symbol || this.toTokenSymbol === item.address);
-                    if (secondObj) {
-                        this.toToken = secondObj;
-                    }
-                    else {
-                        this.toToken = targetChainTokens[0];
-                    }
-                    this.onUpdateToken(this.fromToken, true);
-                    this.onUpdateToken(this.toToken, false);
-                    this.firstTokenInput.token = this.fromToken;
-                    this.secondTokenInput.token = this.toToken;
-                    this.fromInputValue = this.fromInputValue || new eth_wallet_5.BigNumber(this._data.defaultInputValue);
+                let firstDefaultToken;
+                let secondDefaultToken;
+                if (this._data.defaultInputToken) {
+                    firstDefaultToken = currentChainTokens.find(v => v.chainId === this._data.defaultInputToken.chainId && v.address === this._data.defaultInputToken.address);
                 }
                 else {
-                    let firstDefaultToken = currentChainTokens[0];
-                    let secondDefaultToken = targetChainTokens[0];
-                    this.fromInputValue = new eth_wallet_5.BigNumber(this._data.defaultInputValue);
-                    this.onUpdateToken(firstDefaultToken, true);
-                    this.onUpdateToken(secondDefaultToken, false);
-                    this.firstTokenInput.token = this.fromToken;
-                    this.secondTokenInput.token = this.toToken;
+                    firstDefaultToken = currentChainTokens[0];
                 }
+                if (this._data.defaultOutputToken) {
+                    secondDefaultToken = targetChainTokens.find(v => v.chainId === this._data.defaultOutputToken.chainId && v.address === this._data.defaultOutputToken.address);
+                }
+                else {
+                    secondDefaultToken = targetChainTokens[0];
+                }
+                this.fromInputValue = new eth_wallet_5.BigNumber(this._data.defaultInputValue);
+                this.onUpdateToken(firstDefaultToken, true);
+                this.onUpdateToken(secondDefaultToken, false);
+                this.firstTokenInput.token = this.fromToken;
+                this.secondTokenInput.token = this.toToken;
             }
             else {
                 this.secondTokenInput.chainId = currentChainId;
@@ -4282,13 +4243,25 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                     return;
                 const providers = (_a = this.originalData) === null || _a === void 0 ? void 0 : _a.providers;
                 if (providers && providers.length) {
-                    let fromTokenKey = this.getTokenKey(currentChainTokens[0]);
-                    let toTokenKey = this.getTokenKey(currentChainTokens[1]);
+                    let firstDefaultToken;
+                    let secondDefaultToken;
+                    if (this._data.defaultInputToken) {
+                        firstDefaultToken = currentChainTokens.find(v => v.chainId === this._data.defaultInputToken.chainId && v.address === this._data.defaultInputToken.address);
+                    }
+                    else {
+                        firstDefaultToken = currentChainTokens[0];
+                    }
+                    if (this._data.defaultOutputToken) {
+                        secondDefaultToken = currentChainTokens.find(v => v.chainId === this._data.defaultOutputToken.chainId && v.address === this._data.defaultOutputToken.address);
+                    }
+                    else {
+                        secondDefaultToken = currentChainTokens[0];
+                    }
+                    let fromTokenKey = this.getTokenKey(firstDefaultToken);
+                    let toTokenKey = this.getTokenKey(secondDefaultToken);
                     let tokenMap = scom_token_list_6.tokenStore.getTokenMapByChainId(currentChainId);
                     this.fromToken = tokenMap[fromTokenKey];
                     this.toToken = tokenMap[toTokenKey];
-                    this.fromTokenSymbol = (_b = this.fromToken) === null || _b === void 0 ? void 0 : _b.symbol;
-                    this.toTokenSymbol = (_c = this.toToken) === null || _c === void 0 ? void 0 : _c.symbol;
                     this.fromInputValue = new eth_wallet_5.BigNumber(this._data.defaultInputValue);
                     this.toInputValue = new eth_wallet_5.BigNumber(this._data.defaultOutputValue);
                     this.onUpdateToken(this.fromToken, true);
@@ -4385,12 +4358,10 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
             this.maxButton.enabled = enabled;
             [this.fromInputValue, this.toInputValue] = [this.toInputValue, this.fromInputValue];
             [this.payBalance.caption, this.receiveBalance.caption] = [this.receiveBalance.caption, this.payBalance.caption];
-            [this.fromTokenSymbol, this.toTokenSymbol] = [this.toTokenSymbol, this.fromTokenSymbol];
             this.firstTokenInput.token = this.fromToken;
             this.secondTokenInput.token = this.toToken;
             this.firstTokenInput.value = this.getInputValue(true);
             this.secondTokenInput.value = this.getInputValue(false);
-            this.redirectToken();
             await this.handleAddRoute();
         }
         setupCrossChainPopup() {
@@ -4532,7 +4503,6 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
             //   await tokenStore.updateAllTokenBalances(rpcWallet);
             // }
             await this.onUpdateToken(token, isFrom);
-            this.redirectToken();
             await this.handleAddRoute();
             this.firstTokenInput.enabled = true;
             this.secondTokenInput.enabled = true;
@@ -4649,7 +4619,6 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                         if (!isLastDot)
                             toInput.value = value.toFixed();
                     }
-                    this.redirectToken();
                     if (valueChanged)
                         await this.handleAddRoute();
                 }
@@ -4661,7 +4630,6 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                 this.priceInfo.setData(this.getPriceInfo());
             this.fromInputValue = new eth_wallet_5.BigNumber(0);
             this.toInputValue = new eth_wallet_5.BigNumber(0);
-            this.redirectToken();
         }
         initRoutes() {
             this.record = null;
@@ -5303,8 +5271,27 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                 const logo = this.getAttribute('logo', true);
                 const defaultInputValue = this.getAttribute('defaultInputValue', true);
                 const defaultOutputValue = this.getAttribute('defaultOutputValue', true);
+                const defaultInputToken = this.getAttribute('defaultInputToken', true);
+                const defaultOutputToken = this.getAttribute('defaultOutputToken', true);
                 const apiEndpoints = this.getAttribute('apiEndpoints', true);
-                let data = { campaignId, category, providers, commissions, tokens, defaultChainId, networks, wallets, showHeader, title, logo, defaultInputValue, defaultOutputValue, apiEndpoints };
+                let data = {
+                    campaignId,
+                    category,
+                    providers,
+                    commissions,
+                    tokens,
+                    defaultChainId,
+                    networks,
+                    wallets,
+                    showHeader,
+                    title,
+                    logo,
+                    defaultInputValue,
+                    defaultOutputValue,
+                    defaultInputToken,
+                    defaultOutputToken,
+                    apiEndpoints
+                };
                 if (!this.isEmptyData(data)) {
                     await this.setData(data);
                 }

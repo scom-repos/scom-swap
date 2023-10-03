@@ -62,6 +62,8 @@ declare module "@scom/scom-swap/global/utils/swapInterface.ts" {
         showHeader?: boolean;
         logo?: string;
         title?: string;
+        defaultInputToken?: ITokenConfig;
+        defaultOutputToken?: ITokenConfig;
         defaultInputValue?: string;
         defaultOutputValue?: string;
         apiEndpoints?: Record<string, string>;
@@ -866,6 +868,8 @@ declare module "@scom/scom-swap" {
         commissions?: ICommissionInfo[];
         logo?: string;
         title?: string;
+        defaultInputToken?: ITokenConfig;
+        defaultOutputToken?: ITokenConfig;
         defaultInputValue?: string;
         defaultOutputValue?: string;
         apiEndpoints?: Record<string, string>;
@@ -919,8 +923,6 @@ declare module "@scom/scom-swap" {
         private isFrom;
         private fromToken?;
         private toToken?;
-        private fromTokenSymbol;
-        private toTokenSymbol;
         private fromInputValue;
         private toInputValue;
         private timeout;
@@ -954,7 +956,6 @@ declare module "@scom/scom-swap" {
         private desChainList;
         private srcChain;
         private desChain;
-        private targetChainId;
         private srcChainFirstPanel;
         private targetChainFirstPanel;
         private srcChainTokenImage;
@@ -1057,6 +1058,8 @@ declare module "@scom/scom-swap" {
                 showHeader?: boolean;
                 logo?: string;
                 title?: string;
+                defaultInputToken?: ITokenConfig;
+                defaultOutputToken?: ITokenConfig;
                 defaultInputValue?: string;
                 defaultOutputValue?: string;
                 apiEndpoints?: Record<string, string>;
@@ -1093,7 +1096,6 @@ declare module "@scom/scom-swap" {
         get approveButtonStatus(): any;
         get isApprovingRouter(): boolean;
         get isValidToken(): boolean;
-        private redirectToken;
         private fixedNumber;
         private getTokenKey;
         private initializeDefaultTokenPair;
