@@ -1155,7 +1155,6 @@ declare module "@scom/scom-swap" {
         private disableSelectChain;
         private selectSourceChain;
         private selectDestinationChain;
-        private setTargetTokenList;
         private onSelectSourceChain;
         private onSelectDestinationChain;
         private initChainIcon;

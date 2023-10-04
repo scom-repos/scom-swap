@@ -3723,10 +3723,10 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                     console.log(err);
                 }
             };
-            this.initializeWidgetConfig = async (_chainId) => {
+            this.initializeWidgetConfig = async () => {
                 setTimeout(async () => {
                     var _a;
-                    const currentChainId = this.state.getChainId();
+                    // const currentChainId = this.state.getChainId();
                     await this.initWallet();
                     this.initializeDefaultTokenPair();
                     await this.onRenderChainList();
@@ -3776,14 +3776,13 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                         this.onUpdateEstimatedPosition(true, true);
                         this.secondTokenInput.value = this.fixedNumber(this.toInputValue);
                     }
-                    const tokens = (0, index_7.getSupportedTokens)(this._tokens, currentChainId);
-                    this.firstTokenInput.tokenDataListProp = tokens;
-                    if (!this.isCrossChain) {
-                        this.secondTokenInput.tokenDataListProp = tokens;
-                    }
-                    else {
-                        this.setTargetTokenList();
-                    }
+                    // const tokens = getSupportedTokens(this._tokens, currentChainId);
+                    // this.firstTokenInput.tokenDataListProp = tokens;
+                    // if (!this.isCrossChain) {
+                    //   this.secondTokenInput.tokenDataListProp = tokens;
+                    // }
+                    this.firstTokenInput.tokenDataListProp = (0, index_7.getSupportedTokens)(this._tokens, this.fromToken.chainId);
+                    this.secondTokenInput.tokenDataListProp = (0, index_7.getSupportedTokens)(this._tokens, this.toToken.chainId);
                     if (!this.record)
                         this.swapBtn.enabled = false;
                     this.onRenderPriceInfo();
@@ -3943,27 +3942,48 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                 });
             };
             this.selectSourceChain = async (obj, img) => {
-                const rpcWallet = this.state.getRpcWallet();
-                await rpcWallet.switchNetwork(obj.chainId);
-                if (!index_7.crossChainSupportedChainIds.some(v => v.chainId === obj.chainId)) {
-                    this.selectDestinationChain(obj, img);
-                }
-                this.srcChain = obj;
-                this.srcChainLabel.caption = this.srcChain.chainName;
+                var _a, _b, _c;
+                if (!this.isCrossChainEnabled)
+                    return;
+                this.disableSelectChain(true, false);
+                // const rpcWallet = this.state.getRpcWallet();
+                // await rpcWallet.switchNetwork(obj.chainId);
                 const selected = this.srcChainList.querySelector('.icon-selected');
                 if (selected) {
                     selected.classList.remove('icon-selected');
                 }
-                if (img) {
-                    img.classList.add('icon-selected');
-                }
-                else {
-                    const element = this.srcChainList.querySelector(`[chain-id="${obj.chainId}"]`);
-                    if (element) {
-                        element.classList.add('icon-selected');
+                const oldDestination = this.srcChain;
+                try {
+                    this.srcChain = obj;
+                    if (img) {
+                        img.classList.add('icon-selected');
                     }
-                    // this.srcChainList.firstElementChild?.classList.add('icon-selected');
+                    else {
+                        const currentNetwork = (0, index_7.getNetworkInfo)((_a = this.supportedChainList.find((f) => f.chainId == obj.chainId)) === null || _a === void 0 ? void 0 : _a.chainId);
+                        const img = this.srcChainList.querySelector(`[data-tooltip="${currentNetwork === null || currentNetwork === void 0 ? void 0 : currentNetwork.chainName}"]`);
+                        if (img) {
+                            img.classList.add('icon-selected');
+                        }
+                    }
                 }
+                catch (err) {
+                    console.log('err', err);
+                    if (oldDestination) {
+                        this.srcChain = oldDestination;
+                        if (selected) {
+                            selected.classList.add('icon-selected');
+                        }
+                    }
+                    else {
+                        this.srcChain = (0, index_7.getNetworkInfo)((_b = this.supportedChainList[0]) === null || _b === void 0 ? void 0 : _b.chainId);
+                        (_c = this.srcChainList.firstElementChild) === null || _c === void 0 ? void 0 : _c.classList.add('icon-selected');
+                    }
+                }
+                if (this.srcChain) {
+                    this.srcChainLabel.caption = this.srcChain.chainName;
+                }
+                this.firstTokenInput.tokenDataListProp = (0, index_7.getSupportedTokens)(this._tokens, this.srcChain.chainId);
+                this.disableSelectChain(false, false);
             };
             this.selectDestinationChain = async (obj, img) => {
                 var _a, _b, _c;
@@ -4004,32 +4024,28 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                 if (this.desChain) {
                     this.desChainLabel.caption = this.desChain.chainName;
                 }
-                this.setTargetTokenList();
+                // this.setTargetTokenList();
+                this.secondTokenInput.tokenDataListProp = (0, index_7.getSupportedTokens)(this._tokens, this.desChain.chainId);
                 this.disableSelectChain(false, true);
             };
-            this.setTargetTokenList = (isDisabled) => {
-                var _a, _b;
-                if (index_7.crossChainSupportedChainIds.some(v => { var _a; return v.chainId === ((_a = this.srcChain) === null || _a === void 0 ? void 0 : _a.chainId); }) && !isDisabled) {
-                    const targetChainId = ((_a = this.desChain) === null || _a === void 0 ? void 0 : _a.chainId) || this.chainId;
-                    if (this.secondTokenInput.chainId !== targetChainId) {
-                        this.secondTokenInput.chainId = targetChainId;
-                    }
-                    this.secondTokenInput.tokenDataListProp = (0, index_7.getSupportedTokens)(this._tokens, targetChainId);
-                }
-                else {
-                    const srcChainId = ((_b = this.srcChain) === null || _b === void 0 ? void 0 : _b.chainId) || this.chainId;
-                    if (this.secondTokenInput.chainId !== srcChainId) {
-                        this.secondTokenInput.chainId = srcChainId;
-                    }
-                    this.secondTokenInput.tokenDataListProp = (0, index_7.getSupportedTokens)(this._tokens, srcChainId);
-                }
-            };
             this.onSelectSourceChain = async (obj, img) => {
+                var _a;
                 this.firstTokenInput.chainId = obj.chainId;
-                if (this.isMetaMask || !(0, index_7.isClientWalletConnected)()) {
-                    await this.selectSourceChain(obj, img);
-                    this.initializeWidgetConfig();
-                }
+                if (obj.chainId === ((_a = this.srcChain) === null || _a === void 0 ? void 0 : _a.chainId))
+                    return;
+                await this.selectSourceChain(obj, img);
+                // const rpcWallet = this.state.getRpcWallet();
+                // await rpcWallet.switchNetwork(obj.chainId);
+                const tokenList = (0, index_7.getSupportedTokens)(this._tokens, obj.chainId);
+                this.fromToken = tokenList[0];
+                this.firstTokenInput.token = this.fromToken;
+                await scom_token_list_6.tokenStore.updateTokenBalancesByChainId(obj.chainId);
+                const balance = this.getBalance(this.fromToken);
+                this.payBalance.caption = `Balance: ${(0, index_10.formatNumber)(balance, 4)} ${this.fromToken.symbol}`;
+                const enabled = !this.isMaxDisabled();
+                this.maxButton.enabled = enabled;
+                await this.onUpdateToken(this.fromToken, true);
+                await this.handleAddRoute();
             };
             this.onSelectDestinationChain = async (obj, img) => {
                 var _a;
@@ -4037,7 +4053,16 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                 if (obj.chainId === ((_a = this.desChain) === null || _a === void 0 ? void 0 : _a.chainId))
                     return;
                 await this.selectDestinationChain(obj, img);
-                this.initializeWidgetConfig();
+                const tokenList = (0, index_7.getSupportedTokens)(this._tokens, obj.chainId);
+                this.toToken = tokenList[0];
+                this.secondTokenInput.token = this.toToken;
+                await scom_token_list_6.tokenStore.updateTokenBalancesByChainId(obj.chainId);
+                const balance = this.getBalance(this.toToken);
+                this.receiveBalance.caption = `Balance: ${(0, index_10.formatNumber)(balance, 4)} ${this.toToken.symbol}`;
+                const enabled = !this.isMaxDisabled();
+                this.maxButton.enabled = enabled;
+                await this.onUpdateToken(this.toToken, false);
+                await this.handleAddRoute();
             };
             this.initChainIcon = (network, isDes) => {
                 const img = new components_9.Image();
@@ -4100,7 +4125,6 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                 if (this.supportedChainList.length > 1) {
                     const firstChainId = (_c = this.fromToken) === null || _c === void 0 ? void 0 : _c.chainId;
                     const secondChainId = (_d = this.toToken) === null || _d === void 0 ? void 0 : _d.chainId;
-                    console.log('this.fromToken', this.fromToken, 'this.toToken', this.toToken);
                     if (firstChainId && secondChainId) {
                         const firstNetwork = (0, index_7.getNetworkInfo)(firstChainId);
                         const secondNetwork = (0, index_7.getNetworkInfo)(secondChainId);
