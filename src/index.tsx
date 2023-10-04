@@ -170,8 +170,6 @@ export default class ScomSwap extends Module {
   private feesInfo: VStack;
 
   private expertModal: ExpertModeSettings;
-  private networkErrModal: Modal;
-  private supportedNetworksElm: VStack;
   private contractAddress: string;
   private clientEvents: any[] = [];
 
@@ -745,18 +743,6 @@ export default class ScomSwap extends Module {
     if (this.originalData?.providers?.length) await this.initializeWidgetConfig();
   }
 
-  // get supportedNetworks() {
-  //   let providers: IProvider[] = [];
-  //   if (this.originalData?.providers) {
-  //     providers = this.isFixedPair ? [this.originalData.providers[0]] : this.originalData.providers;
-  //   }
-  //   let supportedNetworks = [];
-  //   for (const provider of providers) {
-  //     supportedNetworks.push(...Object.keys(provider.contractInfo));
-  //   }
-  //   return uniqWith(supportedNetworks, (cur: any, oth: any) => { return cur == oth });
-  // }
-
   get isApproveButtonShown(): boolean {
     const warningMessageText = this.getWarningMessageText();
     return warningMessageText === '' && this.approveButtonStatus !== undefined && this.approveButtonStatus !== ApprovalStatus.NONE
@@ -806,62 +792,56 @@ export default class ScomSwap extends Module {
     }
     return token.address.toLowerCase();
   }
-
-  private initializeDefaultTokenPair() {
-    const currentChainId = this.state.getChainId();
-    let currentChainTokens = getSupportedTokens(this._tokens, currentChainId);
-    this.firstTokenInput.chainId = currentChainId;
-    if (this.isCrossChain) {
-      this.secondTokenInput.chainId = this.desChain.chainId;
-      let targetChainTokens = getSupportedTokens(this._tokens, this.desChain.chainId);
-      let firstDefaultToken: ITokenObject;
-      let secondDefaultToken: ITokenObject;
+  private calculateDefaultTokens() {
+    let firstDefaultToken: ITokenObject;
+    let secondDefaultToken: ITokenObject;
+    let currentChainTokens = getSupportedTokens(this._tokens, this.state.getChainId());
+    if (!this._data.defaultInputToken && !this._data.defaultOutputToken) {
+      firstDefaultToken = currentChainTokens[0];
+      secondDefaultToken = currentChainTokens[1];
+    }
+    else {
       if (this._data.defaultInputToken) {
-        firstDefaultToken = currentChainTokens.find(v => v.chainId === this._data.defaultInputToken.chainId && v.address === this._data.defaultInputToken.address);
+        let inputTokens = getSupportedTokens(this._tokens, this._data.defaultInputToken.chainId);
+        firstDefaultToken = inputTokens.find(v => v.chainId === this._data.defaultInputToken.chainId && v.address === this._data.defaultInputToken.address);
       }
       else {
         firstDefaultToken = currentChainTokens[0];
       }
       if (this._data.defaultOutputToken) {
-        secondDefaultToken = targetChainTokens.find(v => v.chainId === this._data.defaultOutputToken.chainId && v.address === this._data.defaultOutputToken.address);
+        let outputTokens = getSupportedTokens(this._tokens, this._data.defaultOutputToken.chainId);
+        secondDefaultToken = outputTokens.find(v => v.chainId === this._data.defaultOutputToken.chainId && v.address === this._data.defaultOutputToken.address);
       }
       else {
-        secondDefaultToken = targetChainTokens[0];
+        secondDefaultToken = currentChainTokens[0];
       }
+    }
+    return {
+      firstDefaultToken,
+      secondDefaultToken
+    }
+  }
+  private initializeDefaultTokenPair() {
+    if (this.isCrossChain) {
+      let {firstDefaultToken, secondDefaultToken} = this.calculateDefaultTokens();
+      this.fromToken = firstDefaultToken;
+      this.toToken = secondDefaultToken;
+      this.firstTokenInput.chainId = firstDefaultToken.chainId;
+      this.secondTokenInput.chainId = secondDefaultToken.chainId;
       this.fromInputValue = new BigNumber(this._data.defaultInputValue);
-      this.onUpdateToken(firstDefaultToken, true);
-      this.onUpdateToken(secondDefaultToken, false);
       this.firstTokenInput.token = this.fromToken;
       this.secondTokenInput.token = this.toToken;
     }
     else {
-      this.secondTokenInput.chainId = currentChainId;
-      if (currentChainTokens.length < 2) return;
       const providers = this.originalData?.providers;
       if (providers && providers.length) {
-        let firstDefaultToken: ITokenObject;
-        let secondDefaultToken: ITokenObject;
-        if (this._data.defaultInputToken) {
-          firstDefaultToken = currentChainTokens.find(v => v.chainId === this._data.defaultInputToken.chainId && v.address === this._data.defaultInputToken.address);
-        }
-        else {
-          firstDefaultToken = currentChainTokens[0];
-        }
-        if (this._data.defaultOutputToken) {
-          secondDefaultToken = currentChainTokens.find(v => v.chainId === this._data.defaultOutputToken.chainId && v.address === this._data.defaultOutputToken.address);
-        }
-        else {
-          secondDefaultToken = currentChainTokens[0];
-        }
-        let fromTokenKey = this.getTokenKey(firstDefaultToken);
-        let toTokenKey = this.getTokenKey(secondDefaultToken);
-        let tokenMap = tokenStore.getTokenMapByChainId(currentChainId);
-        this.fromToken = tokenMap[fromTokenKey];
-        this.toToken = tokenMap[toTokenKey];
+        let {firstDefaultToken, secondDefaultToken} = this.calculateDefaultTokens();
+        this.fromToken = firstDefaultToken;
+        this.toToken = secondDefaultToken;
+        this.firstTokenInput.chainId = firstDefaultToken.chainId;
+        this.secondTokenInput.chainId = secondDefaultToken.chainId;
         this.fromInputValue = new BigNumber(this._data.defaultInputValue);
         this.toInputValue = new BigNumber(this._data.defaultOutputValue);
-        this.onUpdateToken(this.fromToken, true);
-        this.onUpdateToken(this.toToken, false);
         this.firstTokenInput.token = this.fromToken;
         this.secondTokenInput.token = this.toToken;
         this.toggleReverseImage.classList.add('cursor-default');
@@ -882,11 +862,12 @@ export default class ScomSwap extends Module {
   private initializeWidgetConfig = async (_chainId?: number) => {
     setTimeout(async () => {
       const currentChainId = this.state.getChainId();
-      this.closeNetworkErrModal();
       await this.initWallet();
+      this.initializeDefaultTokenPair();
       await this.onRenderChainList();
       await this.updateBalances();
-      this.initializeDefaultTokenPair();
+      this.onUpdateToken(this.fromToken, true);
+      this.onUpdateToken(this.toToken, false);
       this.toggleReverseImage.enabled = !this.isFixedPair && !this.isCrossChain;
       this.firstTokenInput.tokenReadOnly = this.isFixedPair;
       this.secondTokenInput.tokenReadOnly = this.isFixedPair;
@@ -1673,9 +1654,9 @@ export default class ScomSwap extends Module {
     return balance
   }
   private async updateBalances() {
-    await tokenStore.updateTokenBalancesByChainId(this.chainId);
-    if (this.isCrossChainSwap && this.chainId != this.desChain.chainId) {
-      await tokenStore.updateTokenBalancesByChainId(this.desChain.chainId);
+    const chainIds = [...new Set([this.fromToken.chainId, this.toToken.chainId])];
+    for (let chainId of chainIds) {
+      await tokenStore.updateTokenBalancesByChainId(chainId);
     }
     if (this.fromToken) {
       const balance = this.getBalance(this.fromToken);
@@ -2127,12 +2108,15 @@ export default class ScomSwap extends Module {
     });
     
     if (this.supportedChainList.length > 1) {
-      const firstChainId = this.defaultChainId;
-      const secondChainId = this.supportedChainList.find((v: INetworkConfig) => v.chainId != firstChainId)?.chainId;
-      const firstNetwork = getNetworkInfo(firstChainId);
-      const secondNetwork = getNetworkInfo(secondChainId);
-      await this.selectSourceChain(firstNetwork);
-      await this.selectDestinationChain(secondNetwork);
+      const firstChainId = this.fromToken?.chainId;
+      const secondChainId = this.toToken?.chainId;
+      console.log('this.fromToken', this.fromToken, 'this.toToken', this.toToken)
+      if (firstChainId && secondChainId) {
+        const firstNetwork = getNetworkInfo(firstChainId);
+        const secondNetwork = getNetworkInfo(secondChainId);
+        await this.selectSourceChain(firstNetwork);
+        await this.selectDestinationChain(secondNetwork);
+      }
     }
     this.srcChainBox.visible = true;
     this.desChainBox.visible = true;
@@ -2197,31 +2181,6 @@ export default class ScomSwap extends Module {
     this.$eventBus.register(this, EventId.ShowExpertModal, () => {
       this.expertModal.showModal();
     })
-  }
-
-  // private showNetworkErrModal() {
-  //   this.supportedNetworksElm.clearInnerHTML();
-  //   if (!this.supportedNetworks.length) {
-  //     this.supportedNetworksElm.appendChild(<i-label caption={`No networks are supported. Please configure the swap!`} font={{ size: '16px' }} />)
-  //   } else if (this.supportedChainList.some(v => v.chainId == this.currentChainId)) {
-  //     const network = getNetworkInfo(this.currentChainId);
-  //     this.supportedNetworksElm.appendChild(<i-label caption={`The ${network.chainName} (${network.chainId}) network has not been configured for the swap!`} font={{ size: '16px' }} />)
-  //   } else {
-  //     this.supportedNetworksElm.appendChild(<i-label caption={`We only support the following ${this.supportedNetworks.length > 1 ? 'networks' : 'network'}:`} font={{ size: '16px' }} />)
-  //     for (const chainId of this.supportedNetworks) {
-  //       const network = getNetworkInfo(chainId);
-  //       if (network) {
-  //         this.supportedNetworksElm.appendChild(
-  //           <i-label font={{ bold: true, size: '16px' }} caption={`${network.chainName} (${network.chainId})`} />
-  //         )
-  //       }
-  //     }
-  //   }
-  //   this.networkErrModal.visible = true;
-  // }
-
-  private closeNetworkErrModal() {
-    this.networkErrModal.visible = false;
   }
 
   private resizeLayout() {
@@ -2540,26 +2499,6 @@ export default class ScomSwap extends Module {
                     />
                   </i-hstack>
                 </i-panel>
-              </i-panel>
-            </i-modal>
-            <i-modal
-              id="networkErrModal"
-              class="bg-modal custom-modal"
-              title="Supported Networks"
-              closeIcon={{ name: 'times' }}
-            >
-              <i-panel class="i-modal_content">
-                <i-vstack id="supportedNetworksElm" gap={10} verticalAlignment="center" />
-                <i-hstack verticalAlignment="center" horizontalAlignment="center" margin={{ top: 16, bottom: 8 }}>
-                  <i-button
-                    caption="Close"
-                    width={150}
-                    padding={{ top: 4, bottom: 4 }}
-                    class="btn-os"
-                    font={{ color: Theme.colors.primary.contrastText }}
-                    onClick={() => this.closeNetworkErrModal()}
-                  />
-                </i-hstack>
               </i-panel>
             </i-modal>
           </i-panel>

@@ -941,8 +941,6 @@ declare module "@scom/scom-swap" {
         private modalFees;
         private feesInfo;
         private expertModal;
-        private networkErrModal;
-        private supportedNetworksElm;
         private contractAddress;
         private clientEvents;
         private crossChainApprovalStatus;
@@ -1098,6 +1096,7 @@ declare module "@scom/scom-swap" {
         get isValidToken(): boolean;
         private fixedNumber;
         private getTokenKey;
+        private calculateDefaultTokens;
         private initializeDefaultTokenPair;
         private initWallet;
         private initializeWidgetConfig;
@@ -1166,7 +1165,6 @@ declare module "@scom/scom-swap" {
         closeModalFees: () => void;
         private showResultMessage;
         private initExpertModal;
-        private closeNetworkErrModal;
         private resizeLayout;
         private initData;
         isEmptyData(value: ISwapWidgetData): boolean;

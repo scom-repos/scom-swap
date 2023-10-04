@@ -3727,11 +3727,12 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                 setTimeout(async () => {
                     var _a;
                     const currentChainId = this.state.getChainId();
-                    this.closeNetworkErrModal();
                     await this.initWallet();
+                    this.initializeDefaultTokenPair();
                     await this.onRenderChainList();
                     await this.updateBalances();
-                    this.initializeDefaultTokenPair();
+                    this.onUpdateToken(this.fromToken, true);
+                    this.onUpdateToken(this.toToken, false);
                     this.toggleReverseImage.enabled = !this.isFixedPair && !this.isCrossChain;
                     this.firstTokenInput.tokenReadOnly = this.isFixedPair;
                     this.secondTokenInput.tokenReadOnly = this.isFixedPair;
@@ -4077,7 +4078,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                 }
             };
             this.onRenderChainList = async () => {
-                var _a, _b, _c;
+                var _a, _b, _c, _d;
                 if (!this.isCrossChainSwap)
                     return;
                 this.oldSupportedChainList = this.supportedChainList.map(v => (0, index_7.getNetworkInfo)(v.chainId));
@@ -4097,12 +4098,15 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                     this.initChainIcon(network, true);
                 });
                 if (this.supportedChainList.length > 1) {
-                    const firstChainId = this.defaultChainId;
-                    const secondChainId = (_c = this.supportedChainList.find((v) => v.chainId != firstChainId)) === null || _c === void 0 ? void 0 : _c.chainId;
-                    const firstNetwork = (0, index_7.getNetworkInfo)(firstChainId);
-                    const secondNetwork = (0, index_7.getNetworkInfo)(secondChainId);
-                    await this.selectSourceChain(firstNetwork);
-                    await this.selectDestinationChain(secondNetwork);
+                    const firstChainId = (_c = this.fromToken) === null || _c === void 0 ? void 0 : _c.chainId;
+                    const secondChainId = (_d = this.toToken) === null || _d === void 0 ? void 0 : _d.chainId;
+                    console.log('this.fromToken', this.fromToken, 'this.toToken', this.toToken);
+                    if (firstChainId && secondChainId) {
+                        const firstNetwork = (0, index_7.getNetworkInfo)(firstChainId);
+                        const secondNetwork = (0, index_7.getNetworkInfo)(secondChainId);
+                        await this.selectSourceChain(firstNetwork);
+                        await this.selectDestinationChain(secondNetwork);
+                    }
                 }
                 this.srcChainBox.visible = true;
                 this.desChainBox.visible = true;
@@ -4148,17 +4152,6 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                 this.updateSwapButtonCaption();
             }));
         }
-        // get supportedNetworks() {
-        //   let providers: IProvider[] = [];
-        //   if (this.originalData?.providers) {
-        //     providers = this.isFixedPair ? [this.originalData.providers[0]] : this.originalData.providers;
-        //   }
-        //   let supportedNetworks = [];
-        //   for (const provider of providers) {
-        //     supportedNetworks.push(...Object.keys(provider.contractInfo));
-        //   }
-        //   return uniqWith(supportedNetworks, (cur: any, oth: any) => { return cur == oth });
-        // }
         get isApproveButtonShown() {
             const warningMessageText = this.getWarningMessageText();
             return warningMessageText === '' && this.approveButtonStatus !== undefined && this.approveButtonStatus !== index_10.ApprovalStatus.NONE;
@@ -4209,63 +4202,57 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
             }
             return token.address.toLowerCase();
         }
-        initializeDefaultTokenPair() {
-            var _a;
-            const currentChainId = this.state.getChainId();
-            let currentChainTokens = (0, index_7.getSupportedTokens)(this._tokens, currentChainId);
-            this.firstTokenInput.chainId = currentChainId;
-            if (this.isCrossChain) {
-                this.secondTokenInput.chainId = this.desChain.chainId;
-                let targetChainTokens = (0, index_7.getSupportedTokens)(this._tokens, this.desChain.chainId);
-                let firstDefaultToken;
-                let secondDefaultToken;
+        calculateDefaultTokens() {
+            let firstDefaultToken;
+            let secondDefaultToken;
+            let currentChainTokens = (0, index_7.getSupportedTokens)(this._tokens, this.state.getChainId());
+            if (!this._data.defaultInputToken && !this._data.defaultOutputToken) {
+                firstDefaultToken = currentChainTokens[0];
+                secondDefaultToken = currentChainTokens[1];
+            }
+            else {
                 if (this._data.defaultInputToken) {
-                    firstDefaultToken = currentChainTokens.find(v => v.chainId === this._data.defaultInputToken.chainId && v.address === this._data.defaultInputToken.address);
+                    let inputTokens = (0, index_7.getSupportedTokens)(this._tokens, this._data.defaultInputToken.chainId);
+                    firstDefaultToken = inputTokens.find(v => v.chainId === this._data.defaultInputToken.chainId && v.address === this._data.defaultInputToken.address);
                 }
                 else {
                     firstDefaultToken = currentChainTokens[0];
                 }
                 if (this._data.defaultOutputToken) {
-                    secondDefaultToken = targetChainTokens.find(v => v.chainId === this._data.defaultOutputToken.chainId && v.address === this._data.defaultOutputToken.address);
+                    let outputTokens = (0, index_7.getSupportedTokens)(this._tokens, this._data.defaultOutputToken.chainId);
+                    secondDefaultToken = outputTokens.find(v => v.chainId === this._data.defaultOutputToken.chainId && v.address === this._data.defaultOutputToken.address);
                 }
                 else {
-                    secondDefaultToken = targetChainTokens[0];
+                    secondDefaultToken = currentChainTokens[0];
                 }
+            }
+            return {
+                firstDefaultToken,
+                secondDefaultToken
+            };
+        }
+        initializeDefaultTokenPair() {
+            var _a;
+            if (this.isCrossChain) {
+                let { firstDefaultToken, secondDefaultToken } = this.calculateDefaultTokens();
+                this.fromToken = firstDefaultToken;
+                this.toToken = secondDefaultToken;
+                this.firstTokenInput.chainId = firstDefaultToken.chainId;
+                this.secondTokenInput.chainId = secondDefaultToken.chainId;
                 this.fromInputValue = new eth_wallet_5.BigNumber(this._data.defaultInputValue);
-                this.onUpdateToken(firstDefaultToken, true);
-                this.onUpdateToken(secondDefaultToken, false);
                 this.firstTokenInput.token = this.fromToken;
                 this.secondTokenInput.token = this.toToken;
             }
             else {
-                this.secondTokenInput.chainId = currentChainId;
-                if (currentChainTokens.length < 2)
-                    return;
                 const providers = (_a = this.originalData) === null || _a === void 0 ? void 0 : _a.providers;
                 if (providers && providers.length) {
-                    let firstDefaultToken;
-                    let secondDefaultToken;
-                    if (this._data.defaultInputToken) {
-                        firstDefaultToken = currentChainTokens.find(v => v.chainId === this._data.defaultInputToken.chainId && v.address === this._data.defaultInputToken.address);
-                    }
-                    else {
-                        firstDefaultToken = currentChainTokens[0];
-                    }
-                    if (this._data.defaultOutputToken) {
-                        secondDefaultToken = currentChainTokens.find(v => v.chainId === this._data.defaultOutputToken.chainId && v.address === this._data.defaultOutputToken.address);
-                    }
-                    else {
-                        secondDefaultToken = currentChainTokens[0];
-                    }
-                    let fromTokenKey = this.getTokenKey(firstDefaultToken);
-                    let toTokenKey = this.getTokenKey(secondDefaultToken);
-                    let tokenMap = scom_token_list_6.tokenStore.getTokenMapByChainId(currentChainId);
-                    this.fromToken = tokenMap[fromTokenKey];
-                    this.toToken = tokenMap[toTokenKey];
+                    let { firstDefaultToken, secondDefaultToken } = this.calculateDefaultTokens();
+                    this.fromToken = firstDefaultToken;
+                    this.toToken = secondDefaultToken;
+                    this.firstTokenInput.chainId = firstDefaultToken.chainId;
+                    this.secondTokenInput.chainId = secondDefaultToken.chainId;
                     this.fromInputValue = new eth_wallet_5.BigNumber(this._data.defaultInputValue);
                     this.toInputValue = new eth_wallet_5.BigNumber(this._data.defaultOutputValue);
-                    this.onUpdateToken(this.fromToken, true);
-                    this.onUpdateToken(this.toToken, false);
                     this.firstTokenInput.token = this.fromToken;
                     this.secondTokenInput.token = this.toToken;
                     this.toggleReverseImage.classList.add('cursor-default');
@@ -4992,9 +4979,9 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
             return balance;
         }
         async updateBalances() {
-            await scom_token_list_6.tokenStore.updateTokenBalancesByChainId(this.chainId);
-            if (this.isCrossChainSwap && this.chainId != this.desChain.chainId) {
-                await scom_token_list_6.tokenStore.updateTokenBalancesByChainId(this.desChain.chainId);
+            const chainIds = [...new Set([this.fromToken.chainId, this.toToken.chainId])];
+            for (let chainId of chainIds) {
+                await scom_token_list_6.tokenStore.updateTokenBalancesByChainId(chainId);
             }
             if (this.fromToken) {
                 const balance = this.getBalance(this.fromToken);
@@ -5189,29 +5176,6 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
             this.$eventBus.register(this, "ShowExpertModal" /* EventId.ShowExpertModal */, () => {
                 this.expertModal.showModal();
             });
-        }
-        // private showNetworkErrModal() {
-        //   this.supportedNetworksElm.clearInnerHTML();
-        //   if (!this.supportedNetworks.length) {
-        //     this.supportedNetworksElm.appendChild(<i-label caption={`No networks are supported. Please configure the swap!`} font={{ size: '16px' }} />)
-        //   } else if (this.supportedChainList.some(v => v.chainId == this.currentChainId)) {
-        //     const network = getNetworkInfo(this.currentChainId);
-        //     this.supportedNetworksElm.appendChild(<i-label caption={`The ${network.chainName} (${network.chainId}) network has not been configured for the swap!`} font={{ size: '16px' }} />)
-        //   } else {
-        //     this.supportedNetworksElm.appendChild(<i-label caption={`We only support the following ${this.supportedNetworks.length > 1 ? 'networks' : 'network'}:`} font={{ size: '16px' }} />)
-        //     for (const chainId of this.supportedNetworks) {
-        //       const network = getNetworkInfo(chainId);
-        //       if (network) {
-        //         this.supportedNetworksElm.appendChild(
-        //           <i-label font={{ bold: true, size: '16px' }} caption={`${network.chainName} (${network.chainId})`} />
-        //         )
-        //       }
-        //     }
-        //   }
-        //   this.networkErrModal.visible = true;
-        // }
-        closeNetworkErrModal() {
-            this.networkErrModal.visible = false;
         }
         resizeLayout() {
             var _a, _b, _c;
@@ -5426,12 +5390,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                                 this.$render("i-panel", null,
                                     this.$render("i-vstack", { id: "feesInfo" }),
                                     this.$render("i-hstack", { verticalAlignment: "center", horizontalAlignment: "center", margin: { top: 16, bottom: 8 } },
-                                        this.$render("i-button", { caption: "Close", class: "btn-os", font: { color: Theme.colors.primary.contrastText }, onClick: () => this.closeModalFees() }))))),
-                        this.$render("i-modal", { id: "networkErrModal", class: "bg-modal custom-modal", title: "Supported Networks", closeIcon: { name: 'times' } },
-                            this.$render("i-panel", { class: "i-modal_content" },
-                                this.$render("i-vstack", { id: "supportedNetworksElm", gap: 10, verticalAlignment: "center" }),
-                                this.$render("i-hstack", { verticalAlignment: "center", horizontalAlignment: "center", margin: { top: 16, bottom: 8 } },
-                                    this.$render("i-button", { caption: "Close", width: 150, padding: { top: 4, bottom: 4 }, class: "btn-os", font: { color: Theme.colors.primary.contrastText }, onClick: () => this.closeNetworkErrModal() }))))),
+                                        this.$render("i-button", { caption: "Close", class: "btn-os", font: { color: Theme.colors.primary.contrastText }, onClick: () => this.closeModalFees() })))))),
                     this.$render("i-scom-tx-status-modal", { id: "txStatusModal" }),
                     this.$render("i-scom-wallet-modal", { id: "mdWallet", wallets: [] }))));
         }
