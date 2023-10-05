@@ -159,6 +159,7 @@ declare module "@scom/scom-swap/store/providers.ts" {
 }
 /// <amd-module name="@scom/scom-swap/store/cross-chain.ts" />
 declare module "@scom/scom-swap/store/cross-chain.ts" {
+    import { INetworkConfig } from "@scom/scom-swap/global/index.ts";
     enum VaultType {
         Project = "Project",
         Exchange = "Exchange"
@@ -198,12 +199,13 @@ declare module "@scom/scom-swap/store/cross-chain.ts" {
         isTestnet: boolean;
     })[];
     const getBridgeVaultVersion: (chainId: number) => string;
+    const getBridgeSupportedChainList: (chainId: number, networks: INetworkConfig[]) => INetworkConfig[];
     const bridgeVaultConstantMap: {
         [assetSymbol: string]: {
             [chainId: string]: BridgeVaultConstant;
         };
     };
-    export { BridgeVaultGroupList, CrossChainAddressMap, crossChainSupportedChainIds, MockOracleMap, getBridgeVaultVersion, bridgeVaultConstantMap };
+    export { BridgeVaultGroupList, CrossChainAddressMap, crossChainSupportedChainIds, MockOracleMap, getBridgeVaultVersion, getBridgeSupportedChainList, bridgeVaultConstantMap };
 }
 /// <amd-module name="@scom/scom-swap/store/index.ts" />
 declare module "@scom/scom-swap/store/index.ts" {
@@ -936,7 +938,7 @@ declare module "@scom/scom-swap" {
         private lbPayOrReceive;
         private approvalModelAction;
         private toggleReverseImage;
-        private supportedChainList;
+        private bridgeSupportedChainList;
         private swapModalConfirmBtn;
         private modalFees;
         private feesInfo;
@@ -944,7 +946,6 @@ declare module "@scom/scom-swap" {
         private contractAddress;
         private clientEvents;
         private crossChainApprovalStatus;
-        private oldSupportedChainList;
         private minSwapHintLabel;
         private srcChainBox;
         private desChainBox;
@@ -1102,12 +1103,11 @@ declare module "@scom/scom-swap" {
         private initializeWidgetConfig;
         private initApprovalModelAction;
         private onRevertSwap;
-        private totalAmount;
         private setupCrossChainPopup;
         private handleSwapPopup;
         private doSwap;
         private getMinReceivedMaxSold;
-        private onUpdateToken;
+        private updateTokenValues;
         private onSelectToken;
         private setApprovalSpenderAddress;
         private getInputValue;
@@ -1125,7 +1125,7 @@ declare module "@scom/scom-swap" {
         private getTradeFeeExactAmount;
         private getFeeDetails;
         private getPriceInfo;
-        private onUpdateEstimatedPosition;
+        private updateEstimatedPosition;
         private isEstimated;
         private getBalance;
         private updateBalances;
@@ -1139,27 +1139,22 @@ declare module "@scom/scom-swap" {
         private isSwapButtonDisabled;
         private onClickSwapButton;
         private onSubmit;
-        private onApproveRouterMax;
+        private approveRouterMax;
         private onSetMaxBalance;
         private isMaxDisabled;
-        private onRenderPriceInfo;
+        private renderPriceInfo;
         get chainId(): number;
         private get isCrossChainSwap();
         private get isCrossChainEnabled();
         get isCrossChain(): boolean;
-        get fromTokenToVaultMap(): {
-            [key: string]: any;
-        };
         get isMetaMask(): boolean;
-        getSupportedChainList: () => void;
         private disableSelectChain;
         private selectSourceChain;
         private selectDestinationChain;
         private onSelectSourceChain;
         private onSelectDestinationChain;
         private initChainIcon;
-        private updateSrcChainIconList;
-        private onRenderChainList;
+        private renderChainList;
         showModalFees: () => void;
         closeModalFees: () => void;
         private showResultMessage;

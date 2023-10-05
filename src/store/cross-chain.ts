@@ -1,3 +1,5 @@
+import { INetworkConfig } from '../global/index'
+
 enum VaultType {
   Project = 'Project',
   Exchange = 'Exchange',
@@ -196,6 +198,13 @@ const getBridgeVaultVersion = (chainId: number): string => {
   return '1.1.1';
 }
 
+const getBridgeSupportedChainList = (chainId: number, networks: INetworkConfig[]) => {
+  const testnetSupportedList = networks.filter(v => crossChainSupportedChainIds.some(s => s.chainId === v.chainId && s.isTestnet));
+  const mainnetSupportedList = networks.filter(v => !crossChainSupportedChainIds.some(s => s.chainId === v.chainId && s.isTestnet));
+  const isMainnet = mainnetSupportedList.some((item: any) => item.chainId == chainId);
+  return isMainnet ? mainnetSupportedList : testnetSupportedList;
+}
+
 const bridgeVaultConstantMap = BridgeVaultGroupList.reduce((acc, cur) => {
   if (cur.deprecated) return acc;
   if (acc[cur.name] == null) acc[cur.name] = {};
@@ -211,5 +220,6 @@ export {
   crossChainSupportedChainIds,
   MockOracleMap,
   getBridgeVaultVersion,
+  getBridgeSupportedChainList,
   bridgeVaultConstantMap
 }

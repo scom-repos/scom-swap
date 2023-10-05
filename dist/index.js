@@ -807,8 +807,7 @@ define("@scom/scom-swap/store/providers.ts", ["require", "exports"], function (r
 define("@scom/scom-swap/store/cross-chain.ts", ["require", "exports"], function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.bridgeVaultConstantMap = exports.getBridgeVaultVersion = exports.MockOracleMap = exports.crossChainSupportedChainIds = exports.CrossChainAddressMap = exports.BridgeVaultGroupList = void 0;
-    ///<amd-module name='@scom/scom-swap/store/cross-chain.ts'/> 
+    exports.bridgeVaultConstantMap = exports.getBridgeSupportedChainList = exports.getBridgeVaultVersion = exports.MockOracleMap = exports.crossChainSupportedChainIds = exports.CrossChainAddressMap = exports.BridgeVaultGroupList = void 0;
     var VaultType;
     (function (VaultType) {
         VaultType["Project"] = "Project";
@@ -991,6 +990,13 @@ define("@scom/scom-swap/store/cross-chain.ts", ["require", "exports"], function 
         return '1.1.1';
     };
     exports.getBridgeVaultVersion = getBridgeVaultVersion;
+    const getBridgeSupportedChainList = (chainId, networks) => {
+        const testnetSupportedList = networks.filter(v => crossChainSupportedChainIds.some(s => s.chainId === v.chainId && s.isTestnet));
+        const mainnetSupportedList = networks.filter(v => !crossChainSupportedChainIds.some(s => s.chainId === v.chainId && s.isTestnet));
+        const isMainnet = mainnetSupportedList.some((item) => item.chainId == chainId);
+        return isMainnet ? mainnetSupportedList : testnetSupportedList;
+    };
+    exports.getBridgeSupportedChainList = getBridgeSupportedChainList;
     const bridgeVaultConstantMap = BridgeVaultGroupList.reduce((acc, cur) => {
         if (cur.deprecated)
             return acc;
@@ -3542,12 +3548,10 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                 this.onChainChange();
             });
             const connectedEvent = rpcWallet.registerWalletEvent(this, eth_wallet_5.Constants.RpcWalletEvent.Connected, async (connected) => {
-                var _a, _b;
                 if (this.swapBtn)
                     this.swapBtn.visible = true;
                 this.updateContractAddress();
-                if ((_b = (_a = this.originalData) === null || _a === void 0 ? void 0 : _a.providers) === null || _b === void 0 ? void 0 : _b.length)
-                    await this.initializeWidgetConfig();
+                await this.initializeWidgetConfig();
             });
             const data = {
                 defaultChainId: this.defaultChainId,
@@ -3693,19 +3697,17 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
             this.tag = {};
             this._tokens = [];
             this.isInited = false;
-            this.supportedChainList = [];
+            this.bridgeSupportedChainList = [];
             this.clientEvents = [];
             // Cross Chain
             this.crossChainApprovalStatus = index_10.ApprovalStatus.NONE;
-            this.oldSupportedChainList = [];
             this.onChainChange = async () => {
-                var _a, _b;
                 const currentChainId = this.state.getChainId();
                 if (currentChainId != null && currentChainId != undefined)
                     this.swapBtn.visible = true;
                 this.updateContractAddress();
-                if ((_b = (_a = this.originalData) === null || _a === void 0 ? void 0 : _a.providers) === null || _b === void 0 ? void 0 : _b.length)
-                    await this.initializeWidgetConfig();
+                // if (this.originalData?.providers?.length) await this.initializeWidgetConfig();
+                await this.initializeWidgetConfig();
             };
             this.fixedNumber = (value) => {
                 const val = typeof value === 'object' ? value : new eth_wallet_5.BigNumber(value);
@@ -3726,16 +3728,17 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
             this.initializeWidgetConfig = async () => {
                 setTimeout(async () => {
                     var _a;
-                    // const currentChainId = this.state.getChainId();
                     await this.initWallet();
                     this.initializeDefaultTokenPair();
-                    await this.onRenderChainList();
+                    await this.renderChainList();
                     await this.updateBalances();
-                    this.onUpdateToken(this.fromToken, true);
-                    this.onUpdateToken(this.toToken, false);
+                    this.updateTokenValues(this.fromToken, true);
+                    this.updateTokenValues(this.toToken, false);
                     this.toggleReverseImage.enabled = !this.isFixedPair && !this.isCrossChain;
                     this.firstTokenInput.tokenReadOnly = this.isFixedPair;
+                    this.firstTokenInput.inputReadOnly = false;
                     this.secondTokenInput.tokenReadOnly = this.isFixedPair;
+                    this.secondTokenInput.inputReadOnly = false;
                     this.pnlBranding.visible = !!this._data.logo || !!this._data.title;
                     if ((_a = this._data.logo) === null || _a === void 0 ? void 0 : _a.startsWith('ipfs://')) {
                         this.imgLogo.url = this._data.logo.replace('ipfs://', '/ipfs/');
@@ -3745,8 +3748,6 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                     }
                     this.lbTitle.caption = this._data.title;
                     this.updateSwapButtonCaption();
-                    this.secondTokenInput.inputReadOnly = false;
-                    this.firstTokenInput.inputReadOnly = false;
                     if (!this.isFixedPair) {
                         this.toggleReverseImage.classList.remove('cursor-default');
                     }
@@ -3759,7 +3760,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                         }
                         this.toggleReverseImage.classList.add('cursor-default');
                         if (this.isEstimated('from')) {
-                            this.onUpdateEstimatedPosition(false, true);
+                            this.updateEstimatedPosition(false);
                         }
                     }
                     else {
@@ -3769,28 +3770,20 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                         this.toggleReverseImage.classList.remove('cursor-default');
                     }
                     if (this.fromInputValue.isGreaterThan(0)) {
-                        this.onUpdateEstimatedPosition(false, true);
+                        this.updateEstimatedPosition(false);
                         this.firstTokenInput.value = this.fixedNumber(this.fromInputValue);
                     }
                     else if (this.toInputValue.isGreaterThan(0)) {
-                        this.onUpdateEstimatedPosition(true, true);
+                        this.updateEstimatedPosition(true);
                         this.secondTokenInput.value = this.fixedNumber(this.toInputValue);
                     }
-                    // const tokens = getSupportedTokens(this._tokens, currentChainId);
-                    // this.firstTokenInput.tokenDataListProp = tokens;
-                    // if (!this.isCrossChain) {
-                    //   this.secondTokenInput.tokenDataListProp = tokens;
-                    // }
                     this.firstTokenInput.tokenDataListProp = (0, index_7.getSupportedTokens)(this._tokens, this.fromToken.chainId);
                     this.secondTokenInput.tokenDataListProp = (0, index_7.getSupportedTokens)(this._tokens, this.toToken.chainId);
                     if (!this.record)
                         this.swapBtn.enabled = false;
-                    this.onRenderPriceInfo();
+                    this.renderPriceInfo();
                     await this.handleAddRoute();
                 });
-            };
-            this.totalAmount = () => {
-                return this.fromInputValue;
             };
             this.getMinReceivedMaxSold = () => {
                 var _a, _b;
@@ -3812,7 +3805,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                     return minReceivedMaxSold;
                 }
             };
-            this.onUpdateEstimatedPosition = (isFrom, reverseRouting = false) => {
+            this.updateEstimatedPosition = (isFrom) => {
                 if (this.isFrom != isFrom) {
                     this.isFrom = isFrom;
                 }
@@ -3846,7 +3839,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                 var _a, _b, _c, _d;
                 try {
                     this.swapModal.visible = false;
-                    this.showResultMessage('warning', `Swapping ${(0, index_10.formatNumber)(this.totalAmount(), 4)} ${(_a = this.fromToken) === null || _a === void 0 ? void 0 : _a.symbol} to ${(0, index_10.formatNumber)(this.toInputValue, 4)} ${(_b = this.toToken) === null || _b === void 0 ? void 0 : _b.symbol}`);
+                    this.showResultMessage('warning', `Swapping ${(0, index_10.formatNumber)(this.fromInputValue, 4)} ${(_a = this.fromToken) === null || _a === void 0 ? void 0 : _a.symbol} to ${(0, index_10.formatNumber)(this.toInputValue, 4)} ${(_b = this.toToken) === null || _b === void 0 ? void 0 : _b.symbol}`);
                     if (this.isCrossChain) {
                         if (this.toToken && this.fromToken && this.desChain) {
                             this.record.minReceivedMaxSold = this.getMinReceivedMaxSold();
@@ -3888,12 +3881,12 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                     console.error(error);
                 }
             };
-            this.onApproveRouterMax = () => {
+            this.approveRouterMax = () => {
                 this.showResultMessage('warning', 'Approving');
                 this.setApprovalSpenderAddress();
-                this.approvalModelAction.doApproveAction(this.fromToken, this.totalAmount().toString(), this.record);
+                this.approvalModelAction.doApproveAction(this.fromToken, this.fromInputValue.toFixed(), this.record);
             };
-            this.onSetMaxBalance = async (value) => {
+            this.onSetMaxBalance = async () => {
                 var _a, _b, _c, _d;
                 if (!((_a = this.fromToken) === null || _a === void 0 ? void 0 : _a.symbol))
                     return;
@@ -3903,9 +3896,6 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                 let inputVal = new eth_wallet_5.BigNumber(balance);
                 if (!address) {
                     inputVal = new eth_wallet_5.BigNumber(0);
-                }
-                if (value == 0 || value) {
-                    inputVal = inputVal.multipliedBy(value).dividedBy(100);
                 }
                 if (inputVal.eq(this.fromInputValue))
                     return;
@@ -3919,13 +3909,6 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                 const address = ((_a = this.fromToken) === null || _a === void 0 ? void 0 : _a.address) || ((_b = this.fromToken) === null || _b === void 0 ? void 0 : _b.symbol);
                 let balance = this.getBalance(this.fromToken);
                 return !address || new eth_wallet_5.BigNumber(balance).isLessThanOrEqualTo(0);
-            };
-            this.getSupportedChainList = () => {
-                const list = this.networks;
-                const testnetSupportedList = list.filter(v => index_7.crossChainSupportedChainIds.some(s => s.chainId === v.chainId && s.isTestnet));
-                const mainnetSupportedList = list.filter(v => !index_7.crossChainSupportedChainIds.some(s => s.chainId === v.chainId && s.isTestnet));
-                const isMainnet = mainnetSupportedList.some((item) => item.chainId == this.chainId);
-                this.supportedChainList = isMainnet ? mainnetSupportedList : testnetSupportedList;
             };
             this.disableSelectChain = (disabled, isDes) => {
                 const chains = isDes ? this.desChainList : this.srcChainList;
@@ -3946,8 +3929,6 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                 if (!this.isCrossChainEnabled)
                     return;
                 this.disableSelectChain(true, false);
-                // const rpcWallet = this.state.getRpcWallet();
-                // await rpcWallet.switchNetwork(obj.chainId);
                 const selected = this.srcChainList.querySelector('.icon-selected');
                 if (selected) {
                     selected.classList.remove('icon-selected');
@@ -3959,7 +3940,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                         img.classList.add('icon-selected');
                     }
                     else {
-                        const currentNetwork = (0, index_7.getNetworkInfo)((_a = this.supportedChainList.find((f) => f.chainId == obj.chainId)) === null || _a === void 0 ? void 0 : _a.chainId);
+                        const currentNetwork = (0, index_7.getNetworkInfo)((_a = this.bridgeSupportedChainList.find((f) => f.chainId == obj.chainId)) === null || _a === void 0 ? void 0 : _a.chainId);
                         const img = this.srcChainList.querySelector(`[data-tooltip="${currentNetwork === null || currentNetwork === void 0 ? void 0 : currentNetwork.chainName}"]`);
                         if (img) {
                             img.classList.add('icon-selected');
@@ -3975,7 +3956,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                         }
                     }
                     else {
-                        this.srcChain = (0, index_7.getNetworkInfo)((_b = this.supportedChainList[0]) === null || _b === void 0 ? void 0 : _b.chainId);
+                        this.srcChain = (0, index_7.getNetworkInfo)((_b = this.bridgeSupportedChainList[0]) === null || _b === void 0 ? void 0 : _b.chainId);
                         (_c = this.srcChainList.firstElementChild) === null || _c === void 0 ? void 0 : _c.classList.add('icon-selected');
                     }
                 }
@@ -4001,7 +3982,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                         img.classList.add('icon-selected');
                     }
                     else {
-                        const currentNetwork = (0, index_7.getNetworkInfo)((_a = this.supportedChainList.find((f) => f.chainId == obj.chainId)) === null || _a === void 0 ? void 0 : _a.chainId);
+                        const currentNetwork = (0, index_7.getNetworkInfo)((_a = this.bridgeSupportedChainList.find((f) => f.chainId == obj.chainId)) === null || _a === void 0 ? void 0 : _a.chainId);
                         const img = this.desChainList.querySelector(`[data-tooltip="${currentNetwork === null || currentNetwork === void 0 ? void 0 : currentNetwork.chainName}"]`);
                         if (img) {
                             img.classList.add('icon-selected');
@@ -4017,7 +3998,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                         }
                     }
                     else {
-                        this.desChain = (0, index_7.getNetworkInfo)((_b = this.supportedChainList[0]) === null || _b === void 0 ? void 0 : _b.chainId);
+                        this.desChain = (0, index_7.getNetworkInfo)((_b = this.bridgeSupportedChainList[0]) === null || _b === void 0 ? void 0 : _b.chainId);
                         (_c = this.desChainList.firstElementChild) === null || _c === void 0 ? void 0 : _c.classList.add('icon-selected');
                     }
                 }
@@ -4033,19 +4014,8 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                 this.firstTokenInput.chainId = obj.chainId;
                 if (obj.chainId === ((_a = this.srcChain) === null || _a === void 0 ? void 0 : _a.chainId))
                     return;
-                await this.selectSourceChain(obj, img);
-                // const rpcWallet = this.state.getRpcWallet();
-                // await rpcWallet.switchNetwork(obj.chainId);
-                const tokenList = (0, index_7.getSupportedTokens)(this._tokens, obj.chainId);
-                this.fromToken = tokenList[0];
-                this.firstTokenInput.token = this.fromToken;
-                await scom_token_list_6.tokenStore.updateTokenBalancesByChainId(obj.chainId);
-                const balance = this.getBalance(this.fromToken);
-                this.payBalance.caption = `Balance: ${(0, index_10.formatNumber)(balance, 4)} ${this.fromToken.symbol}`;
-                const enabled = !this.isMaxDisabled();
-                this.maxButton.enabled = enabled;
-                await this.onUpdateToken(this.fromToken, true);
-                await this.handleAddRoute();
+                const rpcWallet = this.state.getRpcWallet();
+                await rpcWallet.switchNetwork(obj.chainId);
             };
             this.onSelectDestinationChain = async (obj, img) => {
                 var _a;
@@ -4061,7 +4031,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                 this.receiveBalance.caption = `Balance: ${(0, index_10.formatNumber)(balance, 4)} ${this.toToken.symbol}`;
                 const enabled = !this.isMaxDisabled();
                 this.maxButton.enabled = enabled;
-                await this.onUpdateToken(this.toToken, false);
+                await this.updateTokenValues(this.toToken, false);
                 await this.handleAddRoute();
             };
             this.initChainIcon = (network, isDes) => {
@@ -4085,52 +4055,31 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                     this.srcChainList.appendChild(img);
                 }
             };
-            this.updateSrcChainIconList = () => {
-                const listElm = this.srcChainList.querySelectorAll('i-image');
-                for (const elm of listElm) {
-                    const networkName = elm.getAttribute('network-name');
-                    const chainId = elm.getAttribute('chain-id');
-                    const tooltip = this.isMetaMask ? networkName : `Swap supports this network ${networkName} (${chainId}), please switch network in the connected wallet.`;
-                    if (tooltip) {
-                        elm.tooltip.content = tooltip;
-                    }
-                    if (this.isMetaMask) {
-                        elm.classList.remove('icon-disabled');
-                    }
-                    else {
-                        elm.classList.add('icon-disabled');
-                    }
-                }
-            };
-            this.onRenderChainList = async () => {
-                var _a, _b, _c, _d;
+            this.renderChainList = async () => {
+                var _a, _b;
                 if (!this.isCrossChainSwap)
                     return;
-                this.oldSupportedChainList = this.supportedChainList.map(v => (0, index_7.getNetworkInfo)(v.chainId));
-                this.getSupportedChainList();
-                if (((_a = this.oldSupportedChainList[0]) === null || _a === void 0 ? void 0 : _a.chainId) == ((_b = this.supportedChainList[0]) === null || _b === void 0 ? void 0 : _b.chainId)) {
-                    this.updateSrcChainIconList();
+                this.bridgeSupportedChainList = (0, index_7.getBridgeSupportedChainList)(this.chainId, this.networks);
+                if (this.bridgeSupportedChainList.length < 2)
                     return;
-                }
-                ;
                 this.srcChainList.innerHTML = '';
                 this.desChainList.innerHTML = '';
                 this.srcChain = undefined;
                 this.desChain = undefined;
-                this.supportedChainList.forEach((v) => {
+                this.bridgeSupportedChainList.forEach((v) => {
                     const network = (0, index_7.getNetworkInfo)(v.chainId);
                     this.initChainIcon(network, false);
                     this.initChainIcon(network, true);
                 });
-                if (this.supportedChainList.length > 1) {
-                    const firstChainId = (_c = this.fromToken) === null || _c === void 0 ? void 0 : _c.chainId;
-                    const secondChainId = (_d = this.toToken) === null || _d === void 0 ? void 0 : _d.chainId;
-                    if (firstChainId && secondChainId) {
-                        const firstNetwork = (0, index_7.getNetworkInfo)(firstChainId);
-                        const secondNetwork = (0, index_7.getNetworkInfo)(secondChainId);
-                        await this.selectSourceChain(firstNetwork);
-                        await this.selectDestinationChain(secondNetwork);
-                    }
+                const firstChainId = (_a = this.fromToken) === null || _a === void 0 ? void 0 : _a.chainId;
+                const secondChainId = (_b = this.toToken) === null || _b === void 0 ? void 0 : _b.chainId;
+                console.log('firstChainId', firstChainId);
+                console.log('secondChainId', secondChainId);
+                if (firstChainId && secondChainId) {
+                    const firstNetwork = (0, index_7.getNetworkInfo)(firstChainId);
+                    const secondNetwork = (0, index_7.getNetworkInfo)(secondChainId);
+                    await this.selectSourceChain(firstNetwork);
+                    await this.selectDestinationChain(secondNetwork);
                 }
                 this.srcChainBox.visible = true;
                 this.desChainBox.visible = true;
@@ -4229,13 +4178,14 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
         calculateDefaultTokens() {
             let firstDefaultToken;
             let secondDefaultToken;
-            let currentChainTokens = (0, index_7.getSupportedTokens)(this._tokens, this.state.getChainId());
+            const currentChainId = this.state.getChainId();
+            const currentChainTokens = (0, index_7.getSupportedTokens)(this._tokens, currentChainId);
             if (!this._data.defaultInputToken && !this._data.defaultOutputToken) {
                 firstDefaultToken = currentChainTokens[0];
                 secondDefaultToken = currentChainTokens[1];
             }
             else {
-                if (this._data.defaultInputToken) {
+                if (this._data.defaultInputToken && currentChainId === this._data.defaultInputToken.chainId) {
                     let inputTokens = (0, index_7.getSupportedTokens)(this._tokens, this._data.defaultInputToken.chainId);
                     firstDefaultToken = inputTokens.find(v => v.chainId === this._data.defaultInputToken.chainId && v.address === this._data.defaultInputToken.address);
                 }
@@ -4363,7 +4313,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
         async onRevertSwap() {
             if (this.isCrossChain)
                 return;
-            this.onUpdateEstimatedPosition(!this.isEstimated('from'), true);
+            this.updateEstimatedPosition(!this.isEstimated('from'));
             [this.fromToken, this.toToken] = [this.toToken, this.fromToken];
             const enabled = !this.isMaxDisabled();
             this.maxButton.enabled = enabled;
@@ -4443,7 +4393,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
             const slippageTolerance = this.state.slippageTolerance;
             this.fromTokenImage.url = scom_token_list_6.assets.tokenPath(this.fromToken, currentChainId);
             this.fromTokenLabel.caption = (_b = (_a = this.fromToken) === null || _a === void 0 ? void 0 : _a.symbol) !== null && _b !== void 0 ? _b : '';
-            this.fromTokenValue.caption = (0, index_10.formatNumber)(this.totalAmount(), 4);
+            this.fromTokenValue.caption = (0, index_10.formatNumber)(this.fromInputValue, 4);
             this.toTokenImage.url = scom_token_list_6.assets.tokenPath(this.toToken, this.isCrossChain ? (_c = this.desChain) === null || _c === void 0 ? void 0 : _c.chainId : currentChainId);
             this.toTokenLabel.caption = (_e = (_d = this.toToken) === null || _d === void 0 ? void 0 : _d.symbol) !== null && _e !== void 0 ? _e : '';
             this.toTokenValue.caption = (0, index_10.formatNumber)(this.toInputValue, 4);
@@ -4463,7 +4413,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
         doSwap() {
             this.approvalModelAction.doPayAction(this.record);
         }
-        async onUpdateToken(token, isFrom) {
+        async updateTokenValues(token, isFrom) {
             if (!token)
                 return;
             const balance = this.getBalance(token);
@@ -4481,7 +4431,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                     }
                 }
                 else if (this.fromInputValue.isZero()) {
-                    this.onUpdateEstimatedPosition(true);
+                    this.updateEstimatedPosition(true);
                 }
                 this.payBalance.caption = `Balance: ${(0, index_10.formatNumber)(balance, 4)} ${token.symbol}`;
                 this.updateTokenInput(true);
@@ -4498,7 +4448,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                     }
                 }
                 else if (this.toInputValue.isZero()) {
-                    this.onUpdateEstimatedPosition(false);
+                    this.updateEstimatedPosition(false);
                 }
                 this.receiveBalance.caption = `Balance: ${(0, index_10.formatNumber)(balance, 4)} ${token.symbol}`;
                 await this.updateTokenInput(false);
@@ -4513,7 +4463,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
             //   const rpcWallet = this.state.getRpcWallet();
             //   await tokenStore.updateAllTokenBalances(rpcWallet);
             // }
-            await this.onUpdateToken(token, isFrom);
+            await this.updateTokenValues(token, isFrom);
             await this.handleAddRoute();
             this.firstTokenInput.enabled = true;
             this.secondTokenInput.enabled = true;
@@ -4615,7 +4565,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                     if (isFrom) {
                         if (!this.fromInputValue.eq(value)) {
                             this.fromInputValue = value;
-                            this.onUpdateEstimatedPosition(false, true);
+                            this.updateEstimatedPosition(false);
                             valueChanged = true;
                         }
                         if (!isLastDot)
@@ -4624,7 +4574,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                     else {
                         if (!this.toInputValue.eq(value)) {
                             this.toInputValue = value;
-                            this.onUpdateEstimatedPosition(true, true);
+                            this.updateEstimatedPosition(true);
                             valueChanged = true;
                         }
                         if (!isLastDot)
@@ -5124,7 +5074,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                 return;
             const isApproveButtonShown = this.isCrossChain ? this.crossChainApprovalStatus !== index_10.ApprovalStatus.NONE : this.isApproveButtonShown;
             if (isApproveButtonShown) {
-                this.onApproveRouterMax();
+                this.approveRouterMax();
                 return;
             }
             if (this.isPriceImpactTooHigh) {
@@ -5133,7 +5083,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
             }
             this.handleSwapPopup();
         }
-        onRenderPriceInfo() {
+        renderPriceInfo() {
             if (!this.priceInfo) {
                 this.priceInfo = this.$render("i-scom-swap-price-info", null);
                 this.priceInfo.width = 'auto';
@@ -5159,7 +5109,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
         }
         get isCrossChainEnabled() {
             let chainId = this.state.getChainId();
-            if (!this.supportedChainList.some((v) => v.chainId == chainId) || !this.isCrossChainSwap) {
+            if (!this.bridgeSupportedChainList.some((v) => v.chainId == chainId) || !this.isCrossChainSwap) {
                 return false;
             }
             return true;
@@ -5174,20 +5124,6 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
             }
             (_c = this.minSwapHintLabel) === null || _c === void 0 ? void 0 : _c.classList.add('hidden');
             return false;
-        }
-        ;
-        get fromTokenToVaultMap() {
-            let map = {};
-            for (const vaultGroup of index_7.BridgeVaultGroupList) {
-                if (vaultGroup.deprecated)
-                    continue;
-                const vaults = vaultGroup.vaults;
-                if (!vaults[this.chainId] || Object.keys(vaults).length < 2)
-                    continue;
-                const currentChainTokenAddress = vaults[this.chainId].tokenAddress.toLowerCase();
-                map[currentChainTokenAddress] = vaults;
-            }
-            return map;
         }
         ;
         get isMetaMask() {
@@ -5315,7 +5251,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                                                         this.$render("i-label", { caption: "You Swap", font: { size: '1.125rem' } })),
                                                     this.$render("i-hstack", { gap: 5, horizontalAlignment: "space-between", verticalAlignment: "center", width: "100%" },
                                                         this.$render("i-label", { id: "payBalance", class: "text--grey ml-auto", caption: "Balance: 0" }),
-                                                        this.$render("i-button", { id: "maxButton", class: "btn-max", caption: "Max", enabled: false, onClick: () => this.onSetMaxBalance() }))),
+                                                        this.$render("i-button", { id: "maxButton", class: "btn-max", caption: "Max", enabled: false, onClick: this.onSetMaxBalance }))),
                                                 this.$render("i-panel", { id: "payCol", class: "bg-box", width: "100%", margin: { top: 'auto' } },
                                                     this.$render("i-scom-token-input", { id: "firstTokenInput", placeholder: '0.0', value: '-', tokenReadOnly: false, isBalanceShown: false, isBtnMaxShown: false, isCommonShown: true, inputReadOnly: true, background: { color: Theme.input.background }, border: { radius: '1rem' }, 
                                                         // height={56}
