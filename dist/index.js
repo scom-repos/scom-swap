@@ -818,12 +818,6 @@ define("@scom/scom-swap/store/cross-chain.ts", ["require", "exports"], function 
             "name": "USDT",
             "vaultType": VaultType.Exchange,
             "vaults": {
-                // "42": {
-                //   "tokenAddress": "0xDcdAFd9461c2df544F6E2165481E8174e45fEbD8",
-                //   "vaultRegistryAddress": "0x9580C567daC0EC4D05bB64a078e6fCCDc2103B64",
-                //   "vaultAddress": "0x07578ec965a54bfBdAA83db7261F442d315eC6c2",
-                //   "softCap": 100000,
-                // },
                 "56": {
                     "tokenAddress": "0x55d398326f99059fF775485246999027B3197955",
                     "vaultRegistryAddress": "0x1026deABF37C452F8aF8672cC9B9181fab709154",
@@ -849,25 +843,13 @@ define("@scom/scom-swap/store/cross-chain.ts", ["require", "exports"], function 
                     "vaultAddress": "0x55570d7EcAeFF86a6425815def25447A8b14A222",
                     "vaultDecimals": 18,
                     "softCap": 100000,
-                },
-                "80001": {
-                    "tokenAddress": "0xF6Bf7c1213fdCe4AA92e7c91865cD586891B9cF6",
-                    "vaultRegistryAddress": "0x8E5fcD46C6Dc74180C89572bAd8822cC0Eff3622",
-                    "vaultAddress": "0x90Dd6EF27dBB77CD55Da6818414F3A3185f6a7f6",
-                    "softCap": 100000,
-                },
+                }
             }
         },
         {
             "name": "OSWAP",
             "vaultType": VaultType.Project,
             "vaults": {
-                // "42": {
-                //   "tokenAddress": "0x28A6a9079fA8e041179cD13F4652af2B315b6fd8",
-                //   "vaultRegistryAddress": "0x911567173f33377784a934DC071a999F1dA4bd0C",
-                //   "vaultAddress": "0x13c682d5F11927c24022a743B0510A7C23649667",
-                //   "softCap": 100000,
-                // },
                 "56": {
                     "tokenAddress": "0xb32aC3C79A94aC1eb258f3C830bBDbc676483c93",
                     "vaultRegistryAddress": "0xd8f7a9E2cE096670A27238487a62e1e000334F81",
@@ -894,13 +876,7 @@ define("@scom/scom-swap/store/cross-chain.ts", ["require", "exports"], function 
                     "vaultAddress": "0x8Af3e8596acE65D9c1EDE6d5356a34eAb46a46f5",
                     "vaultDecimals": 18,
                     "softCap": 30000,
-                },
-                "80001": {
-                    "tokenAddress": "0xA9d603421e2777b8BEa685272611A01fF3bc6523",
-                    "vaultRegistryAddress": "0x4c0f2C0acb7a5728a75EE35820Ed14e98F24e8b9",
-                    "vaultAddress": "0x2ED4CE8f09F606ea253bF57c45e83d8BD45Ce572",
-                    "softCap": 100000,
-                },
+                }
             }
         },
         {
@@ -941,9 +917,6 @@ define("@scom/scom-swap/store/cross-chain.ts", ["require", "exports"], function 
         },
         43114: {
             wrapperAddress: '0xcD050070b53924E1965418d7D940fa2ABB4302f3',
-        },
-        80001: {
-            wrapperAddress: '0x788a9036b682AdB247A30Ec3628DE11735B67718'
         }
     };
     exports.CrossChainAddressMap = CrossChainAddressMap;
@@ -966,19 +939,14 @@ define("@scom/scom-swap/store/cross-chain.ts", ["require", "exports"], function 
         43114: {
             '0xb32aC3C79A94aC1eb258f3C830bBDbc676483c93': '0xd9df1285e2effbaaa580513b256bd21c041973f7',
             '0xc7198437980c041c805A1EDcbA50c1Ce5db95118': '0x6979c00cc49e0b5e77a920b25a0e16445b0f665a', // USDT
-        },
-        // 80001: {
-        //   '0xA9d603421e2777b8BEa685272611A01fF3bc6523': '0x7d564Ca1A9fb5a6D2275e62A97333AdaA5d2Cbe6', //OSWAP
-        //   '0xf6bf7c1213fdce4aa92e7c91865cd586891b9cf6': '0xc2817961e17E24853856cC355E902C5D1B8f07E9', //USDT
-        // }
+        }
     };
     exports.MockOracleMap = MockOracleMap;
     const crossChainSupportedChainIds = [
         { chainId: 56 },
         { chainId: 97, isTestnet: true },
         { chainId: 43113, isTestnet: true },
-        { chainId: 43114 },
-        { chainId: 80001, isTestnet: true },
+        { chainId: 43114 }
     ];
     exports.crossChainSupportedChainIds = crossChainSupportedChainIds;
     const getBridgeVaultVersion = (chainId) => {
@@ -1030,7 +998,7 @@ define("@scom/scom-swap/crosschain-utils/crosschain-utils.types.ts", ["require",
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
 });
-define("@scom/scom-swap/crosschain-utils/API.ts", ["require", "exports", "@scom/scom-swap/global/index.ts", "@scom/scom-swap/store/index.ts", "@ijstech/eth-wallet", "@scom/oswap-openswap-contract", "@scom/oswap-cross-chain-bridge-contract", "@scom/oswap-chainlink-contract", "@scom/scom-token-list", "@ijstech/eth-contract"], function (require, exports, index_2, index_3, eth_wallet_3, oswap_openswap_contract_1, oswap_cross_chain_bridge_contract_1, oswap_chainlink_contract_1, scom_token_list_4, eth_contract_1) {
+define("@scom/scom-swap/crosschain-utils/API.ts", ["require", "exports", "@scom/scom-swap/global/index.ts", "@scom/scom-swap/store/index.ts", "@ijstech/eth-wallet", "@scom/oswap-cross-chain-bridge-contract", "@scom/oswap-chainlink-contract", "@scom/scom-token-list", "@ijstech/eth-contract"], function (require, exports, index_2, index_3, eth_wallet_3, oswap_cross_chain_bridge_contract_1, oswap_chainlink_contract_1, scom_token_list_4, eth_contract_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.getOraclePriceMap = exports.getVaultAssetBalance = exports.getBondsInBridgeVault = exports.getBridgeVault = exports.getAvailableRouteOptions = exports.createBridgeVaultOrder = exports.getTargetChainTokenInfoObj = exports.getTargetChainTokenMap = exports.getTokenByVaultAddress = void 0;
@@ -1065,10 +1033,7 @@ define("@scom/scom-swap/crosschain-utils/API.ts", ["require", "exports", "@scom/
     };
     exports.getTargetChainTokenMap = getTargetChainTokenMap;
     const initCrossChainWallet = (chainId) => {
-        const wallet = eth_wallet_3.Wallet.getClientInstance();
-        const networkInfo = (0, index_3.getNetworkInfo)(chainId);
-        let rpcEndpoint = networkInfo.rpcUrls[0];
-        let crossChainWallet = new eth_wallet_3.Wallet(rpcEndpoint, { address: wallet.address });
+        let crossChainWallet = eth_wallet_3.RpcWallet.getRpcWallet(chainId);
         return crossChainWallet;
     };
     const getTargetChainTokenInfoObj = async (chainId) => {
@@ -1282,17 +1247,6 @@ define("@scom/scom-swap/crosschain-utils/API.ts", ["require", "exports", "@scom/
         };
         return extendedRouteObj;
     };
-    const checkIsApproveButtonShown = async (state, tokenIn, fromInput, address) => {
-        if (!state.isRpcWalletConnected())
-            return false;
-        const wallet = eth_wallet_3.Wallet.getClientInstance();
-        let erc20 = new oswap_openswap_contract_1.Contracts.OSWAP_ERC20(wallet, tokenIn.address);
-        let allowance = await erc20.allowance({
-            param1: wallet.address,
-            param2: address
-        });
-        return fromInput.gt(allowance);
-    };
     const getAvailableRouteOptions = async (state, params, getTradeFeeMap, getExtendedRouteObjData) => {
         var _a, _b;
         let { fromChainId, toChainId, tokenIn, tokenOut, amountIn } = params;
@@ -1407,8 +1361,6 @@ define("@scom/scom-swap/crosschain-utils/API.ts", ["require", "exports", "@scom/
         // Only direct token swap is enabled
         bestRouteObjArr = bestRouteObjArr.filter(v => !v.sourceRouteObj && v.targetRouteObj.pairs.length === 0);
         bestRouteObjArr = bestRouteObjArr.sort((a, b) => a.toAmount.lt(b.toAmount) ? 1 : -1);
-        if (bestRouteObjArr[0] && !isTokenInNative)
-            bestRouteObjArr[0].isApproveButtonShown = await checkIsApproveButtonShown(state, tokenIn, new eth_wallet_3.BigNumber(amountIn), bestRouteObjArr[0].contractAddress);
         return bestRouteObjArr;
     };
     exports.getAvailableRouteOptions = getAvailableRouteOptions;
@@ -1456,7 +1408,7 @@ define("@scom/scom-swap/crosschain-utils/index.ts", ["require", "exports", "@sco
     Object.defineProperty(exports, "getVaultAssetBalance", { enumerable: true, get: function () { return API_1.getVaultAssetBalance; } });
     Object.defineProperty(exports, "getOraclePriceMap", { enumerable: true, get: function () { return API_1.getOraclePriceMap; } });
 });
-define("@scom/scom-swap/swap-utils/index.ts", ["require", "exports", "@ijstech/eth-wallet", "@scom/oswap-openswap-contract", "@scom/scom-commission-proxy-contract", "@scom/scom-dex-list", "@scom/scom-swap/global/index.ts", "@scom/scom-swap/store/index.ts", "@scom/scom-token-list", "@scom/scom-swap/crosschain-utils/index.ts"], function (require, exports, eth_wallet_4, oswap_openswap_contract_2, scom_commission_proxy_contract_1, scom_dex_list_1, index_4, index_5, scom_token_list_5, index_6) {
+define("@scom/scom-swap/swap-utils/index.ts", ["require", "exports", "@ijstech/eth-wallet", "@scom/oswap-openswap-contract", "@scom/scom-commission-proxy-contract", "@scom/scom-dex-list", "@scom/scom-swap/global/index.ts", "@scom/scom-swap/store/index.ts", "@scom/scom-token-list", "@scom/scom-swap/crosschain-utils/index.ts"], function (require, exports, eth_wallet_4, oswap_openswap_contract_1, scom_commission_proxy_contract_1, scom_dex_list_1, index_4, index_5, scom_token_list_5, index_6) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.createBridgeVaultOrder = exports.getCrossChainRouteOptions = exports.getCommissionRate = exports.getProviderProxySelectors = exports.setApprovalModalSpenderAddress = exports.getRouterAddress = exports.getChainNativeToken = exports.executeSwap = exports.getPair = exports.getAllRoutesData = exports.getTradeFeeMap = exports.getExtendedRouteObjData = void 0;
@@ -1647,7 +1599,7 @@ define("@scom/scom-swap/swap-utils/index.ts", ["require", "exports", "@ijstech/e
             tokenA = getWETH(chainId);
         if (!tokenB.address)
             tokenB = getWETH(chainId);
-        let factory = new oswap_openswap_contract_2.Contracts.OSWAP_Factory(wallet, getFactoryAddress(state, market));
+        let factory = new oswap_openswap_contract_1.Contracts.OSWAP_Factory(wallet, getFactoryAddress(state, market));
         let pair = await factory.getPair({
             param1: tokenA.address,
             param2: tokenB.address
@@ -4736,7 +4688,6 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
             this.swapButtonStatusMap = {};
             this.approveButtonStatusMap = {};
             this.initRoutes();
-            const pricePercent = this.getPricePercent(listRouting, false);
             if (listRouting.length) {
                 // this.receiveCol.classList.add('bg-box--active');
                 this.lbRouting.classList.add('visibility-hidden');
@@ -4770,28 +4721,6 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                 this.swapBtn.visible = true;
                 this.swapBtn.enabled = !this.isSwapButtonDisabled();
             }
-        }
-        getPricePercent(routes, isFrom) {
-            if (routes && routes.length > 1) {
-                const amountStr = isFrom ? 'amountIn' : 'amountOut';
-                const firstAmount = new eth_wallet_5.BigNumber(routes[0][amountStr] || 0);
-                const secondAmount = new eth_wallet_5.BigNumber(routes[1][amountStr] || 0);
-                if (firstAmount.eq(0) || secondAmount.eq(0)) {
-                    return 0;
-                }
-                let percent = new eth_wallet_5.BigNumber(0);
-                if (isFrom) {
-                    percent = secondAmount.minus(firstAmount).dividedBy(firstAmount);
-                }
-                else {
-                    percent = firstAmount.minus(secondAmount).dividedBy(secondAmount);
-                }
-                percent = percent.multipliedBy(100);
-                if (percent.gte(0.01)) {
-                    return `Save ${(0, index_10.formatNumber)(percent.toNumber(), 2)}%`;
-                }
-            }
-            return 0;
         }
         // Price Info
         onTogglePrice(priceInfo) {

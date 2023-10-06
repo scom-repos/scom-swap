@@ -13,8 +13,7 @@ import {
   getWETH,
   getChainNativeToken
 } from "../store/index";
-import { Wallet, BigNumber, Erc20, Utils, TransactionReceipt, Contracts } from "@ijstech/eth-wallet";
-import { Contracts as OpenSwapContracts } from "@scom/oswap-openswap-contract";
+import { Wallet, BigNumber, Erc20, Utils, TransactionReceipt, Contracts, RpcWallet } from "@ijstech/eth-wallet";
 import { Contracts as CrossChainContracts } from "@scom/oswap-cross-chain-bridge-contract";
 import { Contracts as SolidityContracts } from "@scom/oswap-chainlink-contract";
 import {
@@ -56,10 +55,7 @@ const getTargetChainTokenMap = (chainId: number) => {
 }
 
 const initCrossChainWallet = (chainId: number) => {
-  const wallet = Wallet.getClientInstance();
-  const networkInfo = getNetworkInfo(chainId);
-  let rpcEndpoint = networkInfo.rpcUrls[0]
-  let crossChainWallet = new Wallet(rpcEndpoint, { address: wallet.address })
+  let crossChainWallet = RpcWallet.getRpcWallet(chainId);
   return crossChainWallet
 }
 
@@ -289,17 +285,6 @@ const getExtendedRouteObjDataForDirectRoute = async (bestRouteObj: any, swapPric
   return extendedRouteObj
 }
 
-const checkIsApproveButtonShown = async (state: State, tokenIn: ITokenObject, fromInput: BigNumber, address: string) => {
-  if (!state.isRpcWalletConnected()) return false;
-  const wallet = Wallet.getClientInstance();
-  let erc20 = new OpenSwapContracts.OSWAP_ERC20(wallet, tokenIn.address);
-  let allowance = await erc20.allowance({
-    param1: wallet.address,
-    param2: address
-  })
-  return fromInput.gt(allowance);
-}
-
 const getAvailableRouteOptions = async (state: State, params: GetAvailableRouteOptionsParams, getTradeFeeMap: Function, getExtendedRouteObjData: Function): Promise<ICrossChainRouteResult[]> => {
   let { fromChainId, toChainId, tokenIn, tokenOut, amountIn } = params;
   // Handle native token
@@ -436,7 +421,6 @@ const getAvailableRouteOptions = async (state: State, params: GetAvailableRouteO
   // Only direct token swap is enabled
   bestRouteObjArr = bestRouteObjArr.filter(v => !v.sourceRouteObj && v.targetRouteObj.pairs.length === 0)
   bestRouteObjArr = bestRouteObjArr.sort((a, b) => a.toAmount.lt(b.toAmount) ? 1 : -1)
-  if (bestRouteObjArr[0] && !isTokenInNative) bestRouteObjArr[0].isApproveButtonShown = await checkIsApproveButtonShown(state, tokenIn, new BigNumber(amountIn), bestRouteObjArr[0].contractAddress);
   return bestRouteObjArr;
 }
 

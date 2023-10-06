@@ -26,12 +26,6 @@ const BridgeVaultGroupList: BridgeVaultGroup[] = [
     "name": "USDT",
     "vaultType": VaultType.Exchange,
     "vaults": {
-      // "42": {
-      //   "tokenAddress": "0xDcdAFd9461c2df544F6E2165481E8174e45fEbD8",
-      //   "vaultRegistryAddress": "0x9580C567daC0EC4D05bB64a078e6fCCDc2103B64",
-      //   "vaultAddress": "0x07578ec965a54bfBdAA83db7261F442d315eC6c2",
-      //   "softCap": 100000,
-      // },
       "56": {
         "tokenAddress": "0x55d398326f99059fF775485246999027B3197955",
         "vaultRegistryAddress": "0x1026deABF37C452F8aF8672cC9B9181fab709154",
@@ -57,25 +51,13 @@ const BridgeVaultGroupList: BridgeVaultGroup[] = [
         "vaultAddress": "0x55570d7EcAeFF86a6425815def25447A8b14A222",
         "vaultDecimals": 18,
         "softCap": 100000,
-      },
-      "80001": { //v5
-        "tokenAddress": "0xF6Bf7c1213fdCe4AA92e7c91865cD586891B9cF6",
-        "vaultRegistryAddress": "0x8E5fcD46C6Dc74180C89572bAd8822cC0Eff3622",
-        "vaultAddress": "0x90Dd6EF27dBB77CD55Da6818414F3A3185f6a7f6",
-        "softCap": 100000,
-      },
+      }
     }
   },
   {
     "name": "OSWAP",
     "vaultType": VaultType.Project,
     "vaults": {
-      // "42": {
-      //   "tokenAddress": "0x28A6a9079fA8e041179cD13F4652af2B315b6fd8",
-      //   "vaultRegistryAddress": "0x911567173f33377784a934DC071a999F1dA4bd0C",
-      //   "vaultAddress": "0x13c682d5F11927c24022a743B0510A7C23649667",
-      //   "softCap": 100000,
-      // },
       "56": {
         "tokenAddress": "0xb32aC3C79A94aC1eb258f3C830bBDbc676483c93",
         "vaultRegistryAddress": "0xd8f7a9E2cE096670A27238487a62e1e000334F81",
@@ -102,13 +84,7 @@ const BridgeVaultGroupList: BridgeVaultGroup[] = [
         "vaultAddress": "0x8Af3e8596acE65D9c1EDE6d5356a34eAb46a46f5",
         "vaultDecimals": 18,
         "softCap": 30000,
-      },
-      "80001": {
-        "tokenAddress": "0xA9d603421e2777b8BEa685272611A01fF3bc6523",
-        "vaultRegistryAddress": "0x4c0f2C0acb7a5728a75EE35820Ed14e98F24e8b9",
-        "vaultAddress": "0x2ED4CE8f09F606ea253bF57c45e83d8BD45Ce572",
-        "softCap": 100000,
-      },
+      }
     }
   },
   {
@@ -149,9 +125,6 @@ const CrossChainAddressMap: { [chainId: number]: { wrapperAddress: string } } = 
   },
   43114: {
     wrapperAddress: '0xcD050070b53924E1965418d7D940fa2ABB4302f3',
-  },
-  80001: {
-    wrapperAddress: '0x788a9036b682AdB247A30Ec3628DE11735B67718'
   }
 }
 
@@ -174,19 +147,14 @@ const MockOracleMap: { [chainId: number]: { [token: string]: string } } = {
   43114: {
     '0xb32aC3C79A94aC1eb258f3C830bBDbc676483c93': '0xd9df1285e2effbaaa580513b256bd21c041973f7', // OSWAP
     '0xc7198437980c041c805A1EDcbA50c1Ce5db95118': '0x6979c00cc49e0b5e77a920b25a0e16445b0f665a', // USDT
-  },
-  // 80001: {
-  //   '0xA9d603421e2777b8BEa685272611A01fF3bc6523': '0x7d564Ca1A9fb5a6D2275e62A97333AdaA5d2Cbe6', //OSWAP
-  //   '0xf6bf7c1213fdce4aa92e7c91865cd586891b9cf6': '0xc2817961e17E24853856cC355E902C5D1B8f07E9', //USDT
-  // }
+  }
 }
 
 const crossChainSupportedChainIds = [
   { chainId: 56 },
   { chainId: 97, isTestnet: true },
   { chainId: 43113, isTestnet: true },
-  { chainId: 43114 },
-  { chainId: 80001, isTestnet: true },
+  { chainId: 43114 }
 ];
 
 

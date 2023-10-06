@@ -1117,7 +1117,6 @@ declare module "@scom/scom-swap" {
         private resetValuesByInput;
         private initRoutes;
         private handleAddRoute;
-        private getPricePercent;
         private onTogglePrice;
         private getRate;
         private getPriceImpact;
