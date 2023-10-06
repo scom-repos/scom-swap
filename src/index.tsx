@@ -1364,7 +1364,8 @@ export default class ScomSwap extends Module {
       }, new BigNumber(0));
       const vaultTokenToTargetChain: BigNumber = new BigNumber(listRouting[0].vaultTokenToTargetChain);
       const vaultToUsdPrice = oraclePriceMap[vaultTokenAddress.toLowerCase()]; // This will be the vaultToken -> USD Price
-      const oswapToUsdPrice = oraclePriceMap[bridgeVaultConstantMap['OSWAP'][this.desChain!.chainId].tokenAddress.toLowerCase()];
+      const oswapToken = Object.values(tokenStore.getTokenMapByChainId(this.desChain!.chainId)).find(v => v.symbol === 'OSWAP')
+      const oswapToUsdPrice = oraclePriceMap[oswapToken.address.toLowerCase()];
       const vaultToOswapPrice = vaultToUsdPrice.div(oswapToUsdPrice); // This will vaultToken -> oswap price;
       this.targetVaultAssetBalanceLabel1.caption = `Vault Asset Balance: ${formatNumber(targetVaultAssetBalance.toNumber(), 4)} ${assetSymbol}`;
       this.targetVaultAssetBalanceLabel2.caption = `Vault Asset Balance: ${formatNumber(targetVaultAssetBalance.toNumber(), 4)} ${assetSymbol}`;

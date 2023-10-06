@@ -310,7 +310,7 @@ const getAvailableRouteOptions = async (state: State, params: GetAvailableRouteO
     tokenIn: tokenIn.address,
     tokenOut: tokenOut.address,
     amountIn: Utils.toDecimals(amountIn, tokenIn.decimals),
-    // version: getBridgeVaultVersion(state.getChainId())
+    version: getBridgeVaultVersion(state.getChainId())
   })
   
   if (!routeAPIResult) return [];
@@ -363,10 +363,10 @@ const getAvailableRouteOptions = async (state: State, params: GetAvailableRouteO
   for (let i = 0; i < routes.length; i++) {
     let routeObj: ICrossChainRouteFromAPI = routes[i];
     let sourceVaultToken = getTokenByVaultAddress(fromChainId, routeObj.vault);
-    let targetVaultAddresses = BridgeVaultGroupList.filter((v) => {
+    let targetVaultAddresses = BridgeVaultGroupList.find((v) => {
       if (v.deprecated) return false;
-      return v.vaults[fromChainId].vaultAddress.toLowerCase() == routeObj.vault.toLowerCase()
-    })[0]?.vaults?.[toChainId];
+      return v.vaults[fromChainId]?.vaultAddress.toLowerCase() == routeObj.vault.toLowerCase()
+    })?.vaults?.[toChainId];
 
     if (targetVaultAddresses == null) continue;
     let targetVaultTokenAddress = targetVaultAddresses.tokenAddress
