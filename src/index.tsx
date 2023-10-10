@@ -1,4 +1,4 @@
-import { Module, Panel, Button, Label, VStack, Image, Container, IEventBus, application, customModule, Modal, Input, Control, customElements, ControlElement, Styles, HStack, Icon, FormatUtils } from '@ijstech/components';
+import { Module, Panel, Button, Label, VStack, Image, Container, IEventBus, application, customModule, Modal, Input, Control, customElements, ControlElement, Styles, HStack, Icon, FormatUtils, GridLayout } from '@ijstech/components';
 import { BigNumber, Constants, INetwork, Wallet, IERC20ApprovalAction, TransactionReceipt, Utils } from '@ijstech/eth-wallet';
 import './index.css';
 import {
@@ -58,7 +58,6 @@ import ScomCommissionFeeSetup from '@scom/scom-commission-fee-setup';
 import ScomTokenInput from '@scom/scom-token-input';
 import ScomTxStatusModal from '@scom/scom-tx-status-modal';
 import { swapStyle } from './index.css';
-import assets from './assets';
 
 export { ISwapWidgetData };
 
@@ -115,9 +114,8 @@ export default class ScomSwap extends Module {
   private imgLogo: Image;
   private lbTitle: Label;
   private swapComponent: Panel;
-  private swapContainer: Container;
   private pnlPriceInfo: Panel;
-  private wrapperSwap: HStack;
+  private wrapperSwap: GridLayout;
   private isInited: boolean = false;
 
   private payBalance: Label;
@@ -164,7 +162,9 @@ export default class ScomSwap extends Module {
   private lbPayOrReceive: Label;
   private approvalModelAction: IERC20ApprovalAction;
 
-  private toggleReverseImage: Icon;
+  private toggleReverseImage: HStack;
+  private hIcon: Icon;
+  private vIcon: Icon;
   private bridgeSupportedChainList: INetworkConfig[] = [];
   private swapModalConfirmBtn: Button;
   private modalFees: Modal;
@@ -846,7 +846,7 @@ export default class ScomSwap extends Module {
         this.toInputValue = new BigNumber(this._data.defaultOutputValue);
         this.firstTokenInput.token = this.fromToken;
         this.secondTokenInput.token = this.toToken;
-        this.toggleReverseImage.classList.add('cursor-default');
+        this.toggleReverseImage.cursor = 'default';
       }
     }
   }
@@ -869,7 +869,7 @@ export default class ScomSwap extends Module {
       await this.updateBalances();
       this.updateTokenValues(this.fromToken, true);
       this.updateTokenValues(this.toToken, false);
-      this.toggleReverseImage.enabled = !this.isFixedPair && !this.isCrossChain;
+      this.hIcon.enabled = this.vIcon.enabled = !this.isFixedPair && !this.isCrossChain;
       this.firstTokenInput.tokenReadOnly = this.isFixedPair;
       this.firstTokenInput.inputReadOnly = false;
       this.secondTokenInput.tokenReadOnly = this.isFixedPair;
@@ -885,9 +885,7 @@ export default class ScomSwap extends Module {
 
       this.updateSwapButtonCaption();
 
-      if (!this.isFixedPair) {
-        this.toggleReverseImage.classList.remove('cursor-default');
-      }
+      this.toggleReverseImage.cursor = this.isFixedPair ? 'default' : 'pointer';
       if (this.isCrossChain) {
         this.initRoutes();
         this.toInputValue = new BigNumber(0);
@@ -895,7 +893,7 @@ export default class ScomSwap extends Module {
           this.secondTokenInput.value = '-';
           this.secondTokenInput.inputReadOnly = true;
         }
-        this.toggleReverseImage.classList.add('cursor-default');
+        this.toggleReverseImage.cursor = 'default';
         if (this.isEstimated('from')) {
           this.updateEstimatedPosition(false);
         }
@@ -903,7 +901,7 @@ export default class ScomSwap extends Module {
         if (this.secondTokenInput) {
           this.secondTokenInput.inputReadOnly = false;
         }
-        this.toggleReverseImage.classList.remove('cursor-default');
+        this.toggleReverseImage.cursor = 'pointer';
       }
       if (this.fromInputValue.isGreaterThan(0)) {
         this.updateEstimatedPosition(false);
@@ -1015,55 +1013,57 @@ export default class ScomSwap extends Module {
   private setupCrossChainPopup() {
     const arrows = this.swapModal.querySelectorAll('i-icon.arrow-down');
     if (!this.isCrossChain) {
-      arrows.forEach((arrow: Element) => {
-        arrow.classList.remove('arrow-down--chain');
+      arrows.forEach((arrow: Icon) => {
+        arrow.margin = {top: '0.75rem', bottom: '0.75rem'};
       });
     } else {
-      arrows.forEach((arrow: Element) => {
-        arrow.classList.add('arrow-down--chain');
+      arrows.forEach((arrow: Icon) => {
+        arrow.margin = {top: '0.75rem', left: '6rem', bottom: '0.75rem', right: '6rem'};
       });
     }
-    this.lbReminderRejected?.classList.add('hidden');
+    if (this.lbReminderRejected) this.lbReminderRejected.visible = false;
     if (this.isCrossChain && this.srcChain && this.desChain) {
-      this.srcChainFirstPanel.classList.remove('hidden');
-      this.targetChainFirstPanel.classList.remove('hidden');
+      this.srcChainFirstPanel.visible = true;
+      this.targetChainFirstPanel.visible = true;
       this.srcChainTokenImage.url = this.srcChain.image;
       this.srcChainTokenLabel.caption = this.srcChain.chainName;
       this.targetChainTokenImage.url = this.desChain.image;
       this.targetChainTokenLabel.caption = this.desChain.chainName;
       const { sourceVaultToken, targetVaultToken, sourceRouteObj, vaultTokenFromSourceChain, vaultTokenToTargetChain } = this.record;
       if (sourceVaultToken && sourceRouteObj) {
-        this.srcChainSecondPanel.classList.remove('hidden');
+        this.srcChainSecondPanel.visible = true;
         this.srcChainVaultImage.url = this.srcChain.image;
         this.srcChainVaultLabel.caption = this.srcChain.chainName;
         this.srcVaultTokenImage.url = tokenAssets.getTokenIconPath(sourceVaultToken, this.srcChain.chainId);
         this.srcVaultTokenLabel.caption = sourceVaultToken.symbol;
         this.srcVaultTokenValue.caption = formatNumber(vaultTokenFromSourceChain);
-        this.lbReminderRejected?.classList.remove('hidden');
-        this.lbReminderRejected.caption = `If the order is not executed in the target chain, the estimated withdrawalble amount is <b class="text-pink">${formatNumber(vaultTokenFromSourceChain)} ${sourceVaultToken?.symbol}</b>`;
+        if (this.lbReminderRejected) {
+          this.lbReminderRejected.visible = true;
+          this.lbReminderRejected.caption = `If the order is not executed in the target chain, the estimated withdrawalble amount is <b class="text-pink">${formatNumber(vaultTokenFromSourceChain)} ${sourceVaultToken?.symbol}</b>`;
+        }
       } else {
-        this.srcChainSecondPanel.classList.add('hidden');
+        this.srcChainSecondPanel.visible = false;
       }
       if (targetVaultToken && targetVaultToken.symbol !== this.toToken?.symbol) {
-        this.targetChainSecondPanel.classList.remove('hidden');
+        this.targetChainSecondPanel.visible = true;
         this.targetChainVaultImage.url = this.desChain.image;
         this.targetChainVaultLabel.caption = this.desChain.chainName;
         this.targetVaultTokenImage.url = tokenAssets.getTokenIconPath(targetVaultToken, this.desChain.chainId);
         this.targetVaultTokenLabel.caption = targetVaultToken.symbol;
         this.targetVaultTokenValue.caption = formatNumber(vaultTokenToTargetChain);
         // Hide vault info at toToken
-        this.crossChainVaultInfoVstack.classList.add('hidden');
+        this.crossChainVaultInfoVstack.visible = false;
       } else {
-        this.targetChainSecondPanel.classList.add('hidden');
+        this.targetChainSecondPanel.visible = false;
         // Show vault info at the end if vaultTokenSymbol same as toToken
-        this.crossChainVaultInfoVstack.classList.remove('hidden');
+        this.crossChainVaultInfoVstack.visible = true;
       }
     } else {
-      this.srcChainFirstPanel.classList.add('hidden');
-      this.targetChainFirstPanel.classList.add('hidden');
-      this.srcChainSecondPanel.classList.add('hidden');
-      this.targetChainSecondPanel.classList.add('hidden');
-      this.crossChainVaultInfoVstack.classList.add('hidden');
+      this.srcChainFirstPanel.visible = false;
+      this.targetChainFirstPanel.visible = false;
+      this.srcChainSecondPanel.visible = false;
+      this.targetChainSecondPanel.visible = false;
+      this.crossChainVaultInfoVstack.visible = false;
     }
   }
 
@@ -1090,6 +1090,9 @@ export default class ScomSwap extends Module {
     this.priceInfo2.setData(this.getPriceInfo());
 
     this.swapModal.visible = true;
+  }
+  private onCloseModal(name: string) {
+    this[name].visible = false;
   }
   private doSwap() {
     this.approvalModelAction.doPayAction(this.record);
@@ -1339,10 +1342,8 @@ export default class ScomSwap extends Module {
         }
         return { ...route, fromAmount: new BigNumber(route.fromAmount) };
       });
-      if (listRouting.length) {
-        this.minSwapHintLabel?.classList.add('hidden');
-      } else {
-        this.minSwapHintLabel?.classList.remove('hidden');
+      if (this.minSwapHintLabel) {
+        this.minSwapHintLabel.visible = !listRouting.length;
       }
     }
     if (listRouting[0] && this.isCrossChain) {
@@ -1426,12 +1427,12 @@ export default class ScomSwap extends Module {
     this.initRoutes();
     if (listRouting.length) {
       // this.receiveCol.classList.add('bg-box--active');
-      this.lbRouting.classList.add('visibility-hidden');
+      this.lbRouting.opacity = 0;
       const option = listRouting[0];
       await this.onSelectRouteItem(option);
     } else {
       // this.receiveCol.classList.remove('bg-box--active');
-      this.lbRouting.classList.remove('visibility-hidden');
+      this.lbRouting.opacity = 0.75;
       if (this.priceInfo)
         this.priceInfo.setData(this.getPriceInfo());
       if (this.isEstimated('to')) {
@@ -1842,19 +1843,16 @@ export default class ScomSwap extends Module {
   }
 
   private renderPriceInfo() {
+    const padding = {top: '1rem', bottom: '1rem', left: '1rem', right: '1rem'};
     if (!this.priceInfo) {
-      this.priceInfo = <i-scom-swap-price-info></i-scom-swap-price-info>
-      this.priceInfo.width = 'auto';
-      this.priceInfo.height = 'auto';
+      this.priceInfo = <i-scom-swap-price-info display="block" width={'auto'} height={'auto'}></i-scom-swap-price-info>
       this.pnlPriceInfo.appendChild(this.priceInfo);
       this.priceInfo.onTogglePrice = this.onTogglePrice.bind(this);
     }
     this.priceInfo.setData(this.getPriceInfo());
 
     if (!this.priceInfo2) {
-      this.priceInfo2 = <i-scom-swap-price-info></i-scom-swap-price-info>
-      this.priceInfo2.width = 'auto';
-      this.priceInfo2.height = 'auto';
+      this.priceInfo2 = <i-scom-swap-price-info padding={{...padding}} display="block" width={'auto'} height={'auto'}></i-scom-swap-price-info>
       this.priceInfo2.onTogglePrice = this.onTogglePrice.bind(this);
     }
     this.priceInfoContainer.appendChild(this.priceInfo2);
@@ -1883,7 +1881,7 @@ export default class ScomSwap extends Module {
     if (this.isCrossChainEnabled && crossChainSupportedChainIds.some(v => v.chainId === srcChainId) && srcChainId != desChainId) {
       return true;
     }
-    this.minSwapHintLabel?.classList.add('hidden');
+    if (this.minSwapHintLabel) this.minSwapHintLabel.visible = false;
     return false;
   };
 
@@ -1898,41 +1896,36 @@ export default class ScomSwap extends Module {
       const img = elm as Image;
       img.enabled = !disabled;
       if (disabled) {
-        img.classList.add('.cursor-default');
+        img.cursor = 'default';
       } else {
-        img.classList.remove('.cursor-default');
+        img.cursor = 'pointer';
       }
     });
   }
   private selectSourceChain = async (obj: INetwork, img?: Image) => {
     if (!this.isCrossChainEnabled) return;
     this.disableSelectChain(true, false);
-    const selected = this.srcChainList.querySelector('.icon-selected');
-    if (selected) {
-      selected.classList.remove('icon-selected');
-    }
+    const selected = this.srcChainList.querySelector('.icon-selected') as Control;
+    selected && this.updateChainIcon(selected, false);
     const oldDestination = this.srcChain;
     try {
       this.srcChain = obj;
       if (img) {
-        img.classList.add('icon-selected');
+        this.updateChainIcon(img, true);
       } else {
         const currentNetwork = getNetworkInfo(this.bridgeSupportedChainList.find((f: INetwork) => f.chainId == obj.chainId)?.chainId);
-        const img = this.srcChainList.querySelector(`[data-tooltip="${currentNetwork?.chainName}"]`);
-        if (img) {
-          img.classList.add('icon-selected');
-        }
+        const img = this.srcChainList.querySelector(`[data-tooltip="${currentNetwork?.chainName}"]`) as Control;
+        if (img) this.updateChainIcon(img, true);
       }
     } catch (err) {
       console.log('err', err)
       if (oldDestination) {
         this.srcChain = oldDestination;
-        if (selected) {
-          selected.classList.add('icon-selected');
-        }
+        if (selected) this.updateChainIcon(selected, true);
       } else {
         this.srcChain = getNetworkInfo(this.bridgeSupportedChainList[0]?.chainId);
-        this.srcChainList.firstElementChild?.classList.add('icon-selected');
+        const elm = this.srcChainList?.firstElementChild as Control;
+        elm && this.updateChainIcon(elm, true);
       }
     }
     if (this.srcChain) {
@@ -1944,32 +1937,27 @@ export default class ScomSwap extends Module {
   private selectDestinationChain = async (obj: INetwork, img?: Image) => {
     if (!this.isCrossChainEnabled) return;
     this.disableSelectChain(true, true);
-    const selected = this.desChainList.querySelector('.icon-selected');
-    if (selected) {
-      selected.classList.remove('icon-selected');
-    }
+    const selected = this.desChainList.querySelector('.icon-selected') as Control;
+    selected && this.updateChainIcon(selected, false);
     const oldDestination = this.desChain;
     try {
       this.desChain = obj;
       if (img) {
-        img.classList.add('icon-selected');
+        this.updateChainIcon(img, true);
       } else {
         const currentNetwork = getNetworkInfo(this.bridgeSupportedChainList.find((f: INetwork) => f.chainId == obj.chainId)?.chainId);
-        const img = this.desChainList.querySelector(`[data-tooltip="${currentNetwork?.chainName}"]`);
-        if (img) {
-          img.classList.add('icon-selected');
-        }
+        const img = this.desChainList.querySelector(`[data-tooltip="${currentNetwork?.chainName}"]`) as Control;
+        img && this.updateChainIcon(img, true);
       }
     } catch (err) {
       console.log('err', err)
       if (oldDestination) {
         this.desChain = oldDestination;
-        if (selected) {
-          selected.classList.add('icon-selected');
-        }
+        selected && this.updateChainIcon(selected, true);
       } else {
         this.desChain = getNetworkInfo(this.bridgeSupportedChainList[0]?.chainId);
-        this.desChainList.firstElementChild?.classList.add('icon-selected');
+        const elm = this.desChainList?.firstElementChild as Control;
+        elm && this.updateChainIcon(elm, true);
       }
     }
     if (this.desChain) {
@@ -1979,6 +1967,18 @@ export default class ScomSwap extends Module {
     this.secondTokenInput.tokenDataListProp = getSupportedTokens(this._tokens, this.desChain.chainId);
     this.disableSelectChain(false, true);
   };
+
+  private updateChainIcon(el: Control, selected: boolean) {
+    if (selected) {
+      el.classList.add('icon-selected');
+      el.border.color = Theme.colors.primary.main;
+      el.cursor = 'default';
+    } else {
+      el.classList.remove('icon-selected');
+      el.border.color = 'transparent';
+      el.cursor = 'pointer';
+    }
+  }
 
   private onSelectSourceChain = async (obj: INetwork, img?: Image) => {
     this.firstTokenInput.chainId = obj.chainId;
@@ -2004,9 +2004,18 @@ export default class ScomSwap extends Module {
   }
 
   private initChainIcon = (network: INetwork, isDes?: boolean) => {
-    const img = new Image();
-    img.url = network.image;
-    img.tooltip.content = network.chainName;
+    const img = new Image(undefined, {
+      width: 32,
+      height: 32,
+      margin: {top: '0.25rem', right: '0.5rem'},
+      border: {radius: '50%', width: '2px', style: 'solid', color: 'transparent'},
+      padding: {top: '0.25rem', right: '0.25rem', bottom: '0.25rem', left: '0.25rem'},
+      url: network.image,
+      tooltip: {content: network.chainName},
+      cursor: 'pointer'
+    });
+    // img.url = network.image;
+    // img.tooltip.content = network.chainName;
     img.classList.add('chain-icon');
     img.setAttribute('data-tooltip', network.chainName); // for query
     if (isDes) {
@@ -2015,7 +2024,7 @@ export default class ScomSwap extends Module {
     } else {
       if (!this.isMetaMask) {
         img.tooltip.content = `Swap supports this network ${network.chainName} (${network.chainId}), please switch network in the connected wallet.`;
-        img.classList.add('icon-disabled');
+        img.cursor = 'default';
       }
       img.setAttribute('network-name', network.chainName);
       img.setAttribute('chain-id', `${network.chainId}`);
@@ -2074,7 +2083,7 @@ export default class ScomSwap extends Module {
               data-placement="right"
             />
           </i-hstack>
-          <i-label class="ml-auto" caption={`${feeValue} ${this.fromToken?.symbol}`} />
+          <i-label margin={{left: 'auto'}} caption={`${feeValue} ${this.fromToken?.symbol}`} />
         </i-hstack>
       )
     })
@@ -2083,7 +2092,7 @@ export default class ScomSwap extends Module {
         <i-hstack verticalAlignment="center">
           <i-label caption="Total Transaction Fee" />
         </i-hstack>
-        <i-label class="ml-auto" caption={this.getTradeFeeExactAmount()} />
+        <i-label margin={{left: 'auto'}} caption={this.getTradeFeeExactAmount()} />
       </i-hstack>
     )
     this.modalFees.visible = true;
@@ -2114,11 +2123,20 @@ export default class ScomSwap extends Module {
   }
 
   private resizeLayout() {
+    if (!this.wrapperSwap) return;
     const tagWidth = Number(this.tag?.width);
     if ((this.offsetWidth !== 0 && this.offsetWidth < 550) || (window as any).innerWidth < 550 || (!isNaN(tagWidth) && tagWidth !== 0 && tagWidth < 550)) {
-      this.wrapperSwap?.classList.add('swap-flex--col');
+      this.wrapperSwap.templateColumns = ['auto'];
+      this.toggleReverseImage.alignItems = 'center';
+      this.toggleReverseImage.padding = {bottom: '1rem', top: '1rem'};
+      this.hIcon.visible = false;
+      this.vIcon.visible = true;
     } else {
-      this.wrapperSwap?.classList.remove('swap-flex--col');
+      this.wrapperSwap.templateColumns = ['1fr', '32px', '1fr'];
+      this.toggleReverseImage.alignItems = 'end';
+      this.toggleReverseImage.padding = {bottom: '40px'};
+      this.hIcon.visible = true;
+      this.vIcon.visible = false;
     }
   }
 
@@ -2149,16 +2167,6 @@ export default class ScomSwap extends Module {
     this.state.setDexInfoList(dexList);
     const lazyLoad = this.getAttribute('lazyLoad', true, false);
     if (!lazyLoad) {
-      // const defaultColors = {
-      //   fontColor: currentTheme.text.primary,
-      //   backgroundColor: currentTheme.background.main,
-      //   inputFontColor: currentTheme.input.fontColor,
-      //   inputBackgroundColor: currentTheme.input.background
-      // }
-      // this.setTag({
-      //   light: {...defaultColors},
-      //   dark: {...defaultColors}
-      // })
       const campaignId = this.getAttribute('campaignId', true);
       const category = this.getAttribute('category', true, "fixed-pair");
       const providers = this.getAttribute('providers', true, []);
@@ -2209,35 +2217,72 @@ export default class ScomSwap extends Module {
   render() {
     return (
       <i-scom-dapp-container id="dappContainer">
-        <i-panel id="swapComponent" background={{ color: Theme.background.main }}>
+        <i-panel id="swapComponent" background={{ color: Theme.background.main }} overflow={'hidden'}>
           <i-panel class={swapStyle}>
-            <i-panel id="swapContainer">
+            <i-panel
+              id="swapContainer"
+              width={720}
+              maxWidth={'100%'}
+              minHeight={340}
+              margin={{left: 'auto', right: 'auto'}}
+              padding={{top: '1rem', left: '1rem', right: '1rem', bottom: '1rem'}}
+            >
               <i-vstack id="pnlBranding" margin={{ bottom: '0.25rem' }} gap="0.5rem" horizontalAlignment="center">
                 <i-image id='imgLogo' height={100}></i-image>
                 <i-label id='lbTitle' font={{ bold: true, size: '1.5rem' }}></i-label>
               </i-vstack>
-              <i-panel class="content-swap">
-                <i-hstack id="wrapperSwap" gap={10}>
-                  <i-vstack gap={5} minWidth={230} width="calc(100% - 25px)">
+              <i-panel
+                margin={{top: '0.5rem', bottom: '1rem'}}
+                border={{radius: '1rem'}}
+              >
+                <i-grid-layout
+                  id="wrapperSwap"
+                  templateColumns={['1fr', '32px', '1fr']}
+                  gap={{column: 10}}
+                  mediaQueries={[
+                    {
+                      maxWidth: '767px',
+                      properties: {
+                        templateColumns: ['auto']
+                      }
+                    }
+                  ]}
+                >
+                  <i-vstack gap={5} minWidth={230} width="100%">
                     <i-vstack id="srcChainBox" width="100%" margin={{ top: 8, bottom: 8 }} visible={false}>
                       <i-hstack gap={8} horizontalAlignment="space-between">
                         <i-label opacity={0.8} caption="Source Chain" minWidth="7rem" />
-                        <i-label id="srcChainLabel" class="chain-text" margin={{ left: 'auto' }} caption="-" />
+                        <i-label id="srcChainLabel" textOverflow="ellipsis" margin={{ left: 'auto' }} caption="-" />
                       </i-hstack>
                       <i-hstack id="srcChainList" wrap="wrap" verticalAlignment="center" maxWidth="100%" />
                     </i-vstack>
-                    <i-panel class="token-box" minHeight={120} margin={{ top: 'auto' }}>
-                      <i-vstack class="input--token-container" gap={8}>
-                        <i-vstack class="balance-info" width="100%" gap={8}>
+                    <i-panel minHeight={120} margin={{ top: 'auto' }}>
+                      <i-vstack gap={8}>
+                        <i-vstack width="100%" gap={8}>
                           <i-vstack width="100%">
                             <i-label caption="You Swap" font={{ size: '1.125rem' }}></i-label>
                           </i-vstack>
-                          <i-hstack gap={5} horizontalAlignment="space-between" verticalAlignment="center" width="100%">
-                            <i-label id="payBalance" class="text--grey ml-auto" caption="Balance: 0"></i-label>
-                            <i-button id="maxButton" class="btn-max" caption="Max" enabled={false} onClick={this.onSetMaxBalance}></i-button>
+                          <i-hstack gap={'0.5rem'} horizontalAlignment="end" verticalAlignment="center" width="100%">
+                            <i-label id="payBalance" opacity={0.55} caption="Balance: 0"></i-label>
+                            <i-button
+                              id="maxButton" class="btn-max"
+                              caption="Max" enabled={false}
+                              font={{weight: 600, size: '1rem', color: Theme.colors.primary.contrastText}}
+                              lineHeight={1.5}
+                              border={{radius: '0.5rem'}}
+                              padding={{left: '0.5rem', right: '0.5rem'}}
+                              onClick={this.onSetMaxBalance}
+                            ></i-button>
                           </i-hstack>
                         </i-vstack>
-                        <i-panel id="payCol" class="bg-box" width="100%" margin={{ top: 'auto' }}>
+                        <i-panel
+                          id="payCol"
+                          class="bg-box"
+                          background={{ color: Theme.input.background }}
+                          width="100%"
+                          margin={{ top: 'auto' }}
+                          border={{radius: '1rem', width: '2px', style: 'solid', color: 'transparent'}}
+                        >
                           <i-scom-token-input
                             id="firstTokenInput"
                             placeholder='0.0'
@@ -2249,12 +2294,20 @@ export default class ScomSwap extends Module {
                             inputReadOnly={true}
                             background={{ color: Theme.input.background }}
                             border={{ radius: '1rem' }}
-                            // height={56}
+                            height={'auto'} width={'100%'}
                             display='flex'
                             font={{ size: '1.25rem' }}
+                            padding={{left: '0.75rem', right: '0.75rem'}}
+                            tokenButtonStyles={{
+                              background: {color: Theme.background.main},
+                              padding: {top: '0.5rem', bottom: '0.5rem', left: '0.5rem', right: '0.5rem'},
+                              border: {radius: 8},
+                              font: {size: '1rem', weight: 700, color: Theme.input.fontColor},
+                              lineHeight: 1.5,
+                              opacity: 1
+                            }}
                             onInputAmountChanged={this.onTokenInputChange}
                             onSelectToken={(token: ITokenObject) => this.onSelectToken(token, true)}
-                            class="token-input"
                           ></i-scom-token-input>
                         </i-panel>
                       </i-vstack>
@@ -2264,28 +2317,80 @@ export default class ScomSwap extends Module {
                       <i-label id="lbYouPayValue" caption="0" font={{ size: '1rem' }}></i-label>
                     </i-hstack>
                   </i-vstack>
-                  <i-hstack class="toggle-reverse" alignItems="end">
-                    <i-icon id="toggleReverseImage" position="relative" width={32} height={32} class="icon-swap rounded-icon custom-ic--swap" name="arrows-alt-v" onClick={this.onRevertSwap.bind(this)} />
+                  <i-hstack
+                    id="toggleReverseImage"
+                    alignItems="end" justifyContent="center"
+                    stack={{basis: '32px'}}
+                    padding={{bottom: 40}}
+                    onClick={this.onRevertSwap}
+                    mediaQueries={[
+                      {
+                        maxWidth: '767px',
+                        properties: {
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          padding: {bottom: '1rem', top: '1rem'}
+                        }
+                      }
+                    ]}
+                  >
+                    <i-icon
+                      id="hIcon"
+                      width={32} height={32} name="arrows-alt-h" fill={Theme.text.primary}
+                      padding={{left: '0.45rem', right: '0.45rem', top: '0.45rem', bottom: '0.45rem'}}
+                      background={{color: Theme.input.background}}
+                      border={{radius: '50%'}}
+                      mediaQueries={[
+                        {
+                          maxWidth: '767px',
+                          properties: {
+                            visible: false
+                          }
+                        }
+                      ]}
+                    />
+                    <i-icon
+                      id="vIcon"
+                      width={32} height={32} name="arrows-alt-v" fill={Theme.text.primary}
+                      padding={{left: '0.45rem', right: '0.45rem', top: '0.45rem', bottom: '0.45rem'}}
+                      background={{color: Theme.input.background}}
+                      border={{radius: '50%'}}
+                      visible={false}
+                      mediaQueries={[
+                        {
+                          maxWidth: '767px',
+                          properties: {
+                            visible: true
+                          }
+                        }
+                      ]}
+                    />
                   </i-hstack>
-                  <i-vstack gap={5} minWidth={230} width="calc(100% - 25px)">
+                  <i-vstack gap={5} minWidth={230} width="100%">
                     <i-vstack id="desChainBox" width="100%" margin={{ top: 8, bottom: 8 }} visible={false}>
                       <i-hstack gap={8} horizontalAlignment="space-between">
                         <i-label opacity={0.8} caption="Destination Chain" minWidth="7rem"/>
-                        <i-label id="desChainLabel" class="chain-text" margin={{ left: 'auto' }} caption="-" />
+                        <i-label id="desChainLabel" textOverflow="ellipsis" margin={{ left: 'auto' }} caption="-" />
                       </i-hstack>
                       <i-hstack id="desChainList" wrap="wrap" verticalAlignment="center" maxWidth="100%" />
                     </i-vstack>
-                    <i-panel class="token-box" height="100%" minHeight={120} margin={{ top: 'auto' }}>
-                      <i-vstack class="input--token-container" height="100%" gap={8}>
-                        <i-vstack class="balance-info" width="100%" gap={8}>
+                    <i-panel height="100%" minHeight={120} margin={{ top: 'auto' }}>
+                      <i-vstack height="100%" gap={8}>
+                        <i-vstack width="100%" gap={8}>
                           <i-vstack width="100%">
                             <i-label caption="You Receive" font={{ size: '1.125rem' }}></i-label>
                           </i-vstack>
-                          <i-vstack class="text-right" width="100%">
-                            <i-label id="receiveBalance" class="text--grey ml-auto" caption="Balance: 0"></i-label>
-                          </i-vstack>
+                          <i-hstack horizontalAlignment="end" width="100%">
+                            <i-label id="receiveBalance" opacity={0.55} margin={{left: 'auto'}} caption="Balance: 0"></i-label>
+                          </i-hstack>
                         </i-vstack>
-                        <i-panel id="receiveCol" class="bg-box" background={{ color: Theme.input.background }} width="100%" margin={{ top: 'auto' }}>
+                        <i-panel
+                          id="receiveCol"
+                          background={{ color: Theme.input.background }}
+                          width="100%"
+                          margin={{ top: 'auto' }}
+                          border={{radius: '1rem', width: '2px', style: 'solid', color: 'transparent'}}
+                        >
                           <i-scom-token-input
                             id="secondTokenInput"
                             value='-'
@@ -2297,139 +2402,245 @@ export default class ScomSwap extends Module {
                             isCommonShown={true}
                             background={{ color: Theme.input.background }}
                             border={{ radius: '1rem' }}
-                            // height={56}
+                            height={'auto'} width={'100%'}
                             display='flex'
                             font={{ size: '1.25rem' }}
+                            padding={{left: '0.75rem', right: '0.75rem'}}
+                            tokenButtonStyles={{
+                              background: {color: Theme.background.main},
+                              padding: {top: '0.5rem', bottom: '0.5rem', left: '0.5rem', right: '0.5rem'},
+                              border: {radius: 8},
+                              font: {size: '1rem', weight: 700, color: Theme.input.fontColor},
+                              lineHeight: 1.5,
+                              opacity: 1
+                            }}
                             onInputAmountChanged={this.onTokenInputChange}
                             onSelectToken={(token: ITokenObject) => this.onSelectToken(token, false)}
-                            class="token-input"
                           ></i-scom-token-input>
                         </i-panel>
                       </i-vstack>
                     </i-panel>
                     <i-hstack horizontalAlignment="end">
-                      <i-label id="lbRouting" caption="No routing" opacity={0.75} font={{ size: '1rem' }} class="visibility-hidden" />
+                      <i-label id="lbRouting" caption="No routing" opacity={0} font={{ size: '1rem' }} />
                     </i-hstack>
                   </i-vstack>
-                </i-hstack>
+                </i-grid-layout>
               </i-panel>
-              <i-panel id="minSwapHintLabel" class="hints">
+              <i-hstack
+                id="minSwapHintLabel"
+                verticalAlignment="center"
+                margin={{top: '-0.5rem'}}
+                gap={'0.25rem'}
+              >
                 <i-icon name="star" fill={Theme.colors.primary.main} width={13} height={13} />
-                <i-label caption="No crosschain routes are found. You may try updating the input amount or selecting another token." font={{ color: Theme.colors.primary.main }} />
-              </i-panel>
+                <i-label caption="No crosschain routes are found. You may try updating the input amount or selecting another token." opacity={0.9} font={{ color: Theme.colors.primary.main, size: '0.8rem' }} />
+              </i-hstack>
               <i-panel id="pnlPriceInfo" />
-              <i-vstack class="swap-btn-container" horizontalAlignment="center" width="100%">
+              <i-vstack
+                horizontalAlignment="center"
+                width="100%"
+                margin={{top: 10}}
+              >
                 <i-button
                   id="swapBtn"
-                  class="btn-swap btn-os"
+                  class="btn-os"
                   maxWidth={360}
-                  height={60}
+                  height={60} width={'100%'}
                   visible={false}
-                  rightIcon={{ spin: true, visible: false, fill: Theme.colors.primary.contrastText }}
+                  rightIcon={{ spin: true, visible: false, fill: Theme.colors.primary.contrastText, width: 16, height: 16 }}
+                  border={{radius: '0.65rem'}}
+                  font={{size: '1.125rem', color: Theme.colors.primary.contrastText, bold: true}}
+                  opacity={1}
+                  lineHeight={1.5}
+                  padding={{left: '0.75rem', right: '0.75rem', top: '0.5rem', bottom: '0.5rem'}}
                   onClick={this.onClickSwapButton.bind(this)}
                 ></i-button>
               </i-vstack>
             </i-panel>
-            <i-modal id="swapModal" class="custom-modal" title="Confirm Swap" closeIcon={{ name: 'times' }}>
-              <i-hstack verticalAlignment='center' horizontalAlignment='start'>
-                <i-panel id="srcChainFirstPanel" class="row-chain">
-                  <i-image id="srcChainTokenImage" width="30px" height="30px" url="#" />
-                  <i-label id="srcChainTokenLabel" class="token-name" caption="" />
-                  <i-icon name="minus" class="custom-icon--fill" width={28} height={10} />
-                </i-panel>
-                <i-panel class="row-chain">
-                  <i-image id="fromTokenImage" width="30px" height="30px" url="#" />
-                  <i-label id="fromTokenLabel" class="token-name" caption=""></i-label>
-                </i-panel>
-                <i-label id="fromTokenValue" class="token-value" caption=" - "></i-label>
+            <i-modal
+              id="swapModal"
+              width={490} maxWidth={'100%'}
+              padding={{left: '1rem', right: '1rem', top: '0.75rem', bottom: '0.75rem'}}
+              border={{radius: '1rem'}}
+            >
+              <i-hstack
+                verticalAlignment="center" horizontalAlignment="space-between"
+                margin={{bottom: '1.5rem'}} padding={{bottom: '0.5rem'}}
+                border={{bottom: {width: '2px', style: 'solid', color: Theme.background.main}}}
+              >
+                <i-label
+                  font={{color: Theme.colors.primary.main, size: '1.25rem', weight: 700}}
+                  caption="Confirm Swap"
+                ></i-label>
+                <i-icon
+                  fill={Theme.colors.primary.main}
+                  name="times"
+                  width={16} height={16}
+                  cursor="pointer"
+                  onClick={() => this.onCloseModal('swapModal')}
+                ></i-icon>
               </i-hstack>
-              <i-icon name="arrow-down" class="arrow-down custom-icon--fill" width={28} height={28} />
-              <i-panel id="srcChainSecondPanel">
+              <i-vstack>
                 <i-hstack verticalAlignment='center' horizontalAlignment='start'>
-                  <i-panel class="row-chain">
-                    <i-image id="srcChainVaultImage" width="30px" height="30px" url="#" />
-                    <i-label id="srcChainVaultLabel" class="token-name" caption="" />
-                    <i-icon name="minus" class="custom-icon--fill" width={28} height={10} />
-                  </i-panel>
-                  <i-panel class="row-chain">
-                    <i-image id="srcVaultTokenImage" fallbackUrl={tokenAssets.fallbackUrl} width="30px" height="30px" url="#" />
-                    <i-label id="srcVaultTokenLabel" class="token-name" caption="" />
-                  </i-panel>
-                  <i-label id="srcVaultTokenValue" class="token-value" caption="-" />
+                  <i-hstack id="srcChainFirstPanel" verticalAlignment="center" gap={'0.5rem'}>
+                    <i-image id="srcChainTokenImage" width="30px" height="30px" url="#" />
+                    <i-label id="srcChainTokenLabel" font={{size: '1.1rem'}} caption="" />
+                    <i-icon name="minus" fill={Theme.input.fontColor} width={28} height={10} />
+                  </i-hstack>
+                  <i-hstack verticalAlignment="center" gap={'0.5rem'}>
+                    <i-image id="fromTokenImage" width="30px" height="30px" url="#" />
+                    <i-label id="fromTokenLabel" font={{size: '1.1rem'}} caption=""></i-label>
+                  </i-hstack>
+                  <i-label id="fromTokenValue" margin={{left: 'auto'}} font={{size: '1.1rem'}} caption=" - "></i-label>
                 </i-hstack>
-                <i-icon name="arrow-down" class="arrow-down custom-icon--fill" width={28} height={28} />
-              </i-panel>
-              <i-panel id="targetChainSecondPanel">
-                <i-hstack verticalAlignment='center' horizontalAlignment='start'>
-                  <i-panel class="row-chain">
-                    <i-image id="targetChainVaultImage" width="30px" height="30px" url="#" />
-                    <i-label id="targetChainVaultLabel" class="token-name" caption="" />
-                    <i-icon name="minus" class="custom-icon--fill" width={28} height={10} />
-                  </i-panel>
-                  <i-panel class="row-chain">
-                    <i-image id="targetVaultTokenImage" fallbackUrl={tokenAssets.fallbackUrl} width="30px" height="30px" url="#" />
-                    <i-label id="targetVaultTokenLabel" class="token-name" caption="" />
-                  </i-panel>
-                  <i-label id="targetVaultTokenValue" class="token-value" caption="-" />
+                <i-icon
+                  width={28} height={28} name="arrow-down" fill={Theme.input.fontColor}
+                  border={{width: '2px', style: 'solid', color: 'transparent', radius: '50%'}}
+                  padding={{left: '0.25rem', right: '0.25rem', top: '0.25rem', bottom: '0.25rem'}}
+                  background={{color: Theme.input.background}}
+                  margin={{top: '0.75rem', bottom: '0.75rem'}}
+                  class="arrow-down"
+                ></i-icon>
+                <i-panel id="srcChainSecondPanel">
+                  <i-hstack verticalAlignment='center' horizontalAlignment='start'>
+                    <i-hstack verticalAlignment="center" gap={'0.5rem'}>
+                      <i-image id="srcChainVaultImage" width="30px" height="30px" url="#" />
+                      <i-label id="srcChainVaultLabel" font={{size: '1.1rem'}} caption="" />
+                      <i-icon name="minus" fill={Theme.input.fontColor} width={28} height={10} />
+                    </i-hstack>
+                    <i-hstack verticalAlignment="center" gap={'0.5rem'}>
+                      <i-image id="srcVaultTokenImage" fallbackUrl={tokenAssets.fallbackUrl} width="30px" height="30px" url="#" />
+                      <i-label id="srcVaultTokenLabel" font={{size: '1.1rem'}} caption="" />
+                    </i-hstack>
+                    <i-label id="srcVaultTokenValue" margin={{left: 'auto'}} font={{size: '1.1rem'}} caption="-" />
+                  </i-hstack>
+                  <i-icon
+                    width={28} height={28} name="arrow-down" fill={Theme.input.fontColor}
+                    border={{width: '2px', style: 'solid', color: 'transparent', radius: '50%'}}
+                    padding={{left: '0.25rem', right: '0.25rem', top: '0.25rem', bottom: '0.25rem'}}
+                    background={{color: Theme.input.background}}
+                    margin={{top: '0.75rem', bottom: '0.75rem'}}
+                    class="arrow-down"
+                  ></i-icon>
+                </i-panel>
+                <i-panel id="targetChainSecondPanel">
+                  <i-hstack verticalAlignment='center' horizontalAlignment='start'>
+                    <i-hstack verticalAlignment="center" gap={'0.5rem'}>
+                      <i-image id="targetChainVaultImage" width="30px" height="30px" url="#" />
+                      <i-label id="targetChainVaultLabel" font={{size: '1.1rem'}} caption="" />
+                      <i-icon name="minus" fill={Theme.input.fontColor} width={28} height={10} />
+                    </i-hstack>
+                    <i-hstack verticalAlignment="center" gap={'0.5rem'}>
+                      <i-image id="targetVaultTokenImage" fallbackUrl={tokenAssets.fallbackUrl} width="30px" height="30px" url="#" />
+                      <i-label id="targetVaultTokenLabel" font={{size: '1.1rem'}} caption="" />
+                    </i-hstack>
+                    <i-label id="targetVaultTokenValue" margin={{left: 'auto'}} font={{size: '1.1rem'}} caption="-" />
+                  </i-hstack>
+                  <i-vstack justifyContent='end'>
+                    <i-label id="crossChainSoftCapLabel1" opacity={0.55} margin={{left: 'auto'}}></i-label>
+                    <i-label id="targetVaultAssetBalanceLabel1" opacity={0.55} margin={{left: 'auto'}} caption="Vault Asset Balance: 0"></i-label>
+                    <i-label id="targetVaultBondBalanceLabel1" opacity={0.55} margin={{left: 'auto'}} caption="Vault Bond Balance: 0"></i-label>
+                  </i-vstack>
+                  <i-icon
+                    width={28} height={28} name="arrow-down" fill={Theme.input.fontColor}
+                    border={{width: '2px', style: 'solid', color: 'transparent', radius: '50%'}}
+                    padding={{left: '0.25rem', right: '0.25rem', top: '0.25rem', bottom: '0.25rem'}}
+                    margin={{top: '0.75rem', bottom: '0.75rem'}}
+                    background={{color: Theme.input.background}}
+                    class="arrow-down"
+                  ></i-icon>
+                </i-panel>
+                <i-hstack margin={{bottom: '1rem'}} verticalAlignment='center' horizontalAlignment='start'>
+                  <i-hstack id="targetChainFirstPanel" verticalAlignment="center" gap={'0.5rem'}>
+                    <i-image id="targetChainTokenImage" fallbackUrl={tokenAssets.fallbackUrl} width="30px" height="30px" url="#" />
+                    <i-label id="targetChainTokenLabel" font={{size: '1.1rem'}} caption="" />
+                    <i-icon name="minus" fill={Theme.input.fontColor} width={28} height={10} />
+                  </i-hstack>
+                  <i-hstack verticalAlignment="center" gap={'0.5rem'}>
+                    <i-image id="toTokenImage" width="30px" height="30px" url="#" />
+                    <i-label id="toTokenLabel" font={{size: '1.1rem'}} caption=""></i-label>
+                  </i-hstack>
+                  <i-label id="toTokenValue" margin={{left: 'auto'}} font={{weight: 700, color: Theme.colors.primary.main}} caption=" - "></i-label>
                 </i-hstack>
-                <i-vstack class="text-right">
-                  <i-label id="crossChainSoftCapLabel1" class="text--grey ml-auto"></i-label>
-                  <i-label id="targetVaultAssetBalanceLabel1" class="text--grey ml-auto" caption="Vault Asset Balance: 0"></i-label>
-                  <i-label id="targetVaultBondBalanceLabel1" class="text--grey ml-auto" caption="Vault Bond Balance: 0"></i-label>
+                <i-vstack id="crossChainVaultInfoVstack" justifyContent='end'>
+                  <i-label id="crossChainSoftCapLabel2" opacity={0.55} margin={{left: 'auto'}}></i-label>
+                  <i-label id="targetVaultAssetBalanceLabel2" opacity={0.55} margin={{left: 'auto'}} caption="Vault Asset Balance: 0"></i-label>
+                  <i-label id="targetVaultBondBalanceLabel2" opacity={0.55} margin={{left: 'auto'}} caption="Vault Bond Balance: 0"></i-label>
                 </i-vstack>
-                <i-icon name="arrow-down" class="arrow-down custom-icon--fill" width={28} height={28} />
-              </i-panel>
-              <i-hstack class="mb-1" verticalAlignment='center' horizontalAlignment='start'>
-                <i-panel id="targetChainFirstPanel" class="row-chain">
-                  <i-image id="targetChainTokenImage" fallbackUrl={tokenAssets.fallbackUrl} width="30px" height="30px" url="#" />
-                  <i-label id="targetChainTokenLabel" class="token-name" caption="" />
-                  <i-icon name="minus" class="custom-icon--fill" width={28} height={10} />
-                </i-panel>
-                <i-panel class="row-chain">
-                  <i-image id="toTokenImage" width="30px" height="30px" url="#" />
-                  <i-label id="toTokenLabel" class="token-name" caption=""></i-label>
-                </i-panel>
-                <i-label id="toTokenValue" class="token-value text-primary bold" caption=" - "></i-label>
-              </i-hstack>
-              <i-vstack id="crossChainVaultInfoVstack" class="text-right">
-                <i-label id="crossChainSoftCapLabel2" class="text--grey ml-auto"></i-label>
-                <i-label id="targetVaultAssetBalanceLabel2" class="text--grey ml-auto" caption="Vault Asset Balance: 0"></i-label>
-                <i-label id="targetVaultBondBalanceLabel2" class="text--grey ml-auto" caption="Vault Bond Balance: 0"></i-label>
+                <i-label id="lbEstimate" display="block" margin={{bottom: '1rem'}}></i-label>
+                <i-hstack margin={{bottom: '1rem'}} gap={'0.25rem'}>
+                  <i-label id="lbPayOrReceive"></i-label>
+                  <i-label id="payOrReceiveValue" font={{weight: 700, color: Theme.colors.primary.main}} caption=""></i-label>
+                  <i-label id="payOrReceiveToken" caption=""></i-label>
+                </i-hstack>
               </i-vstack>
-              <i-panel class="mb-1">
-                <i-label id="lbEstimate"></i-label>
-              </i-panel>
-              <i-panel class="mb-1">
-                <i-label id="lbPayOrReceive"></i-label>
-                <i-label id="payOrReceiveValue" class="text-primary bold" caption=""></i-label>
-                <i-label id="payOrReceiveToken" caption=""></i-label>
-              </i-panel>
-              <i-panel id="priceInfoContainer" class="bg-box mt-1 mb-1" background={{ color: Theme.background.main }} width="100%">
-              </i-panel>
-              <i-panel class="swap-btn-container" width="100%">
-                <i-button id="swapModalConfirmBtn" class="btn-swap btn-os" height="auto" caption="Confirm Swap" onClick={this.doSwap}></i-button>
+              <i-panel
+                id="priceInfoContainer"
+                background={{ color: Theme.background.main }}
+                border={{radius: '1rem', width: '2px', style: 'solid', color: 'transparent'}}
+                margin={{top: '1rem', bottom: '1rem'}}
+                width="100%"
+              />
+              <i-panel
+                width="100%"
+                margin={{top: 10}}
+              >
+                <i-button
+                  id="swapModalConfirmBtn"
+                  class="btn-os"
+                  height="auto" width={'100%'}
+                  caption="Confirm Swap"
+                  border={{radius: '0.65rem'}}
+                  font={{size: '1.125rem', color: Theme.colors.primary.contrastText, bold: true}}
+                  opacity={1}
+                  lineHeight={1.5}
+                  padding={{left: '0.75rem', right: '0.75rem', top: '0.5rem', bottom: '0.5rem'}}
+                  onClick={this.doSwap}
+                ></i-button>
               </i-panel>
             </i-modal>
 
             <i-modal
               id="modalFees"
-              class="bg-modal custom-modal"
-              title="Transaction Fee Details"
-              closeIcon={{ name: 'times' }}
+              width={490} maxWidth={'100%'}
+              padding={{left: '1rem', right: '1rem', top: '0.75rem', bottom: '0.75rem'}}
+              border={{radius: '1rem'}}
             >
-              <i-panel class="i-modal_content">
-                <i-panel>
-                  <i-vstack id="feesInfo" />
-                  <i-hstack verticalAlignment="center" horizontalAlignment="center" margin={{ top: 16, bottom: 8 }}>
-                    <i-button
-                      caption="Close"
-                      class="btn-os"
-                      font={{ color: Theme.colors.primary.contrastText }}
-                      onClick={() => this.closeModalFees()}
-                    />
-                  </i-hstack>
-                </i-panel>
-              </i-panel>
+              <i-hstack
+                verticalAlignment="center" horizontalAlignment="space-between"
+                margin={{bottom: '0.5rem'}} padding={{bottom: '0.5rem'}}
+                border={{bottom: {width: '2px', style: 'solid', color: Theme.background.main}}}
+              >
+                <i-label
+                  font={{color: Theme.colors.primary.main, size: '0.875rem', weight: 700}}
+                  caption="Transaction Fee Details"
+                ></i-label>
+                <i-icon
+                  fill={Theme.colors.primary.main}
+                  name="times"
+                  width={16} height={16}
+                  cursor="pointer"
+                  onClick={() => this.onCloseModal('modalFees')}
+                ></i-icon>
+              </i-hstack>
+              <i-vstack gap="1rem">
+                <i-vstack id="feesInfo" />
+                <i-hstack
+                  verticalAlignment="center"
+                  horizontalAlignment="center"
+                  margin={{bottom: '0.5rem'}}
+                >
+                  <i-button
+                    caption="Close"
+                    class="btn-os"
+                    lineHeight={1.5}
+                    width='150px' height="auto"
+                    padding={{top: '0.25rem', bottom: '0.25rem', left: '0.25rem', right: '0.25rem'}}
+                    font={{ size: '1rem', color: Theme.colors.primary.contrastText, weight: 700 }}
+                    onClick={() => this.closeModalFees()}
+                  />
+                </i-hstack>
+              </i-vstack>
             </i-modal>
           </i-panel>
           <i-scom-tx-status-modal id="txStatusModal" />

@@ -462,12 +462,9 @@ declare module "@scom/scom-swap/swap-utils/index.ts" {
     }>;
     export { getExtendedRouteObjData, getTradeFeeMap, getAllRoutesData, getPair, SwapData, executeSwap, getChainNativeToken, getRouterAddress, setApprovalModalSpenderAddress, getProviderProxySelectors, getCommissionRate, getCrossChainRouteOptions, createBridgeVaultOrder };
 }
-/// <amd-module name="@scom/scom-swap/price-info/priceInfo.css.ts" />
-declare module "@scom/scom-swap/price-info/priceInfo.css.ts" { }
 /// <amd-module name="@scom/scom-swap/price-info/index.tsx" />
 declare module "@scom/scom-swap/price-info/index.tsx" {
     import { Module, Control, ControlElement, Icon, Container } from '@ijstech/components';
-    import "@scom/scom-swap/price-info/priceInfo.css.ts";
     global {
         namespace JSX {
             interface IntrinsicElements {
@@ -486,16 +483,10 @@ declare module "@scom/scom-swap/price-info/index.tsx" {
         getData(): any[];
         private renderItems;
         onRenderToggleBtn: (parent: Control) => Icon;
-        renderIconTooltip: (parent: Control, item: any) => Promise<Icon>;
-        updateItems: () => Promise<void>;
+        renderIconTooltip: (parent: Control, item: any) => Icon;
         init(): void;
         render(): any;
     }
-}
-/// <amd-module name="@scom/scom-swap/expert-mode-settings/index.css.ts" />
-declare module "@scom/scom-swap/expert-mode-settings/index.css.ts" {
-    const _default: string;
-    export default _default;
 }
 /// <amd-module name="@scom/scom-swap/expert-mode-settings/index.tsx" />
 declare module "@scom/scom-swap/expert-mode-settings/index.tsx" {
@@ -513,7 +504,6 @@ declare module "@scom/scom-swap/expert-mode-settings/index.tsx" {
         private $eventBus;
         private state;
         constructor(state: State, parent?: Container, options?: any);
-        init(): Promise<void>;
         closeModal(): void;
         showModal(): void;
         onToggle(): void;
@@ -522,7 +512,7 @@ declare module "@scom/scom-swap/expert-mode-settings/index.tsx" {
 }
 /// <amd-module name="@scom/scom-swap/data.json.ts" />
 declare module "@scom/scom-swap/data.json.ts" {
-    const _default_1: {
+    const _default: {
         infuraId: string;
         apiEndpoints: {
             tradingRouting: string;
@@ -554,7 +544,7 @@ declare module "@scom/scom-swap/data.json.ts" {
             showFooter: boolean;
         };
     };
-    export default _default_1;
+    export default _default;
 }
 /// <amd-module name="@scom/scom-swap/formSchema.ts" />
 declare module "@scom/scom-swap/formSchema.ts" {
@@ -838,15 +828,6 @@ declare module "@scom/scom-swap/formSchema.ts" {
         };
     };
 }
-/// <amd-module name="@scom/scom-swap/assets.ts" />
-declare module "@scom/scom-swap/assets.ts" {
-    function fullPath(path: string): string;
-    const _default_2: {
-        logo: string;
-        fullPath: typeof fullPath;
-    };
-    export default _default_2;
-}
 /// <amd-module name="@scom/scom-swap" />
 declare module "@scom/scom-swap" {
     import { Module, Container, ControlElement } from '@ijstech/components';
@@ -892,7 +873,6 @@ declare module "@scom/scom-swap" {
         private imgLogo;
         private lbTitle;
         private swapComponent;
-        private swapContainer;
         private pnlPriceInfo;
         private wrapperSwap;
         private isInited;
@@ -938,6 +918,8 @@ declare module "@scom/scom-swap" {
         private lbPayOrReceive;
         private approvalModelAction;
         private toggleReverseImage;
+        private hIcon;
+        private vIcon;
         private bridgeSupportedChainList;
         private swapModalConfirmBtn;
         private modalFees;
@@ -1105,6 +1087,7 @@ declare module "@scom/scom-swap" {
         private onRevertSwap;
         private setupCrossChainPopup;
         private handleSwapPopup;
+        private onCloseModal;
         private doSwap;
         private getMinReceivedMaxSold;
         private updateTokenValues;
@@ -1150,6 +1133,7 @@ declare module "@scom/scom-swap" {
         private disableSelectChain;
         private selectSourceChain;
         private selectDestinationChain;
+        private updateChainIcon;
         private onSelectSourceChain;
         private onSelectDestinationChain;
         private initChainIcon;
