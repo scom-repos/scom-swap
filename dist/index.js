@@ -34,31 +34,14 @@ define("@scom/scom-swap/index.css.ts", ["require", "exports", "@ijstech/componen
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.swapStyle = void 0;
     const Theme = components_1.Styles.Theme.ThemeVars;
-    const colorVar = {
-        // primaryButton: 'transparent linear-gradient(90deg, #AC1D78 0%, #E04862 100%) 0% 0% no-repeat padding-box',
-        // primaryGradient: 'linear-gradient(255deg,#f15e61,#b52082)',
-        darkBg: '#181E3E 0% 0% no-repeat padding-box',
-        // primaryDisabled: 'transparent linear-gradient(270deg,#351f52,#552a42) 0% 0% no-repeat padding-box !important'
-    };
+    // const colorVar = {
+    //   primaryButton: 'transparent linear-gradient(90deg, #AC1D78 0%, #E04862 100%) 0% 0% no-repeat padding-box',
+    //   primaryGradient: 'linear-gradient(255deg,#f15e61,#b52082)',
+    //   darkBg: '#181E3E 0% 0% no-repeat padding-box',
+    //   primaryDisabled: 'transparent linear-gradient(270deg,#351f52,#552a42) 0% 0% no-repeat padding-box !important'
+    // }
     exports.swapStyle = components_1.Styles.style({
         $nest: {
-            '.btn-register': {
-                padding: '0.75rem',
-                display: 'flex',
-                alignItems: 'center',
-                opacity: 1,
-                color: Theme.colors.primary.contrastText,
-                $nest: {
-                    'i-icon': {
-                        marginInline: '0.25rem',
-                        display: 'flex',
-                        alignItems: 'center',
-                    }
-                }
-            },
-            'i-icon': {
-                display: 'inline-block'
-            },
             '::-webkit-scrollbar': {
                 width: '3px',
             },
@@ -66,431 +49,350 @@ define("@scom/scom-swap/index.css.ts", ["require", "exports", "@ijstech/componen
                 background: Theme.colors.primary.main,
                 borderRadius: '5px',
             },
-            '*': {
-                boxSizing: 'border-box',
-            },
-            '.ml-auto': {
-                marginLeft: 'auto'
-            },
-            '#swapContainer i-button': {
-                fontWeight: 600,
-                verticalAlign: 'middle',
-                lineHeight: 1.5,
-            },
-            '#swapContainer i-button.disabled': {
-                opacity: 0.4,
-            },
-            '#swapContainer i-button.btn-max:not(.disabled):hover': {
-                transition: 'all .2s ease-out',
-                background: 'var(--max-button-hover-background)',
-                color: Theme.colors.primary.contrastText
-            },
-            '#swapContainer i-button:focus': {
-                outline: 0,
-                boxShadow: '0 0 0 0.2rem rgb(0 123 255 / 25%)'
-            },
+            // '*': {
+            //   boxSizing: 'border-box',
+            // },
             '#swapContainer': {
-                width: 720,
-                maxWidth: '100%',
-                minHeight: 340,
-                padding: '1rem',
-                marginInline: 'auto',
+                // width: 720,
+                // maxWidth: '100%',
+                // minHeight: 340,
+                // padding: '1rem',
+                // marginInline: 'auto',
                 $nest: {
                     '#btnToken': {
-                        height: 'auto !important',
-                        background: `${Theme.background.main} !important`,
-                        padding: '0.5rem !important',
-                        borderRadius: '8px',
-                        fontSize: '1rem',
-                        fontWeight: 700,
-                        lineHeight: 1.5,
-                        alignSelf: 'center',
-                        textAlign: 'center',
-                        opacity: 1,
-                        color: Theme.input.fontColor,
+                        // height: 'auto !important',
+                        // background: `${Theme.background.main} !important`,
+                        // padding: '0.5rem !important',
+                        // borderRadius: '8px',
+                        // fontSize: '1rem',
+                        // fontWeight: 700,
+                        // lineHeight: 1.5,
+                        // alignSelf: 'center',
+                        // textAlign: 'center',
+                        // opacity: 1,
+                        // color: Theme.input.fontColor,
                         $nest: {
                             '&:not(.disabled):hover': {
-                                color: Theme.input.fontColor,
-                                // background: '#ffffff35'
+                                color: Theme.input.fontColor
                             },
-                            '&> span': {
-                                verticalAlign: 'middle',
-                            },
-                            '&> i-icon': {
-                                maxWidth: 10,
-                                height: '16px !important',
-                                opacity: 0.5,
-                                marginRight: 'unset',
-                                fill: Theme.input.fontColor,
-                                $nest: {
-                                    'svg': {
-                                        fill: `${Theme.input.fontColor} !important`
-                                    }
-                                }
-                            },
+                            // '&> span': {
+                            //   verticalAlign: 'middle',
+                            // },
+                            // '&> i-icon': {
+                            //   maxWidth: 10,
+                            //   height: '16px !important',
+                            //   opacity: 0.5,
+                            //   marginRight: 'unset',
+                            //   fill: Theme.input.fontColor,
+                            //   $nest: {
+                            //     'svg': {
+                            //       fill: `${Theme.input.fontColor} !important`
+                            //     }
+                            //   }
+                            // },
                             '&> :not(:last-child)': {
                                 marginRight: '0.5rem'
                             }
                         }
-                    },
-                    '.text-value': {
-                        display: 'block',
-                        $nest: {
-                            '> *': {
-                                fontSize: '1.25rem',
-                                paddingRight: '0.25rem'
-                            }
-                        }
-                    },
-                    '.token-input': {
-                        width: '100%'
-                    },
-                    '.token-input > input': {
-                        width: '100%',
-                        height: 'auto !important',
-                        padding: '.375rem .75rem',
-                        paddingRight: '0.25rem',
-                        paddingLeft: 0,
-                        borderRadius: '0.25rem',
-                        border: 'none',
-                        background: 'transparent',
-                        color: Theme.input.fontColor,
-                        fontSize: '1.125rem',
-                        textAlign: 'right'
                     }
                 }
             },
-            '.swap-flex--col': {
-                flexDirection: 'column',
-                $nest: {
-                    '& > i-vstack': {
-                        width: '100% !important'
-                    },
-                    '.custom-ic--swap': {
-                        margin: 'auto',
-                        bottom: '0 !important',
-                        transform: 'none !important'
-                    }
-                }
-            },
-            '.visibility-hidden': {
-                visibility: 'hidden'
-            },
-            '.content-swap': {
-                marginTop: '0.5rem',
-                marginBottom: '1rem',
-                borderRadius: '1rem'
-            },
-            'i-label.text--grey *': {
-                color: Theme.text.primary,
-                opacity: 0.55, // 'hsla(0,0%,100%,0.55)'
-            },
+            // '.swap-flex--col': {
+            //   flexDirection: 'column',
+            //   $nest: {
+            //     '& > i-vstack': {
+            //       width: '100% !important'
+            //     },
+            //     '.custom-ic--swap': {
+            //       margin: 'auto',
+            //       bottom: '0 !important',
+            //       transform: 'none !important'
+            //     }
+            //   }
+            // },
+            // '.visibility-hidden': {
+            //   visibility: 'hidden'
+            // },
+            // '.content-swap': {
+            //   marginTop: '0.5rem',
+            //   marginBottom: '1rem',
+            //   borderRadius: '1rem'
+            // },
+            // 'i-label.text--grey *': {
+            //   color: Theme.text.primary,
+            //   opacity: 0.55, // 'hsla(0,0%,100%,0.55)'
+            // },
             '.btn-max': {
-                position: 'relative',
-                borderRadius: '0.5rem',
-                fontSize: '1rem',
-                padding: '0 0.5rem',
-                marginLeft: '0.5rem',
-                bottom: '1.5px',
+                // position: 'relative',
+                // borderRadius: '0.5rem',
+                // fontSize: '1rem',
+                // padding: '0 0.5rem',
+                // marginLeft: '0.5rem',
+                // bottom: '1.5px',
                 background: 'var(--max-button-background)',
-                color: Theme.colors.primary.contrastText
+                // color: Theme.colors.primary.contrastText
             },
-            '.bg-box': {
-                margin: '0.5rem 0',
-                border: '2px solid transparent',
-                borderRadius: '1rem',
-                $nest: {
-                    '&.bg-box--active': {
-                        borderColor: '#E53780'
-                    }
-                }
-            },
-            '.toggle-reverse': {
-                margin: '1rem 0 0.5rem',
-                fontSize: '20px',
-                textAlign: 'center',
-                $nest: {
-                    '> .icon-swap': {
-                        display: 'inline-flex',
-                        padding: '0.25rem',
-                    },
-                    '.custom-ic--swap': {
-                        bottom: 28,
-                        transform: 'rotate(90deg)',
-                        padding: '0.45rem !important'
-                    }
-                }
-            },
-            '.rounded-icon': {
-                display: 'inline-flex',
-                padding: '3px',
-                background: Theme.input.background,
-                border: '2px solid transparent',
-                borderRadius: '50%',
-                cursor: 'pointer'
-            },
-            '.swap-btn-container': {
-                marginTop: 10,
-                $nest: {
-                    '.btn-swap': {
-                        position: 'relative',
-                        width: '100%',
-                        borderRadius: '0.65rem',
-                        fontSize: '1.125rem',
-                        padding: '0.5rem 0.75rem',
-                        opacity: 1,
-                        color: Theme.colors.primary.contrastText
-                    }
-                }
-            },
+            // '.bg-box': {
+            //   margin: '0.5rem 0',
+            //   border: '2px solid transparent',
+            //   borderRadius: '1rem',
+            //   $nest: {
+            //     '&.bg-box--active': {
+            //       borderColor: '#E53780'
+            //     }
+            //   }
+            // },
+            // '.rounded-icon': {
+            //   display: 'inline-flex',
+            //   padding: '3px',
+            //   background: Theme.input.background,
+            //   border: '2px solid transparent',
+            //   borderRadius: '50%',
+            //   cursor: 'pointer'
+            // },
+            // '.swap-btn-container': {
+            //   marginTop: 10,
+            //   $nest: {
+            //     '.btn-swap': {
+            //       position: 'relative',
+            //       width: '100%',
+            //       borderRadius: '0.65rem',
+            //       fontSize: '1.125rem',
+            //       padding: '0.5rem 0.75rem',
+            //       opacity: 1,
+            //       color: Theme.colors.primary.contrastText
+            //     }
+            //   }
+            // },
             // '#receiveCol': {
             //   maxWidth: 'calc(100% - 9rem)',
             // },
-            '.hints': {
-                display: 'flex',
-                alignItems: 'center',
-                marginTop: '-0.5rem',
-                $nest: {
-                    '*': {
-                        fontSize: '0.8rem',
-                        opacity: 0.9,
-                    },
-                    'i-label *': {
-                        marginLeft: '0.25rem',
-                    },
-                },
-            },
+            // '.hints': {
+            //   display: 'flex',
+            //   alignItems: 'center',
+            //   marginTop: '-0.5rem',
+            //   $nest: {
+            //     '*': {
+            //       fontSize: '0.8rem',
+            //       opacity: 0.9,
+            //     },
+            //     'i-label *': {
+            //       marginLeft: '0.25rem',
+            //     },
+            //   },
+            // },
             '.chain-icon': {
-                margin: '0.25rem 0.5rem 0 0',
-                borderRadius: '50%',
-                border: '2px solid transparent',
-                padding: '0.25rem',
-                cursor: 'pointer',
+                // margin: '0.25rem 0.5rem 0 0',
+                // borderRadius: '50%',
+                // border: '2px solid transparent',
+                // padding: '0.25rem',
+                // cursor: 'pointer',
                 filter: 'grayscale(1)',
                 $nest: {
-                    '&.icon-disabled': {
-                        cursor: 'default',
-                    },
+                    // '&.icon-disabled': {
+                    //   cursor: 'default',
+                    // },
                     '&.icon-selected': {
-                        borderColor: Theme.colors.primary.main,
-                        cursor: 'default',
+                        // borderColor: Theme.colors.primary.main,
+                        // cursor: 'default',
                         filter: 'inherit',
                     },
-                    'img': {
-                        width: '32px',
-                        height: '32px',
-                    },
+                    // 'img': {
+                    //   width: '32px',
+                    //   height: '32px',
+                    // },
                 },
             },
-            '.chain-text': {
-                whiteSpace: 'nowrap',
-                overflow: 'hidden !important',
-                textOverflow: 'ellipsis'
-            },
-            '.cursor-default': {
-                cursor: 'default !important',
-            },
-            '.hidden': {
-                display: 'none !important'
-            },
-            '.custom-md--view': {
-                $nest: {
-                    'i-label > *': {
-                        fontSize: '.875rem',
-                        wordBreak: 'normal'
-                    },
-                    '.i-modal_content': {
-                        padding: '0 1rem 1rem',
-                    },
-                    '.flex-col': {
-                        flexDirection: 'column',
-                    },
-                    'i-button': {
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        width: '150px',
-                        height: '50px !important',
-                        fontWeight: 600,
-                        borderRadius: 5,
-                        margin: '0.5rem',
-                    }
-                }
-            },
-            '.custom-modal': {
-                $nest: {
-                    '.modal': {
-                        background: Theme.background.modal,
-                        width: 490,
-                        maxWidth: '100%',
-                        padding: '0.75rem 1rem',
-                        borderRadius: '1rem',
-                        color: Theme.text.primary
-                    },
-                    '.i-modal_header': {
-                        marginBottom: '1.5rem',
-                        paddingBottom: '0.5rem',
-                        borderBottom: `2px soid ${Theme.background.main}`,
-                        color: Theme.colors.primary.main,
-                        fontSize: '1.25rem',
-                        fontWeight: 700,
-                        $nest: {
-                            '&> span': {
-                                color: Theme.colors.primary.main,
-                            },
-                            '&> i-icon': {
-                                fill: `${Theme.colors.primary.main} !important`
-                            },
-                            '& ~ i-icon': {
-                                display: 'inline-block',
-                                margin: '0.75rem 0',
-                                background: Theme.input.background,
-                                border: '2px solid transparent',
-                                borderRadius: '50%',
-                                padding: '0.25rem'
-                            }
-                        }
-                    },
-                }
-            },
-            '#registerPairModal': {
-                $nest: {
-                    '.modal': {
-                        background: Theme.background.modal,
-                        width: 420,
-                        maxWidth: '100%',
-                        padding: '0.75rem 1rem 1.25rem 1rem',
-                        borderRadius: '1rem',
-                        color: Theme.text.primary
-                    },
-                    '.i-modal_header': {
-                        marginBottom: '1.5rem',
-                        paddingBottom: '0.5rem',
-                        borderBottom: `2px soid ${Theme.background.main}`,
-                        color: Theme.colors.primary.main,
-                        fontSize: '1.25rem',
-                        fontWeight: 700,
-                        $nest: {
-                            '&> span': {
-                                color: Theme.colors.primary.main,
-                            },
-                            '.i-modal-close': {
-                                fill: `${Theme.colors.primary.main} !important`,
-                            }
-                        }
-                    },
-                }
-            },
-            '#swapModal': {
-                $nest: {
-                    '.icon-swap': {
-                        margin: 0
-                    },
-                    'i-image:not(.rounded-icon)': {
-                        display: 'inline-block',
-                        marginRight: '0.5rem'
-                    },
-                    '#tokenReceiveValue': {
-                        margin: '0 5px'
-                    },
-                    '#payOrReceiveValue': {
-                        marginInline: '0.25rem',
-                    },
-                    '.text-primary *': {
-                        color: Theme.colors.primary.main,
-                    },
-                    '.price-info': {
-                        padding: '1rem'
-                    },
-                    '.arrow-down': {
-                        display: 'inline-block',
-                        margin: '0.75rem 0',
-                        background: Theme.input.background,
-                        border: '2px solid transparent',
-                        borderRadius: '50%',
-                        padding: '0.25rem'
-                    },
-                    '.arrow-down--chain': {
-                        margin: '0.75rem 6rem !important',
-                    },
-                    '.token-value': {
-                        marginLeft: 'auto',
-                    },
-                    '.token-value > *, #swapModal .token-name > *': {
-                        fontSize: '1.1rem'
-                    },
-                    '.row-chain': {
-                        display: 'flex',
-                        alignItems: 'center',
-                    },
-                    'i-icon.custom-icon--fill': {
-                        fill: Theme.input.fontColor,
-                        $nest: {
-                            'svg': {
-                                fill: `${Theme.input.fontColor} !important`
-                            }
-                        }
-                    }
-                }
-            },
-            '#modalFees': {
-                $nest: {
-                    '.i-modal_header': {
-                        marginBottom: '0.5rem !important',
-                    },
-                    '.i-modal_content': {
-                        $nest: {
-                            'i-label *': {
-                                fontSize: '0.875rem',
-                            },
-                            'i-button': {
-                                width: '150px',
-                                paddingBlock: '0.25rem',
-                                textAlign: 'center',
-                            },
-                        },
-                    },
-                },
-            },
+            // '.chain-text': {
+            //   whiteSpace: 'nowrap',
+            //   overflow: 'hidden !important',
+            //   textOverflow: 'ellipsis'
+            // },
+            // '.cursor-default': {
+            //   cursor: 'default !important',
+            // },
+            // '.hidden': {
+            //   display: 'none !important'
+            // },
+            // '.custom-md--view': {
+            //   $nest: {
+            //     'i-label > *': {
+            //       fontSize: '.875rem',
+            //       wordBreak: 'normal'
+            //     },
+            //     '.i-modal_content': {
+            //       padding: '0 1rem 1rem',
+            //     },
+            //     '.flex-col': {
+            //       flexDirection: 'column',
+            //     },
+            //     'i-button': {
+            //       display: 'flex',
+            //       alignItems: 'center',
+            //       justifyContent: 'center',
+            //       width: '150px',
+            //       height: '50px !important',
+            //       fontWeight: 600,
+            //       borderRadius: 5,
+            //       margin: '0.5rem',
+            //     }
+            //   }
+            // },
+            // '.custom-modal': {
+            //   $nest: {
+            //     '.modal': {
+            //       background: Theme.background.modal,
+            //       width: 490,
+            //       maxWidth: '100%',
+            //       padding: '0.75rem 1rem',
+            //       borderRadius: '1rem',
+            //       color: Theme.text.primary
+            //     },
+            //     '.i-modal_header': {
+            //       marginBottom: '1.5rem',
+            //       paddingBottom: '0.5rem',
+            //       borderBottom: `2px soid ${Theme.background.main}`,
+            //       color: Theme.colors.primary.main,
+            //       fontSize: '1.25rem',
+            //       fontWeight: 700,
+            //       $nest: {
+            //         '&> span': {
+            //           color: Theme.colors.primary.main,
+            //         },
+            //         '&> i-icon': {
+            //           fill: `${Theme.colors.primary.main} !important`
+            //         },
+            //         '& ~ i-icon': {
+            //           display: 'inline-block',
+            //           margin: '0.75rem 0',
+            //           background: Theme.input.background,
+            //           border: '2px solid transparent',
+            //           borderRadius: '50%',
+            //           padding: '0.25rem'
+            //         }
+            //       }
+            //     },
+            //   }
+            // },
+            // '#registerPairModal': {
+            //   $nest: {
+            //     '.modal': {
+            //       background: Theme.background.modal,
+            //       width: 420,
+            //       maxWidth: '100%',
+            //       padding: '0.75rem 1rem 1.25rem 1rem',
+            //       borderRadius: '1rem',
+            //       color: Theme.text.primary
+            //     },
+            //     '.i-modal_header': {
+            //       marginBottom: '1.5rem',
+            //       paddingBottom: '0.5rem',
+            //       borderBottom: `2px soid ${Theme.background.main}`,
+            //       color: Theme.colors.primary.main,
+            //       fontSize: '1.25rem',
+            //       fontWeight: 700,
+            //       $nest: {
+            //         '&> span': {
+            //           color: Theme.colors.primary.main,
+            //         },
+            //         '.i-modal-close': {
+            //           fill: `${Theme.colors.primary.main} !important`,
+            //         }
+            //       }
+            //     },
+            //   }
+            // },
+            // '#swapModal': {
+            //   $nest: {
+            //     '.icon-swap': {
+            //       margin: 0
+            //     },
+            //     'i-image:not(.rounded-icon)': {
+            //       display: 'inline-block',
+            //       marginRight: '0.5rem'
+            //     },
+            //     '#tokenReceiveValue': {
+            //       margin: '0 5px'
+            //     },
+            //     '#payOrReceiveValue': {
+            //       marginInline: '0.25rem',
+            //     },
+            //     '.text-primary *': {
+            //       color: Theme.colors.primary.main,
+            //     },
+            //     '.price-info': {
+            //       padding: '1rem'
+            //     },
+            //     '.arrow-down': {
+            //       display: 'inline-block',
+            //       margin: '0.75rem 0',
+            //       background: Theme.input.background,
+            //       border: '2px solid transparent',
+            //       borderRadius: '50%',
+            //       padding: '0.25rem'
+            //     },
+            //     '.arrow-down--chain': {
+            //       margin: '0.75rem 6rem !important',
+            //     },
+            //     '.token-value': {
+            //       marginLeft: 'auto',
+            //     },
+            //     '.token-value > *, #swapModal .token-name > *': {
+            //       fontSize: '1.1rem'
+            //     },
+            //     '.row-chain': {
+            //       display: 'flex',
+            //       alignItems: 'center',
+            //     },
+            //     'i-icon.custom-icon--fill': {
+            //       fill: Theme.input.fontColor,
+            //       $nest: {
+            //         'svg': {
+            //           fill: `${Theme.input.fontColor} !important`
+            //         }
+            //       }
+            //     }
+            //   }
+            // },
+            // '#modalFees': {
+            //   $nest: {
+            //     '.i-modal_header': {
+            //       marginBottom: '0.5rem !important',
+            //     },
+            //     '.i-modal_content': {
+            //       $nest: {
+            //         'i-label *': {
+            //           fontSize: '0.875rem',
+            //         },
+            //         'i-button': {
+            //           width: '150px',
+            //           paddingBlock: '0.25rem',
+            //           textAlign: 'center',
+            //         },
+            //       },
+            //     },
+            //   },
+            // },
             '.btn-os': {
                 background: 'var(--primary-button-background)',
-                height: 'auto !important',
-                color: Theme.text.primary,
-                transition: 'background .3s ease',
-                fontSize: '1rem',
-                fontWeight: 'bold',
-                $nest: {
-                    'i-icon.loading-icon': {
-                        marginInline: '0.25rem',
-                        width: '16px !important',
-                        height: '16px !important',
-                    },
-                    'i-icon.is-spin': {
-                        fill: Theme.colors.primary.contrastText,
-                        $nest: {
-                            'svg': {
-                                fill: Theme.colors.primary.contrastText
-                            }
-                        }
-                    }
-                },
+                transition: 'background .3s ease'
             },
             '.btn-os:not(.disabled):not(.is-spinning):hover, .btn-os:not(.disabled):not(.is-spinning):focus': {
                 background: 'var(--primary-button-hover-background)',
-                // backgroundColor: 'transparent',
                 boxShadow: 'none',
                 opacity: .9
             },
             '.btn-os:not(.disabled):not(.is-spinning):focus': {
-                boxShadow: '0 0 0 0.2rem rgb(0 123 255 / 25%)'
+                boxShadow: '0 0 0 0.2rem rgb(0 123 255 / 25%)',
+                outline: 0
             },
             '.btn-os.disabled, .btn-os.is-spinning': {
                 background: 'var(--primary-button-disabled-background)',
-                opacity: 1
+                opacity: 0.4
             },
-            '.dark-modal > div > div': {
-                background: colorVar.darkBg,
-                borderRadius: 5
+            '.btn-max:not(.disabled):hover': {
+                transition: 'all .2s ease-out',
+                background: 'var(--max-button-hover-background)'
             }
         }
     });
@@ -2217,54 +2119,25 @@ define("@scom/scom-swap/swap-utils/index.ts", ["require", "exports", "@ijstech/e
     const createBridgeVaultOrder = async (state, newOrderParams) => (0, index_6.createBridgeVaultOrder)(state, Object.assign({}, newOrderParams));
     exports.createBridgeVaultOrder = createBridgeVaultOrder;
 });
-define("@scom/scom-swap/price-info/priceInfo.css.ts", ["require", "exports", "@ijstech/components"], function (require, exports, components_4) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    const Theme = components_4.Styles.Theme.ThemeVars;
-    components_4.Styles.cssRule('.price-info', {
-        display: 'flex',
-        flexDirection: 'column',
-        $nest: {
-            'i-hstack': {
-                $nest: {
-                    '&> i-label:first-child': {
-                        marginRight: '0.5rem',
-                        opacity: 0.75
-                    },
-                    'i-icon.icon-tooltip': {
-                        opacity: 0.75,
-                        fill: Theme.text.primary,
-                        $nest: {
-                            'svg': {
-                                fill: `${Theme.text.primary} !important`
-                            }
-                        }
-                    }
-                }
-            },
-            '.rounded-icon': {
-                display: 'inline-flex',
-                padding: 0
-            }
-        }
-    });
-});
-define("@scom/scom-swap/price-info/index.tsx", ["require", "exports", "@ijstech/components", "@scom/scom-swap/price-info/priceInfo.css.ts"], function (require, exports, components_5) {
+define("@scom/scom-swap/price-info/index.tsx", ["require", "exports", "@ijstech/components"], function (require, exports, components_4) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.PriceInfo = void 0;
+    const Theme = components_4.Styles.Theme.ThemeVars;
     ;
-    let PriceInfo = class PriceInfo extends components_5.Module {
+    let PriceInfo = class PriceInfo extends components_4.Module {
         constructor(parent, options) {
             super(parent, options);
             this.onRenderToggleBtn = (parent) => {
-                const image = new components_5.Icon(parent, {
+                const image = new components_4.Icon(parent, {
                     width: 18,
                     height: 18,
-                    name: 'arrows-alt-v'
+                    name: 'arrows-alt-v',
+                    fill: Theme.text.primary,
+                    border: { width: '2px', style: 'solid', color: 'transparent', radius: '50%' },
+                    background: { color: Theme.input.background },
+                    margin: { left: 5 },
                 });
-                image.classList.add("rounded-icon");
-                image.style.marginLeft = "5px";
                 image.style.transform = "rotate(90deg)";
                 image.onClick = (source, event) => {
                     event.stopPropagation();
@@ -2273,14 +2146,17 @@ define("@scom/scom-swap/price-info/index.tsx", ["require", "exports", "@ijstech/
                 };
                 return image;
             };
-            this.renderIconTooltip = async (parent, item) => {
-                const iconTooltip = await components_5.Icon.create();
+            this.renderIconTooltip = (parent, item) => {
+                const iconTooltip = new components_4.Icon(parent, {
+                    opacity: 0.75,
+                    fill: Theme.text.primary,
+                    name: 'question-circle',
+                    width: 15,
+                    height: 15
+                });
                 iconTooltip.classList.add('icon-tooltip');
-                iconTooltip.name = 'question-circle';
-                iconTooltip.width = 15;
-                iconTooltip.height = 15;
                 if (item.onClick) {
-                    iconTooltip.classList.add('pointer');
+                    iconTooltip.cursor = 'pointer';
                     iconTooltip.tooltip.content = 'Click to view details';
                     iconTooltip.tooltip.placement = 'right';
                     iconTooltip.tooltip.maxWidth = '270px';
@@ -2292,41 +2168,6 @@ define("@scom/scom-swap/price-info/index.tsx", ["require", "exports", "@ijstech/
                     iconTooltip.tooltip.maxWidth = '270px';
                 }
                 return iconTooltip;
-            };
-            this.updateItems = async () => {
-                for (let i = 0; i < this.Items.length; i++) {
-                    const item = this.Items[i];
-                    const row = this.priceContent.children[i];
-                    const iconTooltip = row.querySelector('.icon-tooltip');
-                    const titleLabel = row.firstChild;
-                    const valueLabel = row.children[iconTooltip ? 2 : 1];
-                    if ((titleLabel === null || titleLabel === void 0 ? void 0 : titleLabel.caption) && item.title != titleLabel.caption) {
-                        titleLabel.caption = item.title;
-                    }
-                    if ((valueLabel === null || valueLabel === void 0 ? void 0 : valueLabel.caption) && item.value != valueLabel.caption) {
-                        valueLabel.caption = item.value;
-                    }
-                    if (iconTooltip) {
-                        row.removeChild(iconTooltip);
-                    }
-                    if (item.tooltip) {
-                        const _iconTooltip = this.renderIconTooltip(row, item);
-                        row.insertBefore(await _iconTooltip, row.children[1]);
-                    }
-                    if (item.isToggleShown && row.children.length <= 2) {
-                        const image = this.onRenderToggleBtn(row);
-                        row.appendChild(image);
-                    }
-                    else if (!item.isToggleShown && row.children.length > 2 && !item.tooltip) {
-                        row.removeChild(row.children[2]);
-                    }
-                    setTimeout(function () {
-                        const iconTooltips = row.querySelectorAll(".icon-tooltip");
-                        if (iconTooltips && iconTooltips.length > 1) {
-                            row.removeChild(iconTooltips[1]);
-                        }
-                    }, 2000);
-                }
             };
         }
         get Items() {
@@ -2343,128 +2184,93 @@ define("@scom/scom-swap/price-info/index.tsx", ["require", "exports", "@ijstech/
             return this.Items;
         }
         async renderItems() {
-            if (this.priceContent.children.length === this.Items.length) {
-                this.updateItems();
-                return;
-            }
-            this.priceContent.innerHTML = '';
+            // if (this.priceContent.children.length === this.Items.length) {
+            //   this.updateItems();
+            //   return;
+            // }
+            this.priceContent.clearInnerHTML();
             for (let i = 0; i < this.Items.length; i++) {
                 const item = this.Items[i];
-                const row = new components_5.HStack();
-                row.horizontalAlignment = "space-between";
-                row.verticalAlignment = "center";
-                row.padding = { top: '0.25rem', bottom: '0.25rem', left: 0, right: 0 };
-                if (item.isHidden) {
-                    row.classList.add('hidden');
-                }
-                const titleLabel = new components_5.Label(row, { caption: item.title });
-                row.appendChild(titleLabel);
+                const row = (this.$render("i-hstack", { verticalAlignment: "center", horizontalAlignment: "space-between", padding: { top: '0.25rem', bottom: '0.25rem', left: 0, right: 0 }, gap: "0.5rem", visible: !item.isHidden }));
+                const pnlTitle = this.$render("i-hstack", { verticalAlignment: "center", gap: "0.5rem" });
+                const titleLabel = this.$render("i-label", { caption: item.title, opacity: 0.75 });
+                pnlTitle.appendChild(titleLabel);
                 if (item.tooltip) {
-                    const iconTooltip = this.renderIconTooltip(row, item);
-                    row.appendChild(await iconTooltip);
+                    const iconTooltip = this.renderIconTooltip(pnlTitle, item);
+                    pnlTitle.appendChild(iconTooltip);
                 }
-                const valueLabel = new components_5.Label(row, { caption: item.value });
-                valueLabel.classList.add('ml-auto', 'text-right');
-                row.appendChild(valueLabel);
+                row.appendChild(pnlTitle);
+                const pnlValue = this.$render("i-hstack", { verticalAlignment: "center", horizontalAlignment: "end", gap: "0.5rem" });
+                const valueLabel = this.$render("i-label", { caption: item.value });
+                pnlValue.appendChild(valueLabel);
                 if (item.isToggleShown) {
-                    const image = this.onRenderToggleBtn(row);
-                    row.appendChild(image);
+                    const image = this.onRenderToggleBtn(pnlValue);
+                    pnlValue.appendChild(image);
                 }
+                row.appendChild(pnlValue);
                 this.priceContent.appendChild(row);
             }
         }
+        // updateItems = async () => {
+        //   for (let i = 0; i < this.Items.length; i++) {
+        //     const item = this.Items[i];
+        //     const row = this.priceContent.children[i] as HStack;
+        //     const iconTooltip = row.querySelector('.icon-tooltip');
+        //     const titleLabel = row.firstChild as Label;
+        //     const valueLabel = row.children[iconTooltip ? 2 : 1] as Label;
+        //     if (titleLabel?.caption && item.title != titleLabel.caption) {
+        //       titleLabel.caption = item.title
+        //     }
+        //     if (valueLabel?.caption && item.value != valueLabel.caption) {
+        //       valueLabel.caption = item.value
+        //     }
+        //     if (iconTooltip) {
+        //       row.removeChild(iconTooltip);
+        //     }
+        //     if (item.tooltip) {
+        //       const _iconTooltip = this.renderIconTooltip(row, item);
+        //       row.insertBefore(_iconTooltip, row.children[1]);
+        //     }
+        //     if (item.isToggleShown && row.children.length <= 2) {
+        //       const image = this.onRenderToggleBtn(row);
+        //       row.appendChild(image);
+        //     } else if (!item.isToggleShown && row.children.length > 2 && !item.tooltip) {
+        //       row.removeChild(row.children[2]);
+        //     }
+        //     setTimeout(function(){
+        //       const iconTooltips = row.querySelectorAll(".icon-tooltip");
+        //       if (iconTooltips && iconTooltips.length > 1) {
+        //           row.removeChild(iconTooltips[1])
+        //       }
+        //     }, 2000)
+        //   }
+        // }
         init() {
             super.init();
         }
         render() {
-            return (this.$render("i-panel", { class: "price-info", width: "auto" },
-                this.$render("i-panel", { id: "priceContent" })));
+            return (this.$render("i-vstack", { class: "price-info", width: "auto" },
+                this.$render("i-vstack", { id: "priceContent" })));
         }
     };
     PriceInfo = __decorate([
-        (0, components_5.customElements)('i-scom-swap-price-info')
+        (0, components_4.customElements)('i-scom-swap-price-info')
     ], PriceInfo);
     exports.PriceInfo = PriceInfo;
 });
-define("@scom/scom-swap/expert-mode-settings/index.css.ts", ["require", "exports", "@ijstech/components"], function (require, exports, components_6) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    const Theme = components_6.Styles.Theme.ThemeVars;
-    exports.default = components_6.Styles.style({
-        textAlign: 'center',
-        $nest: {
-            // 'i-label': {
-            //   color: Theme.text.primary
-            // },
-            // 'i-button': {
-            //   color: Theme.text.primary
-            // },
-            '.modal': {
-                borderRadius: '1rem',
-                padding: '1rem',
-                width: 327
-            },
-            '.i-modal_header': {
-                marginBottom: '1.25rem',
-                paddingBottom: '0.75rem',
-                borderBottom: `2px soid ${Theme.background.main}`,
-                $nest: {
-                    '&> span': {
-                        margin: 'auto',
-                        padding: '0 2rem',
-                        color: Theme.colors.primary.main,
-                        fontWeight: 700,
-                    }
-                }
-            },
-            '.i-modal-close': {
-                fill: `${Theme.colors.primary.main} !important`,
-            },
-            '.expert-content': {
-                fontWeight: 'bold',
-                $nest: {
-                    '.warning-box': {
-                        padding: '0.75rem 1rem',
-                        marginBottom: '1.25rem',
-                        background: 'linear-gradient(90deg,#df5869 -19.25%,#bc4c7b 116.5%)',
-                        border: '1px solid #f15e61',
-                        borderRadius: '0.5rem',
-                    },
-                    '.warning-box i-label *': {
-                        color: Theme.colors.primary.contrastText,
-                        fontSize: '1rem',
-                    },
-                    'i-label.warning-text *': {
-                        color: Theme.colors.warning.light,
-                        fontSize: '1.05rem',
-                    },
-                    'i-button': {
-                        padding: '0.75rem',
-                        margin: '1.25rem 0 0.5rem',
-                        color: Theme.colors.primary.contrastText,
-                        background: 'transparent linear-gradient(255deg,#e75b66,#b52082) 0% 0% no-repeat padding-box',
-                    }
-                }
-            }
-        }
-    });
-});
-define("@scom/scom-swap/expert-mode-settings/index.tsx", ["require", "exports", "@ijstech/components", "@scom/scom-swap/expert-mode-settings/index.css.ts"], function (require, exports, components_7, index_css_1) {
+define("@scom/scom-swap/expert-mode-settings/index.tsx", ["require", "exports", "@ijstech/components"], function (require, exports, components_5) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.ExpertModeSettings = void 0;
+    const Theme = components_5.Styles.Theme.ThemeVars;
     ;
-    let ExpertModeSettings = class ExpertModeSettings extends components_7.Module {
+    let ExpertModeSettings = class ExpertModeSettings extends components_5.Module {
         constructor(state, parent, options) {
             super(parent, options);
             this.state = state;
-            this.$eventBus = components_7.application.EventBus;
+            this.$eventBus = components_5.application.EventBus;
         }
         ;
-        async init() {
-            this.classList.add(index_css_1.default);
-            super.init();
-        }
         closeModal() {
             this.expertModal.visible = false;
         }
@@ -2477,17 +2283,20 @@ define("@scom/scom-swap/expert-mode-settings/index.tsx", ["require", "exports", 
             this.$eventBus.dispatch("ExpertModeChanged" /* EventId.ExpertModeChanged */);
         }
         render() {
-            return (this.$render("i-modal", { id: "expertModal", class: 'dark-modal', title: "Expert Mode", closeIcon: { name: 'times' } },
-                this.$render("i-panel", { class: "expert-content" },
-                    this.$render("i-panel", { class: "warning-box" },
-                        this.$render("i-label", { caption: "Expert mode allows high slippage trades that often result in bad rates and lost funds." })),
-                    this.$render("i-label", { class: "warning-text", caption: "Only use this mode if you know what you are doing." }),
-                    this.$render("i-button", { width: "100%", height: "auto", caption: "Turn On Expert Mode", onClick: this.onToggle.bind(this) }))));
+            return (this.$render("i-modal", { id: "expertModal", border: { radius: '1rem' }, padding: { top: '1rem', bottom: '1rem', left: '1rem', right: '1rem' }, width: 327 },
+                this.$render("i-hstack", { verticalAlignment: "center", horizontalAlignment: "space-between", margin: { bottom: '1.25rem' }, padding: { bottom: '0.75rem' }, border: { bottom: { width: '2px', style: 'solid', color: Theme.background.main } } },
+                    this.$render("i-label", { font: { color: Theme.colors.primary.main, weight: 700, size: '1.125rem' }, caption: "Expert Mode", margin: { left: 'auto', right: 'auto' }, padding: { left: '2rem', right: '2rem' } }),
+                    this.$render("i-icon", { fill: Theme.colors.primary.main, name: "times", width: 16, height: 16, cursor: "pointer", onClick: () => this.closeModal() })),
+                this.$render("i-panel", { class: "text-center" },
+                    this.$render("i-panel", { padding: { top: '1rem', bottom: '1rem', left: '0.75rem', right: '0.75rem' }, margin: { bottom: '1.25rem' }, background: { color: 'linear-gradient(90deg,#df5869 -19.25%,#bc4c7b 116.5%)' }, border: { width: '1px', style: 'solid', color: '#f15e61', radius: '0.5rem' } },
+                        this.$render("i-label", { caption: "Expert mode allows high slippage trades that often result in bad rates and lost funds.", font: { weight: 'bold', color: Theme.colors.primary.contrastText, size: '1rem' } })),
+                    this.$render("i-label", { class: "warning-text", caption: "Only use this mode if you know what you are doing.", font: { weight: 'bold', color: Theme.colors.warning.light, size: '1.05rem' } }),
+                    this.$render("i-button", { width: "100%", height: "auto", caption: "Turn On Expert Mode", padding: { top: '0.75rem', bottom: '0.75rem', left: '0.75rem', right: '0.75rem' }, margin: { top: '1.25rem', bottom: '0.5rem' }, font: { color: Theme.colors.primary.contrastText, weight: 700 }, background: { color: 'transparent linear-gradient(255deg,#e75b66,#b52082) 0% 0% no-repeat padding-box' }, onClick: this.onToggle.bind(this) }))));
         }
     };
     ExpertModeSettings = __decorate([
-        components_7.customModule,
-        (0, components_7.customElements)('i-scom-swap-expert-mode-settings')
+        components_5.customModule,
+        (0, components_5.customElements)('i-scom-swap-expert-mode-settings')
     ], ExpertModeSettings);
     exports.ExpertModeSettings = ExpertModeSettings;
     ;
@@ -3092,26 +2901,13 @@ define("@scom/scom-swap/formSchema.ts", ["require", "exports", "@scom/scom-netwo
     }
     exports.getProjectOwnerSchema = getProjectOwnerSchema;
 });
-define("@scom/scom-swap/assets.ts", ["require", "exports", "@ijstech/components"], function (require, exports, components_8) {
+define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstech/eth-wallet", "@scom/scom-swap/store/index.ts", "@scom/scom-token-list", "@scom/scom-swap/swap-utils/index.ts", "@scom/scom-swap/crosschain-utils/index.ts", "@scom/scom-swap/global/index.ts", "@scom/scom-swap/expert-mode-settings/index.tsx", "@scom/scom-swap/data.json.ts", "@scom/scom-swap/formSchema.ts", "@scom/scom-dex-list", "@scom/scom-commission-fee-setup", "@scom/scom-swap/index.css.ts", "@scom/scom-swap/index.css.ts"], function (require, exports, components_6, eth_wallet_5, index_7, scom_token_list_6, index_8, index_9, index_10, index_11, data_json_1, formSchema_1, scom_dex_list_2, scom_commission_fee_setup_1, index_css_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    const moduleDir = components_8.application.currentModuleDir;
-    function fullPath(path) {
-        return `${moduleDir}/${path}`;
-    }
-    ;
-    exports.default = {
-        logo: fullPath('img/logo.svg'),
-        fullPath
-    };
-});
-define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstech/eth-wallet", "@scom/scom-swap/store/index.ts", "@scom/scom-token-list", "@scom/scom-swap/swap-utils/index.ts", "@scom/scom-swap/crosschain-utils/index.ts", "@scom/scom-swap/global/index.ts", "@scom/scom-swap/expert-mode-settings/index.tsx", "@scom/scom-swap/data.json.ts", "@scom/scom-swap/formSchema.ts", "@scom/scom-dex-list", "@scom/scom-commission-fee-setup", "@scom/scom-swap/index.css.ts", "@scom/scom-swap/index.css.ts"], function (require, exports, components_9, eth_wallet_5, index_7, scom_token_list_6, index_8, index_9, index_10, index_11, data_json_1, formSchema_1, scom_dex_list_2, scom_commission_fee_setup_1, index_css_2) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    const Theme = components_9.Styles.Theme.ThemeVars;
+    const Theme = components_6.Styles.Theme.ThemeVars;
     const priceImpactTooHighMsg = 'Price Impact Too High. If you want to bypass this check, please turn on Expert Mode';
     const ROUNDING_NUMBER = eth_wallet_5.BigNumber.ROUND_DOWN;
-    let ScomSwap = class ScomSwap extends components_9.Module {
+    let ScomSwap = class ScomSwap extends components_6.Module {
         static async create(options, parent) {
             let self = new this(parent, options);
             await self.ready();
@@ -3250,17 +3046,17 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                     },
                     customUI: {
                         render: async (data, onConfirm) => {
-                            const vstack = new components_9.VStack();
+                            const vstack = new components_6.VStack();
                             await self.loadCommissionFee();
                             const config = new scom_commission_fee_setup_1.default(null, {
                                 commissions: self._data.commissions || [],
                                 fee: self.state.embedderCommissionFee,
                                 networks: self._data.networks
                             });
-                            const hstack = new components_9.HStack(null, {
+                            const hstack = new components_6.HStack(null, {
                                 verticalAlignment: 'center',
                             });
-                            const button = new components_9.Button(hstack, {
+                            const button = new components_6.Button(hstack, {
                                 caption: 'Confirm',
                                 width: '100%',
                                 height: 40,
@@ -3633,7 +3429,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                 const val = typeof value === 'object' ? value : new eth_wallet_5.BigNumber(value);
                 if (val.isNaN() || val.isZero())
                     return '';
-                return components_9.FormatUtils.formatNumber(val.toFixed(), { decimalFigures: 4, useSeparators: false });
+                return components_6.FormatUtils.formatNumber(val.toFixed(), { decimalFigures: 4, useSeparators: false });
             };
             this.initWallet = async () => {
                 try {
@@ -3654,7 +3450,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                     await this.updateBalances();
                     this.updateTokenValues(this.fromToken, true);
                     this.updateTokenValues(this.toToken, false);
-                    this.toggleReverseImage.enabled = !this.isFixedPair && !this.isCrossChain;
+                    this.hIcon.enabled = this.vIcon.enabled = !this.isFixedPair && !this.isCrossChain;
                     this.firstTokenInput.tokenReadOnly = this.isFixedPair;
                     this.firstTokenInput.inputReadOnly = false;
                     this.secondTokenInput.tokenReadOnly = this.isFixedPair;
@@ -3668,9 +3464,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                     }
                     this.lbTitle.caption = this._data.title;
                     this.updateSwapButtonCaption();
-                    if (!this.isFixedPair) {
-                        this.toggleReverseImage.classList.remove('cursor-default');
-                    }
+                    this.toggleReverseImage.cursor = this.isFixedPair ? 'default' : 'pointer';
                     if (this.isCrossChain) {
                         this.initRoutes();
                         this.toInputValue = new eth_wallet_5.BigNumber(0);
@@ -3678,7 +3472,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                             this.secondTokenInput.value = '-';
                             this.secondTokenInput.inputReadOnly = true;
                         }
-                        this.toggleReverseImage.classList.add('cursor-default');
+                        this.toggleReverseImage.cursor = 'default';
                         if (this.isEstimated('from')) {
                             this.updateEstimatedPosition(false);
                         }
@@ -3687,7 +3481,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                         if (this.secondTokenInput) {
                             this.secondTokenInput.inputReadOnly = false;
                         }
-                        this.toggleReverseImage.classList.remove('cursor-default');
+                        this.toggleReverseImage.cursor = 'pointer';
                     }
                     if (this.fromInputValue.isGreaterThan(0)) {
                         this.updateEstimatedPosition(false);
@@ -3837,10 +3631,10 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                     const img = elm;
                     img.enabled = !disabled;
                     if (disabled) {
-                        img.classList.add('.cursor-default');
+                        img.cursor = 'default';
                     }
                     else {
-                        img.classList.remove('.cursor-default');
+                        img.cursor = 'pointer';
                     }
                 });
             };
@@ -3850,34 +3644,31 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                     return;
                 this.disableSelectChain(true, false);
                 const selected = this.srcChainList.querySelector('.icon-selected');
-                if (selected) {
-                    selected.classList.remove('icon-selected');
-                }
+                selected && this.updateChainIcon(selected, false);
                 const oldDestination = this.srcChain;
                 try {
                     this.srcChain = obj;
                     if (img) {
-                        img.classList.add('icon-selected');
+                        this.updateChainIcon(img, true);
                     }
                     else {
                         const currentNetwork = (0, index_7.getNetworkInfo)((_a = this.bridgeSupportedChainList.find((f) => f.chainId == obj.chainId)) === null || _a === void 0 ? void 0 : _a.chainId);
                         const img = this.srcChainList.querySelector(`[data-tooltip="${currentNetwork === null || currentNetwork === void 0 ? void 0 : currentNetwork.chainName}"]`);
-                        if (img) {
-                            img.classList.add('icon-selected');
-                        }
+                        if (img)
+                            this.updateChainIcon(img, true);
                     }
                 }
                 catch (err) {
                     console.log('err', err);
                     if (oldDestination) {
                         this.srcChain = oldDestination;
-                        if (selected) {
-                            selected.classList.add('icon-selected');
-                        }
+                        if (selected)
+                            this.updateChainIcon(selected, true);
                     }
                     else {
                         this.srcChain = (0, index_7.getNetworkInfo)((_b = this.bridgeSupportedChainList[0]) === null || _b === void 0 ? void 0 : _b.chainId);
-                        (_c = this.srcChainList.firstElementChild) === null || _c === void 0 ? void 0 : _c.classList.add('icon-selected');
+                        const elm = (_c = this.srcChainList) === null || _c === void 0 ? void 0 : _c.firstElementChild;
+                        elm && this.updateChainIcon(elm, true);
                     }
                 }
                 if (this.srcChain) {
@@ -3892,34 +3683,29 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                     return;
                 this.disableSelectChain(true, true);
                 const selected = this.desChainList.querySelector('.icon-selected');
-                if (selected) {
-                    selected.classList.remove('icon-selected');
-                }
+                selected && this.updateChainIcon(selected, false);
                 const oldDestination = this.desChain;
                 try {
                     this.desChain = obj;
                     if (img) {
-                        img.classList.add('icon-selected');
+                        this.updateChainIcon(img, true);
                     }
                     else {
                         const currentNetwork = (0, index_7.getNetworkInfo)((_a = this.bridgeSupportedChainList.find((f) => f.chainId == obj.chainId)) === null || _a === void 0 ? void 0 : _a.chainId);
                         const img = this.desChainList.querySelector(`[data-tooltip="${currentNetwork === null || currentNetwork === void 0 ? void 0 : currentNetwork.chainName}"]`);
-                        if (img) {
-                            img.classList.add('icon-selected');
-                        }
+                        img && this.updateChainIcon(img, true);
                     }
                 }
                 catch (err) {
                     console.log('err', err);
                     if (oldDestination) {
                         this.desChain = oldDestination;
-                        if (selected) {
-                            selected.classList.add('icon-selected');
-                        }
+                        selected && this.updateChainIcon(selected, true);
                     }
                     else {
                         this.desChain = (0, index_7.getNetworkInfo)((_b = this.bridgeSupportedChainList[0]) === null || _b === void 0 ? void 0 : _b.chainId);
-                        (_c = this.desChainList.firstElementChild) === null || _c === void 0 ? void 0 : _c.classList.add('icon-selected');
+                        const elm = (_c = this.desChainList) === null || _c === void 0 ? void 0 : _c.firstElementChild;
+                        elm && this.updateChainIcon(elm, true);
                     }
                 }
                 if (this.desChain) {
@@ -3955,9 +3741,18 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                 await this.handleAddRoute();
             };
             this.initChainIcon = (network, isDes) => {
-                const img = new components_9.Image();
-                img.url = network.image;
-                img.tooltip.content = network.chainName;
+                const img = new components_6.Image(undefined, {
+                    width: 32,
+                    height: 32,
+                    margin: { top: '0.25rem', right: '0.5rem' },
+                    border: { radius: '50%', width: '2px', style: 'solid', color: 'transparent' },
+                    padding: { top: '0.25rem', right: '0.25rem', bottom: '0.25rem', left: '0.25rem' },
+                    url: network.image,
+                    tooltip: { content: network.chainName },
+                    cursor: 'pointer'
+                });
+                // img.url = network.image;
+                // img.tooltip.content = network.chainName;
                 img.classList.add('chain-icon');
                 img.setAttribute('data-tooltip', network.chainName); // for query
                 if (isDes) {
@@ -3967,7 +3762,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                 else {
                     if (!this.isMetaMask) {
                         img.tooltip.content = `Swap supports this network ${network.chainName} (${network.chainId}), please switch network in the connected wallet.`;
-                        img.classList.add('icon-disabled');
+                        img.cursor = 'default';
                     }
                     img.setAttribute('network-name', network.chainName);
                     img.setAttribute('chain-id', `${network.chainId}`);
@@ -4009,17 +3804,17 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                 this.feesInfo.clearInnerHTML();
                 fees.forEach((fee) => {
                     var _a;
-                    const feeValue = components_9.FormatUtils.formatNumber(fee.value.toFixed(), { decimalFigures: 4 });
+                    const feeValue = components_6.FormatUtils.formatNumber(fee.value.toFixed(), { decimalFigures: 4 });
                     this.feesInfo.appendChild(this.$render("i-hstack", { horizontalAlignment: "space-between", verticalAlignment: "center", margin: { top: 10 }, border: { bottom: { color: Theme.background.main, width: '2px', style: 'solid' } }, padding: { bottom: 16 } },
                         this.$render("i-hstack", { verticalAlignment: "center" },
                             this.$render("i-label", { caption: fee.title, margin: { right: 4 } }),
                             this.$render("i-icon", { name: "question-circle", width: 15, height: 15, fill: Theme.text.primary, tooltip: { content: fee.description }, "data-placement": "right" })),
-                        this.$render("i-label", { class: "ml-auto", caption: `${feeValue} ${(_a = this.fromToken) === null || _a === void 0 ? void 0 : _a.symbol}` })));
+                        this.$render("i-label", { margin: { left: 'auto' }, caption: `${feeValue} ${(_a = this.fromToken) === null || _a === void 0 ? void 0 : _a.symbol}` })));
                 });
                 this.feesInfo.appendChild(this.$render("i-hstack", { horizontalAlignment: "space-between", verticalAlignment: "center", margin: { top: 16 } },
                     this.$render("i-hstack", { verticalAlignment: "center" },
                         this.$render("i-label", { caption: "Total Transaction Fee" })),
-                    this.$render("i-label", { class: "ml-auto", caption: this.getTradeFeeExactAmount() })));
+                    this.$render("i-label", { margin: { left: 'auto' }, caption: this.getTradeFeeExactAmount() })));
                 this.modalFees.visible = true;
             };
             this.closeModalFees = () => {
@@ -4149,7 +3944,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                     this.toInputValue = new eth_wallet_5.BigNumber(this._data.defaultOutputValue);
                     this.firstTokenInput.token = this.fromToken;
                     this.secondTokenInput.token = this.toToken;
-                    this.toggleReverseImage.classList.add('cursor-default');
+                    this.toggleReverseImage.cursor = 'default';
                 }
             }
         }
@@ -4218,7 +4013,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                 onPaid: async (data, receipt) => {
                     this.onSwapConfirmed({ key: data.key, isCrossChain: this.isCrossChain });
                     await this.updateBalances();
-                    components_9.application.EventBus.dispatch("Paid" /* EventId.Paid */, {
+                    components_6.application.EventBus.dispatch("Paid" /* EventId.Paid */, {
                         isCrossChain: this.isCrossChain,
                         data: data !== null && data !== void 0 ? data : null,
                         id: this.id,
@@ -4246,62 +4041,65 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
             await this.handleAddRoute();
         }
         setupCrossChainPopup() {
-            var _a, _b, _c;
+            var _a;
             const arrows = this.swapModal.querySelectorAll('i-icon.arrow-down');
             if (!this.isCrossChain) {
                 arrows.forEach((arrow) => {
-                    arrow.classList.remove('arrow-down--chain');
+                    arrow.margin = { top: '0.75rem', bottom: '0.75rem' };
                 });
             }
             else {
                 arrows.forEach((arrow) => {
-                    arrow.classList.add('arrow-down--chain');
+                    arrow.margin = { top: '0.75rem', left: '6rem', bottom: '0.75rem', right: '6rem' };
                 });
             }
-            (_a = this.lbReminderRejected) === null || _a === void 0 ? void 0 : _a.classList.add('hidden');
+            if (this.lbReminderRejected)
+                this.lbReminderRejected.visible = false;
             if (this.isCrossChain && this.srcChain && this.desChain) {
-                this.srcChainFirstPanel.classList.remove('hidden');
-                this.targetChainFirstPanel.classList.remove('hidden');
+                this.srcChainFirstPanel.visible = true;
+                this.targetChainFirstPanel.visible = true;
                 this.srcChainTokenImage.url = this.srcChain.image;
                 this.srcChainTokenLabel.caption = this.srcChain.chainName;
                 this.targetChainTokenImage.url = this.desChain.image;
                 this.targetChainTokenLabel.caption = this.desChain.chainName;
                 const { sourceVaultToken, targetVaultToken, sourceRouteObj, vaultTokenFromSourceChain, vaultTokenToTargetChain } = this.record;
                 if (sourceVaultToken && sourceRouteObj) {
-                    this.srcChainSecondPanel.classList.remove('hidden');
+                    this.srcChainSecondPanel.visible = true;
                     this.srcChainVaultImage.url = this.srcChain.image;
                     this.srcChainVaultLabel.caption = this.srcChain.chainName;
                     this.srcVaultTokenImage.url = scom_token_list_6.assets.getTokenIconPath(sourceVaultToken, this.srcChain.chainId);
                     this.srcVaultTokenLabel.caption = sourceVaultToken.symbol;
                     this.srcVaultTokenValue.caption = (0, index_10.formatNumber)(vaultTokenFromSourceChain);
-                    (_b = this.lbReminderRejected) === null || _b === void 0 ? void 0 : _b.classList.remove('hidden');
-                    this.lbReminderRejected.caption = `If the order is not executed in the target chain, the estimated withdrawalble amount is <b class="text-pink">${(0, index_10.formatNumber)(vaultTokenFromSourceChain)} ${sourceVaultToken === null || sourceVaultToken === void 0 ? void 0 : sourceVaultToken.symbol}</b>`;
+                    if (this.lbReminderRejected) {
+                        this.lbReminderRejected.visible = true;
+                        this.lbReminderRejected.caption = `If the order is not executed in the target chain, the estimated withdrawalble amount is <b class="text-pink">${(0, index_10.formatNumber)(vaultTokenFromSourceChain)} ${sourceVaultToken === null || sourceVaultToken === void 0 ? void 0 : sourceVaultToken.symbol}</b>`;
+                    }
                 }
                 else {
-                    this.srcChainSecondPanel.classList.add('hidden');
+                    this.srcChainSecondPanel.visible = false;
                 }
-                if (targetVaultToken && targetVaultToken.symbol !== ((_c = this.toToken) === null || _c === void 0 ? void 0 : _c.symbol)) {
-                    this.targetChainSecondPanel.classList.remove('hidden');
+                if (targetVaultToken && targetVaultToken.symbol !== ((_a = this.toToken) === null || _a === void 0 ? void 0 : _a.symbol)) {
+                    this.targetChainSecondPanel.visible = true;
                     this.targetChainVaultImage.url = this.desChain.image;
                     this.targetChainVaultLabel.caption = this.desChain.chainName;
                     this.targetVaultTokenImage.url = scom_token_list_6.assets.getTokenIconPath(targetVaultToken, this.desChain.chainId);
                     this.targetVaultTokenLabel.caption = targetVaultToken.symbol;
                     this.targetVaultTokenValue.caption = (0, index_10.formatNumber)(vaultTokenToTargetChain);
                     // Hide vault info at toToken
-                    this.crossChainVaultInfoVstack.classList.add('hidden');
+                    this.crossChainVaultInfoVstack.visible = false;
                 }
                 else {
-                    this.targetChainSecondPanel.classList.add('hidden');
+                    this.targetChainSecondPanel.visible = false;
                     // Show vault info at the end if vaultTokenSymbol same as toToken
-                    this.crossChainVaultInfoVstack.classList.remove('hidden');
+                    this.crossChainVaultInfoVstack.visible = true;
                 }
             }
             else {
-                this.srcChainFirstPanel.classList.add('hidden');
-                this.targetChainFirstPanel.classList.add('hidden');
-                this.srcChainSecondPanel.classList.add('hidden');
-                this.targetChainSecondPanel.classList.add('hidden');
-                this.crossChainVaultInfoVstack.classList.add('hidden');
+                this.srcChainFirstPanel.visible = false;
+                this.targetChainFirstPanel.visible = false;
+                this.srcChainSecondPanel.visible = false;
+                this.targetChainSecondPanel.visible = false;
+                this.crossChainVaultInfoVstack.visible = false;
             }
         }
         handleSwapPopup() {
@@ -4329,6 +4127,9 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
             this.lbPayOrReceive.caption = this.isFrom ? 'You will pay at most' : 'You will receive at least';
             this.priceInfo2.setData(this.getPriceInfo());
             this.swapModal.visible = true;
+        }
+        onCloseModal(name) {
+            this[name].visible = false;
         }
         doSwap() {
             this.approvalModelAction.doPayAction(this.record);
@@ -4518,7 +4319,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
             this.swapBtn.visible = false;
         }
         async handleAddRoute() {
-            var _a, _b, _c, _d;
+            var _a, _b;
             if (!this.fromToken || !this.toToken || !(this.fromInputValue.gt(0) || this.toInputValue.gt(0)))
                 return;
             this.initRoutes();
@@ -4564,11 +4365,8 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                     }
                     return Object.assign(Object.assign({}, route), { fromAmount: new eth_wallet_5.BigNumber(route.fromAmount) });
                 });
-                if (listRouting.length) {
-                    (_a = this.minSwapHintLabel) === null || _a === void 0 ? void 0 : _a.classList.add('hidden');
-                }
-                else {
-                    (_b = this.minSwapHintLabel) === null || _b === void 0 ? void 0 : _b.classList.remove('hidden');
+                if (this.minSwapHintLabel) {
+                    this.minSwapHintLabel.visible = !listRouting.length;
                 }
             }
             if (listRouting[0] && this.isCrossChain) {
@@ -4659,13 +4457,13 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
             this.initRoutes();
             if (listRouting.length) {
                 // this.receiveCol.classList.add('bg-box--active');
-                this.lbRouting.classList.add('visibility-hidden');
+                this.lbRouting.opacity = 0;
                 const option = listRouting[0];
                 await this.onSelectRouteItem(option);
             }
             else {
                 // this.receiveCol.classList.remove('bg-box--active');
-                this.lbRouting.classList.remove('visibility-hidden');
+                this.lbRouting.opacity = 0.75;
                 if (this.priceInfo)
                     this.priceInfo.setData(this.getPriceInfo());
                 if (this.isEstimated('to')) {
@@ -4681,9 +4479,9 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                 this.setApprovalSpenderAddress();
                 await this.approvalModelAction.checkAllowance(this.fromToken, this.fromInputValue.toFixed(), this.record);
                 this.swapBtn.visible = true;
-                const total = ((_c = this.record) === null || _c === void 0 ? void 0 : _c.fromAmount) ? new eth_wallet_5.BigNumber(this.record.fromAmount) : new eth_wallet_5.BigNumber(0);
+                const total = ((_a = this.record) === null || _a === void 0 ? void 0 : _a.fromAmount) ? new eth_wallet_5.BigNumber(this.record.fromAmount) : new eth_wallet_5.BigNumber(0);
                 this.lbYouPayTitle.caption = `You Pay`;
-                this.lbYouPayValue.caption = `${(0, index_10.formatNumber)(total)} ${(_d = this.fromToken) === null || _d === void 0 ? void 0 : _d.symbol}`;
+                this.lbYouPayValue.caption = `${(0, index_10.formatNumber)(total)} ${(_b = this.fromToken) === null || _b === void 0 ? void 0 : _b.symbol}`;
             }
             else {
                 this.updateSwapButtonCaption();
@@ -4955,7 +4753,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
         async onClickSwapButton() {
             if (!(0, index_7.isClientWalletConnected)()) {
                 if (this.mdWallet) {
-                    await components_9.application.loadPackage('@scom/scom-wallet-modal', '*');
+                    await components_6.application.loadPackage('@scom/scom-wallet-modal', '*');
                     this.mdWallet.networks = this.networks;
                     this.mdWallet.wallets = this.wallets;
                     this.mdWallet.showModal();
@@ -4982,18 +4780,15 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
             this.handleSwapPopup();
         }
         renderPriceInfo() {
+            const padding = { top: '1rem', bottom: '1rem', left: '1rem', right: '1rem' };
             if (!this.priceInfo) {
-                this.priceInfo = this.$render("i-scom-swap-price-info", null);
-                this.priceInfo.width = 'auto';
-                this.priceInfo.height = 'auto';
+                this.priceInfo = this.$render("i-scom-swap-price-info", { display: "block", width: 'auto', height: 'auto' });
                 this.pnlPriceInfo.appendChild(this.priceInfo);
                 this.priceInfo.onTogglePrice = this.onTogglePrice.bind(this);
             }
             this.priceInfo.setData(this.getPriceInfo());
             if (!this.priceInfo2) {
-                this.priceInfo2 = this.$render("i-scom-swap-price-info", null);
-                this.priceInfo2.width = 'auto';
-                this.priceInfo2.height = 'auto';
+                this.priceInfo2 = this.$render("i-scom-swap-price-info", { padding: Object.assign({}, padding), display: "block", width: 'auto', height: 'auto' });
                 this.priceInfo2.onTogglePrice = this.onTogglePrice.bind(this);
             }
             this.priceInfoContainer.appendChild(this.priceInfo2);
@@ -5014,19 +4809,32 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
         }
         ;
         get isCrossChain() {
-            var _a, _b, _c;
+            var _a, _b;
             const srcChainId = (_a = this.srcChain) === null || _a === void 0 ? void 0 : _a.chainId;
             const desChainId = (_b = this.desChain) === null || _b === void 0 ? void 0 : _b.chainId;
             if (this.isCrossChainEnabled && index_7.crossChainSupportedChainIds.some(v => v.chainId === srcChainId) && srcChainId != desChainId) {
                 return true;
             }
-            (_c = this.minSwapHintLabel) === null || _c === void 0 ? void 0 : _c.classList.add('hidden');
+            if (this.minSwapHintLabel)
+                this.minSwapHintLabel.visible = false;
             return false;
         }
         ;
         get isMetaMask() {
             var _a;
             return ((_a = eth_wallet_5.Wallet.getClientInstance().clientSideProvider) === null || _a === void 0 ? void 0 : _a.name) === index_7.WalletPlugin.MetaMask;
+        }
+        updateChainIcon(el, selected) {
+            if (selected) {
+                el.classList.add('icon-selected');
+                el.border.color = Theme.colors.primary.main;
+                el.cursor = 'default';
+            }
+            else {
+                el.classList.remove('icon-selected');
+                el.border.color = 'transparent';
+                el.cursor = 'pointer';
+            }
         }
         initExpertModal() {
             this.expertModal = new index_11.ExpertModeSettings(this.state);
@@ -5036,13 +4844,23 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
             });
         }
         resizeLayout() {
-            var _a, _b, _c;
+            var _a;
+            if (!this.wrapperSwap)
+                return;
             const tagWidth = Number((_a = this.tag) === null || _a === void 0 ? void 0 : _a.width);
             if ((this.offsetWidth !== 0 && this.offsetWidth < 550) || window.innerWidth < 550 || (!isNaN(tagWidth) && tagWidth !== 0 && tagWidth < 550)) {
-                (_b = this.wrapperSwap) === null || _b === void 0 ? void 0 : _b.classList.add('swap-flex--col');
+                this.wrapperSwap.templateColumns = ['auto'];
+                this.toggleReverseImage.alignItems = 'center';
+                this.toggleReverseImage.padding = { bottom: '1rem', top: '1rem' };
+                this.hIcon.visible = false;
+                this.vIcon.visible = true;
             }
             else {
-                (_c = this.wrapperSwap) === null || _c === void 0 ? void 0 : _c.classList.remove('swap-flex--col');
+                this.wrapperSwap.templateColumns = ['1fr', '32px', '1fr'];
+                this.toggleReverseImage.alignItems = 'end';
+                this.toggleReverseImage.padding = { bottom: '40px' };
+                this.hIcon.visible = true;
+                this.vIcon.visible = false;
             }
         }
         async initData() {
@@ -5062,7 +4880,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
             this.toInputValue = new eth_wallet_5.BigNumber(0);
             this.swapButtonStatusMap = {};
             this.approveButtonStatusMap = {};
-            this.$eventBus = components_9.application.EventBus;
+            this.$eventBus = components_6.application.EventBus;
             this.registerEvent();
             this.updateSwapButtonCaption();
             this.initExpertModal();
@@ -5070,16 +4888,6 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
             this.state.setDexInfoList(dexList);
             const lazyLoad = this.getAttribute('lazyLoad', true, false);
             if (!lazyLoad) {
-                // const defaultColors = {
-                //   fontColor: currentTheme.text.primary,
-                //   backgroundColor: currentTheme.background.main,
-                //   inputFontColor: currentTheme.input.fontColor,
-                //   inputBackgroundColor: currentTheme.input.background
-                // }
-                // this.setTag({
-                //   light: {...defaultColors},
-                //   dark: {...defaultColors}
-                // })
                 const campaignId = this.getAttribute('campaignId', true);
                 const category = this.getAttribute('category', true, "fixed-pair");
                 const providers = this.getAttribute('providers', true, []);
@@ -5128,134 +4936,180 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
         }
         render() {
             return (this.$render("i-scom-dapp-container", { id: "dappContainer" },
-                this.$render("i-panel", { id: "swapComponent", background: { color: Theme.background.main } },
-                    this.$render("i-panel", { class: index_css_2.swapStyle },
-                        this.$render("i-panel", { id: "swapContainer" },
+                this.$render("i-panel", { id: "swapComponent", background: { color: Theme.background.main }, overflow: 'hidden' },
+                    this.$render("i-panel", { class: index_css_1.swapStyle },
+                        this.$render("i-panel", { id: "swapContainer", width: 720, maxWidth: '100%', minHeight: 340, margin: { left: 'auto', right: 'auto' }, padding: { top: '1rem', left: '1rem', right: '1rem', bottom: '1rem' } },
                             this.$render("i-vstack", { id: "pnlBranding", margin: { bottom: '0.25rem' }, gap: "0.5rem", horizontalAlignment: "center" },
                                 this.$render("i-image", { id: 'imgLogo', height: 100 }),
                                 this.$render("i-label", { id: 'lbTitle', font: { bold: true, size: '1.5rem' } })),
-                            this.$render("i-panel", { class: "content-swap" },
-                                this.$render("i-hstack", { id: "wrapperSwap", gap: 10 },
-                                    this.$render("i-vstack", { gap: 5, minWidth: 230, width: "calc(100% - 25px)" },
+                            this.$render("i-panel", { margin: { top: '0.5rem', bottom: '1rem' }, border: { radius: '1rem' } },
+                                this.$render("i-grid-layout", { id: "wrapperSwap", templateColumns: ['1fr', '32px', '1fr'], gap: { column: 10 }, mediaQueries: [
+                                        {
+                                            maxWidth: '767px',
+                                            properties: {
+                                                templateColumns: ['auto']
+                                            }
+                                        }
+                                    ] },
+                                    this.$render("i-vstack", { gap: 5, minWidth: 230, width: "100%" },
                                         this.$render("i-vstack", { id: "srcChainBox", width: "100%", margin: { top: 8, bottom: 8 }, visible: false },
                                             this.$render("i-hstack", { gap: 8, horizontalAlignment: "space-between" },
                                                 this.$render("i-label", { opacity: 0.8, caption: "Source Chain", minWidth: "7rem" }),
-                                                this.$render("i-label", { id: "srcChainLabel", class: "chain-text", margin: { left: 'auto' }, caption: "-" })),
+                                                this.$render("i-label", { id: "srcChainLabel", textOverflow: "ellipsis", margin: { left: 'auto' }, caption: "-" })),
                                             this.$render("i-hstack", { id: "srcChainList", wrap: "wrap", verticalAlignment: "center", maxWidth: "100%" })),
-                                        this.$render("i-panel", { class: "token-box", minHeight: 120, margin: { top: 'auto' } },
-                                            this.$render("i-vstack", { class: "input--token-container", gap: 8 },
-                                                this.$render("i-vstack", { class: "balance-info", width: "100%", gap: 8 },
+                                        this.$render("i-panel", { minHeight: 120, margin: { top: 'auto' } },
+                                            this.$render("i-vstack", { gap: 8 },
+                                                this.$render("i-vstack", { width: "100%", gap: 8 },
                                                     this.$render("i-vstack", { width: "100%" },
                                                         this.$render("i-label", { caption: "You Swap", font: { size: '1.125rem' } })),
-                                                    this.$render("i-hstack", { gap: 5, horizontalAlignment: "space-between", verticalAlignment: "center", width: "100%" },
-                                                        this.$render("i-label", { id: "payBalance", class: "text--grey ml-auto", caption: "Balance: 0" }),
-                                                        this.$render("i-button", { id: "maxButton", class: "btn-max", caption: "Max", enabled: false, onClick: this.onSetMaxBalance }))),
-                                                this.$render("i-panel", { id: "payCol", class: "bg-box", width: "100%", margin: { top: 'auto' } },
-                                                    this.$render("i-scom-token-input", { id: "firstTokenInput", placeholder: '0.0', value: '-', tokenReadOnly: false, isBalanceShown: false, isBtnMaxShown: false, isCommonShown: true, inputReadOnly: true, background: { color: Theme.input.background }, border: { radius: '1rem' }, 
-                                                        // height={56}
-                                                        display: 'flex', font: { size: '1.25rem' }, onInputAmountChanged: this.onTokenInputChange, onSelectToken: (token) => this.onSelectToken(token, true), class: "token-input" })))),
+                                                    this.$render("i-hstack", { gap: '0.5rem', horizontalAlignment: "end", verticalAlignment: "center", width: "100%" },
+                                                        this.$render("i-label", { id: "payBalance", opacity: 0.55, caption: "Balance: 0" }),
+                                                        this.$render("i-button", { id: "maxButton", class: "btn-max", caption: "Max", enabled: false, font: { weight: 600, size: '1rem', color: Theme.colors.primary.contrastText }, lineHeight: 1.5, border: { radius: '0.5rem' }, padding: { left: '0.5rem', right: '0.5rem' }, onClick: this.onSetMaxBalance }))),
+                                                this.$render("i-panel", { id: "payCol", class: "bg-box", background: { color: Theme.input.background }, width: "100%", margin: { top: 'auto' }, border: { radius: '1rem', width: '2px', style: 'solid', color: 'transparent' } },
+                                                    this.$render("i-scom-token-input", { id: "firstTokenInput", placeholder: '0.0', value: '-', tokenReadOnly: false, isBalanceShown: false, isBtnMaxShown: false, isCommonShown: true, inputReadOnly: true, background: { color: Theme.input.background }, border: { radius: '1rem' }, height: 'auto', width: '100%', display: 'flex', font: { size: '1.25rem' }, padding: { left: '0.75rem', right: '0.75rem' }, tokenButtonStyles: {
+                                                            background: { color: Theme.background.main },
+                                                            padding: { top: '0.5rem', bottom: '0.5rem', left: '0.5rem', right: '0.5rem' },
+                                                            border: { radius: 8 },
+                                                            font: { size: '1rem', weight: 700, color: Theme.input.fontColor },
+                                                            lineHeight: 1.5,
+                                                            opacity: 1
+                                                        }, onInputAmountChanged: this.onTokenInputChange, onSelectToken: (token) => this.onSelectToken(token, true) })))),
                                         this.$render("i-hstack", { horizontalAlignment: "space-between" },
                                             this.$render("i-label", { id: "lbYouPayTitle", caption: "You Pay", font: { size: '1rem' } }),
                                             this.$render("i-label", { id: "lbYouPayValue", caption: "0", font: { size: '1rem' } }))),
-                                    this.$render("i-hstack", { class: "toggle-reverse", alignItems: "end" },
-                                        this.$render("i-icon", { id: "toggleReverseImage", position: "relative", width: 32, height: 32, class: "icon-swap rounded-icon custom-ic--swap", name: "arrows-alt-v", onClick: this.onRevertSwap.bind(this) })),
-                                    this.$render("i-vstack", { gap: 5, minWidth: 230, width: "calc(100% - 25px)" },
+                                    this.$render("i-hstack", { id: "toggleReverseImage", alignItems: "end", justifyContent: "center", stack: { basis: '32px' }, padding: { bottom: 40 }, onClick: this.onRevertSwap, mediaQueries: [
+                                            {
+                                                maxWidth: '767px',
+                                                properties: {
+                                                    alignItems: 'center',
+                                                    justifyContent: 'center',
+                                                    padding: { bottom: '1rem', top: '1rem' }
+                                                }
+                                            }
+                                        ] },
+                                        this.$render("i-icon", { id: "hIcon", width: 32, height: 32, name: "arrows-alt-h", fill: Theme.text.primary, padding: { left: '0.45rem', right: '0.45rem', top: '0.45rem', bottom: '0.45rem' }, background: { color: Theme.input.background }, border: { radius: '50%' }, mediaQueries: [
+                                                {
+                                                    maxWidth: '767px',
+                                                    properties: {
+                                                        visible: false
+                                                    }
+                                                }
+                                            ] }),
+                                        this.$render("i-icon", { id: "vIcon", width: 32, height: 32, name: "arrows-alt-v", fill: Theme.text.primary, padding: { left: '0.45rem', right: '0.45rem', top: '0.45rem', bottom: '0.45rem' }, background: { color: Theme.input.background }, border: { radius: '50%' }, visible: false, mediaQueries: [
+                                                {
+                                                    maxWidth: '767px',
+                                                    properties: {
+                                                        visible: true
+                                                    }
+                                                }
+                                            ] })),
+                                    this.$render("i-vstack", { gap: 5, minWidth: 230, width: "100%" },
                                         this.$render("i-vstack", { id: "desChainBox", width: "100%", margin: { top: 8, bottom: 8 }, visible: false },
                                             this.$render("i-hstack", { gap: 8, horizontalAlignment: "space-between" },
                                                 this.$render("i-label", { opacity: 0.8, caption: "Destination Chain", minWidth: "7rem" }),
-                                                this.$render("i-label", { id: "desChainLabel", class: "chain-text", margin: { left: 'auto' }, caption: "-" })),
+                                                this.$render("i-label", { id: "desChainLabel", textOverflow: "ellipsis", margin: { left: 'auto' }, caption: "-" })),
                                             this.$render("i-hstack", { id: "desChainList", wrap: "wrap", verticalAlignment: "center", maxWidth: "100%" })),
-                                        this.$render("i-panel", { class: "token-box", height: "100%", minHeight: 120, margin: { top: 'auto' } },
-                                            this.$render("i-vstack", { class: "input--token-container", height: "100%", gap: 8 },
-                                                this.$render("i-vstack", { class: "balance-info", width: "100%", gap: 8 },
+                                        this.$render("i-panel", { height: "100%", minHeight: 120, margin: { top: 'auto' } },
+                                            this.$render("i-vstack", { height: "100%", gap: 8 },
+                                                this.$render("i-vstack", { width: "100%", gap: 8 },
                                                     this.$render("i-vstack", { width: "100%" },
                                                         this.$render("i-label", { caption: "You Receive", font: { size: '1.125rem' } })),
-                                                    this.$render("i-vstack", { class: "text-right", width: "100%" },
-                                                        this.$render("i-label", { id: "receiveBalance", class: "text--grey ml-auto", caption: "Balance: 0" }))),
-                                                this.$render("i-panel", { id: "receiveCol", class: "bg-box", background: { color: Theme.input.background }, width: "100%", margin: { top: 'auto' } },
-                                                    this.$render("i-scom-token-input", { id: "secondTokenInput", value: '-', placeholder: '0.0', inputReadOnly: true, tokenReadOnly: false, isBalanceShown: false, isBtnMaxShown: false, isCommonShown: true, background: { color: Theme.input.background }, border: { radius: '1rem' }, 
-                                                        // height={56}
-                                                        display: 'flex', font: { size: '1.25rem' }, onInputAmountChanged: this.onTokenInputChange, onSelectToken: (token) => this.onSelectToken(token, false), class: "token-input" })))),
+                                                    this.$render("i-hstack", { horizontalAlignment: "end", width: "100%" },
+                                                        this.$render("i-label", { id: "receiveBalance", opacity: 0.55, margin: { left: 'auto' }, caption: "Balance: 0" }))),
+                                                this.$render("i-panel", { id: "receiveCol", background: { color: Theme.input.background }, width: "100%", margin: { top: 'auto' }, border: { radius: '1rem', width: '2px', style: 'solid', color: 'transparent' } },
+                                                    this.$render("i-scom-token-input", { id: "secondTokenInput", value: '-', placeholder: '0.0', inputReadOnly: true, tokenReadOnly: false, isBalanceShown: false, isBtnMaxShown: false, isCommonShown: true, background: { color: Theme.input.background }, border: { radius: '1rem' }, height: 'auto', width: '100%', display: 'flex', font: { size: '1.25rem' }, padding: { left: '0.75rem', right: '0.75rem' }, tokenButtonStyles: {
+                                                            background: { color: Theme.background.main },
+                                                            padding: { top: '0.5rem', bottom: '0.5rem', left: '0.5rem', right: '0.5rem' },
+                                                            border: { radius: 8 },
+                                                            font: { size: '1rem', weight: 700, color: Theme.input.fontColor },
+                                                            lineHeight: 1.5,
+                                                            opacity: 1
+                                                        }, onInputAmountChanged: this.onTokenInputChange, onSelectToken: (token) => this.onSelectToken(token, false) })))),
                                         this.$render("i-hstack", { horizontalAlignment: "end" },
-                                            this.$render("i-label", { id: "lbRouting", caption: "No routing", opacity: 0.75, font: { size: '1rem' }, class: "visibility-hidden" }))))),
-                            this.$render("i-panel", { id: "minSwapHintLabel", class: "hints" },
+                                            this.$render("i-label", { id: "lbRouting", caption: "No routing", opacity: 0, font: { size: '1rem' } }))))),
+                            this.$render("i-hstack", { id: "minSwapHintLabel", verticalAlignment: "center", margin: { top: '-0.5rem' }, gap: '0.25rem' },
                                 this.$render("i-icon", { name: "star", fill: Theme.colors.primary.main, width: 13, height: 13 }),
-                                this.$render("i-label", { caption: "No crosschain routes are found. You may try updating the input amount or selecting another token.", font: { color: Theme.colors.primary.main } })),
+                                this.$render("i-label", { caption: "No crosschain routes are found. You may try updating the input amount or selecting another token.", opacity: 0.9, font: { color: Theme.colors.primary.main, size: '0.8rem' } })),
                             this.$render("i-panel", { id: "pnlPriceInfo" }),
-                            this.$render("i-vstack", { class: "swap-btn-container", horizontalAlignment: "center", width: "100%" },
-                                this.$render("i-button", { id: "swapBtn", class: "btn-swap btn-os", maxWidth: 360, height: 60, visible: false, rightIcon: { spin: true, visible: false, fill: Theme.colors.primary.contrastText }, onClick: this.onClickSwapButton.bind(this) }))),
-                        this.$render("i-modal", { id: "swapModal", class: "custom-modal", title: "Confirm Swap", closeIcon: { name: 'times' } },
-                            this.$render("i-hstack", { verticalAlignment: 'center', horizontalAlignment: 'start' },
-                                this.$render("i-panel", { id: "srcChainFirstPanel", class: "row-chain" },
-                                    this.$render("i-image", { id: "srcChainTokenImage", width: "30px", height: "30px", url: "#" }),
-                                    this.$render("i-label", { id: "srcChainTokenLabel", class: "token-name", caption: "" }),
-                                    this.$render("i-icon", { name: "minus", class: "custom-icon--fill", width: 28, height: 10 })),
-                                this.$render("i-panel", { class: "row-chain" },
-                                    this.$render("i-image", { id: "fromTokenImage", width: "30px", height: "30px", url: "#" }),
-                                    this.$render("i-label", { id: "fromTokenLabel", class: "token-name", caption: "" })),
-                                this.$render("i-label", { id: "fromTokenValue", class: "token-value", caption: " - " })),
-                            this.$render("i-icon", { name: "arrow-down", class: "arrow-down custom-icon--fill", width: 28, height: 28 }),
-                            this.$render("i-panel", { id: "srcChainSecondPanel" },
+                            this.$render("i-vstack", { horizontalAlignment: "center", width: "100%", margin: { top: 10 } },
+                                this.$render("i-button", { id: "swapBtn", class: "btn-os", maxWidth: 360, height: 60, width: '100%', visible: false, rightIcon: { spin: true, visible: false, fill: Theme.colors.primary.contrastText, width: 16, height: 16 }, border: { radius: '0.65rem' }, font: { size: '1.125rem', color: Theme.colors.primary.contrastText, bold: true }, opacity: 1, lineHeight: 1.5, padding: { left: '0.75rem', right: '0.75rem', top: '0.5rem', bottom: '0.5rem' }, onClick: this.onClickSwapButton.bind(this) }))),
+                        this.$render("i-modal", { id: "swapModal", width: 490, maxWidth: '100%', padding: { left: '1rem', right: '1rem', top: '0.75rem', bottom: '0.75rem' }, border: { radius: '1rem' } },
+                            this.$render("i-hstack", { verticalAlignment: "center", horizontalAlignment: "space-between", margin: { bottom: '1.5rem' }, padding: { bottom: '0.5rem' }, border: { bottom: { width: '2px', style: 'solid', color: Theme.background.main } } },
+                                this.$render("i-label", { font: { color: Theme.colors.primary.main, size: '1.25rem', weight: 700 }, caption: "Confirm Swap" }),
+                                this.$render("i-icon", { fill: Theme.colors.primary.main, name: "times", width: 16, height: 16, cursor: "pointer", onClick: () => this.onCloseModal('swapModal') })),
+                            this.$render("i-vstack", null,
                                 this.$render("i-hstack", { verticalAlignment: 'center', horizontalAlignment: 'start' },
-                                    this.$render("i-panel", { class: "row-chain" },
-                                        this.$render("i-image", { id: "srcChainVaultImage", width: "30px", height: "30px", url: "#" }),
-                                        this.$render("i-label", { id: "srcChainVaultLabel", class: "token-name", caption: "" }),
-                                        this.$render("i-icon", { name: "minus", class: "custom-icon--fill", width: 28, height: 10 })),
-                                    this.$render("i-panel", { class: "row-chain" },
-                                        this.$render("i-image", { id: "srcVaultTokenImage", fallbackUrl: scom_token_list_6.assets.fallbackUrl, width: "30px", height: "30px", url: "#" }),
-                                        this.$render("i-label", { id: "srcVaultTokenLabel", class: "token-name", caption: "" })),
-                                    this.$render("i-label", { id: "srcVaultTokenValue", class: "token-value", caption: "-" })),
-                                this.$render("i-icon", { name: "arrow-down", class: "arrow-down custom-icon--fill", width: 28, height: 28 })),
-                            this.$render("i-panel", { id: "targetChainSecondPanel" },
-                                this.$render("i-hstack", { verticalAlignment: 'center', horizontalAlignment: 'start' },
-                                    this.$render("i-panel", { class: "row-chain" },
-                                        this.$render("i-image", { id: "targetChainVaultImage", width: "30px", height: "30px", url: "#" }),
-                                        this.$render("i-label", { id: "targetChainVaultLabel", class: "token-name", caption: "" }),
-                                        this.$render("i-icon", { name: "minus", class: "custom-icon--fill", width: 28, height: 10 })),
-                                    this.$render("i-panel", { class: "row-chain" },
-                                        this.$render("i-image", { id: "targetVaultTokenImage", fallbackUrl: scom_token_list_6.assets.fallbackUrl, width: "30px", height: "30px", url: "#" }),
-                                        this.$render("i-label", { id: "targetVaultTokenLabel", class: "token-name", caption: "" })),
-                                    this.$render("i-label", { id: "targetVaultTokenValue", class: "token-value", caption: "-" })),
-                                this.$render("i-vstack", { class: "text-right" },
-                                    this.$render("i-label", { id: "crossChainSoftCapLabel1", class: "text--grey ml-auto" }),
-                                    this.$render("i-label", { id: "targetVaultAssetBalanceLabel1", class: "text--grey ml-auto", caption: "Vault Asset Balance: 0" }),
-                                    this.$render("i-label", { id: "targetVaultBondBalanceLabel1", class: "text--grey ml-auto", caption: "Vault Bond Balance: 0" })),
-                                this.$render("i-icon", { name: "arrow-down", class: "arrow-down custom-icon--fill", width: 28, height: 28 })),
-                            this.$render("i-hstack", { class: "mb-1", verticalAlignment: 'center', horizontalAlignment: 'start' },
-                                this.$render("i-panel", { id: "targetChainFirstPanel", class: "row-chain" },
-                                    this.$render("i-image", { id: "targetChainTokenImage", fallbackUrl: scom_token_list_6.assets.fallbackUrl, width: "30px", height: "30px", url: "#" }),
-                                    this.$render("i-label", { id: "targetChainTokenLabel", class: "token-name", caption: "" }),
-                                    this.$render("i-icon", { name: "minus", class: "custom-icon--fill", width: 28, height: 10 })),
-                                this.$render("i-panel", { class: "row-chain" },
-                                    this.$render("i-image", { id: "toTokenImage", width: "30px", height: "30px", url: "#" }),
-                                    this.$render("i-label", { id: "toTokenLabel", class: "token-name", caption: "" })),
-                                this.$render("i-label", { id: "toTokenValue", class: "token-value text-primary bold", caption: " - " })),
-                            this.$render("i-vstack", { id: "crossChainVaultInfoVstack", class: "text-right" },
-                                this.$render("i-label", { id: "crossChainSoftCapLabel2", class: "text--grey ml-auto" }),
-                                this.$render("i-label", { id: "targetVaultAssetBalanceLabel2", class: "text--grey ml-auto", caption: "Vault Asset Balance: 0" }),
-                                this.$render("i-label", { id: "targetVaultBondBalanceLabel2", class: "text--grey ml-auto", caption: "Vault Bond Balance: 0" })),
-                            this.$render("i-panel", { class: "mb-1" },
-                                this.$render("i-label", { id: "lbEstimate" })),
-                            this.$render("i-panel", { class: "mb-1" },
-                                this.$render("i-label", { id: "lbPayOrReceive" }),
-                                this.$render("i-label", { id: "payOrReceiveValue", class: "text-primary bold", caption: "" }),
-                                this.$render("i-label", { id: "payOrReceiveToken", caption: "" })),
-                            this.$render("i-panel", { id: "priceInfoContainer", class: "bg-box mt-1 mb-1", background: { color: Theme.background.main }, width: "100%" }),
-                            this.$render("i-panel", { class: "swap-btn-container", width: "100%" },
-                                this.$render("i-button", { id: "swapModalConfirmBtn", class: "btn-swap btn-os", height: "auto", caption: "Confirm Swap", onClick: this.doSwap }))),
-                        this.$render("i-modal", { id: "modalFees", class: "bg-modal custom-modal", title: "Transaction Fee Details", closeIcon: { name: 'times' } },
-                            this.$render("i-panel", { class: "i-modal_content" },
-                                this.$render("i-panel", null,
-                                    this.$render("i-vstack", { id: "feesInfo" }),
-                                    this.$render("i-hstack", { verticalAlignment: "center", horizontalAlignment: "center", margin: { top: 16, bottom: 8 } },
-                                        this.$render("i-button", { caption: "Close", class: "btn-os", font: { color: Theme.colors.primary.contrastText }, onClick: () => this.closeModalFees() })))))),
+                                    this.$render("i-hstack", { id: "srcChainFirstPanel", verticalAlignment: "center", gap: '0.5rem' },
+                                        this.$render("i-image", { id: "srcChainTokenImage", width: "30px", height: "30px", url: "#" }),
+                                        this.$render("i-label", { id: "srcChainTokenLabel", font: { size: '1.1rem' }, caption: "" }),
+                                        this.$render("i-icon", { name: "minus", fill: Theme.input.fontColor, width: 28, height: 10 })),
+                                    this.$render("i-hstack", { verticalAlignment: "center", gap: '0.5rem' },
+                                        this.$render("i-image", { id: "fromTokenImage", width: "30px", height: "30px", url: "#" }),
+                                        this.$render("i-label", { id: "fromTokenLabel", font: { size: '1.1rem' }, caption: "" })),
+                                    this.$render("i-label", { id: "fromTokenValue", margin: { left: 'auto' }, font: { size: '1.1rem' }, caption: " - " })),
+                                this.$render("i-icon", { width: 28, height: 28, name: "arrow-down", fill: Theme.input.fontColor, border: { width: '2px', style: 'solid', color: 'transparent', radius: '50%' }, padding: { left: '0.25rem', right: '0.25rem', top: '0.25rem', bottom: '0.25rem' }, background: { color: Theme.input.background }, margin: { top: '0.75rem', bottom: '0.75rem' }, class: "arrow-down" }),
+                                this.$render("i-panel", { id: "srcChainSecondPanel" },
+                                    this.$render("i-hstack", { verticalAlignment: 'center', horizontalAlignment: 'start' },
+                                        this.$render("i-hstack", { verticalAlignment: "center", gap: '0.5rem' },
+                                            this.$render("i-image", { id: "srcChainVaultImage", width: "30px", height: "30px", url: "#" }),
+                                            this.$render("i-label", { id: "srcChainVaultLabel", font: { size: '1.1rem' }, caption: "" }),
+                                            this.$render("i-icon", { name: "minus", fill: Theme.input.fontColor, width: 28, height: 10 })),
+                                        this.$render("i-hstack", { verticalAlignment: "center", gap: '0.5rem' },
+                                            this.$render("i-image", { id: "srcVaultTokenImage", fallbackUrl: scom_token_list_6.assets.fallbackUrl, width: "30px", height: "30px", url: "#" }),
+                                            this.$render("i-label", { id: "srcVaultTokenLabel", font: { size: '1.1rem' }, caption: "" })),
+                                        this.$render("i-label", { id: "srcVaultTokenValue", margin: { left: 'auto' }, font: { size: '1.1rem' }, caption: "-" })),
+                                    this.$render("i-icon", { width: 28, height: 28, name: "arrow-down", fill: Theme.input.fontColor, border: { width: '2px', style: 'solid', color: 'transparent', radius: '50%' }, padding: { left: '0.25rem', right: '0.25rem', top: '0.25rem', bottom: '0.25rem' }, background: { color: Theme.input.background }, margin: { top: '0.75rem', bottom: '0.75rem' }, class: "arrow-down" })),
+                                this.$render("i-panel", { id: "targetChainSecondPanel" },
+                                    this.$render("i-hstack", { verticalAlignment: 'center', horizontalAlignment: 'start' },
+                                        this.$render("i-hstack", { verticalAlignment: "center", gap: '0.5rem' },
+                                            this.$render("i-image", { id: "targetChainVaultImage", width: "30px", height: "30px", url: "#" }),
+                                            this.$render("i-label", { id: "targetChainVaultLabel", font: { size: '1.1rem' }, caption: "" }),
+                                            this.$render("i-icon", { name: "minus", fill: Theme.input.fontColor, width: 28, height: 10 })),
+                                        this.$render("i-hstack", { verticalAlignment: "center", gap: '0.5rem' },
+                                            this.$render("i-image", { id: "targetVaultTokenImage", fallbackUrl: scom_token_list_6.assets.fallbackUrl, width: "30px", height: "30px", url: "#" }),
+                                            this.$render("i-label", { id: "targetVaultTokenLabel", font: { size: '1.1rem' }, caption: "" })),
+                                        this.$render("i-label", { id: "targetVaultTokenValue", margin: { left: 'auto' }, font: { size: '1.1rem' }, caption: "-" })),
+                                    this.$render("i-vstack", { justifyContent: 'end' },
+                                        this.$render("i-label", { id: "crossChainSoftCapLabel1", opacity: 0.55, margin: { left: 'auto' } }),
+                                        this.$render("i-label", { id: "targetVaultAssetBalanceLabel1", opacity: 0.55, margin: { left: 'auto' }, caption: "Vault Asset Balance: 0" }),
+                                        this.$render("i-label", { id: "targetVaultBondBalanceLabel1", opacity: 0.55, margin: { left: 'auto' }, caption: "Vault Bond Balance: 0" })),
+                                    this.$render("i-icon", { width: 28, height: 28, name: "arrow-down", fill: Theme.input.fontColor, border: { width: '2px', style: 'solid', color: 'transparent', radius: '50%' }, padding: { left: '0.25rem', right: '0.25rem', top: '0.25rem', bottom: '0.25rem' }, margin: { top: '0.75rem', bottom: '0.75rem' }, background: { color: Theme.input.background }, class: "arrow-down" })),
+                                this.$render("i-hstack", { margin: { bottom: '1rem' }, verticalAlignment: 'center', horizontalAlignment: 'start' },
+                                    this.$render("i-hstack", { id: "targetChainFirstPanel", verticalAlignment: "center", gap: '0.5rem' },
+                                        this.$render("i-image", { id: "targetChainTokenImage", fallbackUrl: scom_token_list_6.assets.fallbackUrl, width: "30px", height: "30px", url: "#" }),
+                                        this.$render("i-label", { id: "targetChainTokenLabel", font: { size: '1.1rem' }, caption: "" }),
+                                        this.$render("i-icon", { name: "minus", fill: Theme.input.fontColor, width: 28, height: 10 })),
+                                    this.$render("i-hstack", { verticalAlignment: "center", gap: '0.5rem' },
+                                        this.$render("i-image", { id: "toTokenImage", width: "30px", height: "30px", url: "#" }),
+                                        this.$render("i-label", { id: "toTokenLabel", font: { size: '1.1rem' }, caption: "" })),
+                                    this.$render("i-label", { id: "toTokenValue", margin: { left: 'auto' }, font: { weight: 700, color: Theme.colors.primary.main }, caption: " - " })),
+                                this.$render("i-vstack", { id: "crossChainVaultInfoVstack", justifyContent: 'end' },
+                                    this.$render("i-label", { id: "crossChainSoftCapLabel2", opacity: 0.55, margin: { left: 'auto' } }),
+                                    this.$render("i-label", { id: "targetVaultAssetBalanceLabel2", opacity: 0.55, margin: { left: 'auto' }, caption: "Vault Asset Balance: 0" }),
+                                    this.$render("i-label", { id: "targetVaultBondBalanceLabel2", opacity: 0.55, margin: { left: 'auto' }, caption: "Vault Bond Balance: 0" })),
+                                this.$render("i-label", { id: "lbEstimate", display: "block", margin: { bottom: '1rem' } }),
+                                this.$render("i-hstack", { margin: { bottom: '1rem' }, gap: '0.25rem' },
+                                    this.$render("i-label", { id: "lbPayOrReceive" }),
+                                    this.$render("i-label", { id: "payOrReceiveValue", font: { weight: 700, color: Theme.colors.primary.main }, caption: "" }),
+                                    this.$render("i-label", { id: "payOrReceiveToken", caption: "" }))),
+                            this.$render("i-panel", { id: "priceInfoContainer", background: { color: Theme.background.main }, border: { radius: '1rem', width: '2px', style: 'solid', color: 'transparent' }, margin: { top: '1rem', bottom: '1rem' }, width: "100%" }),
+                            this.$render("i-panel", { width: "100%", margin: { top: 10 } },
+                                this.$render("i-button", { id: "swapModalConfirmBtn", class: "btn-os", height: "auto", width: '100%', caption: "Confirm Swap", border: { radius: '0.65rem' }, font: { size: '1.125rem', color: Theme.colors.primary.contrastText, bold: true }, opacity: 1, lineHeight: 1.5, padding: { left: '0.75rem', right: '0.75rem', top: '0.5rem', bottom: '0.5rem' }, onClick: this.doSwap }))),
+                        this.$render("i-modal", { id: "modalFees", width: 490, maxWidth: '100%', padding: { left: '1rem', right: '1rem', top: '0.75rem', bottom: '0.75rem' }, border: { radius: '1rem' } },
+                            this.$render("i-hstack", { verticalAlignment: "center", horizontalAlignment: "space-between", margin: { bottom: '0.5rem' }, padding: { bottom: '0.5rem' }, border: { bottom: { width: '2px', style: 'solid', color: Theme.background.main } } },
+                                this.$render("i-label", { font: { color: Theme.colors.primary.main, size: '0.875rem', weight: 700 }, caption: "Transaction Fee Details" }),
+                                this.$render("i-icon", { fill: Theme.colors.primary.main, name: "times", width: 16, height: 16, cursor: "pointer", onClick: () => this.onCloseModal('modalFees') })),
+                            this.$render("i-vstack", { gap: "1rem" },
+                                this.$render("i-vstack", { id: "feesInfo" }),
+                                this.$render("i-hstack", { verticalAlignment: "center", horizontalAlignment: "center", margin: { bottom: '0.5rem' } },
+                                    this.$render("i-button", { caption: "Close", class: "btn-os", lineHeight: 1.5, width: '150px', height: "auto", padding: { top: '0.25rem', bottom: '0.25rem', left: '0.25rem', right: '0.25rem' }, font: { size: '1rem', color: Theme.colors.primary.contrastText, weight: 700 }, onClick: () => this.closeModalFees() }))))),
                     this.$render("i-scom-tx-status-modal", { id: "txStatusModal" }),
                     this.$render("i-scom-wallet-modal", { id: "mdWallet", wallets: [] }))));
         }
     };
     ScomSwap = __decorate([
-        components_9.customModule,
-        (0, components_9.customElements)('i-scom-swap')
+        components_6.customModule,
+        (0, components_6.customElements)('i-scom-swap')
     ], ScomSwap);
     exports.default = ScomSwap;
 });

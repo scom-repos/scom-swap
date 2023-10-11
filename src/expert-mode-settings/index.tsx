@@ -1,7 +1,7 @@
-import { customElements, customModule, Module, Container, ControlElement, Modal, application, IEventBus } from '@ijstech/components';
+import { customElements, customModule, Module, Container, ControlElement, Modal, application, IEventBus, Styles } from '@ijstech/components';
 import { State } from '../store/index';
 import { EventId } from '../global/index';
-import styleClass from './index.css';
+const Theme = Styles.Theme.ThemeVars;
 
 declare global {
 	namespace JSX {
@@ -24,11 +24,6 @@ export class ExpertModeSettings extends Module {
     this.$eventBus = application.EventBus;
 	};
 
-	async init(){
-		this.classList.add(styleClass);
-		super.init();
-  }
-
   closeModal() {
     this.expertModal.visible = false;
   }
@@ -45,13 +40,57 @@ export class ExpertModeSettings extends Module {
 
 	render() {
 		return (
-      <i-modal id="expertModal" class='dark-modal' title="Expert Mode" closeIcon={{ name: 'times' }}>
-        <i-panel class="expert-content">
-          <i-panel class="warning-box">
-            <i-label caption="Expert mode allows high slippage trades that often result in bad rates and lost funds."></i-label>
+      <i-modal
+        id="expertModal"
+        border={{radius: '1rem'}}
+        padding={{top: '1rem', bottom: '1rem', left: '1rem', right: '1rem'}}
+        width={327}
+      >
+        <i-hstack
+          verticalAlignment="center" horizontalAlignment="space-between"
+          margin={{bottom: '1.25rem'}} padding={{bottom: '0.75rem'}}
+          border={{bottom: {width: '2px', style: 'solid', color: Theme.background.main}}}
+        >
+          <i-label
+            font={{color: Theme.colors.primary.main, weight: 700, size: '1.125rem'}}
+            caption="Expert Mode"
+            margin={{left: 'auto', right: 'auto'}}
+            padding={{left: '2rem', right: '2rem'}}
+          ></i-label>
+          <i-icon
+            fill={Theme.colors.primary.main}
+            name="times"
+            width={16} height={16}
+            cursor="pointer"
+            onClick={() => this.closeModal()}
+          ></i-icon>
+        </i-hstack>
+        <i-panel class="text-center">
+          <i-panel
+            padding={{top: '1rem', bottom: '1rem', left: '0.75rem', right: '0.75rem'}}
+            margin={{bottom: '1.25rem'}}
+            background={{color: 'linear-gradient(90deg,#df5869 -19.25%,#bc4c7b 116.5%)'}}
+            border={{width: '1px', style: 'solid', color: '#f15e61', radius: '0.5rem'}}
+          >
+            <i-label
+              caption="Expert mode allows high slippage trades that often result in bad rates and lost funds."
+              font={{weight: 'bold', color: Theme.colors.primary.contrastText, size: '1rem'}}
+            ></i-label>
           </i-panel>
-          <i-label class="warning-text" caption="Only use this mode if you know what you are doing."></i-label>
-          <i-button width="100%" height="auto" caption="Turn On Expert Mode" onClick={this.onToggle.bind(this)}></i-button>
+          <i-label
+            class="warning-text"
+            caption="Only use this mode if you know what you are doing."
+            font={{weight: 'bold', color: Theme.colors.warning.light, size: '1.05rem'}}
+          ></i-label>
+          <i-button
+            width="100%" height="auto"
+            caption="Turn On Expert Mode"
+            padding={{top: '0.75rem', bottom: '0.75rem', left: '0.75rem', right: '0.75rem'}}
+            margin={{top: '1.25rem', bottom: '0.5rem'}}
+            font={{color: Theme.colors.primary.contrastText, weight: 700}}
+            background={{color: 'transparent linear-gradient(255deg,#e75b66,#b52082) 0% 0% no-repeat padding-box'}}
+            onClick={this.onToggle.bind(this)}
+          ></i-button>
         </i-panel>
       </i-modal>
 		)
