@@ -984,7 +984,7 @@ export default class ScomSwap extends Module {
         application.EventBus.dispatch(EventId.Paid, { 
           isCrossChain: this.isCrossChain,
           data: data ?? null, 
-          id: this.id,
+          id: this.uuid,
           receipt: receipt
         });
       },

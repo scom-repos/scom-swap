@@ -4016,7 +4016,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                     components_6.application.EventBus.dispatch("Paid" /* EventId.Paid */, {
                         isCrossChain: this.isCrossChain,
                         data: data !== null && data !== void 0 ? data : null,
-                        id: this.id,
+                        id: this.uuid,
                         receipt: receipt
                     });
                 },
