@@ -1455,7 +1455,7 @@ define("@scom/scom-swap/swap-utils/index.ts", ["require", "exports", "@ijstech/e
             const dex = state.getDexInfoList({ key: provider.key, chainId: provider.chainId })[0];
             if (dex) {
                 const routerAddress = ((_a = dex.details.find(v => v.chainId === provider.chainId)) === null || _a === void 0 ? void 0 : _a.routerAddress) || '';
-                const selectors = await (0, scom_dex_list_1.getSwapProxySelectors)(wallet, dex.dexType, provider.chainId, routerAddress);
+                const selectors = await (0, scom_dex_list_1.getSwapProxySelectors)(dex.dexType, provider.chainId, routerAddress);
                 selectors.forEach(v => selectorsSet.add(v));
             }
         }
@@ -1487,7 +1487,7 @@ define("@scom/scom-swap/swap-utils/index.ts", ["require", "exports", "@ijstech/e
                 tokenIn = getWETH(chainId);
             if (!tokenOut.address)
                 tokenOut = getWETH(chainId);
-            let reserveObj = await (0, scom_dex_list_1.getDexPairReserves)(wallet, wallet.chainId, market, pairAddress, tokenIn.address, tokenOut.address);
+            let reserveObj = await (0, scom_dex_list_1.getDexPairReserves)(wallet.chainId, market, pairAddress, tokenIn.address, tokenOut.address);
             return reserveObj;
         };
         let composeAvailableRoutePromise = async (state, market, tokenIn, tokenOut) => {

@@ -225,7 +225,7 @@ const getProviderProxySelectors = async (state: State, providers: IProviderUI[])
     const dex = state.getDexInfoList({ key: provider.key, chainId: provider.chainId })[0];
     if (dex) {
       const routerAddress = dex.details.find(v => v.chainId === provider.chainId)?.routerAddress || '';
-      const selectors = await getSwapProxySelectors(wallet, dex.dexType, provider.chainId, routerAddress);
+      const selectors = await getSwapProxySelectors(dex.dexType, provider.chainId, routerAddress);
       selectors.forEach(v => selectorsSet.add(v));
     }
   }
@@ -254,7 +254,7 @@ const getAllAvailableRoutes = async (state: State, markets: string[], tokenList:
     let chainId = state.getChainId();
     if (!tokenIn.address) tokenIn = getWETH(chainId);
     if (!tokenOut.address) tokenOut = getWETH(chainId);
-    let reserveObj = await getDexPairReserves(wallet, wallet.chainId, market, pairAddress, tokenIn.address, tokenOut.address);
+    let reserveObj = await getDexPairReserves(wallet.chainId, market, pairAddress, tokenIn.address, tokenOut.address);
     return reserveObj;
   }
 
