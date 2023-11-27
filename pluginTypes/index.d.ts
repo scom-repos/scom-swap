@@ -1007,20 +1007,6 @@ declare module "@scom/scom-swap" {
         } | {
             name: string;
             target: string;
-            getActions: (category?: string) => any[];
-            getData: any;
-            setData: (value: any) => Promise<void>;
-            getTag: any;
-            setTag: any;
-            getProxySelectors?: undefined;
-            getDexProviderOptions?: undefined;
-            getPair?: undefined;
-            elementName?: undefined;
-            getLinkParams?: undefined;
-            bindOnChanged?: undefined;
-        } | {
-            name: string;
-            target: string;
             elementName: string;
             getLinkParams: () => {
                 data: any;
@@ -1052,6 +1038,20 @@ declare module "@scom/scom-swap" {
             getDexProviderOptions?: undefined;
             getPair?: undefined;
             getActions?: undefined;
+        } | {
+            name: string;
+            target: string;
+            getActions: (category?: string) => any[];
+            getData: any;
+            setData: any;
+            getTag: any;
+            setTag: any;
+            getProxySelectors?: undefined;
+            getDexProviderOptions?: undefined;
+            getPair?: undefined;
+            elementName?: undefined;
+            getLinkParams?: undefined;
+            bindOnChanged?: undefined;
         })[];
         private getData;
         private resetRpcWallet;

@@ -325,7 +325,7 @@ export default class ScomSwap extends Module {
     const formSchema: any = getBuilderSchema();
     const dataSchema = formSchema.dataSchema;
     const uiSchema = formSchema.uiSchema;
-    const customControls = formSchema.customControls(this.state.getRpcWallet()?.instanceId);
+    const customControls = formSchema.customControls(this.state?.getRpcWallet()?.instanceId);
     let self = this;
     const actions: any[] = [
       {
@@ -569,6 +569,19 @@ export default class ScomSwap extends Module {
           }
           await this.setData(resultingData);
         },
+        getTag: this.getTag.bind(this),
+        setTag: this.setTag.bind(this)
+      },
+      {
+        name: 'Editor',
+        target: 'Editor',
+        getActions: (category?: string) => {
+          const actions = this.determineActionsByTarget('builder', this.category);
+          const editAction = actions.find(action => action.name === 'Edit');
+          return editAction ? [editAction] : [];
+        },
+        getData: this.getData.bind(this),
+        setData: this.setData.bind(this),
         getTag: this.getTag.bind(this),
         setTag: this.setTag.bind(this)
       }
