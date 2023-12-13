@@ -739,6 +739,7 @@ export default class ScomSwap extends Module {
 
   constructor(parent?: Container, options?: any) {
     super(parent, options);
+    this.deferReadyCallback = true;
   }
 
   private registerEvent() {
@@ -2165,8 +2166,7 @@ export default class ScomSwap extends Module {
   }
 
   async init() {
-    this.isReadyCallbackQueued = true;
-    super.init();
+    await super.init();
     this.state = new State(configData);
     this.fromInputValue = new BigNumber(0);
     this.toInputValue = new BigNumber(0);
@@ -2217,8 +2217,7 @@ export default class ScomSwap extends Module {
       if (!this.isEmptyData(data)) {
         await this.setData(data);
       }
-    }
-    this.isReadyCallbackQueued = false;
+    };
     this.executeReadyCallback();
     window.addEventListener('resize', () => {
       setTimeout(() => {

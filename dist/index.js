@@ -3840,6 +3840,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                 this.txStatusModal.message = { ...params };
                 this.txStatusModal.showModal();
             };
+            this.deferReadyCallback = true;
         }
         registerEvent() {
             this.clientEvents.push(this.$eventBus.register(this, "SlippageToleranceChanged" /* EventId.SlippageToleranceChanged */, () => { this.priceInfo.setData(this.getPriceInfo()); }));
@@ -4877,8 +4878,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
             return !value || !value.networks || value.networks.length === 0;
         }
         async init() {
-            this.isReadyCallbackQueued = true;
-            super.init();
+            await super.init();
             this.state = new index_7.State(data_json_1.default);
             this.fromInputValue = new eth_wallet_5.BigNumber(0);
             this.toInputValue = new eth_wallet_5.BigNumber(0);
@@ -4930,7 +4930,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                     await this.setData(data);
                 }
             }
-            this.isReadyCallbackQueued = false;
+            ;
             this.executeReadyCallback();
             window.addEventListener('resize', () => {
                 setTimeout(() => {
