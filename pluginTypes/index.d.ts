@@ -779,22 +779,22 @@ declare module "@scom/scom-swap/formSchema.ts" {
             '#/properties/networks/properties/chainId': {
                 render: () => ScomNetworkPicker;
                 getData: (control: ScomNetworkPicker) => number;
-                setData: (control: ScomNetworkPicker, value: number) => void;
+                setData: (control: ScomNetworkPicker, value: number) => Promise<void>;
             };
             '#/properties/tokens/properties/chainId': {
                 render: () => ScomNetworkPicker;
                 getData: (control: ScomNetworkPicker) => number;
-                setData: (control: ScomNetworkPicker, value: number) => void;
+                setData: (control: ScomNetworkPicker, value: number) => Promise<void>;
             };
             '#/properties/tokens/properties/address': {
                 render: () => ScomTokenInput;
                 getData: (control: ScomTokenInput) => string;
-                setData: (control: ScomTokenInput, value: string) => void;
+                setData: (control: ScomTokenInput, value: string, rowData: any) => void;
             };
             '#/properties/providers/properties/chainId': {
                 render: () => ScomNetworkPicker;
                 getData: (control: ScomNetworkPicker) => number;
-                setData: (control: ScomNetworkPicker, value: number) => void;
+                setData: (control: ScomNetworkPicker, value: number) => Promise<void>;
             };
         };
     };

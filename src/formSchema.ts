@@ -427,7 +427,8 @@ export function getBuilderSchema() {
                     getData: (control: ScomNetworkPicker) => {
                         return control.selectedNetwork?.chainId;
                     },
-                    setData: (control: ScomNetworkPicker, value: number) => {
+                    setData: async (control: ScomNetworkPicker, value: number) => {
+                        await control.ready();
                         control.setNetworkByChainId(value);
                         const idx = networkPickers.findIndex(f => f === control);
                         if (tokenInputs[idx]) tokenInputs[idx].chainId = value;
@@ -449,7 +450,8 @@ export function getBuilderSchema() {
                     getData: (control: ScomTokenInput) => {
                         return control.token?.address || control.token?.symbol;
                     },
-                    setData: (control: ScomTokenInput, value: string) => {
+                    setData: (control: ScomTokenInput, value: string, rowData: any) => {
+                        control.chainId = rowData.chainId;
                         control.address = value;
                     }
                 },
@@ -472,7 +474,8 @@ const customNetworkPicker = () => {
         getData: (control: ScomNetworkPicker) => {
             return control.selectedNetwork?.chainId;
         },
-        setData: (control: ScomNetworkPicker, value: number) => {
+        setData: async (control: ScomNetworkPicker, value: number) => {
+            await control.ready();
             control.setNetworkByChainId(value);
         }
     }

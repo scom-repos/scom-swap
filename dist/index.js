@@ -2821,7 +2821,8 @@ define("@scom/scom-swap/formSchema.ts", ["require", "exports", "@ijstech/compone
                         getData: (control) => {
                             return control.selectedNetwork?.chainId;
                         },
-                        setData: (control, value) => {
+                        setData: async (control, value) => {
+                            await control.ready();
                             control.setNetworkByChainId(value);
                             const idx = networkPickers.findIndex(f => f === control);
                             if (tokenInputs[idx])
@@ -2844,7 +2845,8 @@ define("@scom/scom-swap/formSchema.ts", ["require", "exports", "@ijstech/compone
                         getData: (control) => {
                             return control.token?.address || control.token?.symbol;
                         },
-                        setData: (control, value) => {
+                        setData: (control, value, rowData) => {
+                            control.chainId = rowData.chainId;
                             control.address = value;
                         }
                     },
@@ -2866,7 +2868,8 @@ define("@scom/scom-swap/formSchema.ts", ["require", "exports", "@ijstech/compone
             getData: (control) => {
                 return control.selectedNetwork?.chainId;
             },
-            setData: (control, value) => {
+            setData: async (control, value) => {
+                await control.ready();
                 control.setNetworkByChainId(value);
             }
         };
