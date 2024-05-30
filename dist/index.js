@@ -21,7 +21,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 define("@scom/scom-swap/index.css.ts", ["require", "exports", "@ijstech/components"], function (require, exports, components_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.swapStyle = void 0;
+    exports.storageModalStyle = exports.swapStyle = void 0;
     const Theme = components_1.Styles.Theme.ThemeVars;
     // const colorVar = {
     //   primaryButton: 'transparent linear-gradient(90deg, #AC1D78 0%, #E04862 100%) 0% 0% no-repeat padding-box',
@@ -382,6 +382,21 @@ define("@scom/scom-swap/index.css.ts", ["require", "exports", "@ijstech/componen
             '.btn-max:not(.disabled):hover': {
                 transition: 'all .2s ease-out',
                 background: 'var(--max-button-hover-background)'
+            }
+        }
+    });
+    exports.storageModalStyle = components_1.Styles.style({
+        $nest: {
+            '.modal > div:nth-child(2)': {
+                width: '100%',
+                height: '100%',
+                overflow: 'hidden'
+            },
+            'i-scom-storage': {
+                display: 'block',
+                width: '100%',
+                height: 'calc(100% - 1.5rem)',
+                overflow: 'hidden'
             }
         }
     });
@@ -2383,10 +2398,11 @@ define("@scom/scom-swap/data.json.ts", ["require", "exports"], function (require
         }
     };
 });
-define("@scom/scom-swap/formSchema.ts", ["require", "exports", "@scom/scom-network-picker", "@scom/scom-token-input"], function (require, exports, scom_network_picker_1, scom_token_input_1) {
+define("@scom/scom-swap/formSchema.ts", ["require", "exports", "@ijstech/components", "@scom/scom-network-picker", "@scom/scom-token-input", "@scom/scom-storage", "@scom/scom-swap/index.css.ts"], function (require, exports, components_6, scom_network_picker_1, scom_token_input_1, scom_storage_1, index_css_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.getProjectOwnerSchema = exports.getBuilderSchema = void 0;
+    const Theme = components_6.Styles.Theme.ThemeVars;
     const chainIds = [1, 56, 137, 250, 97, 80001, 43113, 43114];
     const networks = chainIds.map(v => { return { chainId: v }; });
     const theme = {
@@ -2753,7 +2769,41 @@ define("@scom/scom-swap/formSchema.ts", ["require", "exports", "@scom/scom-netwo
             customControls(rpcWalletId) {
                 let networkPickers = [];
                 let tokenInputs = [];
+                let edtLogo;
                 return {
+                    '#/properties/logo': {
+                        render: () => {
+                            const hstack = new components_6.StackLayout(undefined, {
+                                width: '100%',
+                                alignItems: 'center',
+                                background: Theme.input.background
+                            });
+                            edtLogo = new components_6.Input(hstack, {
+                                width: '100%',
+                                height: 42,
+                                padding: { left: '1rem', right: '1rem' },
+                                border: { width: 0 }
+                            });
+                            const button = new components_6.Button(hstack, {
+                                height: 42,
+                                padding: { left: '0.5rem', right: '0.5rem' },
+                                caption: 'Browse',
+                                icon: { width: '0.875rem', height: '0.875rem', name: 'image' },
+                                font: { size: '0.875rem', color: Theme.colors.secondary.contrastText },
+                                background: { color: Theme.colors.secondary.main }
+                            });
+                            button.onClick = () => {
+                                showStorage(edtLogo);
+                            };
+                            return hstack;
+                        },
+                        getData: (control) => {
+                            return edtLogo.value;
+                        },
+                        setData: (control, value) => {
+                            edtLogo.value = value;
+                        }
+                    },
                     '#/properties/networks/properties/chainId': customNetworkPicker(),
                     '#/properties/tokens/properties/chainId': {
                         render: () => {
@@ -2820,6 +2870,30 @@ define("@scom/scom-swap/formSchema.ts", ["require", "exports", "@scom/scom-netwo
                 control.setNetworkByChainId(value);
             }
         };
+    };
+    const showStorage = (target) => {
+        const scomStorage = scom_storage_1.ScomStorage.getInstance();
+        scomStorage.onCancel = () => {
+            scomStorage.closeModal();
+        };
+        scomStorage.onOpen = (path) => {
+            const imageTypes = ['jpg', 'jpeg', 'png', 'gif', 'svg', 'webp'];
+            const ext = path.split('.').pop().toLowerCase();
+            if (imageTypes.includes(ext)) {
+                target.value = path;
+                scomStorage.closeModal();
+            }
+        };
+        scomStorage.openModal({
+            width: 800,
+            maxWidth: '100%',
+            height: '90vh',
+            overflow: 'hidden',
+            zIndex: 1002,
+            closeIcon: { width: '1rem', height: '1rem', name: 'times', fill: Theme.text.primary, margin: { bottom: '0.5rem' } },
+            class: index_css_1.storageModalStyle
+        });
+        scomStorage.onShow();
     };
     function getProjectOwnerSchema() {
         return {
@@ -2913,13 +2987,13 @@ define("@scom/scom-swap/formSchema.ts", ["require", "exports", "@scom/scom-netwo
     }
     exports.getProjectOwnerSchema = getProjectOwnerSchema;
 });
-define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstech/eth-wallet", "@scom/scom-swap/store/index.ts", "@scom/scom-token-list", "@scom/scom-swap/swap-utils/index.ts", "@scom/scom-swap/crosschain-utils/index.ts", "@scom/scom-swap/global/index.ts", "@scom/scom-swap/expert-mode-settings/index.tsx", "@scom/scom-swap/data.json.ts", "@scom/scom-swap/formSchema.ts", "@scom/scom-dex-list", "@scom/scom-commission-fee-setup", "@scom/scom-swap/index.css.ts", "@scom/scom-swap/index.css.ts"], function (require, exports, components_6, eth_wallet_5, index_7, scom_token_list_6, index_8, index_9, index_10, index_11, data_json_1, formSchema_1, scom_dex_list_2, scom_commission_fee_setup_1, index_css_1) {
+define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstech/eth-wallet", "@scom/scom-swap/store/index.ts", "@scom/scom-token-list", "@scom/scom-swap/swap-utils/index.ts", "@scom/scom-swap/crosschain-utils/index.ts", "@scom/scom-swap/global/index.ts", "@scom/scom-swap/expert-mode-settings/index.tsx", "@scom/scom-swap/data.json.ts", "@scom/scom-swap/formSchema.ts", "@scom/scom-dex-list", "@scom/scom-commission-fee-setup", "@scom/scom-swap/index.css.ts", "@scom/scom-swap/index.css.ts"], function (require, exports, components_7, eth_wallet_5, index_7, scom_token_list_6, index_8, index_9, index_10, index_11, data_json_1, formSchema_1, scom_dex_list_2, scom_commission_fee_setup_1, index_css_2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    const Theme = components_6.Styles.Theme.ThemeVars;
+    const Theme = components_7.Styles.Theme.ThemeVars;
     const priceImpactTooHighMsg = 'Price Impact Too High. If you want to bypass this check, please turn on Expert Mode';
     const ROUNDING_NUMBER = eth_wallet_5.BigNumber.ROUND_DOWN;
-    let ScomSwap = class ScomSwap extends components_6.Module {
+    let ScomSwap = class ScomSwap extends components_7.Module {
         static async create(options, parent) {
             let self = new this(parent, options);
             await self.ready();
@@ -3051,17 +3125,17 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                     },
                     customUI: {
                         render: async (data, onConfirm) => {
-                            const vstack = new components_6.VStack();
+                            const vstack = new components_7.VStack();
                             await self.loadCommissionFee();
                             const config = new scom_commission_fee_setup_1.default(null, {
                                 commissions: self._data.commissions || [],
                                 fee: self.state.embedderCommissionFee,
                                 networks: self._data.networks
                             });
-                            const hstack = new components_6.HStack(null, {
+                            const hstack = new components_7.HStack(null, {
                                 verticalAlignment: 'center',
                             });
-                            const button = new components_6.Button(hstack, {
+                            const button = new components_7.Button(hstack, {
                                 caption: 'Confirm',
                                 width: '100%',
                                 height: 40,
@@ -3447,7 +3521,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                 const val = typeof value === 'object' ? value : new eth_wallet_5.BigNumber(value);
                 if (val.isNaN() || val.isZero())
                     return '';
-                return components_6.FormatUtils.formatNumber(val.toFixed(), { decimalFigures: 4, useSeparators: false });
+                return components_7.FormatUtils.formatNumber(val.toFixed(), { decimalFigures: 4, useSeparators: false });
             };
             this.initWallet = async () => {
                 try {
@@ -3750,7 +3824,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                 await this.handleAddRoute();
             };
             this.initChainIcon = (network, isDes) => {
-                const img = new components_6.Image(undefined, {
+                const img = new components_7.Image(undefined, {
                     width: 32,
                     height: 32,
                     margin: { top: '0.25rem', right: '0.5rem' },
@@ -3811,7 +3885,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                 const fees = this.getFeeDetails();
                 this.feesInfo.clearInnerHTML();
                 fees.forEach((fee) => {
-                    const feeValue = components_6.FormatUtils.formatNumber(fee.value.toFixed(), { decimalFigures: 4 });
+                    const feeValue = components_7.FormatUtils.formatNumber(fee.value.toFixed(), { decimalFigures: 4 });
                     this.feesInfo.appendChild(this.$render("i-hstack", { horizontalAlignment: "space-between", verticalAlignment: "center", margin: { top: 10 }, border: { bottom: { color: Theme.background.main, width: '2px', style: 'solid' } }, padding: { bottom: 16 } },
                         this.$render("i-hstack", { verticalAlignment: "center" },
                             this.$render("i-label", { caption: fee.title, margin: { right: 4 } }),
@@ -4016,7 +4090,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                 onPaid: async (data, receipt) => {
                     this.onSwapConfirmed({ key: data.key, isCrossChain: this.isCrossChain });
                     await this.updateBalances();
-                    components_6.application.EventBus.dispatch("Paid" /* EventId.Paid */, {
+                    components_7.application.EventBus.dispatch("Paid" /* EventId.Paid */, {
                         isCrossChain: this.isCrossChain,
                         data: data ?? null,
                         id: this.uuid,
@@ -4761,7 +4835,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
         async onClickSwapButton() {
             if (!(0, index_7.isClientWalletConnected)()) {
                 if (this.mdWallet) {
-                    await components_6.application.loadPackage('@scom/scom-wallet-modal', '*');
+                    await components_7.application.loadPackage('@scom/scom-wallet-modal', '*');
                     this.mdWallet.networks = this.networks;
                     this.mdWallet.wallets = this.wallets;
                     this.mdWallet.showModal();
@@ -4884,7 +4958,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
             this.toInputValue = new eth_wallet_5.BigNumber(0);
             this.swapButtonStatusMap = {};
             this.approveButtonStatusMap = {};
-            this.$eventBus = components_6.application.EventBus;
+            this.$eventBus = components_7.application.EventBus;
             this.registerEvent();
             this.updateSwapButtonCaption();
             this.initExpertModal();
@@ -4941,7 +5015,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
         render() {
             return (this.$render("i-scom-dapp-container", { id: "dappContainer" },
                 this.$render("i-panel", { id: "swapComponent", background: { color: Theme.background.main }, overflow: 'hidden' },
-                    this.$render("i-panel", { class: index_css_1.swapStyle },
+                    this.$render("i-panel", { class: index_css_2.swapStyle },
                         this.$render("i-panel", { id: "swapContainer", width: 720, maxWidth: '100%', minHeight: 340, margin: { left: 'auto', right: 'auto' }, padding: { top: '1rem', left: '1rem', right: '1rem', bottom: '1rem' } },
                             this.$render("i-vstack", { id: "pnlBranding", margin: { bottom: '0.25rem' }, gap: "0.5rem", horizontalAlignment: "center" },
                                 this.$render("i-image", { id: 'imgLogo', height: 100 }),
@@ -5112,8 +5186,8 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
         }
     };
     ScomSwap = __decorate([
-        components_6.customModule,
-        (0, components_6.customElements)('i-scom-swap')
+        components_7.customModule,
+        (0, components_7.customElements)('i-scom-swap')
     ], ScomSwap);
     exports.default = ScomSwap;
 });

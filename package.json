@@ -26,6 +26,7 @@
         "@scom/scom-token-input": "^0.1.1",
         "@scom/scom-network-picker": "^0.1.4",
         "@scom/scom-tx-status-modal": "^0.1.0",
+        "@scom/scom-storage": "^0.1.2",
         "@scom/scom-commission-proxy-contract": "^0.1.9",
         "@scom/oswap-cross-chain-bridge-contract": "^0.1.0",
         "@scom/oswap-chainlink-contract": "^0.1.1",

@@ -1,6 +1,10 @@
+import { Button, Input, StackLayout, Styles } from '@ijstech/components';
 import ScomNetworkPicker from '@scom/scom-network-picker';
 import ScomTokenInput from '@scom/scom-token-input';
+import { ScomStorage } from "@scom/scom-storage";
+import { storageModalStyle } from './index.css';
 
+const Theme = Styles.Theme.ThemeVars;
 const chainIds = [1, 56, 137, 250, 97, 80001, 43113, 43114];
 const networks = chainIds.map(v => { return { chainId: v } });
 
@@ -371,7 +375,41 @@ export function getBuilderSchema() {
         customControls(rpcWalletId: string) {
             let networkPickers: ScomNetworkPicker[] = [];
             let tokenInputs: ScomTokenInput[] = [];
+            let edtLogo: Input;
             return {
+                '#/properties/logo': {
+                    render: () => {
+                        const hstack = new StackLayout(undefined, {
+                            width: '100%',
+                            alignItems: 'center',
+                            background: Theme.input.background
+                        });
+                        edtLogo = new Input(hstack, {
+                            width: '100%',
+                            height: 42,
+                            padding: { left: '1rem', right: '1rem' },
+                            border: { width: 0 }
+                        });
+                        const button = new Button(hstack, {
+                            height: 42,
+                            padding: { left: '0.5rem', right: '0.5rem' },
+                            caption: 'Browse',
+                            icon: { width: '0.875rem', height: '0.875rem', name: 'image' },
+                            font: { size: '0.875rem', color: Theme.colors.secondary.contrastText },
+                            background: { color: Theme.colors.secondary.main }
+                        });
+                        button.onClick = () => {
+                            showStorage(edtLogo);
+                        }
+                        return hstack;
+                    },
+                    getData: (control: StackLayout) => {
+                        return edtLogo.value;
+                    },
+                    setData: (control: StackLayout, value: string) => {
+                        edtLogo.value = value;
+                    }
+                },
                 '#/properties/networks/properties/chainId': customNetworkPicker(),
                 '#/properties/tokens/properties/chainId': {
                     render: () => {
@@ -438,6 +476,31 @@ const customNetworkPicker = () => {
             control.setNetworkByChainId(value);
         }
     }
+}
+
+const showStorage = (target: Input) => {
+    const scomStorage = ScomStorage.getInstance();
+    scomStorage.onCancel = () => {
+        scomStorage.closeModal();
+    }
+    scomStorage.onOpen = (path: string) => {
+        const imageTypes = ['jpg', 'jpeg', 'png', 'gif', 'svg', 'webp'];
+        const ext = path.split('.').pop().toLowerCase();
+        if (imageTypes.includes(ext)) {
+            target.value = path;
+            scomStorage.closeModal();
+        }
+    }
+    scomStorage.openModal({
+        width: 800,
+        maxWidth: '100%',
+        height: '90vh',
+        overflow: 'hidden',
+        zIndex: 1002,
+        closeIcon: {width: '1rem', height: '1rem', name: 'times', fill: Theme.text.primary, margin: {bottom: '0.5rem'}},
+        class: storageModalStyle
+    });
+    scomStorage.onShow();
 }
 
 export function getProjectOwnerSchema() {

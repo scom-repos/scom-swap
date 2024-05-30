@@ -5,6 +5,7 @@
 /// <amd-module name="@scom/scom-swap/index.css.ts" />
 declare module "@scom/scom-swap/index.css.ts" {
     export const swapStyle: string;
+    export const storageModalStyle: string;
 }
 /// <amd-module name="@scom/scom-swap/global/utils/helper.ts" />
 declare module "@scom/scom-swap/global/utils/helper.ts" {
@@ -548,6 +549,7 @@ declare module "@scom/scom-swap/data.json.ts" {
 }
 /// <amd-module name="@scom/scom-swap/formSchema.ts" />
 declare module "@scom/scom-swap/formSchema.ts" {
+    import { StackLayout } from '@ijstech/components';
     import ScomNetworkPicker from '@scom/scom-network-picker';
     import ScomTokenInput from '@scom/scom-token-input';
     export function getBuilderSchema(): {
@@ -769,6 +771,11 @@ declare module "@scom/scom-swap/formSchema.ts" {
             })[];
         };
         customControls(rpcWalletId: string): {
+            '#/properties/logo': {
+                render: () => StackLayout;
+                getData: (control: StackLayout) => any;
+                setData: (control: StackLayout, value: string) => void;
+            };
             '#/properties/networks/properties/chainId': {
                 render: () => ScomNetworkPicker;
                 getData: (control: ScomNetworkPicker) => number;
