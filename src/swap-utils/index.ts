@@ -710,7 +710,7 @@ const AmmTradeExactIn = async function (state: State, wallet: any, market: strin
         value: amount
       }
     }
-    if (campaignId !== undefined) {
+    if (campaignId !== null && campaignId >= 0) {
       let txData = await getRouterSwapTxData(wallet.chainId, market, executeSwapOptions);
       const proxyAddress = state.getProxyAddress();
       const proxy = new ProxyContracts.ProxyV3(wallet, proxyAddress);
