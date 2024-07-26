@@ -46,6 +46,9 @@ declare module "@scom/scom-swap/global/utils/swapInterface.ts" {
     export interface INetworkConfig {
         chainName?: string;
         chainId: number;
+        tokens?: {
+            address?: string;
+        }[];
     }
     export interface ITokenConfig {
         chainId: number;
@@ -530,13 +533,13 @@ declare module "@scom/scom-swap/data.json.ts" {
                 chainId: number;
             }[];
             category: string;
-            tokens: {
-                address: string;
-                chainId: number;
-            }[];
             defaultChainId: number;
             networks: {
                 chainId: number;
+                tokens: {
+                    address: string;
+                    chainId: number;
+                }[];
             }[];
             wallets: {
                 name: string;
@@ -549,7 +552,7 @@ declare module "@scom/scom-swap/data.json.ts" {
 }
 /// <amd-module name="@scom/scom-swap/formSchema.ts" />
 declare module "@scom/scom-swap/formSchema.ts" {
-    import { StackLayout } from '@ijstech/components';
+    import { Control, StackLayout } from '@ijstech/components';
     import ScomNetworkPicker from '@scom/scom-network-picker';
     import ScomTokenInput from '@scom/scom-token-input';
     export function getBuilderSchema(): {
@@ -579,22 +582,18 @@ declare module "@scom/scom-swap/formSchema.ts" {
                                 enum: number[];
                                 required: boolean;
                             };
-                        };
-                    };
-                };
-                tokens: {
-                    type: string;
-                    required: boolean;
-                    items: {
-                        type: string;
-                        properties: {
-                            chainId: {
+                            tokens: {
                                 type: string;
-                                enum: number[];
                                 required: boolean;
-                            };
-                            address: {
-                                type: string;
+                                items: {
+                                    type: string;
+                                    properties: {
+                                        address: {
+                                            type: string;
+                                            required: boolean;
+                                        };
+                                    };
+                                };
                             };
                         };
                     };
@@ -757,20 +756,13 @@ declare module "@scom/scom-swap/formSchema.ts" {
                                         };
                                     };
                                 }[];
-                            } | {
-                                type: string;
-                                label: string;
-                                elements: {
-                                    type: string;
-                                    scope: string;
-                                }[];
                             })[];
                         }[];
                     })[];
                 }[];
             })[];
         };
-        customControls(rpcWalletId: string): {
+        customControls(): {
             '#/properties/logo': {
                 render: () => StackLayout;
                 getData: (control: StackLayout) => any;
@@ -781,15 +773,10 @@ declare module "@scom/scom-swap/formSchema.ts" {
                 getData: (control: ScomNetworkPicker) => number;
                 setData: (control: ScomNetworkPicker, value: number) => Promise<void>;
             };
-            '#/properties/tokens/properties/chainId': {
-                render: () => ScomNetworkPicker;
-                getData: (control: ScomNetworkPicker) => number;
-                setData: (control: ScomNetworkPicker, value: number) => Promise<void>;
-            };
-            '#/properties/tokens/properties/address': {
-                render: () => ScomTokenInput;
+            '#/properties/networks/properties/tokens/properties/address': {
+                render: (parent?: Control) => ScomTokenInput;
                 getData: (control: ScomTokenInput) => string;
-                setData: (control: ScomTokenInput, value: string, rowData: any) => void;
+                setData: (control: ScomTokenInput, value: string, rowData: any) => Promise<void>;
             };
             '#/properties/providers/properties/chainId': {
                 render: () => ScomNetworkPicker;

@@ -325,7 +325,7 @@ export default class ScomSwap extends Module {
     const formSchema: any = getBuilderSchema();
     const dataSchema = formSchema.dataSchema;
     const uiSchema = formSchema.uiSchema;
-    const customControls = formSchema.customControls(this.state?.getRpcWallet()?.instanceId);
+    const customControls = formSchema.customControls();
     let self = this;
     const actions: any[] = [
       {
@@ -405,7 +405,6 @@ export default class ScomSwap extends Module {
                 networks,
                 category,
                 providers,
-                tokens,
                 ...themeSettings
               } = userInputData;
 
@@ -415,7 +414,6 @@ export default class ScomSwap extends Module {
                 networks,
                 category,
                 providers,
-                tokens
               };
 
               this._data.logo = generalSettings.logo;
@@ -424,10 +422,20 @@ export default class ScomSwap extends Module {
               this._data.defaultChainId = this._data.networks[0].chainId;
               this._data.category = generalSettings.category;
               this._data.providers = generalSettings.providers;
-              this._tokens = this._data.tokens = [];
-              if (generalSettings.tokens) {
-                this._data.tokens = generalSettings.tokens;
-                this._tokens = getTokenObjArr(generalSettings.tokens);
+              this._tokens = [];
+              if (generalSettings.networks) {
+                let tokenList = [];
+                for (let network of generalSettings.networks) {
+                  const { chainId, tokens = [] } = network;
+                  const _tokens = tokens.map(v => {
+                    return {
+                      chainId,
+                      address: v.address
+                    }
+                  })
+                  tokenList.push(..._tokens);
+                }
+                this._tokens = getTokenObjArr(tokenList);
               }
               await this.resetRpcWallet();
               this.updateContractAddress();
@@ -616,13 +624,22 @@ export default class ScomSwap extends Module {
 
   private async setData(value: ISwapWidgetData) {
     this._data = value;
+    let tokenList = [];
+    for (let network of value.networks) {
+      const { chainId, tokens = [] } = network;
+      tokenStore.updateTokenMapData(chainId);
+      const _tokens = tokens.map(v => {
+        return {
+          chainId,
+          address: v.address
+        }
+      })
+      tokenList.push(..._tokens);
+    }
     if (this._data.apiEndpoints) {
       this.state.setAPIEnpoints(this._data.apiEndpoints);
     }
-    for (let network of this._data.networks) {
-      tokenStore.updateTokenMapData(network.chainId);
-    }
-    this._tokens = getTokenObjArr(this._data.tokens);
+    this._tokens = getTokenObjArr(tokenList);
     await this.resetRpcWallet();
     this.updateContractAddress();
     await this.refreshUI();
@@ -798,7 +815,7 @@ export default class ScomSwap extends Module {
   private fixedNumber = (value: BigNumber | string | number) => {
     const val = typeof value === 'object' ? value : new BigNumber(value);
     if (val.isNaN() || val.isZero()) return '';
-    return FormatUtils.formatNumber(val.toFixed(), {decimalFigures: 4, useSeparators: false});
+    return FormatUtils.formatNumber(val.toFixed(), { decimalFigures: 4, useSeparators: false });
   }
 
   private getTokenKey(token: ITokenObject) {
@@ -839,7 +856,7 @@ export default class ScomSwap extends Module {
   }
   private initializeDefaultTokenPair() {
     if (this.isCrossChain) {
-      let {firstDefaultToken, secondDefaultToken} = this.calculateDefaultTokens();
+      let { firstDefaultToken, secondDefaultToken } = this.calculateDefaultTokens();
       this.fromToken = firstDefaultToken;
       this.toToken = secondDefaultToken;
       this.firstTokenInput.chainId = firstDefaultToken.chainId;
@@ -851,7 +868,7 @@ export default class ScomSwap extends Module {
     else {
       const providers = this.originalData?.providers;
       if (providers && providers.length) {
-        let {firstDefaultToken, secondDefaultToken} = this.calculateDefaultTokens();
+        let { firstDefaultToken, secondDefaultToken } = this.calculateDefaultTokens();
         this.fromToken = firstDefaultToken;
         this.toToken = secondDefaultToken;
         this.firstTokenInput.chainId = firstDefaultToken.chainId;
@@ -920,7 +937,7 @@ export default class ScomSwap extends Module {
       if (this.fromInputValue.isGreaterThan(0)) {
         this.updateEstimatedPosition(false);
         this.firstTokenInput.value = this.fixedNumber(this.fromInputValue);
-      } 
+      }
       else if (this.toInputValue.isGreaterThan(0)) {
         this.updateEstimatedPosition(true);
         this.secondTokenInput.value = this.fixedNumber(this.toInputValue);
@@ -995,9 +1012,9 @@ export default class ScomSwap extends Module {
       onPaid: async (data?: any, receipt?: TransactionReceipt) => {
         this.onSwapConfirmed({ key: data.key, isCrossChain: this.isCrossChain });
         await this.updateBalances();
-        application.EventBus.dispatch(EventId.Paid, { 
+        application.EventBus.dispatch(EventId.Paid, {
           isCrossChain: this.isCrossChain,
-          data: data ?? null, 
+          data: data ?? null,
           id: this.uuid,
           receipt: receipt
         });
@@ -1028,11 +1045,11 @@ export default class ScomSwap extends Module {
     const arrows = this.swapModal.querySelectorAll('i-icon.arrow-down');
     if (!this.isCrossChain) {
       arrows.forEach((arrow: Icon) => {
-        arrow.margin = {top: '0.75rem', bottom: '0.75rem'};
+        arrow.margin = { top: '0.75rem', bottom: '0.75rem' };
       });
     } else {
       arrows.forEach((arrow: Icon) => {
-        arrow.margin = {top: '0.75rem', left: '6rem', bottom: '0.75rem', right: '6rem'};
+        arrow.margin = { top: '0.75rem', left: '6rem', bottom: '0.75rem', right: '6rem' };
       });
     }
     if (this.lbReminderRejected) this.lbReminderRejected.visible = false;
@@ -1857,7 +1874,7 @@ export default class ScomSwap extends Module {
   }
 
   private renderPriceInfo() {
-    const padding = {top: '1rem', bottom: '1rem', left: '1rem', right: '1rem'};
+    const padding = { top: '1rem', bottom: '1rem', left: '1rem', right: '1rem' };
     if (!this.priceInfo) {
       this.priceInfo = <i-scom-swap-price-info display="block" width={'auto'} height={'auto'}></i-scom-swap-price-info>
       this.pnlPriceInfo.appendChild(this.priceInfo);
@@ -1866,7 +1883,7 @@ export default class ScomSwap extends Module {
     this.priceInfo.setData(this.getPriceInfo());
 
     if (!this.priceInfo2) {
-      this.priceInfo2 = <i-scom-swap-price-info padding={{...padding}} display="block" width={'auto'} height={'auto'}></i-scom-swap-price-info>
+      this.priceInfo2 = <i-scom-swap-price-info padding={{ ...padding }} display="block" width={'auto'} height={'auto'}></i-scom-swap-price-info>
       this.priceInfo2.onTogglePrice = this.onTogglePrice.bind(this);
     }
     this.priceInfoContainer.appendChild(this.priceInfo2);
@@ -2021,11 +2038,11 @@ export default class ScomSwap extends Module {
     const img = new Image(undefined, {
       width: 32,
       height: 32,
-      margin: {top: '0.25rem', right: '0.5rem'},
-      border: {radius: '50%', width: '2px', style: 'solid', color: 'transparent'},
-      padding: {top: '0.25rem', right: '0.25rem', bottom: '0.25rem', left: '0.25rem'},
+      margin: { top: '0.25rem', right: '0.5rem' },
+      border: { radius: '50%', width: '2px', style: 'solid', color: 'transparent' },
+      padding: { top: '0.25rem', right: '0.25rem', bottom: '0.25rem', left: '0.25rem' },
       url: network.image,
-      tooltip: {content: network.chainName},
+      tooltip: { content: network.chainName },
       cursor: 'pointer'
     });
     // img.url = network.image;
@@ -2060,7 +2077,7 @@ export default class ScomSwap extends Module {
       this.initChainIcon(network, false);
       this.initChainIcon(network, true);
     });
-    
+
     const firstChainId = this.fromToken?.chainId;
     const secondChainId = this.toToken?.chainId;
     console.log('firstChainId', firstChainId)
@@ -2079,7 +2096,7 @@ export default class ScomSwap extends Module {
     const fees = this.getFeeDetails();
     this.feesInfo.clearInnerHTML();
     fees.forEach((fee) => {
-      const feeValue = FormatUtils.formatNumber(fee.value.toFixed(), { decimalFigures: 4});
+      const feeValue = FormatUtils.formatNumber(fee.value.toFixed(), { decimalFigures: 4 });
       this.feesInfo.appendChild(
         <i-hstack
           horizontalAlignment="space-between" verticalAlignment="center" margin={{ top: 10 }}
@@ -2097,7 +2114,7 @@ export default class ScomSwap extends Module {
               data-placement="right"
             />
           </i-hstack>
-          <i-label margin={{left: 'auto'}} caption={`${feeValue} ${this.fromToken?.symbol}`} />
+          <i-label margin={{ left: 'auto' }} caption={`${feeValue} ${this.fromToken?.symbol}`} />
         </i-hstack>
       )
     })
@@ -2106,7 +2123,7 @@ export default class ScomSwap extends Module {
         <i-hstack verticalAlignment="center">
           <i-label caption="Total Transaction Fee" />
         </i-hstack>
-        <i-label margin={{left: 'auto'}} caption={this.getTradeFeeExactAmount()} />
+        <i-label margin={{ left: 'auto' }} caption={this.getTradeFeeExactAmount()} />
       </i-hstack>
     )
     this.modalFees.visible = true;
@@ -2142,13 +2159,13 @@ export default class ScomSwap extends Module {
     if ((this.offsetWidth !== 0 && this.offsetWidth < 550) || (window as any).innerWidth < 550 || (!isNaN(tagWidth) && tagWidth !== 0 && tagWidth < 550)) {
       this.wrapperSwap.templateColumns = ['auto'];
       this.toggleReverseImage.alignItems = 'center';
-      this.toggleReverseImage.padding = {bottom: '1rem', top: '1rem'};
+      this.toggleReverseImage.padding = { bottom: '1rem', top: '1rem' };
       this.hIcon.visible = false;
       this.vIcon.visible = true;
     } else {
       this.wrapperSwap.templateColumns = ['1fr', '32px', '1fr'];
       this.toggleReverseImage.alignItems = 'end';
-      this.toggleReverseImage.padding = {bottom: '40px'};
+      this.toggleReverseImage.padding = { bottom: '40px' };
       this.hIcon.visible = true;
       this.vIcon.visible = false;
     }
@@ -2184,7 +2201,6 @@ export default class ScomSwap extends Module {
       const category = this.getAttribute('category', true, "fixed-pair");
       const providers = this.getAttribute('providers', true, []);
       const commissions = this.getAttribute('commissions', true, []);
-      const tokens = this.getAttribute('tokens', true, []);
       const defaultChainId = this.getAttribute('defaultChainId', true);
       const networks = this.getAttribute('networks', true);
       const wallets = this.getAttribute('wallets', true);
@@ -2196,23 +2212,22 @@ export default class ScomSwap extends Module {
       const defaultInputToken = this.getAttribute('defaultInputToken', true);
       const defaultOutputToken = this.getAttribute('defaultOutputToken', true);
       const apiEndpoints = this.getAttribute('apiEndpoints', true);
-      let data = { 
-        campaignId, 
-        category, 
-        providers, 
-        commissions, 
-        tokens, 
-        defaultChainId, 
-        networks, 
-        wallets, 
-        showHeader, 
-        title, 
-        logo, 
-        defaultInputValue, 
-        defaultOutputValue, 
+      let data = {
+        campaignId,
+        category,
+        providers,
+        commissions,
+        defaultChainId,
+        networks,
+        wallets,
+        showHeader,
+        title,
+        logo,
+        defaultInputValue,
+        defaultOutputValue,
         defaultInputToken,
         defaultOutputToken,
-        apiEndpoints 
+        apiEndpoints
       };
       if (!this.isEmptyData(data)) {
         await this.setData(data);
@@ -2236,21 +2251,21 @@ export default class ScomSwap extends Module {
               width={720}
               maxWidth={'100%'}
               minHeight={340}
-              margin={{left: 'auto', right: 'auto'}}
-              padding={{top: '1rem', left: '1rem', right: '1rem', bottom: '1rem'}}
+              margin={{ left: 'auto', right: 'auto' }}
+              padding={{ top: '1rem', left: '1rem', right: '1rem', bottom: '1rem' }}
             >
               <i-vstack id="pnlBranding" margin={{ bottom: '0.25rem' }} gap="0.5rem" horizontalAlignment="center">
                 <i-image id='imgLogo' height={100}></i-image>
                 <i-label id='lbTitle' font={{ bold: true, size: '1.5rem' }}></i-label>
               </i-vstack>
               <i-panel
-                margin={{top: '0.5rem', bottom: '1rem'}}
-                border={{radius: '1rem'}}
+                margin={{ top: '0.5rem', bottom: '1rem' }}
+                border={{ radius: '1rem' }}
               >
                 <i-grid-layout
                   id="wrapperSwap"
                   templateColumns={['1fr', '32px', '1fr']}
-                  gap={{column: 10}}
+                  gap={{ column: 10 }}
                   mediaQueries={[
                     {
                       maxWidth: '767px',
@@ -2279,10 +2294,10 @@ export default class ScomSwap extends Module {
                             <i-button
                               id="maxButton" class="btn-max"
                               caption="Max" enabled={false}
-                              font={{weight: 600, size: '1rem', color: Theme.colors.primary.contrastText}}
+                              font={{ weight: 600, size: '1rem', color: Theme.colors.primary.contrastText }}
                               lineHeight={1.5}
-                              border={{radius: '0.5rem'}}
-                              padding={{left: '0.5rem', right: '0.5rem'}}
+                              border={{ radius: '0.5rem' }}
+                              padding={{ left: '0.5rem', right: '0.5rem' }}
                               onClick={this.onSetMaxBalance}
                             ></i-button>
                           </i-hstack>
@@ -2293,7 +2308,7 @@ export default class ScomSwap extends Module {
                           background={{ color: Theme.input.background }}
                           width="100%"
                           margin={{ top: 'auto' }}
-                          border={{radius: '1rem', width: '2px', style: 'solid', color: 'transparent'}}
+                          border={{ radius: '1rem', width: '2px', style: 'solid', color: 'transparent' }}
                         >
                           <i-scom-token-input
                             id="firstTokenInput"
@@ -2309,12 +2324,12 @@ export default class ScomSwap extends Module {
                             height={'auto'} width={'100%'}
                             display='flex'
                             font={{ size: '1.25rem' }}
-                            padding={{left: '0.75rem', right: '0.75rem'}}
+                            padding={{ left: '0.75rem', right: '0.75rem' }}
                             tokenButtonStyles={{
-                              background: {color: Theme.background.main},
-                              padding: {top: '0.5rem', bottom: '0.5rem', left: '0.5rem', right: '0.5rem'},
-                              border: {radius: 8},
-                              font: {size: '1rem', weight: 700, color: Theme.input.fontColor},
+                              background: { color: Theme.background.main },
+                              padding: { top: '0.5rem', bottom: '0.5rem', left: '0.5rem', right: '0.5rem' },
+                              border: { radius: 8 },
+                              font: { size: '1rem', weight: 700, color: Theme.input.fontColor },
                               lineHeight: 1.5,
                               opacity: 1
                             }}
@@ -2332,8 +2347,8 @@ export default class ScomSwap extends Module {
                   <i-hstack
                     id="toggleReverseImage"
                     alignItems="end" justifyContent="center"
-                    stack={{basis: '32px'}}
-                    padding={{bottom: 40}}
+                    stack={{ basis: '32px' }}
+                    padding={{ bottom: 40 }}
                     onClick={this.onRevertSwap}
                     mediaQueries={[
                       {
@@ -2341,7 +2356,7 @@ export default class ScomSwap extends Module {
                         properties: {
                           alignItems: 'center',
                           justifyContent: 'center',
-                          padding: {bottom: '1rem', top: '1rem'}
+                          padding: { bottom: '1rem', top: '1rem' }
                         }
                       }
                     ]}
@@ -2349,9 +2364,9 @@ export default class ScomSwap extends Module {
                     <i-icon
                       id="hIcon"
                       width={32} height={32} name="arrows-alt-h" fill={Theme.text.primary}
-                      padding={{left: '0.45rem', right: '0.45rem', top: '0.45rem', bottom: '0.45rem'}}
-                      background={{color: Theme.input.background}}
-                      border={{radius: '50%'}}
+                      padding={{ left: '0.45rem', right: '0.45rem', top: '0.45rem', bottom: '0.45rem' }}
+                      background={{ color: Theme.input.background }}
+                      border={{ radius: '50%' }}
                       mediaQueries={[
                         {
                           maxWidth: '767px',
@@ -2364,9 +2379,9 @@ export default class ScomSwap extends Module {
                     <i-icon
                       id="vIcon"
                       width={32} height={32} name="arrows-alt-v" fill={Theme.text.primary}
-                      padding={{left: '0.45rem', right: '0.45rem', top: '0.45rem', bottom: '0.45rem'}}
-                      background={{color: Theme.input.background}}
-                      border={{radius: '50%'}}
+                      padding={{ left: '0.45rem', right: '0.45rem', top: '0.45rem', bottom: '0.45rem' }}
+                      background={{ color: Theme.input.background }}
+                      border={{ radius: '50%' }}
                       visible={false}
                       mediaQueries={[
                         {
@@ -2381,7 +2396,7 @@ export default class ScomSwap extends Module {
                   <i-vstack gap={5} minWidth={230} width="100%">
                     <i-vstack id="desChainBox" width="100%" margin={{ top: 8, bottom: 8 }} visible={false}>
                       <i-hstack gap={8} horizontalAlignment="space-between">
-                        <i-label opacity={0.8} caption="Destination Chain" minWidth="7rem"/>
+                        <i-label opacity={0.8} caption="Destination Chain" minWidth="7rem" />
                         <i-label id="desChainLabel" textOverflow="ellipsis" margin={{ left: 'auto' }} caption="-" />
                       </i-hstack>
                       <i-hstack id="desChainList" wrap="wrap" verticalAlignment="center" maxWidth="100%" />
@@ -2393,7 +2408,7 @@ export default class ScomSwap extends Module {
                             <i-label caption="You Receive" font={{ size: '1.125rem' }}></i-label>
                           </i-vstack>
                           <i-hstack horizontalAlignment="end" width="100%">
-                            <i-label id="receiveBalance" opacity={0.55} margin={{left: 'auto'}} caption="Balance: 0"></i-label>
+                            <i-label id="receiveBalance" opacity={0.55} margin={{ left: 'auto' }} caption="Balance: 0"></i-label>
                           </i-hstack>
                         </i-vstack>
                         <i-panel
@@ -2401,7 +2416,7 @@ export default class ScomSwap extends Module {
                           background={{ color: Theme.input.background }}
                           width="100%"
                           margin={{ top: 'auto' }}
-                          border={{radius: '1rem', width: '2px', style: 'solid', color: 'transparent'}}
+                          border={{ radius: '1rem', width: '2px', style: 'solid', color: 'transparent' }}
                         >
                           <i-scom-token-input
                             id="secondTokenInput"
@@ -2417,12 +2432,12 @@ export default class ScomSwap extends Module {
                             height={'auto'} width={'100%'}
                             display='flex'
                             font={{ size: '1.25rem' }}
-                            padding={{left: '0.75rem', right: '0.75rem'}}
+                            padding={{ left: '0.75rem', right: '0.75rem' }}
                             tokenButtonStyles={{
-                              background: {color: Theme.background.main},
-                              padding: {top: '0.5rem', bottom: '0.5rem', left: '0.5rem', right: '0.5rem'},
-                              border: {radius: 8},
-                              font: {size: '1rem', weight: 700, color: Theme.input.fontColor},
+                              background: { color: Theme.background.main },
+                              padding: { top: '0.5rem', bottom: '0.5rem', left: '0.5rem', right: '0.5rem' },
+                              border: { radius: 8 },
+                              font: { size: '1rem', weight: 700, color: Theme.input.fontColor },
                               lineHeight: 1.5,
                               opacity: 1
                             }}
@@ -2441,7 +2456,7 @@ export default class ScomSwap extends Module {
               <i-hstack
                 id="minSwapHintLabel"
                 verticalAlignment="center"
-                margin={{top: '-0.5rem'}}
+                margin={{ top: '-0.5rem' }}
                 gap={'0.25rem'}
               >
                 <i-icon name="star" fill={Theme.colors.primary.main} width={13} height={13} />
@@ -2451,7 +2466,7 @@ export default class ScomSwap extends Module {
               <i-vstack
                 horizontalAlignment="center"
                 width="100%"
-                margin={{top: 10}}
+                margin={{ top: 10 }}
               >
                 <i-button
                   id="swapBtn"
@@ -2460,11 +2475,11 @@ export default class ScomSwap extends Module {
                   height={60} width={'100%'}
                   visible={false}
                   rightIcon={{ spin: true, visible: false, fill: Theme.colors.primary.contrastText, width: 16, height: 16 }}
-                  border={{radius: '0.65rem'}}
-                  font={{size: '1.125rem', color: Theme.colors.primary.contrastText, bold: true}}
+                  border={{ radius: '0.65rem' }}
+                  font={{ size: '1.125rem', color: Theme.colors.primary.contrastText, bold: true }}
                   opacity={1}
                   lineHeight={1.5}
-                  padding={{left: '0.75rem', right: '0.75rem', top: '0.5rem', bottom: '0.5rem'}}
+                  padding={{ left: '0.75rem', right: '0.75rem', top: '0.5rem', bottom: '0.5rem' }}
                   onClick={this.onClickSwapButton.bind(this)}
                 ></i-button>
               </i-vstack>
@@ -2472,16 +2487,16 @@ export default class ScomSwap extends Module {
             <i-modal
               id="swapModal"
               width={490} maxWidth={'100%'}
-              padding={{left: '1rem', right: '1rem', top: '0.75rem', bottom: '0.75rem'}}
-              border={{radius: '1rem'}}
+              padding={{ left: '1rem', right: '1rem', top: '0.75rem', bottom: '0.75rem' }}
+              border={{ radius: '1rem' }}
             >
               <i-hstack
                 verticalAlignment="center" horizontalAlignment="space-between"
-                margin={{bottom: '1.5rem'}} padding={{bottom: '0.5rem'}}
-                border={{bottom: {width: '2px', style: 'solid', color: Theme.background.main}}}
+                margin={{ bottom: '1.5rem' }} padding={{ bottom: '0.5rem' }}
+                border={{ bottom: { width: '2px', style: 'solid', color: Theme.background.main } }}
               >
                 <i-label
-                  font={{color: Theme.colors.primary.main, size: '1.25rem', weight: 700}}
+                  font={{ color: Theme.colors.primary.main, size: '1.25rem', weight: 700 }}
                   caption="Confirm Swap"
                 ></i-label>
                 <i-icon
@@ -2496,42 +2511,42 @@ export default class ScomSwap extends Module {
                 <i-hstack verticalAlignment='center' horizontalAlignment='start'>
                   <i-hstack id="srcChainFirstPanel" verticalAlignment="center" gap={'0.5rem'}>
                     <i-image id="srcChainTokenImage" width="30px" height="30px" url="#" />
-                    <i-label id="srcChainTokenLabel" font={{size: '1.1rem'}} caption="" />
+                    <i-label id="srcChainTokenLabel" font={{ size: '1.1rem' }} caption="" />
                     <i-icon name="minus" fill={Theme.input.fontColor} width={28} height={10} />
                   </i-hstack>
                   <i-hstack verticalAlignment="center" gap={'0.5rem'}>
                     <i-image id="fromTokenImage" width="30px" height="30px" url="#" />
-                    <i-label id="fromTokenLabel" font={{size: '1.1rem'}} caption=""></i-label>
+                    <i-label id="fromTokenLabel" font={{ size: '1.1rem' }} caption=""></i-label>
                   </i-hstack>
-                  <i-label id="fromTokenValue" margin={{left: 'auto'}} font={{size: '1.1rem'}} caption=" - "></i-label>
+                  <i-label id="fromTokenValue" margin={{ left: 'auto' }} font={{ size: '1.1rem' }} caption=" - "></i-label>
                 </i-hstack>
                 <i-icon
                   width={28} height={28} name="arrow-down" fill={Theme.input.fontColor}
-                  border={{width: '2px', style: 'solid', color: 'transparent', radius: '50%'}}
-                  padding={{left: '0.25rem', right: '0.25rem', top: '0.25rem', bottom: '0.25rem'}}
-                  background={{color: Theme.input.background}}
-                  margin={{top: '0.75rem', bottom: '0.75rem'}}
+                  border={{ width: '2px', style: 'solid', color: 'transparent', radius: '50%' }}
+                  padding={{ left: '0.25rem', right: '0.25rem', top: '0.25rem', bottom: '0.25rem' }}
+                  background={{ color: Theme.input.background }}
+                  margin={{ top: '0.75rem', bottom: '0.75rem' }}
                   class="arrow-down"
                 ></i-icon>
                 <i-panel id="srcChainSecondPanel">
                   <i-hstack verticalAlignment='center' horizontalAlignment='start'>
                     <i-hstack verticalAlignment="center" gap={'0.5rem'}>
                       <i-image id="srcChainVaultImage" width="30px" height="30px" url="#" />
-                      <i-label id="srcChainVaultLabel" font={{size: '1.1rem'}} caption="" />
+                      <i-label id="srcChainVaultLabel" font={{ size: '1.1rem' }} caption="" />
                       <i-icon name="minus" fill={Theme.input.fontColor} width={28} height={10} />
                     </i-hstack>
                     <i-hstack verticalAlignment="center" gap={'0.5rem'}>
                       <i-image id="srcVaultTokenImage" fallbackUrl={tokenAssets.fallbackUrl} width="30px" height="30px" url="#" />
-                      <i-label id="srcVaultTokenLabel" font={{size: '1.1rem'}} caption="" />
+                      <i-label id="srcVaultTokenLabel" font={{ size: '1.1rem' }} caption="" />
                     </i-hstack>
-                    <i-label id="srcVaultTokenValue" margin={{left: 'auto'}} font={{size: '1.1rem'}} caption="-" />
+                    <i-label id="srcVaultTokenValue" margin={{ left: 'auto' }} font={{ size: '1.1rem' }} caption="-" />
                   </i-hstack>
                   <i-icon
                     width={28} height={28} name="arrow-down" fill={Theme.input.fontColor}
-                    border={{width: '2px', style: 'solid', color: 'transparent', radius: '50%'}}
-                    padding={{left: '0.25rem', right: '0.25rem', top: '0.25rem', bottom: '0.25rem'}}
-                    background={{color: Theme.input.background}}
-                    margin={{top: '0.75rem', bottom: '0.75rem'}}
+                    border={{ width: '2px', style: 'solid', color: 'transparent', radius: '50%' }}
+                    padding={{ left: '0.25rem', right: '0.25rem', top: '0.25rem', bottom: '0.25rem' }}
+                    background={{ color: Theme.input.background }}
+                    margin={{ top: '0.75rem', bottom: '0.75rem' }}
                     class="arrow-down"
                   ></i-icon>
                 </i-panel>
@@ -2539,74 +2554,74 @@ export default class ScomSwap extends Module {
                   <i-hstack verticalAlignment='center' horizontalAlignment='start'>
                     <i-hstack verticalAlignment="center" gap={'0.5rem'}>
                       <i-image id="targetChainVaultImage" width="30px" height="30px" url="#" />
-                      <i-label id="targetChainVaultLabel" font={{size: '1.1rem'}} caption="" />
+                      <i-label id="targetChainVaultLabel" font={{ size: '1.1rem' }} caption="" />
                       <i-icon name="minus" fill={Theme.input.fontColor} width={28} height={10} />
                     </i-hstack>
                     <i-hstack verticalAlignment="center" gap={'0.5rem'}>
                       <i-image id="targetVaultTokenImage" fallbackUrl={tokenAssets.fallbackUrl} width="30px" height="30px" url="#" />
-                      <i-label id="targetVaultTokenLabel" font={{size: '1.1rem'}} caption="" />
+                      <i-label id="targetVaultTokenLabel" font={{ size: '1.1rem' }} caption="" />
                     </i-hstack>
-                    <i-label id="targetVaultTokenValue" margin={{left: 'auto'}} font={{size: '1.1rem'}} caption="-" />
+                    <i-label id="targetVaultTokenValue" margin={{ left: 'auto' }} font={{ size: '1.1rem' }} caption="-" />
                   </i-hstack>
                   <i-vstack justifyContent='end'>
-                    <i-label id="crossChainSoftCapLabel1" opacity={0.55} margin={{left: 'auto'}}></i-label>
-                    <i-label id="targetVaultAssetBalanceLabel1" opacity={0.55} margin={{left: 'auto'}} caption="Vault Asset Balance: 0"></i-label>
-                    <i-label id="targetVaultBondBalanceLabel1" opacity={0.55} margin={{left: 'auto'}} caption="Vault Bond Balance: 0"></i-label>
+                    <i-label id="crossChainSoftCapLabel1" opacity={0.55} margin={{ left: 'auto' }}></i-label>
+                    <i-label id="targetVaultAssetBalanceLabel1" opacity={0.55} margin={{ left: 'auto' }} caption="Vault Asset Balance: 0"></i-label>
+                    <i-label id="targetVaultBondBalanceLabel1" opacity={0.55} margin={{ left: 'auto' }} caption="Vault Bond Balance: 0"></i-label>
                   </i-vstack>
                   <i-icon
                     width={28} height={28} name="arrow-down" fill={Theme.input.fontColor}
-                    border={{width: '2px', style: 'solid', color: 'transparent', radius: '50%'}}
-                    padding={{left: '0.25rem', right: '0.25rem', top: '0.25rem', bottom: '0.25rem'}}
-                    margin={{top: '0.75rem', bottom: '0.75rem'}}
-                    background={{color: Theme.input.background}}
+                    border={{ width: '2px', style: 'solid', color: 'transparent', radius: '50%' }}
+                    padding={{ left: '0.25rem', right: '0.25rem', top: '0.25rem', bottom: '0.25rem' }}
+                    margin={{ top: '0.75rem', bottom: '0.75rem' }}
+                    background={{ color: Theme.input.background }}
                     class="arrow-down"
                   ></i-icon>
                 </i-panel>
-                <i-hstack margin={{bottom: '1rem'}} verticalAlignment='center' horizontalAlignment='start'>
+                <i-hstack margin={{ bottom: '1rem' }} verticalAlignment='center' horizontalAlignment='start'>
                   <i-hstack id="targetChainFirstPanel" verticalAlignment="center" gap={'0.5rem'}>
                     <i-image id="targetChainTokenImage" fallbackUrl={tokenAssets.fallbackUrl} width="30px" height="30px" url="#" />
-                    <i-label id="targetChainTokenLabel" font={{size: '1.1rem'}} caption="" />
+                    <i-label id="targetChainTokenLabel" font={{ size: '1.1rem' }} caption="" />
                     <i-icon name="minus" fill={Theme.input.fontColor} width={28} height={10} />
                   </i-hstack>
                   <i-hstack verticalAlignment="center" gap={'0.5rem'}>
                     <i-image id="toTokenImage" width="30px" height="30px" url="#" />
-                    <i-label id="toTokenLabel" font={{size: '1.1rem'}} caption=""></i-label>
+                    <i-label id="toTokenLabel" font={{ size: '1.1rem' }} caption=""></i-label>
                   </i-hstack>
-                  <i-label id="toTokenValue" margin={{left: 'auto'}} font={{weight: 700, color: Theme.colors.primary.main}} caption=" - "></i-label>
+                  <i-label id="toTokenValue" margin={{ left: 'auto' }} font={{ weight: 700, color: Theme.colors.primary.main }} caption=" - "></i-label>
                 </i-hstack>
                 <i-vstack id="crossChainVaultInfoVstack" justifyContent='end'>
-                  <i-label id="crossChainSoftCapLabel2" opacity={0.55} margin={{left: 'auto'}}></i-label>
-                  <i-label id="targetVaultAssetBalanceLabel2" opacity={0.55} margin={{left: 'auto'}} caption="Vault Asset Balance: 0"></i-label>
-                  <i-label id="targetVaultBondBalanceLabel2" opacity={0.55} margin={{left: 'auto'}} caption="Vault Bond Balance: 0"></i-label>
+                  <i-label id="crossChainSoftCapLabel2" opacity={0.55} margin={{ left: 'auto' }}></i-label>
+                  <i-label id="targetVaultAssetBalanceLabel2" opacity={0.55} margin={{ left: 'auto' }} caption="Vault Asset Balance: 0"></i-label>
+                  <i-label id="targetVaultBondBalanceLabel2" opacity={0.55} margin={{ left: 'auto' }} caption="Vault Bond Balance: 0"></i-label>
                 </i-vstack>
-                <i-label id="lbEstimate" display="block" margin={{bottom: '1rem'}}></i-label>
-                <i-hstack margin={{bottom: '1rem'}} gap={'0.25rem'}>
+                <i-label id="lbEstimate" display="block" margin={{ bottom: '1rem' }}></i-label>
+                <i-hstack margin={{ bottom: '1rem' }} gap={'0.25rem'}>
                   <i-label id="lbPayOrReceive"></i-label>
-                  <i-label id="payOrReceiveValue" font={{weight: 700, color: Theme.colors.primary.main}} caption=""></i-label>
+                  <i-label id="payOrReceiveValue" font={{ weight: 700, color: Theme.colors.primary.main }} caption=""></i-label>
                   <i-label id="payOrReceiveToken" caption=""></i-label>
                 </i-hstack>
               </i-vstack>
               <i-panel
                 id="priceInfoContainer"
                 background={{ color: Theme.background.main }}
-                border={{radius: '1rem', width: '2px', style: 'solid', color: 'transparent'}}
-                margin={{top: '1rem', bottom: '1rem'}}
+                border={{ radius: '1rem', width: '2px', style: 'solid', color: 'transparent' }}
+                margin={{ top: '1rem', bottom: '1rem' }}
                 width="100%"
               />
               <i-panel
                 width="100%"
-                margin={{top: 10}}
+                margin={{ top: 10 }}
               >
                 <i-button
                   id="swapModalConfirmBtn"
                   class="btn-os"
                   height="auto" width={'100%'}
                   caption="Confirm Swap"
-                  border={{radius: '0.65rem'}}
-                  font={{size: '1.125rem', color: Theme.colors.primary.contrastText, bold: true}}
+                  border={{ radius: '0.65rem' }}
+                  font={{ size: '1.125rem', color: Theme.colors.primary.contrastText, bold: true }}
                   opacity={1}
                   lineHeight={1.5}
-                  padding={{left: '0.75rem', right: '0.75rem', top: '0.5rem', bottom: '0.5rem'}}
+                  padding={{ left: '0.75rem', right: '0.75rem', top: '0.5rem', bottom: '0.5rem' }}
                   onClick={this.doSwap}
                 ></i-button>
               </i-panel>
@@ -2615,16 +2630,16 @@ export default class ScomSwap extends Module {
             <i-modal
               id="modalFees"
               width={490} maxWidth={'100%'}
-              padding={{left: '1rem', right: '1rem', top: '0.75rem', bottom: '0.75rem'}}
-              border={{radius: '1rem'}}
+              padding={{ left: '1rem', right: '1rem', top: '0.75rem', bottom: '0.75rem' }}
+              border={{ radius: '1rem' }}
             >
               <i-hstack
                 verticalAlignment="center" horizontalAlignment="space-between"
-                margin={{bottom: '0.5rem'}} padding={{bottom: '0.5rem'}}
-                border={{bottom: {width: '2px', style: 'solid', color: Theme.background.main}}}
+                margin={{ bottom: '0.5rem' }} padding={{ bottom: '0.5rem' }}
+                border={{ bottom: { width: '2px', style: 'solid', color: Theme.background.main } }}
               >
                 <i-label
-                  font={{color: Theme.colors.primary.main, size: '0.875rem', weight: 700}}
+                  font={{ color: Theme.colors.primary.main, size: '0.875rem', weight: 700 }}
                   caption="Transaction Fee Details"
                 ></i-label>
                 <i-icon
@@ -2640,14 +2655,14 @@ export default class ScomSwap extends Module {
                 <i-hstack
                   verticalAlignment="center"
                   horizontalAlignment="center"
-                  margin={{bottom: '0.5rem'}}
+                  margin={{ bottom: '0.5rem' }}
                 >
                   <i-button
                     caption="Close"
                     class="btn-os"
                     lineHeight={1.5}
                     width='150px' height="auto"
-                    padding={{top: '0.25rem', bottom: '0.25rem', left: '0.25rem', right: '0.25rem'}}
+                    padding={{ top: '0.25rem', bottom: '0.25rem', left: '0.25rem', right: '0.25rem' }}
                     font={{ size: '1rem', color: Theme.colors.primary.contrastText, weight: 700 }}
                     onClick={() => this.closeModalFees()}
                   />

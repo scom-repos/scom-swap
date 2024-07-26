@@ -36,6 +36,9 @@ export interface ICommissionInfo {
 export interface INetworkConfig {
   chainName?: string;
   chainId: number;
+  tokens?: {
+    address?: string
+  }[]
 }
 
 export interface ITokenConfig {
