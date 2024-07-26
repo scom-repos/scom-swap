@@ -2361,31 +2361,33 @@ define("@scom/scom-swap/data.json.ts", ["require", "exports"], function (require
                 }
             ],
             "category": "fixed-pair",
-            "tokens": [
-                {
-                    "address": "0x29386B60e0A9A1a30e1488ADA47256577ca2C385",
-                    "chainId": 97
-                },
-                {
-                    "address": "0x45eee762aaeA4e5ce317471BDa8782724972Ee19",
-                    "chainId": 97
-                },
-                {
-                    "address": "0xb9C31Ea1D475c25E58a1bE1a46221db55E5A7C6e",
-                    "chainId": 43113
-                },
-                {
-                    "address": "0x78d9D80E67bC80A11efbf84B7c8A65Da51a8EF3C",
-                    "chainId": 43113
-                }
-            ],
             "defaultChainId": 43113,
             "networks": [
                 {
-                    "chainId": 43113
+                    "chainId": 43113,
+                    "tokens": [
+                        {
+                            "address": "0xb9C31Ea1D475c25E58a1bE1a46221db55E5A7C6e",
+                            "chainId": 43113
+                        },
+                        {
+                            "address": "0x78d9D80E67bC80A11efbf84B7c8A65Da51a8EF3C",
+                            "chainId": 43113
+                        }
+                    ]
                 },
                 {
-                    "chainId": 97
+                    "chainId": 97,
+                    "tokens": [
+                        {
+                            "address": "0x29386B60e0A9A1a30e1488ADA47256577ca2C385",
+                            "chainId": 97
+                        },
+                        {
+                            "address": "0x45eee762aaeA4e5ce317471BDa8782724972Ee19",
+                            "chainId": 97
+                        }
+                    ]
                 }
             ],
             "wallets": [
@@ -2398,7 +2400,7 @@ define("@scom/scom-swap/data.json.ts", ["require", "exports"], function (require
         }
     };
 });
-define("@scom/scom-swap/formSchema.ts", ["require", "exports", "@ijstech/components", "@scom/scom-network-picker", "@scom/scom-token-input", "@scom/scom-storage", "@scom/scom-swap/index.css.ts"], function (require, exports, components_6, scom_network_picker_1, scom_token_input_1, scom_storage_1, index_css_1) {
+define("@scom/scom-swap/formSchema.ts", ["require", "exports", "@ijstech/components", "@scom/scom-network-picker", "@scom/scom-token-input", "@scom/scom-storage", "@scom/scom-swap/index.css.ts", "@scom/scom-token-list"], function (require, exports, components_6, scom_network_picker_1, scom_token_input_1, scom_storage_1, index_css_1, scom_token_list_6) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.getProjectOwnerSchema = exports.getBuilderSchema = void 0;
@@ -2623,23 +2625,19 @@ define("@scom/scom-swap/formSchema.ts", ["require", "exports", "@ijstech/compone
                                     type: 'number',
                                     enum: chainIds,
                                     required: true
-                                }
-                            }
-                        }
-                    },
-                    tokens: {
-                        type: 'array',
-                        required: true,
-                        items: {
-                            type: 'object',
-                            properties: {
-                                chainId: {
-                                    type: 'number',
-                                    enum: chainIds,
-                                    required: true
                                 },
-                                address: {
-                                    type: 'string'
+                                tokens: {
+                                    type: 'array',
+                                    required: true,
+                                    items: {
+                                        type: 'object',
+                                        properties: {
+                                            address: {
+                                                type: 'string',
+                                                required: true
+                                            }
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -2745,16 +2743,6 @@ define("@scom/scom-swap/formSchema.ts", ["require", "exports", "@ijstech/compone
                                                             }
                                                         ]
                                                     },
-                                                    {
-                                                        type: 'Category',
-                                                        label: 'Tokens',
-                                                        elements: [
-                                                            {
-                                                                type: 'Control',
-                                                                scope: '#/properties/tokens'
-                                                            }
-                                                        ]
-                                                    }
                                                 ]
                                             }
                                         ]
@@ -2766,9 +2754,9 @@ define("@scom/scom-swap/formSchema.ts", ["require", "exports", "@ijstech/compone
                     themeUISchema
                 ]
             },
-            customControls(rpcWalletId) {
+            customControls() {
                 let networkPickers = [];
-                let tokenInputs = [];
+                let tokenInputs = {};
                 let edtLogo;
                 return {
                     '#/properties/logo': {
@@ -2804,8 +2792,7 @@ define("@scom/scom-swap/formSchema.ts", ["require", "exports", "@ijstech/compone
                             edtLogo.value = value;
                         }
                     },
-                    '#/properties/networks/properties/chainId': customNetworkPicker(),
-                    '#/properties/tokens/properties/chainId': {
+                    '#/properties/networks/properties/chainId': {
                         render: () => {
                             const idx = networkPickers.length;
                             networkPickers[idx] = new scom_network_picker_1.default(undefined, {
@@ -2813,7 +2800,12 @@ define("@scom/scom-swap/formSchema.ts", ["require", "exports", "@ijstech/compone
                                 networks,
                                 onCustomNetworkSelected: () => {
                                     const chainId = networkPickers[idx].selectedNetwork?.chainId;
-                                    tokenInputs[idx].chainId = chainId;
+                                    tokenInputs[idx]?.forEach(input => {
+                                        if (chainId !== input.chainId) {
+                                            input.chainId = chainId;
+                                            input.token = undefined;
+                                        }
+                                    });
                                 }
                             });
                             return networkPickers[idx];
@@ -2825,28 +2817,58 @@ define("@scom/scom-swap/formSchema.ts", ["require", "exports", "@ijstech/compone
                             await control.ready();
                             control.setNetworkByChainId(value);
                             const idx = networkPickers.findIndex(f => f === control);
-                            if (tokenInputs[idx])
-                                tokenInputs[idx].chainId = value;
+                            tokenInputs[idx]?.forEach(input => {
+                                if (value !== input.chainId) {
+                                    input.chainId = value;
+                                    input.token = undefined;
+                                }
+                            });
                         }
                     },
-                    '#/properties/tokens/properties/address': {
-                        render: () => {
-                            const idx = tokenInputs.length;
-                            tokenInputs[idx] = new scom_token_input_1.default(undefined, {
+                    '#/properties/networks/properties/tokens/properties/address': {
+                        render: (parent) => {
+                            const scomNetworkPicker = parent?.closest('[object-field="items"]')?.querySelector('i-scom-network-picker');
+                            const index = networkPickers.findIndex(f => f === scomNetworkPicker);
+                            if (!tokenInputs[index])
+                                tokenInputs[index] = [];
+                            const idx = tokenInputs[index].length;
+                            tokenInputs[index][idx] = new scom_token_input_1.default(undefined, {
                                 type: 'combobox',
+                                chainId: scomNetworkPicker?.selectedNetwork?.chainId,
                                 isBalanceShown: false,
                                 isBtnMaxShown: false,
                                 isInputShown: false
                             });
-                            const chainId = networkPickers[idx]?.selectedNetwork?.chainId;
-                            tokenInputs[idx].chainId = chainId;
-                            return tokenInputs[idx];
+                            return tokenInputs[index][idx];
                         },
                         getData: (control) => {
                             return control.token?.address || control.token?.symbol;
                         },
-                        setData: (control, value, rowData) => {
+                        setData: async (control, value, rowData) => {
+                            await control.ready();
                             control.chainId = rowData.chainId;
+                            if (!control.chainId && value) {
+                                let chainId;
+                                let address = value.toLowerCase();
+                                if (value.startsWith('0x')) {
+                                    for (const network of networks) {
+                                        const token = scom_token_list_6.DefaultERC20Tokens[network.chainId]?.find(v => v.address?.toLowerCase() === address);
+                                        if (token) {
+                                            chainId = network.chainId;
+                                            break;
+                                        }
+                                    }
+                                }
+                                else {
+                                    for (const network of networks) {
+                                        if (scom_token_list_6.ChainNativeTokenByChainId[network.chainId]?.symbol?.toLowerCase() === address) {
+                                            chainId = network.chainId;
+                                            break;
+                                        }
+                                    }
+                                }
+                                control.chainId = chainId;
+                            }
                             control.address = value;
                         }
                     },
@@ -2990,7 +3012,7 @@ define("@scom/scom-swap/formSchema.ts", ["require", "exports", "@ijstech/compone
     }
     exports.getProjectOwnerSchema = getProjectOwnerSchema;
 });
-define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstech/eth-wallet", "@scom/scom-swap/store/index.ts", "@scom/scom-token-list", "@scom/scom-swap/swap-utils/index.ts", "@scom/scom-swap/crosschain-utils/index.ts", "@scom/scom-swap/global/index.ts", "@scom/scom-swap/expert-mode-settings/index.tsx", "@scom/scom-swap/data.json.ts", "@scom/scom-swap/formSchema.ts", "@scom/scom-dex-list", "@scom/scom-commission-fee-setup", "@scom/scom-swap/index.css.ts", "@scom/scom-swap/index.css.ts"], function (require, exports, components_7, eth_wallet_5, index_7, scom_token_list_6, index_8, index_9, index_10, index_11, data_json_1, formSchema_1, scom_dex_list_2, scom_commission_fee_setup_1, index_css_2) {
+define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstech/eth-wallet", "@scom/scom-swap/store/index.ts", "@scom/scom-token-list", "@scom/scom-swap/swap-utils/index.ts", "@scom/scom-swap/crosschain-utils/index.ts", "@scom/scom-swap/global/index.ts", "@scom/scom-swap/expert-mode-settings/index.tsx", "@scom/scom-swap/data.json.ts", "@scom/scom-swap/formSchema.ts", "@scom/scom-dex-list", "@scom/scom-commission-fee-setup", "@scom/scom-swap/index.css.ts", "@scom/scom-swap/index.css.ts"], function (require, exports, components_7, eth_wallet_5, index_7, scom_token_list_7, index_8, index_9, index_10, index_11, data_json_1, formSchema_1, scom_dex_list_2, scom_commission_fee_setup_1, index_css_2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     const Theme = components_7.Styles.Theme.ThemeVars;
@@ -3094,7 +3116,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
             const formSchema = (0, formSchema_1.getBuilderSchema)();
             const dataSchema = formSchema.dataSchema;
             const uiSchema = formSchema.uiSchema;
-            const customControls = formSchema.customControls(this.state?.getRpcWallet()?.instanceId);
+            const customControls = formSchema.customControls();
             let self = this;
             const actions = [
                 {
@@ -3172,14 +3194,13 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                         return {
                             execute: async () => {
                                 oldData = JSON.parse(JSON.stringify(this._data));
-                                const { logo, title, networks, category, providers, tokens, ...themeSettings } = userInputData;
+                                const { logo, title, networks, category, providers, ...themeSettings } = userInputData;
                                 const generalSettings = {
                                     logo,
                                     title,
                                     networks,
                                     category,
                                     providers,
-                                    tokens
                                 };
                                 this._data.logo = generalSettings.logo;
                                 this._data.title = generalSettings.title;
@@ -3187,10 +3208,20 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                                 this._data.defaultChainId = this._data.networks[0].chainId;
                                 this._data.category = generalSettings.category;
                                 this._data.providers = generalSettings.providers;
-                                this._tokens = this._data.tokens = [];
-                                if (generalSettings.tokens) {
-                                    this._data.tokens = generalSettings.tokens;
-                                    this._tokens = (0, index_7.getTokenObjArr)(generalSettings.tokens);
+                                this._tokens = [];
+                                if (generalSettings.networks) {
+                                    let tokenList = [];
+                                    for (let network of generalSettings.networks) {
+                                        const { chainId, tokens = [] } = network;
+                                        const _tokens = tokens.map(v => {
+                                            return {
+                                                chainId,
+                                                address: v.address
+                                            };
+                                        });
+                                        tokenList.push(..._tokens);
+                                    }
+                                    this._tokens = (0, index_7.getTokenObjArr)(tokenList);
                                 }
                                 await this.resetRpcWallet();
                                 this.updateContractAddress();
@@ -3380,13 +3411,22 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
         }
         async setData(value) {
             this._data = value;
+            let tokenList = [];
+            for (let network of value.networks) {
+                const { chainId, tokens = [] } = network;
+                scom_token_list_7.tokenStore.updateTokenMapData(chainId);
+                const _tokens = tokens.map(v => {
+                    return {
+                        chainId,
+                        address: v.address
+                    };
+                });
+                tokenList.push(..._tokens);
+            }
             if (this._data.apiEndpoints) {
                 this.state.setAPIEnpoints(this._data.apiEndpoints);
             }
-            for (let network of this._data.networks) {
-                scom_token_list_6.tokenStore.updateTokenMapData(network.chainId);
-            }
-            this._tokens = (0, index_7.getTokenObjArr)(this._data.tokens);
+            this._tokens = (0, index_7.getTokenObjArr)(tokenList);
             await this.resetRpcWallet();
             this.updateContractAddress();
             await this.refreshUI();
@@ -3818,7 +3858,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                 const tokenList = (0, index_7.getSupportedTokens)(this._tokens, obj.chainId);
                 this.toToken = tokenList[0];
                 this.secondTokenInput.token = this.toToken;
-                await scom_token_list_6.tokenStore.updateTokenBalancesByChainId(obj.chainId);
+                await scom_token_list_7.tokenStore.updateTokenBalancesByChainId(obj.chainId);
                 const balance = this.getBalance(this.toToken);
                 this.receiveBalance.caption = `Balance: ${(0, index_10.formatNumber)(balance, 4)} ${this.toToken.symbol}`;
                 const enabled = !this.isMaxDisabled();
@@ -4146,7 +4186,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                     this.srcChainSecondPanel.visible = true;
                     this.srcChainVaultImage.url = this.srcChain.image;
                     this.srcChainVaultLabel.caption = this.srcChain.chainName;
-                    this.srcVaultTokenImage.url = scom_token_list_6.assets.getTokenIconPath(sourceVaultToken, this.srcChain.chainId);
+                    this.srcVaultTokenImage.url = scom_token_list_7.assets.getTokenIconPath(sourceVaultToken, this.srcChain.chainId);
                     this.srcVaultTokenLabel.caption = sourceVaultToken.symbol;
                     this.srcVaultTokenValue.caption = (0, index_10.formatNumber)(vaultTokenFromSourceChain);
                     if (this.lbReminderRejected) {
@@ -4161,7 +4201,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                     this.targetChainSecondPanel.visible = true;
                     this.targetChainVaultImage.url = this.desChain.image;
                     this.targetChainVaultLabel.caption = this.desChain.chainName;
-                    this.targetVaultTokenImage.url = scom_token_list_6.assets.getTokenIconPath(targetVaultToken, this.desChain.chainId);
+                    this.targetVaultTokenImage.url = scom_token_list_7.assets.getTokenIconPath(targetVaultToken, this.desChain.chainId);
                     this.targetVaultTokenLabel.caption = targetVaultToken.symbol;
                     this.targetVaultTokenValue.caption = (0, index_10.formatNumber)(vaultTokenToTargetChain);
                     // Hide vault info at toToken
@@ -4187,10 +4227,10 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
             this.setupCrossChainPopup();
             const currentChainId = this.state.getChainId();
             const slippageTolerance = this.state.slippageTolerance;
-            this.fromTokenImage.url = scom_token_list_6.assets.tokenPath(this.fromToken, currentChainId);
+            this.fromTokenImage.url = scom_token_list_7.assets.tokenPath(this.fromToken, currentChainId);
             this.fromTokenLabel.caption = this.fromToken?.symbol ?? '';
             this.fromTokenValue.caption = (0, index_10.formatNumber)(this.fromInputValue, 4);
-            this.toTokenImage.url = scom_token_list_6.assets.tokenPath(this.toToken, this.isCrossChain ? this.desChain?.chainId : currentChainId);
+            this.toTokenImage.url = scom_token_list_7.assets.tokenPath(this.toToken, this.isCrossChain ? this.desChain?.chainId : currentChainId);
             this.toTokenLabel.caption = this.toToken?.symbol ?? '';
             this.toTokenValue.caption = (0, index_10.formatNumber)(this.toInputValue, 4);
             const minimumReceived = this.getMinReceivedMaxSold();
@@ -4479,7 +4519,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                 }, new eth_wallet_5.BigNumber(0));
                 const vaultTokenToTargetChain = new eth_wallet_5.BigNumber(listRouting[0].vaultTokenToTargetChain);
                 const vaultToUsdPrice = oraclePriceMap[vaultTokenAddress.toLowerCase()]; // This will be the vaultToken -> USD Price
-                const oswapToken = Object.values(scom_token_list_6.tokenStore.getTokenMapByChainId(this.desChain.chainId)).find(v => v.symbol === 'OSWAP');
+                const oswapToken = Object.values(scom_token_list_7.tokenStore.getTokenMapByChainId(this.desChain.chainId)).find(v => v.symbol === 'OSWAP');
                 const oswapToUsdPrice = oraclePriceMap[oswapToken.address.toLowerCase()];
                 const vaultToOswapPrice = vaultToUsdPrice.div(oswapToUsdPrice); // This will vaultToken -> oswap price;
                 this.targetVaultAssetBalanceLabel1.caption = `Vault Asset Balance: ${(0, index_10.formatNumber)(targetVaultAssetBalance.toNumber(), 4)} ${assetSymbol}`;
@@ -4724,7 +4764,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
         getBalance(token) {
             if (!token)
                 return '0';
-            let tokenBalances = scom_token_list_6.tokenStore.getTokenBalancesByChainId(token.chainId);
+            let tokenBalances = scom_token_list_7.tokenStore.getTokenBalancesByChainId(token.chainId);
             if (!tokenBalances)
                 return '0';
             const address = token.address || '';
@@ -4734,7 +4774,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
         async updateBalances() {
             const chainIds = [...new Set([this.fromToken.chainId, this.toToken.chainId])];
             for (let chainId of chainIds) {
-                await scom_token_list_6.tokenStore.updateTokenBalancesByChainId(chainId);
+                await scom_token_list_7.tokenStore.updateTokenBalancesByChainId(chainId);
             }
             if (this.fromToken) {
                 const balance = this.getBalance(this.fromToken);
@@ -4973,7 +5013,6 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                 const category = this.getAttribute('category', true, "fixed-pair");
                 const providers = this.getAttribute('providers', true, []);
                 const commissions = this.getAttribute('commissions', true, []);
-                const tokens = this.getAttribute('tokens', true, []);
                 const defaultChainId = this.getAttribute('defaultChainId', true);
                 const networks = this.getAttribute('networks', true);
                 const wallets = this.getAttribute('wallets', true);
@@ -4990,7 +5029,6 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                     category,
                     providers,
                     commissions,
-                    tokens,
                     defaultChainId,
                     networks,
                     wallets,
@@ -5136,7 +5174,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                                             this.$render("i-label", { id: "srcChainVaultLabel", font: { size: '1.1rem' }, caption: "" }),
                                             this.$render("i-icon", { name: "minus", fill: Theme.input.fontColor, width: 28, height: 10 })),
                                         this.$render("i-hstack", { verticalAlignment: "center", gap: '0.5rem' },
-                                            this.$render("i-image", { id: "srcVaultTokenImage", fallbackUrl: scom_token_list_6.assets.fallbackUrl, width: "30px", height: "30px", url: "#" }),
+                                            this.$render("i-image", { id: "srcVaultTokenImage", fallbackUrl: scom_token_list_7.assets.fallbackUrl, width: "30px", height: "30px", url: "#" }),
                                             this.$render("i-label", { id: "srcVaultTokenLabel", font: { size: '1.1rem' }, caption: "" })),
                                         this.$render("i-label", { id: "srcVaultTokenValue", margin: { left: 'auto' }, font: { size: '1.1rem' }, caption: "-" })),
                                     this.$render("i-icon", { width: 28, height: 28, name: "arrow-down", fill: Theme.input.fontColor, border: { width: '2px', style: 'solid', color: 'transparent', radius: '50%' }, padding: { left: '0.25rem', right: '0.25rem', top: '0.25rem', bottom: '0.25rem' }, background: { color: Theme.input.background }, margin: { top: '0.75rem', bottom: '0.75rem' }, class: "arrow-down" })),
@@ -5147,7 +5185,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                                             this.$render("i-label", { id: "targetChainVaultLabel", font: { size: '1.1rem' }, caption: "" }),
                                             this.$render("i-icon", { name: "minus", fill: Theme.input.fontColor, width: 28, height: 10 })),
                                         this.$render("i-hstack", { verticalAlignment: "center", gap: '0.5rem' },
-                                            this.$render("i-image", { id: "targetVaultTokenImage", fallbackUrl: scom_token_list_6.assets.fallbackUrl, width: "30px", height: "30px", url: "#" }),
+                                            this.$render("i-image", { id: "targetVaultTokenImage", fallbackUrl: scom_token_list_7.assets.fallbackUrl, width: "30px", height: "30px", url: "#" }),
                                             this.$render("i-label", { id: "targetVaultTokenLabel", font: { size: '1.1rem' }, caption: "" })),
                                         this.$render("i-label", { id: "targetVaultTokenValue", margin: { left: 'auto' }, font: { size: '1.1rem' }, caption: "-" })),
                                     this.$render("i-vstack", { justifyContent: 'end' },
@@ -5157,7 +5195,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                                     this.$render("i-icon", { width: 28, height: 28, name: "arrow-down", fill: Theme.input.fontColor, border: { width: '2px', style: 'solid', color: 'transparent', radius: '50%' }, padding: { left: '0.25rem', right: '0.25rem', top: '0.25rem', bottom: '0.25rem' }, margin: { top: '0.75rem', bottom: '0.75rem' }, background: { color: Theme.input.background }, class: "arrow-down" })),
                                 this.$render("i-hstack", { margin: { bottom: '1rem' }, verticalAlignment: 'center', horizontalAlignment: 'start' },
                                     this.$render("i-hstack", { id: "targetChainFirstPanel", verticalAlignment: "center", gap: '0.5rem' },
-                                        this.$render("i-image", { id: "targetChainTokenImage", fallbackUrl: scom_token_list_6.assets.fallbackUrl, width: "30px", height: "30px", url: "#" }),
+                                        this.$render("i-image", { id: "targetChainTokenImage", fallbackUrl: scom_token_list_7.assets.fallbackUrl, width: "30px", height: "30px", url: "#" }),
                                         this.$render("i-label", { id: "targetChainTokenLabel", font: { size: '1.1rem' }, caption: "" }),
                                         this.$render("i-icon", { name: "minus", fill: Theme.input.fontColor, width: 28, height: 10 })),
                                     this.$render("i-hstack", { verticalAlignment: "center", gap: '0.5rem' },

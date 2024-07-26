@@ -1,8 +1,9 @@
-import { Button, Input, StackLayout, Styles } from '@ijstech/components';
+import { Button, Control, Input, StackLayout, Styles } from '@ijstech/components';
 import ScomNetworkPicker from '@scom/scom-network-picker';
 import ScomTokenInput from '@scom/scom-token-input';
 import { ScomStorage } from "@scom/scom-storage";
 import { storageModalStyle } from './index.css';
+import { ChainNativeTokenByChainId, DefaultERC20Tokens } from '@scom/scom-token-list';
 
 const Theme = Styles.Theme.ThemeVars;
 const chainIds = [1, 56, 137, 250, 97, 80001, 43113, 43114];
@@ -228,23 +229,19 @@ export function getBuilderSchema() {
                                 type: 'number',
                                 enum: chainIds,
                                 required: true
-                            }
-                        }
-                    }
-                },
-                tokens: {
-                    type: 'array',
-                    required: true,
-                    items: {
-                        type: 'object',
-                        properties: {
-                            chainId: {
-                                type: 'number',
-                                enum: chainIds,
-                                required: true
                             },
-                            address: {
-                                type: 'string'
+                            tokens: {
+                                type: 'array',
+                                required: true,
+                                items: {
+                                    type: 'object',
+                                    properties: {
+                                        address: {
+                                            type: 'string',
+                                            required: true
+                                        }
+                                    }
+                                }
                             }
                         }
                     }
@@ -350,16 +347,6 @@ export function getBuilderSchema() {
                                                         }
                                                     ]
                                                 },
-                                                {
-                                                    type: 'Category',
-                                                    label: 'Tokens',
-                                                    elements: [
-                                                        {
-                                                            type: 'Control',
-                                                            scope: '#/properties/tokens'
-                                                        }
-                                                    ]
-                                                }
                                             ]
                                         }
                                     ]
@@ -372,9 +359,9 @@ export function getBuilderSchema() {
             ]
 
         },
-        customControls(rpcWalletId: string) {
+        customControls() {
             let networkPickers: ScomNetworkPicker[] = [];
-            let tokenInputs: ScomTokenInput[] = [];
+            let tokenInputs: { [key: number]: ScomTokenInput[] } = {};
             let edtLogo: Input;
             return {
                 '#/properties/logo': {
@@ -410,8 +397,7 @@ export function getBuilderSchema() {
                         edtLogo.value = value;
                     }
                 },
-                '#/properties/networks/properties/chainId': customNetworkPicker(),
-                '#/properties/tokens/properties/chainId': {
+                '#/properties/networks/properties/chainId': {
                     render: () => {
                         const idx = networkPickers.length;
                         networkPickers[idx] = new ScomNetworkPicker(undefined, {
@@ -419,7 +405,12 @@ export function getBuilderSchema() {
                             networks,
                             onCustomNetworkSelected: () => {
                                 const chainId = networkPickers[idx].selectedNetwork?.chainId;
-                                tokenInputs[idx].chainId = chainId;
+                                tokenInputs[idx]?.forEach(input => {
+                                    if (chainId !== input.chainId) {
+                                        input.chainId = chainId;
+                                        input.token = undefined;
+                                    }
+                                });
                             }
                         });
                         return networkPickers[idx];
@@ -431,27 +422,56 @@ export function getBuilderSchema() {
                         await control.ready();
                         control.setNetworkByChainId(value);
                         const idx = networkPickers.findIndex(f => f === control);
-                        if (tokenInputs[idx]) tokenInputs[idx].chainId = value;
+                        tokenInputs[idx]?.forEach(input => {
+                            if (value !== input.chainId) {
+                                input.chainId = value;
+                                input.token = undefined;
+                            }
+                        });
                     }
                 },
-                '#/properties/tokens/properties/address': {
-                    render: () => {
-                        const idx = tokenInputs.length;
-                        tokenInputs[idx] = new ScomTokenInput(undefined, {
+                '#/properties/networks/properties/tokens/properties/address': {
+                    render: (parent?: Control) => {
+                        const scomNetworkPicker = parent?.closest('[object-field="items"]')?.querySelector('i-scom-network-picker') as ScomNetworkPicker;
+                        const index = networkPickers.findIndex(f => f === scomNetworkPicker);
+                        if (!tokenInputs[index]) tokenInputs[index] = [];
+                        const idx = tokenInputs[index].length;
+                        tokenInputs[index][idx] = new ScomTokenInput(undefined, {
                             type: 'combobox',
+                            chainId: scomNetworkPicker?.selectedNetwork?.chainId,
                             isBalanceShown: false,
                             isBtnMaxShown: false,
                             isInputShown: false
                         });
-                        const chainId = networkPickers[idx]?.selectedNetwork?.chainId;
-                        tokenInputs[idx].chainId = chainId;
-                        return tokenInputs[idx];
+                        return tokenInputs[index][idx];
                     },
                     getData: (control: ScomTokenInput) => {
                         return control.token?.address || control.token?.symbol;
                     },
-                    setData: (control: ScomTokenInput, value: string, rowData: any) => {
+                    setData: async (control: ScomTokenInput, value: string, rowData: any) => {
+                        await control.ready();
                         control.chainId = rowData.chainId;
+                        if (!control.chainId && value) {
+                            let chainId: number;
+                            let address = value.toLowerCase();
+                            if (value.startsWith('0x')) {
+                                for (const network of networks) {
+                                    const token = DefaultERC20Tokens[network.chainId]?.find(v => v.address?.toLowerCase() === address);
+                                    if (token) {
+                                        chainId = network.chainId;
+                                        break;
+                                    }
+                                }
+                            } else {
+                                for (const network of networks) {
+                                    if (ChainNativeTokenByChainId[network.chainId]?.symbol?.toLowerCase() === address) {
+                                        chainId = network.chainId;
+                                        break;
+                                    }
+                                }
+                            }
+                            control.chainId = chainId;
+                        }
                         control.address = value;
                     }
                 },
