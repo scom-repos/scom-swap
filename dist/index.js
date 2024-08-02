@@ -3056,7 +3056,10 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
             this._data.commissions = value;
         }
         get defaultChainId() {
-            return this._data.defaultChainId;
+            if (this.networks.some(v => v.chainId === this._data.defaultChainId)) {
+                return this._data.defaultChainId;
+            }
+            return this.networks[0]?.chainId || this._data.defaultChainId;
         }
         set defaultChainId(value) {
             this._data.defaultChainId = value;
@@ -3628,7 +3631,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                     this.firstTokenInput.tokenDataListProp = (0, index_7.getSupportedTokens)(this._tokens, this.fromToken.chainId);
                     this.secondTokenInput.tokenDataListProp = (0, index_7.getSupportedTokens)(this._tokens, this.toToken.chainId);
                     if (!this.record)
-                        this.swapBtn.enabled = false;
+                        this.swapBtn.enabled = !this.isSwapButtonDisabled();
                     this.renderPriceInfo();
                     await this.handleAddRoute();
                 });
