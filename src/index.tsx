@@ -254,7 +254,10 @@ export default class ScomSwap extends Module {
   }
 
   get defaultChainId() {
-    return this._data.defaultChainId;
+    if (this.networks.some(v => v.chainId === this._data.defaultChainId)) {
+      return this._data.defaultChainId;
+    }
+    return this.networks[0]?.chainId || this._data.defaultChainId;
   }
 
   set defaultChainId(value: number) {
@@ -945,7 +948,7 @@ export default class ScomSwap extends Module {
       this.firstTokenInput.tokenDataListProp = getSupportedTokens(this._tokens, this.fromToken.chainId);
       this.secondTokenInput.tokenDataListProp = getSupportedTokens(this._tokens, this.toToken.chainId);
       if (!this.record)
-        this.swapBtn.enabled = false;
+        this.swapBtn.enabled = !this.isSwapButtonDisabled();
       this.renderPriceInfo();
       await this.handleAddRoute();
     });

@@ -1,19 +1,17 @@
-import { Module, customModule, Container, VStack, Styles, application } from '@ijstech/components';
+import { Module, customModule, Container, VStack, application } from '@ijstech/components';
 import { getMulticallInfoList } from '@scom/scom-multicall';
 import { INetwork } from '@ijstech/eth-wallet';
 import getNetworkList from '@scom/scom-network-list';
 import ScomSwap from '@scom/scom-swap'
+import ScomWidgetTest from '@scom/scom-widget-test';
 
-const Theme = Styles.Theme.currentTheme;
-Theme.background.main = '#2c2626';
-Theme.text.primary = '#d3c0c0 ';
-Theme.input.background = '#272F39';
-Theme.input.fontColor = '#ffffff4d';
 @customModule
 export default class Module1 extends Module {
   private swapEl: ScomSwap;
   private mainStack: VStack;
   private _providers: any[] = [];
+  private swapWidget: ScomSwap;
+  private widgetModule: ScomWidgetTest;
 
   constructor(parent?: Container, options?: any) {
     super(parent, options);
@@ -81,6 +79,29 @@ export default class Module1 extends Module {
     return networkMap;
   }
 
+  private async onShowConfig() {
+    const editor = this.swapWidget.getConfigurators().find(v => v.target === 'Editor');
+    const widgetData = await editor.getData();
+    if (!this.widgetModule) {
+      this.widgetModule = await ScomWidgetTest.create({
+        widgetName: 'scom-swap',
+        onConfirm: (data: any, tag: any) => {
+          editor.setData(data);
+          editor.setTag(tag);
+          this.widgetModule.closeModal();
+        }
+      });
+    }
+    this.widgetModule.openModal({
+      width: '95%',
+      maxWidth: '95rem',
+      padding: { top: 0, bottom: 0, left: 0, right: 0 },
+      closeOnBackdropClick: true,
+      closeIcon: null
+    });
+    this.widgetModule.show(widgetData);
+  }
+
   async init() {
     super.init();
     // this.swapEl = await ScomSwap.create({
@@ -93,12 +114,14 @@ export default class Module1 extends Module {
   render() {
     return (
       <i-panel>
-        <i-hstack
-          id='mainStack'
-          margin={{ top: '1rem', left: '1rem' }}
-          gap='2rem'
+        <i-vstack
+          id="mainStack"
+          margin={{ top: '1rem', left: '1rem', right: '1rem' }}
+          gap="1rem"
         >
+          <i-button caption="Config" onClick={this.onShowConfig} width={160} padding={{ top: 5, bottom: 5 }} margin={{ left: 'auto', right: 20 }} font={{ color: '#fff' }} />
           <i-scom-swap
+            id="swapWidget"
             providers={[
               {
                 "key": "OpenSwap",
@@ -110,43 +133,29 @@ export default class Module1 extends Module {
               }
             ]}
             category="aggregator"
-            tokens={[
-              {
-                // "name": "USDT",
-                "address": "0x29386B60e0A9A1a30e1488ADA47256577ca2C385",
-                // "symbol": "USDT",
-                // "decimals": 6,
-                "chainId": 97
-              },
-              {
-                // "name": "OpenSwap",
-                "address": "0x45eee762aaeA4e5ce317471BDa8782724972Ee19",
-                // "symbol": "OSWAP",
-                // "decimals": 18,
-                "chainId": 97
-              },
-              {
-                // "name": "Tether USD",
-                "address": "0xb9C31Ea1D475c25E58a1bE1a46221db55E5A7C6e",
-                // "symbol": "USDT.e",
-                // "decimals": 6,
-                "chainId": 43113
-              },
-              {
-                // "name": "OpenSwap",
-                "address": "0x78d9D80E67bC80A11efbf84B7c8A65Da51a8EF3C",
-                // "symbol": "OSWAP",
-                // "decimals": 18,
-                "chainId": 43113
-              }
-            ]}
             defaultChainId={43113}
             networks={[
               {
-                "chainId": 43113
+                "chainId": 43113,
+                "tokens": [
+                  {
+                    "address": "0xb9C31Ea1D475c25E58a1bE1a46221db55E5A7C6e",
+                  },
+                  {
+                    "address": "0x78d9D80E67bC80A11efbf84B7c8A65Da51a8EF3C",
+                  }
+                ]
               },
               {
-                "chainId": 97
+                "chainId": 97,
+                "tokens": [
+                  {
+                    "address": "0x29386B60e0A9A1a30e1488ADA47256577ca2C385",
+                  },
+                  {
+                    "address": "0x45eee762aaeA4e5ce317471BDa8782724972Ee19",
+                  }
+                ]
               }
             ]}
             wallets={[
@@ -155,7 +164,7 @@ export default class Module1 extends Module {
               }
             ]}
           ></i-scom-swap>
-        </i-hstack>
+        </i-vstack>
       </i-panel>
     )
   }
