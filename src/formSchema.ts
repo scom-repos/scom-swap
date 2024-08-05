@@ -506,6 +506,15 @@ const showStorage = (target: Input) => {
     scomStorage.onCancel = () => {
         scomStorage.closeModal();
     }
+    scomStorage.uploadMultiple = false;
+    scomStorage.onUploadedFile = (path: string) => {
+        const imageTypes = ['jpg', 'jpeg', 'png', 'gif', 'svg', 'webp'];
+        const ext = path.split('.').pop().toLowerCase();
+        if (imageTypes.includes(ext)) {
+            target.value = path;
+            scomStorage.closeModal();
+        }
+    }
     scomStorage.onOpen = (path: string) => {
         const imageTypes = ['jpg', 'jpeg', 'png', 'gif', 'svg', 'webp'];
         const ext = path.split('.').pop().toLowerCase();

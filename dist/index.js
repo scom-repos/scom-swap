@@ -2901,6 +2901,15 @@ define("@scom/scom-swap/formSchema.ts", ["require", "exports", "@ijstech/compone
         scomStorage.onCancel = () => {
             scomStorage.closeModal();
         };
+        scomStorage.uploadMultiple = false;
+        scomStorage.onUploadedFile = (path) => {
+            const imageTypes = ['jpg', 'jpeg', 'png', 'gif', 'svg', 'webp'];
+            const ext = path.split('.').pop().toLowerCase();
+            if (imageTypes.includes(ext)) {
+                target.value = path;
+                scomStorage.closeModal();
+            }
+        };
         scomStorage.onOpen = (path) => {
             const imageTypes = ['jpg', 'jpeg', 'png', 'gif', 'svg', 'webp'];
             const ext = path.split('.').pop().toLowerCase();
