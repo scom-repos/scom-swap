@@ -18,397 +18,14 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
-define("@scom/scom-swap/index.css.ts", ["require", "exports", "@ijstech/components"], function (require, exports, components_1) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    exports.storageModalStyle = exports.swapStyle = void 0;
-    const Theme = components_1.Styles.Theme.ThemeVars;
-    // const colorVar = {
-    //   primaryButton: 'transparent linear-gradient(90deg, #AC1D78 0%, #E04862 100%) 0% 0% no-repeat padding-box',
-    //   primaryGradient: 'linear-gradient(255deg,#f15e61,#b52082)',
-    //   darkBg: '#181E3E 0% 0% no-repeat padding-box',
-    //   primaryDisabled: 'transparent linear-gradient(270deg,#351f52,#552a42) 0% 0% no-repeat padding-box !important'
-    // }
-    exports.swapStyle = components_1.Styles.style({
-        $nest: {
-            '::-webkit-scrollbar': {
-                width: '3px',
-            },
-            '::-webkit-scrollbar-thumb': {
-                background: Theme.colors.primary.main,
-                borderRadius: '5px',
-            },
-            // '*': {
-            //   boxSizing: 'border-box',
-            // },
-            '#swapContainer': {
-                // width: 720,
-                // maxWidth: '100%',
-                // minHeight: 340,
-                // padding: '1rem',
-                // marginInline: 'auto',
-                $nest: {
-                    '#btnToken': {
-                        // height: 'auto !important',
-                        // background: `${Theme.background.main} !important`,
-                        // padding: '0.5rem !important',
-                        // borderRadius: '8px',
-                        // fontSize: '1rem',
-                        // fontWeight: 700,
-                        // lineHeight: 1.5,
-                        // alignSelf: 'center',
-                        // textAlign: 'center',
-                        // opacity: 1,
-                        // color: Theme.input.fontColor,
-                        $nest: {
-                            '&:not(.disabled):hover': {
-                                color: Theme.input.fontColor
-                            },
-                            // '&> span': {
-                            //   verticalAlign: 'middle',
-                            // },
-                            // '&> i-icon': {
-                            //   maxWidth: 10,
-                            //   height: '16px !important',
-                            //   opacity: 0.5,
-                            //   marginRight: 'unset',
-                            //   fill: Theme.input.fontColor,
-                            //   $nest: {
-                            //     'svg': {
-                            //       fill: `${Theme.input.fontColor} !important`
-                            //     }
-                            //   }
-                            // },
-                            '&> :not(:last-child)': {
-                                marginRight: '0.5rem'
-                            }
-                        }
-                    }
-                }
-            },
-            // '.swap-flex--col': {
-            //   flexDirection: 'column',
-            //   $nest: {
-            //     '& > i-vstack': {
-            //       width: '100% !important'
-            //     },
-            //     '.custom-ic--swap': {
-            //       margin: 'auto',
-            //       bottom: '0 !important',
-            //       transform: 'none !important'
-            //     }
-            //   }
-            // },
-            // '.visibility-hidden': {
-            //   visibility: 'hidden'
-            // },
-            // '.content-swap': {
-            //   marginTop: '0.5rem',
-            //   marginBottom: '1rem',
-            //   borderRadius: '1rem'
-            // },
-            // 'i-label.text--grey *': {
-            //   color: Theme.text.primary,
-            //   opacity: 0.55, // 'hsla(0,0%,100%,0.55)'
-            // },
-            '.btn-max': {
-                // position: 'relative',
-                // borderRadius: '0.5rem',
-                // fontSize: '1rem',
-                // padding: '0 0.5rem',
-                // marginLeft: '0.5rem',
-                // bottom: '1.5px',
-                background: 'var(--max-button-background)',
-                // color: Theme.colors.primary.contrastText
-            },
-            // '.bg-box': {
-            //   margin: '0.5rem 0',
-            //   border: '2px solid transparent',
-            //   borderRadius: '1rem',
-            //   $nest: {
-            //     '&.bg-box--active': {
-            //       borderColor: '#E53780'
-            //     }
-            //   }
-            // },
-            // '.rounded-icon': {
-            //   display: 'inline-flex',
-            //   padding: '3px',
-            //   background: Theme.input.background,
-            //   border: '2px solid transparent',
-            //   borderRadius: '50%',
-            //   cursor: 'pointer'
-            // },
-            // '.swap-btn-container': {
-            //   marginTop: 10,
-            //   $nest: {
-            //     '.btn-swap': {
-            //       position: 'relative',
-            //       width: '100%',
-            //       borderRadius: '0.65rem',
-            //       fontSize: '1.125rem',
-            //       padding: '0.5rem 0.75rem',
-            //       opacity: 1,
-            //       color: Theme.colors.primary.contrastText
-            //     }
-            //   }
-            // },
-            // '#receiveCol': {
-            //   maxWidth: 'calc(100% - 9rem)',
-            // },
-            // '.hints': {
-            //   display: 'flex',
-            //   alignItems: 'center',
-            //   marginTop: '-0.5rem',
-            //   $nest: {
-            //     '*': {
-            //       fontSize: '0.8rem',
-            //       opacity: 0.9,
-            //     },
-            //     'i-label *': {
-            //       marginLeft: '0.25rem',
-            //     },
-            //   },
-            // },
-            '.chain-icon': {
-                // margin: '0.25rem 0.5rem 0 0',
-                // borderRadius: '50%',
-                // border: '2px solid transparent',
-                // padding: '0.25rem',
-                // cursor: 'pointer',
-                filter: 'grayscale(1)',
-                $nest: {
-                    // '&.icon-disabled': {
-                    //   cursor: 'default',
-                    // },
-                    '&.icon-selected': {
-                        // borderColor: Theme.colors.primary.main,
-                        // cursor: 'default',
-                        filter: 'inherit',
-                    },
-                    // 'img': {
-                    //   width: '32px',
-                    //   height: '32px',
-                    // },
-                },
-            },
-            // '.chain-text': {
-            //   whiteSpace: 'nowrap',
-            //   overflow: 'hidden !important',
-            //   textOverflow: 'ellipsis'
-            // },
-            // '.cursor-default': {
-            //   cursor: 'default !important',
-            // },
-            // '.hidden': {
-            //   display: 'none !important'
-            // },
-            // '.custom-md--view': {
-            //   $nest: {
-            //     'i-label > *': {
-            //       fontSize: '.875rem',
-            //       wordBreak: 'normal'
-            //     },
-            //     '.i-modal_content': {
-            //       padding: '0 1rem 1rem',
-            //     },
-            //     '.flex-col': {
-            //       flexDirection: 'column',
-            //     },
-            //     'i-button': {
-            //       display: 'flex',
-            //       alignItems: 'center',
-            //       justifyContent: 'center',
-            //       width: '150px',
-            //       height: '50px !important',
-            //       fontWeight: 600,
-            //       borderRadius: 5,
-            //       margin: '0.5rem',
-            //     }
-            //   }
-            // },
-            // '.custom-modal': {
-            //   $nest: {
-            //     '.modal': {
-            //       background: Theme.background.modal,
-            //       width: 490,
-            //       maxWidth: '100%',
-            //       padding: '0.75rem 1rem',
-            //       borderRadius: '1rem',
-            //       color: Theme.text.primary
-            //     },
-            //     '.i-modal_header': {
-            //       marginBottom: '1.5rem',
-            //       paddingBottom: '0.5rem',
-            //       borderBottom: `2px soid ${Theme.background.main}`,
-            //       color: Theme.colors.primary.main,
-            //       fontSize: '1.25rem',
-            //       fontWeight: 700,
-            //       $nest: {
-            //         '&> span': {
-            //           color: Theme.colors.primary.main,
-            //         },
-            //         '&> i-icon': {
-            //           fill: `${Theme.colors.primary.main} !important`
-            //         },
-            //         '& ~ i-icon': {
-            //           display: 'inline-block',
-            //           margin: '0.75rem 0',
-            //           background: Theme.input.background,
-            //           border: '2px solid transparent',
-            //           borderRadius: '50%',
-            //           padding: '0.25rem'
-            //         }
-            //       }
-            //     },
-            //   }
-            // },
-            // '#registerPairModal': {
-            //   $nest: {
-            //     '.modal': {
-            //       background: Theme.background.modal,
-            //       width: 420,
-            //       maxWidth: '100%',
-            //       padding: '0.75rem 1rem 1.25rem 1rem',
-            //       borderRadius: '1rem',
-            //       color: Theme.text.primary
-            //     },
-            //     '.i-modal_header': {
-            //       marginBottom: '1.5rem',
-            //       paddingBottom: '0.5rem',
-            //       borderBottom: `2px soid ${Theme.background.main}`,
-            //       color: Theme.colors.primary.main,
-            //       fontSize: '1.25rem',
-            //       fontWeight: 700,
-            //       $nest: {
-            //         '&> span': {
-            //           color: Theme.colors.primary.main,
-            //         },
-            //         '.i-modal-close': {
-            //           fill: `${Theme.colors.primary.main} !important`,
-            //         }
-            //       }
-            //     },
-            //   }
-            // },
-            // '#swapModal': {
-            //   $nest: {
-            //     '.icon-swap': {
-            //       margin: 0
-            //     },
-            //     'i-image:not(.rounded-icon)': {
-            //       display: 'inline-block',
-            //       marginRight: '0.5rem'
-            //     },
-            //     '#tokenReceiveValue': {
-            //       margin: '0 5px'
-            //     },
-            //     '#payOrReceiveValue': {
-            //       marginInline: '0.25rem',
-            //     },
-            //     '.text-primary *': {
-            //       color: Theme.colors.primary.main,
-            //     },
-            //     '.price-info': {
-            //       padding: '1rem'
-            //     },
-            //     '.arrow-down': {
-            //       display: 'inline-block',
-            //       margin: '0.75rem 0',
-            //       background: Theme.input.background,
-            //       border: '2px solid transparent',
-            //       borderRadius: '50%',
-            //       padding: '0.25rem'
-            //     },
-            //     '.arrow-down--chain': {
-            //       margin: '0.75rem 6rem !important',
-            //     },
-            //     '.token-value': {
-            //       marginLeft: 'auto',
-            //     },
-            //     '.token-value > *, #swapModal .token-name > *': {
-            //       fontSize: '1.1rem'
-            //     },
-            //     '.row-chain': {
-            //       display: 'flex',
-            //       alignItems: 'center',
-            //     },
-            //     'i-icon.custom-icon--fill': {
-            //       fill: Theme.input.fontColor,
-            //       $nest: {
-            //         'svg': {
-            //           fill: `${Theme.input.fontColor} !important`
-            //         }
-            //       }
-            //     }
-            //   }
-            // },
-            // '#modalFees': {
-            //   $nest: {
-            //     '.i-modal_header': {
-            //       marginBottom: '0.5rem !important',
-            //     },
-            //     '.i-modal_content': {
-            //       $nest: {
-            //         'i-label *': {
-            //           fontSize: '0.875rem',
-            //         },
-            //         'i-button': {
-            //           width: '150px',
-            //           paddingBlock: '0.25rem',
-            //           textAlign: 'center',
-            //         },
-            //       },
-            //     },
-            //   },
-            // },
-            '.btn-os': {
-                background: 'var(--primary-button-background)',
-                transition: 'background .3s ease'
-            },
-            '.btn-os:not(.disabled):not(.is-spinning):hover, .btn-os:not(.disabled):not(.is-spinning):focus': {
-                background: 'var(--primary-button-hover-background)',
-                boxShadow: 'none',
-                opacity: .9
-            },
-            '.btn-os:not(.disabled):not(.is-spinning):focus': {
-                boxShadow: '0 0 0 0.2rem rgb(0 123 255 / 25%)',
-                outline: 0
-            },
-            '.btn-os.disabled, .btn-os.is-spinning': {
-                background: 'var(--primary-button-disabled-background)',
-                opacity: 0.4
-            },
-            '.btn-max:not(.disabled):hover': {
-                transition: 'all .2s ease-out',
-                background: 'var(--max-button-hover-background)'
-            }
-        }
-    });
-    exports.storageModalStyle = components_1.Styles.style({
-        $nest: {
-            '.modal > div:nth-child(2)': {
-                width: '100%',
-                height: '100%',
-                overflow: 'hidden'
-            },
-            'i-scom-storage': {
-                display: 'block',
-                width: '100%',
-                height: 'calc(100% - 1.5rem)',
-                overflow: 'hidden'
-            }
-        }
-    });
-});
-define("@scom/scom-swap/global/utils/helper.ts", ["require", "exports", "@ijstech/components", "@ijstech/eth-wallet"], function (require, exports, components_2, eth_wallet_1) {
+define("@scom/scom-swap/global/utils/helper.ts", ["require", "exports", "@ijstech/components", "@ijstech/eth-wallet"], function (require, exports, components_1, eth_wallet_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.getAPI = exports.isInvalidInput = exports.formatNumber = void 0;
     const formatNumber = (value, decimalFigures) => {
         const newValue = (typeof value === 'object') ? value.toFixed() : value;
         const minValue = '0.0000001';
-        return components_2.FormatUtils.formatNumber(newValue, { decimalFigures: decimalFigures || 4, minValue });
+        return components_1.FormatUtils.formatNumber(newValue, { decimalFigures: decimalFigures || 4, minValue, hasTrailingZero: false });
     };
     exports.formatNumber = formatNumber;
     const isInvalidInput = (val) => {
@@ -463,7 +80,7 @@ define("@scom/scom-swap/global/index.ts", ["require", "exports", "@scom/scom-swa
     })(ApprovalStatus = exports.ApprovalStatus || (exports.ApprovalStatus = {}));
     __exportStar(index_1, exports);
 });
-define("@scom/scom-swap/store/utils.ts", ["require", "exports", "@ijstech/components", "@ijstech/eth-wallet", "@scom/scom-token-list", "@scom/scom-token-list"], function (require, exports, components_3, eth_wallet_2, scom_token_list_1, scom_token_list_2) {
+define("@scom/scom-swap/store/utils.ts", ["require", "exports", "@ijstech/components", "@ijstech/eth-wallet", "@scom/scom-token-list", "@scom/scom-token-list"], function (require, exports, components_2, eth_wallet_2, scom_token_list_1, scom_token_list_2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.getClientWallet = exports.getChainNativeToken = exports.isClientWalletConnected = exports.getTokenObjArr = exports.getNetworkInfo = exports.State = exports.WalletPlugin = void 0;
@@ -491,12 +108,12 @@ define("@scom/scom-swap/store/utils.ts", ["require", "exports", "@ijstech/compon
                 return this.rpcWalletId;
             }
             const clientWallet = eth_wallet_2.Wallet.getClientInstance();
-            const networkList = Object.values(components_3.application.store?.networkMap || []);
+            const networkList = Object.values(components_2.application.store?.networkMap || []);
             const instanceId = clientWallet.initRpcWallet({
                 networks: networkList,
                 defaultChainId,
-                infuraId: components_3.application.store?.infuraId,
-                multicalls: components_3.application.store?.multicalls
+                infuraId: components_2.application.store?.infuraId,
+                multicalls: components_2.application.store?.multicalls
             });
             this.rpcWalletId = instanceId;
             if (clientWallet.address) {
@@ -591,7 +208,7 @@ define("@scom/scom-swap/store/utils.ts", ["require", "exports", "@ijstech/compon
     }
     exports.State = State;
     const getNetworkInfo = (chainId) => {
-        const networkMap = components_3.application.store["networkMap"];
+        const networkMap = components_2.application.store["networkMap"];
         return networkMap[chainId];
     };
     exports.getNetworkInfo = getNetworkInfo;
@@ -2151,17 +1768,17 @@ define("@scom/scom-swap/swap-utils/index.ts", ["require", "exports", "@ijstech/e
     const createBridgeVaultOrder = async (state, newOrderParams) => (0, index_6.createBridgeVaultOrder)(state, { ...newOrderParams });
     exports.createBridgeVaultOrder = createBridgeVaultOrder;
 });
-define("@scom/scom-swap/price-info/index.tsx", ["require", "exports", "@ijstech/components"], function (require, exports, components_4) {
+define("@scom/scom-swap/price-info/index.tsx", ["require", "exports", "@ijstech/components"], function (require, exports, components_3) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.PriceInfo = void 0;
-    const Theme = components_4.Styles.Theme.ThemeVars;
+    const Theme = components_3.Styles.Theme.ThemeVars;
     ;
-    let PriceInfo = class PriceInfo extends components_4.Module {
+    let PriceInfo = class PriceInfo extends components_3.Module {
         constructor(parent, options) {
             super(parent, options);
             this.onRenderToggleBtn = (parent) => {
-                const image = new components_4.Icon(parent, {
+                const image = new components_3.Icon(parent, {
                     width: 18,
                     height: 18,
                     name: 'arrows-alt-v',
@@ -2179,7 +1796,7 @@ define("@scom/scom-swap/price-info/index.tsx", ["require", "exports", "@ijstech/
                 return image;
             };
             this.renderIconTooltip = (parent, item) => {
-                const iconTooltip = new components_4.Icon(parent, {
+                const iconTooltip = new components_3.Icon(parent, {
                     opacity: 0.75,
                     fill: Theme.text.primary,
                     name: 'question-circle',
@@ -2286,21 +1903,21 @@ define("@scom/scom-swap/price-info/index.tsx", ["require", "exports", "@ijstech/
         }
     };
     PriceInfo = __decorate([
-        (0, components_4.customElements)('i-scom-swap-price-info')
+        (0, components_3.customElements)('i-scom-swap-price-info')
     ], PriceInfo);
     exports.PriceInfo = PriceInfo;
 });
-define("@scom/scom-swap/expert-mode-settings/index.tsx", ["require", "exports", "@ijstech/components"], function (require, exports, components_5) {
+define("@scom/scom-swap/expert-mode-settings/index.tsx", ["require", "exports", "@ijstech/components"], function (require, exports, components_4) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.ExpertModeSettings = void 0;
-    const Theme = components_5.Styles.Theme.ThemeVars;
+    const Theme = components_4.Styles.Theme.ThemeVars;
     ;
-    let ExpertModeSettings = class ExpertModeSettings extends components_5.Module {
+    let ExpertModeSettings = class ExpertModeSettings extends components_4.Module {
         constructor(state, parent, options) {
             super(parent, options);
             this.state = state;
-            this.$eventBus = components_5.application.EventBus;
+            this.$eventBus = components_4.application.EventBus;
         }
         ;
         closeModal() {
@@ -2327,8 +1944,8 @@ define("@scom/scom-swap/expert-mode-settings/index.tsx", ["require", "exports", 
         }
     };
     ExpertModeSettings = __decorate([
-        components_5.customModule,
-        (0, components_5.customElements)('i-scom-swap-expert-mode-settings')
+        components_4.customModule,
+        (0, components_4.customElements)('i-scom-swap-expert-mode-settings')
     ], ExpertModeSettings);
     exports.ExpertModeSettings = ExpertModeSettings;
     ;
@@ -2399,6 +2016,389 @@ define("@scom/scom-swap/data.json.ts", ["require", "exports"], function (require
             "showFooter": true
         }
     };
+});
+define("@scom/scom-swap/index.css.ts", ["require", "exports", "@ijstech/components"], function (require, exports, components_5) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.storageModalStyle = exports.swapStyle = void 0;
+    const Theme = components_5.Styles.Theme.ThemeVars;
+    // const colorVar = {
+    //   primaryButton: 'transparent linear-gradient(90deg, #AC1D78 0%, #E04862 100%) 0% 0% no-repeat padding-box',
+    //   primaryGradient: 'linear-gradient(255deg,#f15e61,#b52082)',
+    //   darkBg: '#181E3E 0% 0% no-repeat padding-box',
+    //   primaryDisabled: 'transparent linear-gradient(270deg,#351f52,#552a42) 0% 0% no-repeat padding-box !important'
+    // }
+    exports.swapStyle = components_5.Styles.style({
+        $nest: {
+            '::-webkit-scrollbar': {
+                width: '3px',
+            },
+            '::-webkit-scrollbar-thumb': {
+                background: Theme.colors.primary.main,
+                borderRadius: '5px',
+            },
+            // '*': {
+            //   boxSizing: 'border-box',
+            // },
+            '#swapContainer': {
+                // width: 720,
+                // maxWidth: '100%',
+                // minHeight: 340,
+                // padding: '1rem',
+                // marginInline: 'auto',
+                $nest: {
+                    '#btnToken': {
+                        // height: 'auto !important',
+                        // background: `${Theme.background.main} !important`,
+                        // padding: '0.5rem !important',
+                        // borderRadius: '8px',
+                        // fontSize: '1rem',
+                        // fontWeight: 700,
+                        // lineHeight: 1.5,
+                        // alignSelf: 'center',
+                        // textAlign: 'center',
+                        // opacity: 1,
+                        // color: Theme.input.fontColor,
+                        $nest: {
+                            '&:not(.disabled):hover': {
+                                color: Theme.input.fontColor
+                            },
+                            // '&> span': {
+                            //   verticalAlign: 'middle',
+                            // },
+                            // '&> i-icon': {
+                            //   maxWidth: 10,
+                            //   height: '16px !important',
+                            //   opacity: 0.5,
+                            //   marginRight: 'unset',
+                            //   fill: Theme.input.fontColor,
+                            //   $nest: {
+                            //     'svg': {
+                            //       fill: `${Theme.input.fontColor} !important`
+                            //     }
+                            //   }
+                            // },
+                            '&> :not(:last-child)': {
+                                marginRight: '0.5rem'
+                            }
+                        }
+                    }
+                }
+            },
+            // '.swap-flex--col': {
+            //   flexDirection: 'column',
+            //   $nest: {
+            //     '& > i-vstack': {
+            //       width: '100% !important'
+            //     },
+            //     '.custom-ic--swap': {
+            //       margin: 'auto',
+            //       bottom: '0 !important',
+            //       transform: 'none !important'
+            //     }
+            //   }
+            // },
+            // '.visibility-hidden': {
+            //   visibility: 'hidden'
+            // },
+            // '.content-swap': {
+            //   marginTop: '0.5rem',
+            //   marginBottom: '1rem',
+            //   borderRadius: '1rem'
+            // },
+            // 'i-label.text--grey *': {
+            //   color: Theme.text.primary,
+            //   opacity: 0.55, // 'hsla(0,0%,100%,0.55)'
+            // },
+            '.btn-max': {
+                // position: 'relative',
+                // borderRadius: '0.5rem',
+                // fontSize: '1rem',
+                // padding: '0 0.5rem',
+                // marginLeft: '0.5rem',
+                // bottom: '1.5px',
+                background: 'var(--max-button-background)',
+                // color: Theme.colors.primary.contrastText
+            },
+            // '.bg-box': {
+            //   margin: '0.5rem 0',
+            //   border: '2px solid transparent',
+            //   borderRadius: '1rem',
+            //   $nest: {
+            //     '&.bg-box--active': {
+            //       borderColor: '#E53780'
+            //     }
+            //   }
+            // },
+            // '.rounded-icon': {
+            //   display: 'inline-flex',
+            //   padding: '3px',
+            //   background: Theme.input.background,
+            //   border: '2px solid transparent',
+            //   borderRadius: '50%',
+            //   cursor: 'pointer'
+            // },
+            // '.swap-btn-container': {
+            //   marginTop: 10,
+            //   $nest: {
+            //     '.btn-swap': {
+            //       position: 'relative',
+            //       width: '100%',
+            //       borderRadius: '0.65rem',
+            //       fontSize: '1.125rem',
+            //       padding: '0.5rem 0.75rem',
+            //       opacity: 1,
+            //       color: Theme.colors.primary.contrastText
+            //     }
+            //   }
+            // },
+            // '#receiveCol': {
+            //   maxWidth: 'calc(100% - 9rem)',
+            // },
+            // '.hints': {
+            //   display: 'flex',
+            //   alignItems: 'center',
+            //   marginTop: '-0.5rem',
+            //   $nest: {
+            //     '*': {
+            //       fontSize: '0.8rem',
+            //       opacity: 0.9,
+            //     },
+            //     'i-label *': {
+            //       marginLeft: '0.25rem',
+            //     },
+            //   },
+            // },
+            '.chain-icon': {
+                // margin: '0.25rem 0.5rem 0 0',
+                // borderRadius: '50%',
+                // border: '2px solid transparent',
+                // padding: '0.25rem',
+                // cursor: 'pointer',
+                filter: 'grayscale(1)',
+                $nest: {
+                    // '&.icon-disabled': {
+                    //   cursor: 'default',
+                    // },
+                    '&.icon-selected': {
+                        // borderColor: Theme.colors.primary.main,
+                        // cursor: 'default',
+                        filter: 'inherit',
+                    },
+                    // 'img': {
+                    //   width: '32px',
+                    //   height: '32px',
+                    // },
+                },
+            },
+            // '.chain-text': {
+            //   whiteSpace: 'nowrap',
+            //   overflow: 'hidden !important',
+            //   textOverflow: 'ellipsis'
+            // },
+            // '.cursor-default': {
+            //   cursor: 'default !important',
+            // },
+            // '.hidden': {
+            //   display: 'none !important'
+            // },
+            // '.custom-md--view': {
+            //   $nest: {
+            //     'i-label > *': {
+            //       fontSize: '.875rem',
+            //       wordBreak: 'normal'
+            //     },
+            //     '.i-modal_content': {
+            //       padding: '0 1rem 1rem',
+            //     },
+            //     '.flex-col': {
+            //       flexDirection: 'column',
+            //     },
+            //     'i-button': {
+            //       display: 'flex',
+            //       alignItems: 'center',
+            //       justifyContent: 'center',
+            //       width: '150px',
+            //       height: '50px !important',
+            //       fontWeight: 600,
+            //       borderRadius: 5,
+            //       margin: '0.5rem',
+            //     }
+            //   }
+            // },
+            // '.custom-modal': {
+            //   $nest: {
+            //     '.modal': {
+            //       background: Theme.background.modal,
+            //       width: 490,
+            //       maxWidth: '100%',
+            //       padding: '0.75rem 1rem',
+            //       borderRadius: '1rem',
+            //       color: Theme.text.primary
+            //     },
+            //     '.i-modal_header': {
+            //       marginBottom: '1.5rem',
+            //       paddingBottom: '0.5rem',
+            //       borderBottom: `2px soid ${Theme.background.main}`,
+            //       color: Theme.colors.primary.main,
+            //       fontSize: '1.25rem',
+            //       fontWeight: 700,
+            //       $nest: {
+            //         '&> span': {
+            //           color: Theme.colors.primary.main,
+            //         },
+            //         '&> i-icon': {
+            //           fill: `${Theme.colors.primary.main} !important`
+            //         },
+            //         '& ~ i-icon': {
+            //           display: 'inline-block',
+            //           margin: '0.75rem 0',
+            //           background: Theme.input.background,
+            //           border: '2px solid transparent',
+            //           borderRadius: '50%',
+            //           padding: '0.25rem'
+            //         }
+            //       }
+            //     },
+            //   }
+            // },
+            // '#registerPairModal': {
+            //   $nest: {
+            //     '.modal': {
+            //       background: Theme.background.modal,
+            //       width: 420,
+            //       maxWidth: '100%',
+            //       padding: '0.75rem 1rem 1.25rem 1rem',
+            //       borderRadius: '1rem',
+            //       color: Theme.text.primary
+            //     },
+            //     '.i-modal_header': {
+            //       marginBottom: '1.5rem',
+            //       paddingBottom: '0.5rem',
+            //       borderBottom: `2px soid ${Theme.background.main}`,
+            //       color: Theme.colors.primary.main,
+            //       fontSize: '1.25rem',
+            //       fontWeight: 700,
+            //       $nest: {
+            //         '&> span': {
+            //           color: Theme.colors.primary.main,
+            //         },
+            //         '.i-modal-close': {
+            //           fill: `${Theme.colors.primary.main} !important`,
+            //         }
+            //       }
+            //     },
+            //   }
+            // },
+            // '#swapModal': {
+            //   $nest: {
+            //     '.icon-swap': {
+            //       margin: 0
+            //     },
+            //     'i-image:not(.rounded-icon)': {
+            //       display: 'inline-block',
+            //       marginRight: '0.5rem'
+            //     },
+            //     '#tokenReceiveValue': {
+            //       margin: '0 5px'
+            //     },
+            //     '#payOrReceiveValue': {
+            //       marginInline: '0.25rem',
+            //     },
+            //     '.text-primary *': {
+            //       color: Theme.colors.primary.main,
+            //     },
+            //     '.price-info': {
+            //       padding: '1rem'
+            //     },
+            //     '.arrow-down': {
+            //       display: 'inline-block',
+            //       margin: '0.75rem 0',
+            //       background: Theme.input.background,
+            //       border: '2px solid transparent',
+            //       borderRadius: '50%',
+            //       padding: '0.25rem'
+            //     },
+            //     '.arrow-down--chain': {
+            //       margin: '0.75rem 6rem !important',
+            //     },
+            //     '.token-value': {
+            //       marginLeft: 'auto',
+            //     },
+            //     '.token-value > *, #swapModal .token-name > *': {
+            //       fontSize: '1.1rem'
+            //     },
+            //     '.row-chain': {
+            //       display: 'flex',
+            //       alignItems: 'center',
+            //     },
+            //     'i-icon.custom-icon--fill': {
+            //       fill: Theme.input.fontColor,
+            //       $nest: {
+            //         'svg': {
+            //           fill: `${Theme.input.fontColor} !important`
+            //         }
+            //       }
+            //     }
+            //   }
+            // },
+            // '#modalFees': {
+            //   $nest: {
+            //     '.i-modal_header': {
+            //       marginBottom: '0.5rem !important',
+            //     },
+            //     '.i-modal_content': {
+            //       $nest: {
+            //         'i-label *': {
+            //           fontSize: '0.875rem',
+            //         },
+            //         'i-button': {
+            //           width: '150px',
+            //           paddingBlock: '0.25rem',
+            //           textAlign: 'center',
+            //         },
+            //       },
+            //     },
+            //   },
+            // },
+            '.btn-os': {
+                background: 'var(--primary-button-background)',
+                transition: 'background .3s ease'
+            },
+            '.btn-os:not(.disabled):not(.is-spinning):hover, .btn-os:not(.disabled):not(.is-spinning):focus': {
+                background: 'var(--primary-button-hover-background)',
+                boxShadow: 'none',
+                opacity: .9
+            },
+            '.btn-os:not(.disabled):not(.is-spinning):focus': {
+                boxShadow: '0 0 0 0.2rem rgb(0 123 255 / 25%)',
+                outline: 0
+            },
+            '.btn-os.disabled, .btn-os.is-spinning': {
+                background: 'var(--primary-button-disabled-background)',
+                opacity: 0.4
+            },
+            '.btn-max:not(.disabled):hover': {
+                transition: 'all .2s ease-out',
+                background: 'var(--max-button-hover-background)'
+            }
+        }
+    });
+    exports.storageModalStyle = components_5.Styles.style({
+        $nest: {
+            '.modal > div:nth-child(2)': {
+                width: '100%',
+                height: '100%',
+                overflow: 'hidden'
+            },
+            'i-scom-storage': {
+                display: 'block',
+                width: '100%',
+                height: 'calc(100% - 1.5rem)',
+                overflow: 'hidden'
+            }
+        }
+    });
 });
 define("@scom/scom-swap/formSchema.ts", ["require", "exports", "@ijstech/components", "@scom/scom-network-picker", "@scom/scom-token-input", "@scom/scom-storage", "@scom/scom-swap/index.css.ts", "@scom/scom-token-list"], function (require, exports, components_6, scom_network_picker_1, scom_token_input_1, scom_storage_1, index_css_1, scom_token_list_6) {
     "use strict";
@@ -3021,48 +3021,92 @@ define("@scom/scom-swap/formSchema.ts", ["require", "exports", "@ijstech/compone
     }
     exports.getProjectOwnerSchema = getProjectOwnerSchema;
 });
-define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstech/eth-wallet", "@scom/scom-swap/store/index.ts", "@scom/scom-token-list", "@scom/scom-swap/swap-utils/index.ts", "@scom/scom-swap/crosschain-utils/index.ts", "@scom/scom-swap/global/index.ts", "@scom/scom-swap/expert-mode-settings/index.tsx", "@scom/scom-swap/data.json.ts", "@scom/scom-swap/formSchema.ts", "@scom/scom-dex-list", "@scom/scom-commission-fee-setup", "@scom/scom-swap/index.css.ts", "@scom/scom-swap/index.css.ts"], function (require, exports, components_7, eth_wallet_5, index_7, scom_token_list_7, index_8, index_9, index_10, index_11, data_json_1, formSchema_1, scom_dex_list_2, scom_commission_fee_setup_1, index_css_2) {
+///<amd-module name='@scom/scom-swap/model/configModel.ts'/> 
+define("@scom/scom-swap/model/configModel.ts", ["require", "exports", "@ijstech/components", "@scom/scom-swap/store/index.ts", "@ijstech/eth-wallet", "@scom/scom-swap/formSchema.ts", "@scom/scom-commission-fee-setup", "@scom/scom-swap/data.json.ts", "@scom/scom-token-list", "@scom/scom-swap/swap-utils/index.ts"], function (require, exports, components_7, index_7, eth_wallet_5, formSchema_1, scom_commission_fee_setup_1, data_json_1, scom_token_list_7, index_8) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
+    exports.ConfigModel = void 0;
     const Theme = components_7.Styles.Theme.ThemeVars;
-    const priceImpactTooHighMsg = 'Price Impact Too High. If you want to bypass this check, please turn on Expert Mode';
-    const ROUNDING_NUMBER = eth_wallet_5.BigNumber.ROUND_DOWN;
-    let ScomSwap = class ScomSwap extends components_7.Module {
-        static async create(options, parent) {
-            let self = new this(parent, options);
-            await self.ready();
-            return self;
+    class ConfigModel {
+        constructor(state, module, options) {
+            this.options = {
+                refreshWidget: async () => { },
+                refreshDappContainer: () => { },
+                setContaiterTag: (value) => { },
+                updateTheme: () => { },
+                onChainChanged: async () => { },
+                onWalletConnected: async () => { },
+                updateContractAddress: () => { }
+            };
+            this._data = {
+                category: 'fixed-pair',
+                providers: [],
+                tokens: [],
+                defaultChainId: 0,
+                wallets: [],
+                networks: []
+            };
+            this._tokens = [];
+            this.rpcWalletEvents = [];
+            this.removeRpcWalletEvents = () => {
+                const rpcWallet = this.rpcWallet;
+                for (let event of this.rpcWalletEvents) {
+                    rpcWallet.unregisterWalletEvent(event);
+                }
+                this.rpcWalletEvents = [];
+            };
+            this.resetRpcWallet = async () => {
+                this.removeRpcWalletEvents();
+                const rpcWalletId = await this.state.initRpcWallet(this.defaultChainId);
+                const rpcWallet = this.rpcWallet;
+                const chainChangedEvent = rpcWallet.registerWalletEvent(this, eth_wallet_5.Constants.RpcWalletEvent.ChainChanged, async (chainId) => {
+                    await this.options.onChainChanged();
+                });
+                const connectedEvent = rpcWallet.registerWalletEvent(this, eth_wallet_5.Constants.RpcWalletEvent.Connected, async (connected) => {
+                    this.options.onWalletConnected();
+                });
+                this.rpcWalletEvents.push(chainChangedEvent, connectedEvent);
+                this.options.refreshDappContainer();
+            };
+            this.initWallet = async () => {
+                try {
+                    await eth_wallet_5.Wallet.getClientInstance().init();
+                    await this.rpcWallet.init();
+                }
+                catch (err) {
+                    console.log(err);
+                }
+            };
+            this.isEmptyData = (value) => {
+                return !value || !value.networks || value.networks.length === 0;
+            };
+            this.state = state;
+            this.module = module;
+            this.options = options;
         }
-        removeRpcWalletEvents() {
-            const rpcWallet = this.state.getRpcWallet();
-            if (rpcWallet)
-                rpcWallet.unregisterAllWalletEvents();
+        get chainId() {
+            return this.state.getChainId();
         }
-        onHide() {
-            this.dappContainer.onHide();
-            this.removeRpcWalletEvents();
-            for (let event of this.clientEvents) {
-                event.unregister();
-            }
-            this.clientEvents = [];
+        get campaignId() {
+            return this._data.campaignId;
         }
-        get category() {
-            return this._data.category;
+        get defaultInputValue() {
+            return this._data.defaultInputValue;
         }
-        set category(value) {
-            this._data.category = value;
+        get defaultOutputValue() {
+            return this._data.defaultOutputValue;
         }
-        get providers() {
-            return this._data.providers;
+        get defaultOutputToken() {
+            return this._data.defaultOutputToken;
         }
-        set providers(value) {
-            this._data.providers = value;
+        get defaultInputToken() {
+            return this._data.defaultInputToken;
         }
-        get commissions() {
-            return this._data.commissions ?? [];
+        get isFixedPair() {
+            return this._data.category === 'fixed-pair';
         }
-        set commissions(value) {
-            this._data.commissions = value;
+        get isCrossChainSwap() {
+            return this._data.category === 'cross-chain-swap';
         }
         get defaultChainId() {
             if (this.networks.some(v => v.chainId === this._data.defaultChainId)) {
@@ -3091,6 +3135,30 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
         set showHeader(value) {
             this._data.showHeader = value;
         }
+        get category() {
+            return this._data.category;
+        }
+        set category(value) {
+            this._data.category = value;
+        }
+        get providers() {
+            return this._data.providers;
+        }
+        set providers(value) {
+            this._data.providers = value;
+        }
+        get commissions() {
+            return this._data.commissions ?? [];
+        }
+        set commissions(value) {
+            this._data.commissions = value;
+        }
+        get tokens() {
+            return this._tokens ?? [];
+        }
+        get rpcWallet() {
+            return this.state.getRpcWallet();
+        }
         get title() {
             return this._data.title ?? '';
         }
@@ -3102,13 +3170,6 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
         }
         set logo(value) {
             this._data.logo = value ?? '';
-        }
-        set width(value) {
-            this.resizeLayout();
-        }
-        get hasData() {
-            const { providers, defaultChainId, networks, wallets } = this._data;
-            return !!(providers?.length || networks?.length || wallets?.length || !isNaN(Number(defaultChainId)));
         }
         determineActionsByTarget(target, category) {
             if (target === 'builder') {
@@ -3147,13 +3208,13 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                                 _oldData = { ...this._data };
                                 if (userInputData.commissions)
                                     this._data.commissions = userInputData.commissions;
-                                this.refreshUI();
+                                this.options.refreshWidget();
                                 if (builder?.setData)
                                     builder.setData(this._data);
                             },
                             undo: () => {
                                 this._data = { ..._oldData };
-                                this.refreshUI();
+                                this.options.refreshWidget();
                                 if (builder?.setData)
                                     builder.setData(this._data);
                             },
@@ -3236,30 +3297,29 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                                     this._tokens = (0, index_7.getTokenObjArr)(tokenList);
                                 }
                                 await this.resetRpcWallet();
-                                this.updateContractAddress();
-                                this.refreshUI();
+                                this.options.updateContractAddress();
+                                this.options.refreshWidget();
                                 if (builder?.setData)
                                     builder.setData(this._data);
-                                oldTag = JSON.parse(JSON.stringify(this.tag));
+                                oldTag = JSON.parse(JSON.stringify(this.module.tag));
                                 if (builder?.setTag)
                                     builder.setTag(themeSettings);
                                 else
                                     this.setTag(themeSettings);
-                                if (this.dappContainer)
-                                    this.dappContainer.setTag(themeSettings);
+                                this.options.setContaiterTag(themeSettings);
                             },
                             undo: () => {
                                 this._data = JSON.parse(JSON.stringify(oldData));
-                                this.refreshUI();
+                                this.options.refreshWidget();
                                 if (builder?.setData)
                                     builder.setData(this._data);
-                                this.tag = JSON.parse(JSON.stringify(oldTag));
+                                const tag = JSON.parse(JSON.stringify(oldTag));
+                                this.module.tag = tag;
                                 if (builder?.setTag)
-                                    builder.setTag(this.tag);
+                                    builder.setTag(tag);
                                 else
-                                    this.setTag(this.tag);
-                                if (this.dappContainer)
-                                    this.dappContainer.setTag(this.tag);
+                                    this.setTag(tag);
+                                this.options.setContaiterTag(tag);
                             },
                             redo: () => { }
                         };
@@ -3336,17 +3396,6 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                             data: window.btoa(JSON.stringify(commissions))
                         };
                     },
-                    // setLinkParams: async (params: any) => {
-                    //   if (params.data) {
-                    //     const decodedString = window.atob(params.data);
-                    //     const commissions = JSON.parse(decodedString);
-                    //     let resultingData = {
-                    //       ...self._data,
-                    //       commissions
-                    //     };
-                    //     await this.setData(resultingData);
-                    //   }
-                    // },
                     bindOnChanged: (element, callback) => {
                         element.onChanged = async (data) => {
                             const commissions = data.commissions;
@@ -3398,29 +3447,6 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
         getData() {
             return this._data;
         }
-        async resetRpcWallet() {
-            this.removeRpcWalletEvents();
-            const rpcWalletId = await this.state.initRpcWallet(this.defaultChainId);
-            const rpcWallet = this.state.getRpcWallet();
-            const chainChangedEvent = rpcWallet.registerWalletEvent(this, eth_wallet_5.Constants.RpcWalletEvent.ChainChanged, async (chainId) => {
-                this.onChainChange();
-            });
-            const connectedEvent = rpcWallet.registerWalletEvent(this, eth_wallet_5.Constants.RpcWalletEvent.Connected, async (connected) => {
-                if (this.swapBtn)
-                    this.swapBtn.visible = true;
-                this.updateContractAddress();
-                await this.initializeWidgetConfig();
-            });
-            const data = {
-                defaultChainId: this.defaultChainId,
-                wallets: this.wallets,
-                networks: this.networks,
-                showHeader: this.showHeader,
-                rpcWalletId: rpcWallet.instanceId
-            };
-            if (this.dappContainer?.setData)
-                this.dappContainer.setData(data);
-        }
         async setData(value) {
             this._data = value;
             let tokenList = [];
@@ -3440,83 +3466,474 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
             }
             this._tokens = (0, index_7.getTokenObjArr)(tokenList);
             await this.resetRpcWallet();
-            this.updateContractAddress();
-            await this.refreshUI();
+            this.options.updateContractAddress();
+            await this.options.refreshWidget();
         }
-        async getTag() {
-            return this.tag;
+        getTag() {
+            return this.module.tag;
         }
-        updateTag(type, value) {
-            this.tag[type] = this.tag[type] ?? {};
-            for (let prop in value) {
-                if (value.hasOwnProperty(prop))
-                    this.tag[type][prop] = value[prop];
-            }
-        }
-        async setTag(value) {
+        setTag(value) {
             const newValue = value || {};
             for (let prop in newValue) {
                 if (newValue.hasOwnProperty(prop)) {
                     if (prop === 'light' || prop === 'dark')
                         this.updateTag(prop, newValue[prop]);
                     else
-                        this.tag[prop] = newValue[prop];
+                        this.module.tag[prop] = newValue[prop];
                 }
             }
-            if (this.dappContainer)
-                this.dappContainer.setTag(this.tag);
-            this.updateTheme();
-            this.resizeLayout();
+            this.options.setContaiterTag(this.module.tag);
+            this.options.updateTheme();
         }
-        updateStyle(name, value) {
-            value ?
-                this.style.setProperty(name, value) :
-                this.style.removeProperty(name);
-        }
-        updateTheme() {
-            const themeVar = this.dappContainer?.theme || 'light';
-            this.updateStyle('--text-primary', this.tag[themeVar]?.fontColor);
-            this.updateStyle('--background-main', this.tag[themeVar]?.backgroundColor);
-            this.updateStyle('--input-font_color', this.tag[themeVar]?.inputFontColor);
-            this.updateStyle('--input-background', this.tag[themeVar]?.inputBackgroundColor);
-            //FIXME: temporary solution
-            this.updateStyle('--primary-button-background', this.tag[themeVar]?.primaryButtonBackground || 'transparent linear-gradient(90deg, #AC1D78 0%, #E04862 100%) 0% 0% no-repeat padding-box');
-            this.updateStyle('--primary-button-hover-background', this.tag[themeVar]?.primaryButtonHoverBackground || 'linear-gradient(255deg,#f15e61,#b52082)');
-            this.updateStyle('--primary-button-disabled-background', this.tag[themeVar]?.primaryButtonDisabledBackground || 'transparent linear-gradient(270deg,#351f52,#552a42) 0% 0% no-repeat padding-box');
-            this.updateStyle('--max-button-background', this.tag[themeVar]?.maxButtonBackground || 'transparent linear-gradient(255deg,#e75b66,#b52082) 0% 0% no-repeat padding-box');
-            this.updateStyle('--max-button-hover-background', this.tag[themeVar]?.maxButtonHoverBackground || 'linear-gradient(255deg,#f15e61,#b52082)');
-        }
-        setProviders() {
-            const providers = this.originalData?.providers || [];
-            if (this.isFixedPair) {
-                this.state.setProviderList([providers[0]]);
-            }
-            else {
-                this.state.setProviderList(providers);
+        updateTag(type, value) {
+            this.module.tag[type] = this.module.tag[type] ?? {};
+            for (let prop in value) {
+                if (value.hasOwnProperty(prop))
+                    this.module.tag[type][prop] = value[prop];
             }
         }
-        updateContractAddress() {
-            if (this.approvalModelAction) {
-                if (this._data.campaignId !== undefined) {
-                    this.contractAddress = this.state.getProxyAddress();
+    }
+    exports.ConfigModel = ConfigModel;
+});
+///<amd-module name='@scom/scom-swap/model/swapModel.ts'/> 
+define("@scom/scom-swap/model/swapModel.ts", ["require", "exports", "@ijstech/components", "@scom/scom-swap/store/index.ts", "@ijstech/eth-wallet", "@scom/scom-token-list", "@scom/scom-swap/global/index.ts", "@scom/scom-swap/swap-utils/index.ts", "@scom/scom-swap/crosschain-utils/index.ts"], function (require, exports, components_8, index_9, eth_wallet_6, scom_token_list_8, index_10, index_11, index_12) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.SwapModel = void 0;
+    const priceImpactTooHighMsg = 'Price Impact Too High. If you want to bypass this check, please turn on Expert Mode';
+    const ROUNDING_NUMBER = eth_wallet_6.BigNumber.ROUND_DOWN;
+    class SwapModel {
+        constructor(state, configModel, options) {
+            this.options = {
+                setHintLabel: (value) => { },
+                showModalFees: () => { }
+            };
+            this._bridgeSupportedChainList = [];
+            this._swapButtonStatusMap = {};
+            this._approveButtonStatusMap = {};
+            this._crossChainApprovalStatus = index_10.ApprovalStatus.NONE;
+            this.isEstimated = (tokenPosition, strict = false) => {
+                if (tokenPosition === 'from') {
+                    return strict ? this.isFrom && !this.fromInputValue.isZero() : this.isFrom;
+                }
+                else if (tokenPosition === 'to') {
+                    return strict ? !this.isFrom && !this.toInputValue.isZero() : !this.isFrom;
                 }
                 else {
-                    this.contractAddress = '';
+                    return false;
                 }
-                this.setApprovalSpenderAddress();
-            }
+            };
+            this.updateEstimatedPosition = (isFrom) => {
+                if (this.isFrom != isFrom) {
+                    this.isFrom = isFrom;
+                }
+            };
+            this.setProviders = () => {
+                const providers = this.originalData?.providers || [];
+                if (this.configModel.isFixedPair) {
+                    this.state.setProviderList([providers[0]]);
+                }
+                else {
+                    this.state.setProviderList(providers);
+                }
+            };
+            this.setMapStatus = (type, key, status) => {
+                if (type === 'approve') {
+                    let mapStatus = this.approveButtonStatusMap;
+                    mapStatus[key] = status;
+                    this.approveButtonStatusMap = {
+                        ...mapStatus
+                    };
+                }
+                else {
+                    let mapStatus = this.swapButtonStatusMap;
+                    mapStatus[key] = status;
+                    this.swapButtonStatusMap = {
+                        ...mapStatus
+                    };
+                }
+            };
+            this.updateTokenValues = (token, isFrom, tokenInput) => {
+                if (!token)
+                    return;
+                if (isFrom) {
+                    this.fromToken = token;
+                    if (this.fromInputValue.gt(0)) {
+                        const formattedValue = new eth_wallet_6.BigNumber(this.fromInputValue).dp(token.decimals || 18, ROUNDING_NUMBER).toFixed();
+                        if (!this.fromInputValue.eq(formattedValue)) {
+                            if (tokenInput) {
+                                tokenInput.value = formattedValue === '0' ? '' : formattedValue;
+                            }
+                            this.fromInputValue = new eth_wallet_6.BigNumber(formattedValue);
+                        }
+                    }
+                    else if (this.fromInputValue.isZero()) {
+                        this.updateEstimatedPosition(true);
+                    }
+                }
+                else {
+                    this.toToken = token;
+                    if (this.toInputValue.gt(0)) {
+                        const formattedValue = new eth_wallet_6.BigNumber(this.toInputValue).dp(token.decimals || 18, ROUNDING_NUMBER).toFixed();
+                        if (!this.toInputValue.eq(formattedValue)) {
+                            if (tokenInput) {
+                                tokenInput.value = formattedValue === '0' ? '' : formattedValue;
+                            }
+                            this.toInputValue = new eth_wallet_6.BigNumber(formattedValue);
+                        }
+                    }
+                    else if (this.toInputValue.isZero()) {
+                        this.updateEstimatedPosition(false);
+                    }
+                }
+            };
+            this.getBalance = (token) => {
+                if (!token)
+                    return '0';
+                let tokenBalances = scom_token_list_8.tokenStore.getTokenBalancesByChainId(token.chainId);
+                if (!tokenBalances)
+                    return '0';
+                const address = token.address || '';
+                let balance = address ? tokenBalances[address.toLowerCase()] ?? '0' : tokenBalances[token.symbol] || '0';
+                return balance;
+            };
+            this.fixedNumber = (value) => {
+                const val = typeof value === 'object' ? value : new eth_wallet_6.BigNumber(value);
+                if (val.isNaN() || val.isZero())
+                    return '';
+                return components_8.FormatUtils.formatNumber(val.toFixed(), { decimalFigures: 4, useSeparators: false, hasTrailingZero: false });
+            };
+            this.getInputValue = (isFrom) => {
+                const token = isFrom ? this.fromToken : this.toToken;
+                const value = isFrom ? this.fromInputValue : this.toInputValue;
+                if (!value || value.isNaN())
+                    return '';
+                const newValue = value.dp(token?.decimals || 18, ROUNDING_NUMBER).toFixed();
+                return newValue;
+            };
+            this.calculateDefaultTokens = () => {
+                let firstDefaultToken;
+                let secondDefaultToken;
+                const currentChainId = this.configModel.chainId;
+                const { tokens, defaultInputToken, defaultOutputToken } = this.configModel;
+                const currentChainTokens = (0, index_9.getSupportedTokens)(tokens, currentChainId);
+                if (!defaultInputToken && !defaultOutputToken) {
+                    firstDefaultToken = currentChainTokens[0];
+                    secondDefaultToken = currentChainTokens[1];
+                }
+                else {
+                    if (defaultInputToken && currentChainId === defaultInputToken.chainId) {
+                        let inputTokens = (0, index_9.getSupportedTokens)(tokens, defaultInputToken.chainId);
+                        firstDefaultToken = inputTokens.find(v => v.chainId === defaultInputToken.chainId && v.address === defaultInputToken.address);
+                    }
+                    else {
+                        firstDefaultToken = currentChainTokens[0];
+                    }
+                    if (defaultOutputToken) {
+                        let outputTokens = (0, index_9.getSupportedTokens)(tokens, defaultOutputToken.chainId);
+                        secondDefaultToken = outputTokens.find(v => v.chainId === defaultOutputToken.chainId && v.address === defaultOutputToken.address);
+                    }
+                    else {
+                        secondDefaultToken = currentChainTokens[0];
+                    }
+                }
+                this.fromToken = firstDefaultToken;
+                this.toToken = secondDefaultToken;
+                return {
+                    firstDefaultToken,
+                    secondDefaultToken
+                };
+            };
+            this.getSwapRoutesData = async () => {
+                const useAPI = this.configModel.category === 'aggregator' || this.configModel.category === 'cross-chain-swap';
+                let listRouting = await (0, index_11.getAllRoutesData)(this.state, this.fromToken, this.toToken, this.fromInputValue, this.toInputValue, this.isFrom, useAPI);
+                listRouting = listRouting.map((v) => {
+                    return {
+                        ...v,
+                        isHybrid: false // market == Market.HYBRID,
+                    };
+                });
+                return listRouting;
+            };
+            this.getCrossChainRouteData = async () => {
+                const tokenIn = Object.assign({}, this.fromToken);
+                const tokenOut = Object.assign({}, this.toToken);
+                let listRouting = await (0, index_11.getCrossChainRouteOptions)(this.state, {
+                    fromChainId: this.srcChain.chainId,
+                    toChainId: this.desChain.chainId,
+                    tokenIn: tokenIn,
+                    tokenOut: tokenOut,
+                    amountIn: this.fromInputValue
+                });
+                listRouting = listRouting.map((v) => {
+                    let route = {};
+                    if (v.sourceRouteObj) {
+                        const amountOut = v.targetRouteObj ? v.targetRouteObj.amountOut : v.sourceRouteObj.amountOut;
+                        route = {
+                            ...v,
+                            ...v.sourceRouteObj,
+                            tradeFee: v.tradeFee,
+                            price: v.price,
+                            amountOut: new eth_wallet_6.BigNumber(amountOut),
+                        };
+                        if (v.targetRouteObj) {
+                            const market = this.state.getProviderByKey(v.targetRouteObj.provider)?.key || '';
+                            if (market) {
+                                route.targetRouteObj = {
+                                    ...route.targetRouteObj,
+                                    route: v.targetRouteObj.bestRoute,
+                                    isHybrid: false //market == Market.HYBRID,
+                                };
+                            }
+                            else {
+                                route.targetRouteObj = undefined;
+                            }
+                        }
+                    }
+                    else {
+                        route = {
+                            ...v,
+                            ...v.targetRouteObj,
+                            tradeFee: v.tradeFee,
+                            price: v.price,
+                        };
+                    }
+                    return { ...route, fromAmount: new eth_wallet_6.BigNumber(route.fromAmount) };
+                });
+                return listRouting;
+            };
+            this.getVaultData = async (record) => {
+                const assetSymbol = record.targetVaultToken.symbol;
+                const assetDecimal = record.targetVaultToken.decimals;
+                const vaultTokenToTargetChain = new eth_wallet_6.BigNumber(record.vaultTokenToTargetChain);
+                const { vaultAddress, vaultRegistryAddress, tokenAddress: vaultTokenAddress, softCap } = index_9.bridgeVaultConstantMap[assetSymbol === 'USDT.e' ? 'USDT' : assetSymbol][this.desChain.chainId];
+                const [vault, vaultAssetBalance, bonds, oraclePriceMap] = await Promise.all([
+                    (0, index_12.getBridgeVault)(this.state, this.desChain.chainId, vaultAddress),
+                    (0, index_12.getVaultAssetBalance)(this.desChain.chainId, vaultAddress),
+                    (0, index_12.getBondsInBridgeVault)(this.state, this.desChain.chainId, vaultRegistryAddress),
+                    (0, index_12.getOraclePriceMap)(this.desChain.chainId)
+                ]);
+                const assetBalance = vaultAssetBalance ?? 0;
+                const targetVaultAssetBalance = (new eth_wallet_6.BigNumber(assetBalance)).shiftedBy(-assetDecimal);
+                const targetVaultBondBalance = bonds.reduce((acc, cur) => {
+                    if (cur.chainId !== this.desChain?.chainId)
+                        return acc;
+                    acc = acc.plus((new eth_wallet_6.BigNumber(cur.bond)).shiftedBy(-18));
+                    return acc;
+                }, new eth_wallet_6.BigNumber(0));
+                const vaultToUsdPrice = oraclePriceMap[vaultTokenAddress.toLowerCase()]; // This will be the vaultToken -> USD Price
+                const oswapToken = Object.values(scom_token_list_8.tokenStore.getTokenMapByChainId(this.desChain.chainId)).find(v => v.symbol === 'OSWAP');
+                const oswapToUsdPrice = oraclePriceMap[oswapToken.address.toLowerCase()];
+                const vaultToOswapPrice = vaultToUsdPrice.div(oswapToUsdPrice); // This will vaultToken -> oswap price;
+                const minValue = eth_wallet_6.BigNumber.min(targetVaultAssetBalance, targetVaultBondBalance, softCap);
+                return {
+                    assetSymbol,
+                    softCap,
+                    vault,
+                    targetVaultAssetBalance,
+                    targetVaultBondBalance,
+                    vaultTokenToTargetChain,
+                    vaultToOswapPrice,
+                    minValue
+                };
+            };
+            this.getRate = (isPriceToggled) => {
+                const value = isPriceToggled ? this.record?.priceSwap : this.record?.price;
+                let fromSymbol = this.fromToken?.symbol;
+                let toSymbol = this.toToken?.symbol;
+                if (this.isCrossChain) {
+                    const srcName = this.srcChain?.chainName;
+                    const desName = this.desChain?.chainName;
+                    if (srcName) {
+                        fromSymbol = `${fromSymbol} (${srcName})`;
+                    }
+                    if (desName) {
+                        toSymbol = `${toSymbol} (${desName})`;
+                    }
+                }
+                if (value || value == 0) {
+                    if (isPriceToggled) {
+                        return `1 ${fromSymbol} &#8776; ${(0, index_10.formatNumber)(value)} ${toSymbol}`;
+                    }
+                    return `1 ${toSymbol} &#8776; ${(0, index_10.formatNumber)(value)} ${fromSymbol}`;
+                }
+                return '-';
+            };
+            this.getPriceInfo = (isPriceToggled) => {
+                const rate = this.getRate(isPriceToggled);
+                const fees = this.feeDetails;
+                const countFees = fees.length;
+                let feeTooltip;
+                if (countFees === 1) {
+                    const fee = fees[0];
+                    feeTooltip = `${fee.description}`;
+                }
+                else if (countFees > 1) {
+                    feeTooltip = fees;
+                }
+                let info = [
+                    {
+                        title: "Rate",
+                        value: this.isValidToken ? rate : '-',
+                        isToggleShown: this.record && this.isValidToken,
+                    },
+                    {
+                        title: "Price Impact",
+                        value: this.isValidToken ? this.priceImpact : '-',
+                        isHidden: this.isCrossChain,
+                    },
+                    {
+                        title: this.isFrom ? "Maximum Sold" : "Minimum Received",
+                        value: this.isValidToken ? this.minimumReceived : '-',
+                    },
+                    {
+                        title: "Transaction Fee",
+                        value: this.isValidToken ? this.tradeFeeExactAmount : '-',
+                        tooltip: feeTooltip,
+                        onClick: countFees > 1 ? () => this.options.showModalFees() : null
+                    },
+                    {
+                        title: "Estimated Time",
+                        value: this.isValidToken && this.record ? '30 seconds' : '-',
+                        isHidden: !this.isCrossChain
+                    }
+                ];
+                return info.filter((f) => !f.isHidden);
+            };
+            this.updateBridgeSupportChainList = () => {
+                this.bridgeSupportedChainList = (0, index_9.getBridgeSupportedChainList)(this.configModel.chainId, this.configModel.networks);
+            };
+            this.onSubmit = async () => {
+                let _error;
+                try {
+                    if (this.isCrossChain) {
+                        if (this.toToken && this.fromToken && this.desChain) {
+                            this.record.minReceivedMaxSold = this.minReceivedMaxSold;
+                            const { error } = await (0, index_11.createBridgeVaultOrder)(this.state, {
+                                vaultAddress: this.record.vaultAddress,
+                                targetChainId: this.desChain.chainId,
+                                tokenIn: this.fromToken,
+                                tokenOut: this.toToken,
+                                amountIn: this.record.fromAmount,
+                                minAmountOut: this.record.minReceivedMaxSold,
+                                sourceRouteInfo: this.record.sourceRouteObj ? { amountOut: this.record.sourceRouteObj.amountOut, pairs: this.record.sourceRouteObj.pairs } : undefined
+                            });
+                            _error = error;
+                        }
+                    }
+                    else {
+                        const route = this.record.bestRoute ? this.record.bestRoute : [this.fromToken, this.toToken];
+                        const swapData = {
+                            provider: this.record.provider,
+                            queueType: this.record.queueType,
+                            routeTokens: this.record.bestRoute,
+                            bestSmartRoute: route,
+                            pairs: this.record.pairs,
+                            fromAmount: this.record.fromAmount,
+                            toAmount: this.record.toAmount,
+                            isFromEstimated: this.isFrom,
+                            providerList: this.originalData?.providers || [],
+                            campaignId: this.configModel.campaignId,
+                            referrer: this.configModel.commissions.find(v => v.chainId === this.state.getChainId())?.walletAddress,
+                        };
+                        const { error } = await (0, index_11.executeSwap)(this.state, swapData);
+                        _error = error;
+                    }
+                }
+                catch (error) {
+                    console.error(error);
+                }
+                return _error;
+            };
+            this.state = state;
+            this.configModel = configModel;
+            this.options = options;
+            this.fromInputValue = new eth_wallet_6.BigNumber(0);
+            this.toInputValue = new eth_wallet_6.BigNumber(0);
+            this.swapButtonStatusMap = {};
+            this.approveButtonStatusMap = {};
         }
-        get isFixedPair() {
-            return this._data?.category === 'fixed-pair';
+        get crossChainApprovalStatus() {
+            return this._crossChainApprovalStatus;
+        }
+        set crossChainApprovalStatus(value) {
+            this._crossChainApprovalStatus = value;
+        }
+        get swapButtonStatusMap() {
+            return this._swapButtonStatusMap;
+        }
+        set swapButtonStatusMap(value) {
+            this._swapButtonStatusMap = value;
+        }
+        get approveButtonStatusMap() {
+            return this._approveButtonStatusMap;
+        }
+        set approveButtonStatusMap(value) {
+            this._approveButtonStatusMap = value;
+        }
+        get isFrom() {
+            return this._isFrom;
+        }
+        set isFrom(value) {
+            this._isFrom = value;
+        }
+        get fromInputValue() {
+            return this._fromInputValue;
+        }
+        set fromInputValue(value) {
+            this._fromInputValue = value;
+        }
+        get toInputValue() {
+            return this._toInputValue;
+        }
+        set toInputValue(value) {
+            this._toInputValue = value;
+        }
+        get record() {
+            return this._record;
+        }
+        set record(value) {
+            this._record = value;
+        }
+        get fromToken() {
+            return this._fromToken;
+        }
+        set fromToken(token) {
+            this._fromToken = token;
+        }
+        get toToken() {
+            return this._toToken;
+        }
+        set toToken(token) {
+            this._toToken = token;
+        }
+        get srcChain() {
+            return this._srcChain;
+        }
+        set srcChain(value) {
+            this._srcChain = value;
+        }
+        get desChain() {
+            return this._desChain;
+        }
+        set desChain(value) {
+            this._desChain = value;
+        }
+        get bridgeSupportedChainList() {
+            return this._bridgeSupportedChainList;
+        }
+        set bridgeSupportedChainList(value) {
+            this._bridgeSupportedChainList = value;
         }
         get originalData() {
-            if (!this._data)
+            const data = this.configModel.getData();
+            if (!data)
                 return undefined;
-            const { category, providers } = this._data;
+            const { category, providers } = data;
             if (!providers.length)
                 return undefined;
             let _providers = [];
-            if (this.isFixedPair) {
+            if (this.configModel.isFixedPair) {
                 const { key } = providers[0];
                 let defaultProvider = {
                     key
@@ -3542,450 +3959,29 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
             }
             return { category, providers: _providers };
         }
-        async refreshUI() {
-            this.setProviders();
-            await this.initData();
-            await this.initializeWidgetConfig();
+        get isCrossChainEnabled() {
+            let chainId = this.state.getChainId();
+            if (!this.bridgeSupportedChainList.some((v) => v.chainId == chainId) || !this.configModel.isCrossChainSwap) {
+                return false;
+            }
+            return true;
         }
-        constructor(parent, options) {
-            super(parent, options);
-            this._data = {
-                category: 'fixed-pair',
-                providers: [],
-                tokens: [],
-                defaultChainId: 0,
-                wallets: [],
-                networks: []
-            };
-            this.tag = {};
-            this._tokens = [];
-            this.isInited = false;
-            this.bridgeSupportedChainList = [];
-            this.clientEvents = [];
-            // Cross Chain
-            this.crossChainApprovalStatus = index_10.ApprovalStatus.NONE;
-            this.onChainChange = async () => {
-                const currentChainId = this.state.getChainId();
-                if (currentChainId != null && currentChainId != undefined)
-                    this.swapBtn.visible = true;
-                this.updateContractAddress();
-                // if (this.originalData?.providers?.length) await this.initializeWidgetConfig();
-                await this.initializeWidgetConfig();
-            };
-            this.fixedNumber = (value) => {
-                const val = typeof value === 'object' ? value : new eth_wallet_5.BigNumber(value);
-                if (val.isNaN() || val.isZero())
-                    return '';
-                return components_7.FormatUtils.formatNumber(val.toFixed(), { decimalFigures: 4, useSeparators: false });
-            };
-            this.initWallet = async () => {
-                try {
-                    await eth_wallet_5.Wallet.getClientInstance().init();
-                    const rpcWallet = this.state.getRpcWallet();
-                    await rpcWallet.init();
-                }
-                catch (err) {
-                    console.log(err);
-                }
-            };
-            this.initializeWidgetConfig = async () => {
-                setTimeout(async () => {
-                    await this.initWallet();
-                    this.initializeDefaultTokenPair();
-                    await this.renderChainList();
-                    await this.updateBalances();
-                    this.updateTokenValues(this.fromToken, true);
-                    this.updateTokenValues(this.toToken, false);
-                    this.hIcon.enabled = this.vIcon.enabled = !this.isFixedPair && !this.isCrossChain;
-                    this.firstTokenInput.tokenReadOnly = this.isFixedPair;
-                    this.firstTokenInput.inputReadOnly = false;
-                    this.secondTokenInput.tokenReadOnly = this.isFixedPair;
-                    this.secondTokenInput.inputReadOnly = false;
-                    this.pnlBranding.visible = !!this._data.logo || !!this._data.title;
-                    if (this._data.logo?.startsWith('ipfs://')) {
-                        this.imgLogo.url = this._data.logo.replace('ipfs://', '/ipfs/');
-                    }
-                    else {
-                        this.imgLogo.url = this._data.logo;
-                    }
-                    this.lbTitle.caption = this._data.title;
-                    this.updateSwapButtonCaption();
-                    this.toggleReverseImage.cursor = this.isFixedPair ? 'default' : 'pointer';
-                    if (this.isCrossChain) {
-                        this.initRoutes();
-                        this.toInputValue = new eth_wallet_5.BigNumber(0);
-                        if (this.secondTokenInput) {
-                            this.secondTokenInput.value = '-';
-                            this.secondTokenInput.inputReadOnly = true;
-                        }
-                        this.toggleReverseImage.cursor = 'default';
-                        if (this.isEstimated('from')) {
-                            this.updateEstimatedPosition(false);
-                        }
-                    }
-                    else {
-                        if (this.secondTokenInput) {
-                            this.secondTokenInput.inputReadOnly = false;
-                        }
-                        this.toggleReverseImage.cursor = 'pointer';
-                    }
-                    if (this.fromInputValue.isGreaterThan(0)) {
-                        this.updateEstimatedPosition(false);
-                        this.firstTokenInput.value = this.fixedNumber(this.fromInputValue);
-                    }
-                    else if (this.toInputValue.isGreaterThan(0)) {
-                        this.updateEstimatedPosition(true);
-                        this.secondTokenInput.value = this.fixedNumber(this.toInputValue);
-                    }
-                    this.firstTokenInput.tokenDataListProp = (0, index_7.getSupportedTokens)(this._tokens, this.fromToken.chainId);
-                    this.secondTokenInput.tokenDataListProp = (0, index_7.getSupportedTokens)(this._tokens, this.toToken.chainId);
-                    if (!this.record)
-                        this.swapBtn.enabled = !this.isSwapButtonDisabled();
-                    this.renderPriceInfo();
-                    await this.handleAddRoute();
-                });
-            };
-            this.getMinReceivedMaxSold = () => {
-                const slippageTolerance = this.state.slippageTolerance;
-                if (!slippageTolerance)
-                    return null;
-                if (this.isFrom) {
-                    const poolAmount = new eth_wallet_5.BigNumber(this.record?.amountIn);
-                    if (poolAmount.isZero())
-                        return null;
-                    const minReceivedMaxSold = poolAmount.times(1 + slippageTolerance / 100).toNumber();
-                    return minReceivedMaxSold;
-                }
-                else {
-                    const poolAmount = new eth_wallet_5.BigNumber(this.record?.amountOut);
-                    if (poolAmount.isZero())
-                        return null;
-                    const minReceivedMaxSold = poolAmount.times(1 - slippageTolerance / 100).toNumber();
-                    return minReceivedMaxSold;
-                }
-            };
-            this.updateEstimatedPosition = (isFrom) => {
-                if (this.isFrom != isFrom) {
-                    this.isFrom = isFrom;
-                }
-            };
-            this.isEstimated = (tokenPosition, strict = false) => {
-                if (tokenPosition === 'from') {
-                    return strict ? this.isFrom && !this.fromInputValue.isZero() : this.isFrom;
-                }
-                else if (tokenPosition === 'to') {
-                    return strict ? !this.isFrom && !this.toInputValue.isZero() : !this.isFrom;
-                }
-                else {
-                    return false;
-                }
-            };
-            this.onSwapConfirming = (key) => {
-                this.setMapStatus('swap', key, index_10.ApprovalStatus.APPROVING);
-                this.updateSwapButtonCaption();
-                if (!this.swapBtn.rightIcon.visible)
-                    this.swapBtn.rightIcon.visible = true;
-            };
-            this.onSwapConfirmed = async (data) => {
-                const { key, isCrossChain } = data;
-                this.setMapStatus('swap', key, index_10.ApprovalStatus.TO_BE_APPROVED);
-                this.updateSwapButtonCaption();
-                if (this.swapBtn.rightIcon.visible)
-                    this.swapBtn.rightIcon.visible = false;
-                await this.handleAddRoute();
-            };
-            this.onSubmit = async () => {
-                try {
-                    this.swapModal.visible = false;
-                    this.showResultMessage('warning', `Swapping ${(0, index_10.formatNumber)(this.fromInputValue, 4)} ${this.fromToken?.symbol} to ${(0, index_10.formatNumber)(this.toInputValue, 4)} ${this.toToken?.symbol}`);
-                    if (this.isCrossChain) {
-                        if (this.toToken && this.fromToken && this.desChain) {
-                            this.record.minReceivedMaxSold = this.getMinReceivedMaxSold();
-                            const { error } = await (0, index_8.createBridgeVaultOrder)(this.state, {
-                                vaultAddress: this.record.vaultAddress,
-                                targetChainId: this.desChain.chainId,
-                                tokenIn: this.fromToken,
-                                tokenOut: this.toToken,
-                                amountIn: this.record.fromAmount,
-                                minAmountOut: this.record.minReceivedMaxSold,
-                                sourceRouteInfo: this.record.sourceRouteObj ? { amountOut: this.record.sourceRouteObj.amountOut, pairs: this.record.sourceRouteObj.pairs } : undefined
-                            });
-                            if (error) {
-                                this.showResultMessage('error', error);
-                            }
-                        }
-                        return;
-                    }
-                    const route = this.record.bestRoute ? this.record.bestRoute : [this.fromToken, this.toToken];
-                    const swapData = {
-                        provider: this.record.provider,
-                        queueType: this.record.queueType,
-                        routeTokens: this.record.bestRoute,
-                        bestSmartRoute: route,
-                        pairs: this.record.pairs,
-                        fromAmount: this.record.fromAmount,
-                        toAmount: this.record.toAmount,
-                        isFromEstimated: this.isFrom,
-                        providerList: this.originalData?.providers || [],
-                        campaignId: this._data.campaignId,
-                        referrer: this.commissions.find(v => v.chainId === this.state.getChainId())?.walletAddress,
-                    };
-                    const { error } = await (0, index_8.executeSwap)(this.state, swapData);
-                    if (error) {
-                        this.showResultMessage('error', error);
-                    }
-                }
-                catch (error) {
-                    console.error(error);
-                }
-            };
-            this.approveRouterMax = () => {
-                this.showResultMessage('warning', 'Approving');
-                this.setApprovalSpenderAddress();
-                this.approvalModelAction.doApproveAction(this.fromToken, this.fromInputValue.toFixed(), this.record);
-            };
-            this.onSetMaxBalance = async () => {
-                if (!this.fromToken?.symbol)
-                    return;
-                this.isFrom = false;
-                const address = this.fromToken?.address || this.fromToken?.symbol;
-                let balance = this.getBalance(this.fromToken);
-                let inputVal = new eth_wallet_5.BigNumber(balance);
-                if (!address) {
-                    inputVal = new eth_wallet_5.BigNumber(0);
-                }
-                if (inputVal.eq(this.fromInputValue))
-                    return;
-                this.fromInputValue = inputVal;
-                const decimals = this.fromToken?.decimals || 18;
-                this.firstTokenInput.value = this.fromInputValue.dp(decimals, ROUNDING_NUMBER).toFixed();
-                await this.handleAddRoute();
-            };
-            this.isMaxDisabled = () => {
-                const address = this.fromToken?.address || this.fromToken?.symbol;
-                let balance = this.getBalance(this.fromToken);
-                return !address || new eth_wallet_5.BigNumber(balance).isLessThanOrEqualTo(0);
-            };
-            this.disableSelectChain = (disabled, isDes) => {
-                const chains = isDes ? this.desChainList : this.srcChainList;
-                const imgs = chains.querySelectorAll('i-image');
-                imgs.forEach((elm) => {
-                    const img = elm;
-                    img.enabled = !disabled;
-                    if (disabled) {
-                        img.cursor = 'default';
-                    }
-                    else {
-                        img.cursor = 'pointer';
-                    }
-                });
-            };
-            this.selectSourceChain = async (obj, img) => {
-                if (!this.isCrossChainEnabled)
-                    return;
-                this.disableSelectChain(true, false);
-                const selected = this.srcChainList.querySelector('.icon-selected');
-                selected && this.updateChainIcon(selected, false);
-                const oldDestination = this.srcChain;
-                try {
-                    this.srcChain = obj;
-                    if (img) {
-                        this.updateChainIcon(img, true);
-                    }
-                    else {
-                        const currentNetwork = (0, index_7.getNetworkInfo)(this.bridgeSupportedChainList.find((f) => f.chainId == obj.chainId)?.chainId);
-                        const img = this.srcChainList.querySelector(`[data-tooltip="${currentNetwork?.chainName}"]`);
-                        if (img)
-                            this.updateChainIcon(img, true);
-                    }
-                }
-                catch (err) {
-                    console.log('err', err);
-                    if (oldDestination) {
-                        this.srcChain = oldDestination;
-                        if (selected)
-                            this.updateChainIcon(selected, true);
-                    }
-                    else {
-                        this.srcChain = (0, index_7.getNetworkInfo)(this.bridgeSupportedChainList[0]?.chainId);
-                        const elm = this.srcChainList?.firstElementChild;
-                        elm && this.updateChainIcon(elm, true);
-                    }
-                }
-                if (this.srcChain) {
-                    this.srcChainLabel.caption = this.srcChain.chainName;
-                }
-                this.firstTokenInput.tokenDataListProp = (0, index_7.getSupportedTokens)(this._tokens, this.srcChain.chainId);
-                this.disableSelectChain(false, false);
-            };
-            this.selectDestinationChain = async (obj, img) => {
-                if (!this.isCrossChainEnabled)
-                    return;
-                this.disableSelectChain(true, true);
-                const selected = this.desChainList.querySelector('.icon-selected');
-                selected && this.updateChainIcon(selected, false);
-                const oldDestination = this.desChain;
-                try {
-                    this.desChain = obj;
-                    if (img) {
-                        this.updateChainIcon(img, true);
-                    }
-                    else {
-                        const currentNetwork = (0, index_7.getNetworkInfo)(this.bridgeSupportedChainList.find((f) => f.chainId == obj.chainId)?.chainId);
-                        const img = this.desChainList.querySelector(`[data-tooltip="${currentNetwork?.chainName}"]`);
-                        img && this.updateChainIcon(img, true);
-                    }
-                }
-                catch (err) {
-                    console.log('err', err);
-                    if (oldDestination) {
-                        this.desChain = oldDestination;
-                        selected && this.updateChainIcon(selected, true);
-                    }
-                    else {
-                        this.desChain = (0, index_7.getNetworkInfo)(this.bridgeSupportedChainList[0]?.chainId);
-                        const elm = this.desChainList?.firstElementChild;
-                        elm && this.updateChainIcon(elm, true);
-                    }
-                }
-                if (this.desChain) {
-                    this.desChainLabel.caption = this.desChain.chainName;
-                }
-                // this.setTargetTokenList();
-                this.secondTokenInput.tokenDataListProp = (0, index_7.getSupportedTokens)(this._tokens, this.desChain.chainId);
-                this.disableSelectChain(false, true);
-            };
-            this.onSelectSourceChain = async (obj, img) => {
-                this.firstTokenInput.chainId = obj.chainId;
-                if (obj.chainId === this.srcChain?.chainId)
-                    return;
-                const rpcWallet = this.state.getRpcWallet();
-                await rpcWallet.switchNetwork(obj.chainId);
-            };
-            this.onSelectDestinationChain = async (obj, img) => {
-                this.secondTokenInput.chainId = obj.chainId;
-                if (obj.chainId === this.desChain?.chainId)
-                    return;
-                await this.selectDestinationChain(obj, img);
-                const tokenList = (0, index_7.getSupportedTokens)(this._tokens, obj.chainId);
-                this.toToken = tokenList[0];
-                this.secondTokenInput.token = this.toToken;
-                await scom_token_list_7.tokenStore.updateTokenBalancesByChainId(obj.chainId);
-                const balance = this.getBalance(this.toToken);
-                this.receiveBalance.caption = `Balance: ${(0, index_10.formatNumber)(balance, 4)} ${this.toToken.symbol}`;
-                const enabled = !this.isMaxDisabled();
-                this.maxButton.enabled = enabled;
-                await this.updateTokenValues(this.toToken, false);
-                await this.handleAddRoute();
-            };
-            this.initChainIcon = (network, isDes) => {
-                const img = new components_7.Image(undefined, {
-                    width: 32,
-                    height: 32,
-                    margin: { top: '0.25rem', right: '0.5rem' },
-                    border: { radius: '50%', width: '2px', style: 'solid', color: 'transparent' },
-                    padding: { top: '0.25rem', right: '0.25rem', bottom: '0.25rem', left: '0.25rem' },
-                    url: network.image,
-                    tooltip: { content: network.chainName },
-                    cursor: 'pointer'
-                });
-                // img.url = network.image;
-                // img.tooltip.content = network.chainName;
-                img.classList.add('chain-icon');
-                img.setAttribute('data-tooltip', network.chainName); // for query
-                if (isDes) {
-                    img.onClick = () => this.onSelectDestinationChain(network, img);
-                    this.desChainList.appendChild(img);
-                }
-                else {
-                    if (!this.isMetaMask) {
-                        img.tooltip.content = `Swap supports this network ${network.chainName} (${network.chainId}), please switch network in the connected wallet.`;
-                        img.cursor = 'default';
-                    }
-                    img.setAttribute('network-name', network.chainName);
-                    img.setAttribute('chain-id', `${network.chainId}`);
-                    img.onClick = () => this.onSelectSourceChain(network, img);
-                    this.srcChainList.appendChild(img);
-                }
-            };
-            this.renderChainList = async () => {
-                if (!this.isCrossChainSwap)
-                    return;
-                this.bridgeSupportedChainList = (0, index_7.getBridgeSupportedChainList)(this.chainId, this.networks);
-                if (this.bridgeSupportedChainList.length < 2)
-                    return;
-                this.srcChainList.innerHTML = '';
-                this.desChainList.innerHTML = '';
-                this.srcChain = undefined;
-                this.desChain = undefined;
-                this.bridgeSupportedChainList.forEach((v) => {
-                    const network = (0, index_7.getNetworkInfo)(v.chainId);
-                    this.initChainIcon(network, false);
-                    this.initChainIcon(network, true);
-                });
-                const firstChainId = this.fromToken?.chainId;
-                const secondChainId = this.toToken?.chainId;
-                console.log('firstChainId', firstChainId);
-                console.log('secondChainId', secondChainId);
-                if (firstChainId && secondChainId) {
-                    const firstNetwork = (0, index_7.getNetworkInfo)(firstChainId);
-                    const secondNetwork = (0, index_7.getNetworkInfo)(secondChainId);
-                    await this.selectSourceChain(firstNetwork);
-                    await this.selectDestinationChain(secondNetwork);
-                }
-                this.srcChainBox.visible = true;
-                this.desChainBox.visible = true;
-            };
-            this.showModalFees = () => {
-                const fees = this.getFeeDetails();
-                this.feesInfo.clearInnerHTML();
-                fees.forEach((fee) => {
-                    const feeValue = components_7.FormatUtils.formatNumber(fee.value.toFixed(), { decimalFigures: 4 });
-                    this.feesInfo.appendChild(this.$render("i-hstack", { horizontalAlignment: "space-between", verticalAlignment: "center", margin: { top: 10 }, border: { bottom: { color: Theme.background.main, width: '2px', style: 'solid' } }, padding: { bottom: 16 } },
-                        this.$render("i-hstack", { verticalAlignment: "center" },
-                            this.$render("i-label", { caption: fee.title, margin: { right: 4 } }),
-                            this.$render("i-icon", { name: "question-circle", width: 15, height: 15, fill: Theme.text.primary, tooltip: { content: fee.description }, "data-placement": "right" })),
-                        this.$render("i-label", { margin: { left: 'auto' }, caption: `${feeValue} ${this.fromToken?.symbol}` })));
-                });
-                this.feesInfo.appendChild(this.$render("i-hstack", { horizontalAlignment: "space-between", verticalAlignment: "center", margin: { top: 16 } },
-                    this.$render("i-hstack", { verticalAlignment: "center" },
-                        this.$render("i-label", { caption: "Total Transaction Fee" })),
-                    this.$render("i-label", { margin: { left: 'auto' }, caption: this.getTradeFeeExactAmount() })));
-                this.modalFees.visible = true;
-            };
-            this.closeModalFees = () => {
-                this.modalFees.visible = false;
-            };
-            this.showResultMessage = (status, content) => {
-                if (!this.txStatusModal)
-                    return;
-                let params = { status };
-                if (status === 'success') {
-                    params.txtHash = content;
-                }
-                else {
-                    params.content = content;
-                }
-                this.txStatusModal.message = { ...params };
-                this.txStatusModal.showModal();
-            };
-            this.deferReadyCallback = true;
-        }
-        registerEvent() {
-            this.clientEvents.push(this.$eventBus.register(this, "SlippageToleranceChanged" /* EventId.SlippageToleranceChanged */, () => { this.priceInfo.setData(this.getPriceInfo()); }));
-            this.clientEvents.push(this.$eventBus.register(this, "ExpertModeChanged" /* EventId.ExpertModeChanged */, () => {
-                this.updateSwapButtonCaption();
-            }));
+        get isCrossChain() {
+            const srcChainId = this.srcChain?.chainId;
+            const desChainId = this.desChain?.chainId;
+            if (this.isCrossChainEnabled && index_9.crossChainSupportedChainIds.some(v => v.chainId === srcChainId) && srcChainId != desChainId) {
+                return true;
+            }
+            this.options.setHintLabel(false);
+            return false;
         }
         get isApproveButtonShown() {
-            const warningMessageText = this.getWarningMessageText();
-            return warningMessageText === '' && this.approveButtonStatus !== undefined && this.approveButtonStatus !== index_10.ApprovalStatus.NONE;
+            return this.warningMessageText === '' && this.approveButtonStatus !== undefined && this.approveButtonStatus !== index_10.ApprovalStatus.NONE;
         }
         get isPriceImpactTooHigh() {
             if (this.isCrossChain)
                 return false;
-            const warningMessageText = this.getWarningMessageText();
-            return this.record?.priceImpact > 15 && !this.state.isExpertMode && warningMessageText === priceImpactTooHighMsg;
+            return this.record?.priceImpact > 15 && !this.state.isExpertMode && this.warningMessageText === priceImpactTooHighMsg;
         }
         get isInsufficientBalance() {
             if (!this.fromToken || !this.record)
@@ -3995,10 +3991,10 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
         }
         get maxSold() {
             if (!this.fromToken || !this.record)
-                return new eth_wallet_5.BigNumber(0);
+                return new eth_wallet_6.BigNumber(0);
             if (!this.isFrom)
-                return new eth_wallet_5.BigNumber(this.record.fromAmount);
-            return new eth_wallet_5.BigNumber(this.getMinReceivedMaxSold() || this.record.fromAmount);
+                return new eth_wallet_6.BigNumber(this.record.fromAmount);
+            return new eth_wallet_6.BigNumber(this.minReceivedMaxSold || this.record.fromAmount);
         }
         get isSwapping() {
             const key = this.record?.key;
@@ -4017,655 +4013,71 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
             }
             return false;
         }
-        getTokenKey(token) {
-            if (token.isNative) {
-                return token.symbol;
+        get isButtonLoading() {
+            if (this.isApproveButtonShown || (this.isCrossChain && this.crossChainApprovalStatus === index_10.ApprovalStatus.APPROVING)) {
+                return this.isApprovingRouter;
             }
-            return token.address.toLowerCase();
+            return this.isSwapping;
         }
-        calculateDefaultTokens() {
-            let firstDefaultToken;
-            let secondDefaultToken;
-            const currentChainId = this.state.getChainId();
-            const currentChainTokens = (0, index_7.getSupportedTokens)(this._tokens, currentChainId);
-            if (!this._data.defaultInputToken && !this._data.defaultOutputToken) {
-                firstDefaultToken = currentChainTokens[0];
-                secondDefaultToken = currentChainTokens[1];
+        get isSwapButtonDisabled() {
+            if ((0, index_9.isClientWalletConnected)() && this.state.isRpcWalletConnected() && !this.record) {
+                return true;
             }
-            else {
-                if (this._data.defaultInputToken && currentChainId === this._data.defaultInputToken.chainId) {
-                    let inputTokens = (0, index_7.getSupportedTokens)(this._tokens, this._data.defaultInputToken.chainId);
-                    firstDefaultToken = inputTokens.find(v => v.chainId === this._data.defaultInputToken.chainId && v.address === this._data.defaultInputToken.address);
-                }
-                else {
-                    firstDefaultToken = currentChainTokens[0];
-                }
-                if (this._data.defaultOutputToken) {
-                    let outputTokens = (0, index_7.getSupportedTokens)(this._tokens, this._data.defaultOutputToken.chainId);
-                    secondDefaultToken = outputTokens.find(v => v.chainId === this._data.defaultOutputToken.chainId && v.address === this._data.defaultOutputToken.address);
-                }
-                else {
-                    secondDefaultToken = currentChainTokens[0];
-                }
-            }
-            return {
-                firstDefaultToken,
-                secondDefaultToken
-            };
+            return (this.state.isRpcWalletConnected() && (this.warningMessageText != '' && !this.isPriceImpactTooHigh));
         }
-        initializeDefaultTokenPair() {
-            if (this.isCrossChain) {
-                let { firstDefaultToken, secondDefaultToken } = this.calculateDefaultTokens();
-                this.fromToken = firstDefaultToken;
-                this.toToken = secondDefaultToken;
-                this.firstTokenInput.chainId = firstDefaultToken.chainId;
-                this.secondTokenInput.chainId = secondDefaultToken.chainId;
-                this.fromInputValue = new eth_wallet_5.BigNumber(this._data.defaultInputValue);
-                this.firstTokenInput.token = this.fromToken;
-                this.secondTokenInput.token = this.toToken;
+        get warningMessageText() {
+            const tokens = [this.fromToken?.symbol, this.toToken?.symbol];
+            if (tokens.every(v => v === 'ETH' || v === 'WETH')) {
+                return 'Invalid pair';
             }
-            else {
-                const providers = this.originalData?.providers;
-                if (providers && providers.length) {
-                    let { firstDefaultToken, secondDefaultToken } = this.calculateDefaultTokens();
-                    this.fromToken = firstDefaultToken;
-                    this.toToken = secondDefaultToken;
-                    this.firstTokenInput.chainId = firstDefaultToken.chainId;
-                    this.secondTokenInput.chainId = secondDefaultToken.chainId;
-                    this.fromInputValue = new eth_wallet_5.BigNumber(this._data.defaultInputValue);
-                    this.toInputValue = new eth_wallet_5.BigNumber(this._data.defaultOutputValue);
-                    this.firstTokenInput.token = this.fromToken;
-                    this.secondTokenInput.token = this.toToken;
-                    this.toggleReverseImage.cursor = 'default';
-                }
-            }
-        }
-        async initApprovalModelAction() {
-            this.approvalModelAction = await this.state.setApprovalModelAction({
-                sender: this,
-                payAction: this.onSubmit,
-                onToBeApproved: async (token, data) => {
-                    if (this.isCrossChain) {
-                        this.crossChainApprovalStatus = index_10.ApprovalStatus.TO_BE_APPROVED;
-                    }
-                    else {
-                        this.setMapStatus('approve', data.key, index_10.ApprovalStatus.TO_BE_APPROVED);
-                        this.setMapStatus('swap', data.key, index_10.ApprovalStatus.TO_BE_APPROVED);
-                    }
-                    this.updateSwapButtonCaption();
-                    const enabled = !this.isSwapButtonDisabled();
-                    this.swapBtn.enabled = enabled;
-                },
-                onToBePaid: async (token, data) => {
-                    if (this.isCrossChain) {
-                        this.crossChainApprovalStatus = index_10.ApprovalStatus.NONE;
-                    }
-                    else {
-                        this.setMapStatus('approve', data.key, index_10.ApprovalStatus.NONE);
-                        this.setMapStatus('swap', data.key, index_10.ApprovalStatus.TO_BE_APPROVED);
-                    }
-                    this.updateSwapButtonCaption();
-                    const enabled = !this.isSwapButtonDisabled();
-                    this.swapBtn.enabled = enabled;
-                },
-                onApproving: async (token, receipt, data) => {
-                    if (this.isCrossChain) {
-                        this.crossChainApprovalStatus = index_10.ApprovalStatus.APPROVING;
-                    }
-                    else {
-                        this.setMapStatus('approve', data.key, index_10.ApprovalStatus.APPROVING);
-                    }
-                    this.updateSwapButtonCaption();
-                    this.showResultMessage('success', receipt);
-                    if ((this.isApprovingRouter || this.isCrossChain) && !this.swapBtn.rightIcon.visible)
-                        this.swapBtn.rightIcon.visible = true;
-                },
-                onApproved: async (token, data) => {
-                    if (this.isCrossChain) {
-                        this.crossChainApprovalStatus = index_10.ApprovalStatus.NONE;
-                    }
-                    else {
-                        this.setMapStatus('approve', data.key, index_10.ApprovalStatus.NONE);
-                    }
-                    this.updateSwapButtonCaption();
-                    if (this.swapBtn.rightIcon.visible)
-                        this.swapBtn.rightIcon.visible = false;
-                    await this.handleAddRoute();
-                },
-                onApprovingError: async (token, err) => {
-                    this.showResultMessage('error', err);
-                    this.crossChainApprovalStatus = index_10.ApprovalStatus.TO_BE_APPROVED;
-                    if (this.swapBtn.rightIcon.visible)
-                        this.swapBtn.rightIcon.visible = false;
-                },
-                onPaying: async (receipt, data) => {
-                    this.showResultMessage('success', receipt);
-                    this.onSwapConfirming(data.key);
-                },
-                onPaid: async (data, receipt) => {
-                    this.onSwapConfirmed({ key: data.key, isCrossChain: this.isCrossChain });
-                    await this.updateBalances();
-                    components_7.application.EventBus.dispatch("Paid" /* EventId.Paid */, {
-                        isCrossChain: this.isCrossChain,
-                        data: data ?? null,
-                        id: this.uuid,
-                        receipt: receipt
-                    });
-                },
-                onPayingError: async (err) => {
-                    this.showResultMessage('error', err);
-                }
-            });
-        }
-        async onRevertSwap() {
-            if (this.isCrossChain)
-                return;
-            this.updateEstimatedPosition(!this.isEstimated('from'));
-            [this.fromToken, this.toToken] = [this.toToken, this.fromToken];
-            const enabled = !this.isMaxDisabled();
-            this.maxButton.enabled = enabled;
-            [this.fromInputValue, this.toInputValue] = [this.toInputValue, this.fromInputValue];
-            [this.payBalance.caption, this.receiveBalance.caption] = [this.receiveBalance.caption, this.payBalance.caption];
-            this.firstTokenInput.token = this.fromToken;
-            this.secondTokenInput.token = this.toToken;
-            this.firstTokenInput.value = this.getInputValue(true);
-            this.secondTokenInput.value = this.getInputValue(false);
-            await this.handleAddRoute();
-        }
-        setupCrossChainPopup() {
-            const arrows = this.swapModal.querySelectorAll('i-icon.arrow-down');
-            if (!this.isCrossChain) {
-                arrows.forEach((arrow) => {
-                    arrow.margin = { top: '0.75rem', bottom: '0.75rem' };
-                });
-            }
-            else {
-                arrows.forEach((arrow) => {
-                    arrow.margin = { top: '0.75rem', left: '6rem', bottom: '0.75rem', right: '6rem' };
-                });
-            }
-            if (this.lbReminderRejected)
-                this.lbReminderRejected.visible = false;
-            if (this.isCrossChain && this.srcChain && this.desChain) {
-                this.srcChainFirstPanel.visible = true;
-                this.targetChainFirstPanel.visible = true;
-                this.srcChainTokenImage.url = this.srcChain.image;
-                this.srcChainTokenLabel.caption = this.srcChain.chainName;
-                this.targetChainTokenImage.url = this.desChain.image;
-                this.targetChainTokenLabel.caption = this.desChain.chainName;
-                const { sourceVaultToken, targetVaultToken, sourceRouteObj, vaultTokenFromSourceChain, vaultTokenToTargetChain } = this.record;
-                if (sourceVaultToken && sourceRouteObj) {
-                    this.srcChainSecondPanel.visible = true;
-                    this.srcChainVaultImage.url = this.srcChain.image;
-                    this.srcChainVaultLabel.caption = this.srcChain.chainName;
-                    this.srcVaultTokenImage.url = scom_token_list_7.assets.getTokenIconPath(sourceVaultToken, this.srcChain.chainId);
-                    this.srcVaultTokenLabel.caption = sourceVaultToken.symbol;
-                    this.srcVaultTokenValue.caption = (0, index_10.formatNumber)(vaultTokenFromSourceChain);
-                    if (this.lbReminderRejected) {
-                        this.lbReminderRejected.visible = true;
-                        this.lbReminderRejected.caption = `If the order is not executed in the target chain, the estimated withdrawalble amount is <b class="text-pink">${(0, index_10.formatNumber)(vaultTokenFromSourceChain)} ${sourceVaultToken?.symbol}</b>`;
-                    }
-                }
-                else {
-                    this.srcChainSecondPanel.visible = false;
-                }
-                if (targetVaultToken && targetVaultToken.symbol !== this.toToken?.symbol) {
-                    this.targetChainSecondPanel.visible = true;
-                    this.targetChainVaultImage.url = this.desChain.image;
-                    this.targetChainVaultLabel.caption = this.desChain.chainName;
-                    this.targetVaultTokenImage.url = scom_token_list_7.assets.getTokenIconPath(targetVaultToken, this.desChain.chainId);
-                    this.targetVaultTokenLabel.caption = targetVaultToken.symbol;
-                    this.targetVaultTokenValue.caption = (0, index_10.formatNumber)(vaultTokenToTargetChain);
-                    // Hide vault info at toToken
-                    this.crossChainVaultInfoVstack.visible = false;
-                }
-                else {
-                    this.targetChainSecondPanel.visible = false;
-                    // Show vault info at the end if vaultTokenSymbol same as toToken
-                    this.crossChainVaultInfoVstack.visible = true;
-                }
-            }
-            else {
-                this.srcChainFirstPanel.visible = false;
-                this.targetChainFirstPanel.visible = false;
-                this.srcChainSecondPanel.visible = false;
-                this.targetChainSecondPanel.visible = false;
-                this.crossChainVaultInfoVstack.visible = false;
-            }
-        }
-        handleSwapPopup() {
-            if (!this.record)
-                return;
-            this.setupCrossChainPopup();
-            const currentChainId = this.state.getChainId();
-            const slippageTolerance = this.state.slippageTolerance;
-            this.fromTokenImage.url = scom_token_list_7.assets.tokenPath(this.fromToken, currentChainId);
-            this.fromTokenLabel.caption = this.fromToken?.symbol ?? '';
-            this.fromTokenValue.caption = (0, index_10.formatNumber)(this.fromInputValue, 4);
-            this.toTokenImage.url = scom_token_list_7.assets.tokenPath(this.toToken, this.isCrossChain ? this.desChain?.chainId : currentChainId);
-            this.toTokenLabel.caption = this.toToken?.symbol ?? '';
-            this.toTokenValue.caption = (0, index_10.formatNumber)(this.toInputValue, 4);
-            const minimumReceived = this.getMinReceivedMaxSold();
-            if (minimumReceived || minimumReceived == 0) {
-                this.payOrReceiveValue.caption = (0, index_10.formatNumber)(minimumReceived, 4);
-            }
-            else {
-                this.payOrReceiveValue.caption = ' - ';
-            }
-            this.payOrReceiveToken.caption = this.isFrom ? this.fromTokenLabel.caption : this.toTokenLabel.caption;
-            this.lbEstimate.caption = `${this.isFrom ? 'Input' : 'Output'} is estimated. If the price change by more than ${slippageTolerance}%, your transaction will revert`;
-            this.lbPayOrReceive.caption = this.isFrom ? 'You will pay at most' : 'You will receive at least';
-            this.priceInfo2.setData(this.getPriceInfo());
-            this.swapModal.visible = true;
-        }
-        onCloseModal(name) {
-            this[name].visible = false;
-        }
-        doSwap() {
-            this.approvalModelAction.doPayAction(this.record);
-        }
-        async updateTokenValues(token, isFrom) {
-            if (!token)
-                return;
-            const balance = this.getBalance(token);
-            if (isFrom) {
-                this.fromToken = token;
-                const enabled = !this.isMaxDisabled();
-                this.maxButton.enabled = enabled;
-                if (this.fromInputValue.gt(0)) {
-                    const formattedValue = new eth_wallet_5.BigNumber(this.fromInputValue).dp(token.decimals || 18, ROUNDING_NUMBER).toFixed();
-                    if (!this.fromInputValue.eq(formattedValue)) {
-                        if (this.firstTokenInput) {
-                            this.firstTokenInput.value = formattedValue === '0' ? '' : formattedValue;
-                        }
-                        this.fromInputValue = new eth_wallet_5.BigNumber(formattedValue);
-                    }
-                }
-                else if (this.fromInputValue.isZero()) {
-                    this.updateEstimatedPosition(true);
-                }
-                this.payBalance.caption = `Balance: ${(0, index_10.formatNumber)(balance, 4)} ${token.symbol}`;
-                this.updateTokenInput(true);
-            }
-            else {
-                this.toToken = token;
-                if (this.toInputValue.gt(0)) {
-                    const formattedValue = new eth_wallet_5.BigNumber(this.toInputValue).dp(token.decimals || 18, ROUNDING_NUMBER).toFixed();
-                    if (!this.toInputValue.eq(formattedValue)) {
-                        if (this.secondTokenInput) {
-                            this.secondTokenInput.value = formattedValue === '0' ? '' : formattedValue;
-                        }
-                        this.toInputValue = new eth_wallet_5.BigNumber(formattedValue);
-                    }
-                }
-                else if (this.toInputValue.isZero()) {
-                    this.updateEstimatedPosition(false);
-                }
-                this.receiveBalance.caption = `Balance: ${(0, index_10.formatNumber)(balance, 4)} ${token.symbol}`;
-                await this.updateTokenInput(false);
-            }
-        }
-        async onSelectToken(token, isFrom) {
-            if (!token)
-                return;
-            this.firstTokenInput.enabled = false;
-            this.secondTokenInput.enabled = false;
-            // if (token.isNew && this.state.isRpcWalletConnected()) {
-            //   const rpcWallet = this.state.getRpcWallet();
-            //   await tokenStore.updateAllTokenBalances(rpcWallet);
-            // }
-            await this.updateTokenValues(token, isFrom);
-            await this.handleAddRoute();
-            this.firstTokenInput.enabled = true;
-            this.secondTokenInput.enabled = true;
-        }
-        setApprovalSpenderAddress() {
-            const item = this.record;
-            if (!item)
-                return;
-            const market = this.state.getProviderByKey(item.provider)?.key || '';
-            if (this.approvalModelAction) {
-                if (this.isCrossChain && item.contractAddress) {
-                    (0, index_8.setApprovalModalSpenderAddress)(this.state, market, item.contractAddress);
-                }
-                else if (this._data.campaignId !== undefined) {
-                    this.contractAddress = this.state.getProxyAddress();
-                    (0, index_8.setApprovalModalSpenderAddress)(this.state, market, this.contractAddress);
-                }
-                else {
-                    (0, index_8.setApprovalModalSpenderAddress)(this.state, market);
-                }
-            }
-        }
-        getInputValue(isFrom) {
-            const token = isFrom ? this.fromToken : this.toToken;
-            const value = isFrom ? this.fromInputValue : this.toInputValue;
-            if (!value || value.isNaN())
+            if (!this.record) {
                 return '';
-            const newValue = value.dp(token?.decimals || 18, ROUNDING_NUMBER).toFixed();
-            return newValue;
+            }
+            if (this.record.key === 'Oracle' && (this.record.fromAmount.isZero() || this.record.toAmount.isZero())) {
+                return 'Circuit breaker triggered';
+            }
+            const balance = this.getBalance(this.fromToken);
+            if (this.maxSold.gt(balance)) {
+                return `Insufficient ${this.fromToken?.symbol} balance`;
+            }
+            if (this.record.priceImpact > 15 && !this.state.isExpertMode) {
+                return priceImpactTooHighMsg;
+            }
+            return '';
         }
-        async updateTokenInput(isFrom, init) {
-            const inputEl = isFrom ? this.firstTokenInput : this.secondTokenInput;
-            if (inputEl)
-                inputEl.value = this.getInputValue(isFrom);
-        }
-        async onSelectRouteItem(item) {
+        get minReceivedMaxSold() {
+            const slippageTolerance = this.state.slippageTolerance;
+            if (!slippageTolerance)
+                return null;
             if (this.isFrom) {
-                if (this.payCol.children) {
-                    let balanceValue = item.amountIn;
-                    this.firstTokenInput.value = this.fixedNumber(balanceValue);
-                    this.fromInputValue = typeof balanceValue !== 'object' ? new eth_wallet_5.BigNumber(balanceValue) : balanceValue;
-                }
+                const poolAmount = new eth_wallet_6.BigNumber(this.record?.amountIn);
+                if (poolAmount.isZero())
+                    return null;
+                const minReceivedMaxSold = poolAmount.times(1 + slippageTolerance / 100).toNumber();
+                return minReceivedMaxSold;
             }
             else {
-                if (this.receiveCol.children) {
-                    let balanceValue = item.amountOut;
-                    this.secondTokenInput.value = this.fixedNumber(balanceValue);
-                    this.toInputValue = typeof balanceValue !== 'object' ? new eth_wallet_5.BigNumber(balanceValue) : balanceValue;
-                }
-            }
-            this.record = item;
-            if (this.isCrossChain && this.fromToken && !this.fromToken.isNative && this.state.isRpcWalletConnected()) {
-                try {
-                    this.setApprovalSpenderAddress();
-                    await this.approvalModelAction.checkAllowance(this.fromToken, this.fromInputValue.toFixed());
-                }
-                catch (e) {
-                    console.log('Cannot check the Approval status (Cross Chain)', e);
-                }
-            }
-            const isButtonLoading = this.isButtonLoading();
-            if (this.swapBtn.rightIcon.visible != isButtonLoading) {
-                this.swapBtn.rightIcon.visible = isButtonLoading;
-            }
-            if (this.priceInfo)
-                await this.priceInfo.setData(this.getPriceInfo());
-        }
-        onTokenInputChange(source) {
-            clearTimeout(this.timeout);
-            this.timeout = setTimeout(async () => {
-                const fromInput = this.payCol.getElementsByTagName('I-INPUT')?.[0];
-                const toInput = this.receiveCol.getElementsByTagName('I-INPUT')?.[0];
-                const isFrom = source.isSameNode(fromInput);
-                const amount = source.value;
-                if ((0, index_10.isInvalidInput)(amount)) {
-                    this.resetValuesByInput();
-                    if (fromInput)
-                        fromInput.value = '0';
-                    if (toInput)
-                        toInput.value = '0';
-                    return;
-                }
-                const limit = (isFrom ? this.fromToken?.decimals : this.toToken?.decimals) || 18;
-                const value = new eth_wallet_5.BigNumber(amount).dp(limit, ROUNDING_NUMBER);
-                if (!value.gt(0)) {
-                    this.resetValuesByInput();
-                    if (isFrom && toInput) {
-                        toInput.value = '0';
-                    }
-                    else if (!isFrom && fromInput) {
-                        fromInput.value = '0';
-                    }
-                }
-                else {
-                    let valueChanged = false;
-                    const isLastDot = amount.indexOf('.') === amount.length - 1;
-                    if (isFrom) {
-                        if (!this.fromInputValue.eq(value)) {
-                            this.fromInputValue = value;
-                            this.updateEstimatedPosition(false);
-                            valueChanged = true;
-                        }
-                        if (!isLastDot)
-                            fromInput.value = value.toFixed();
-                    }
-                    else {
-                        if (!this.toInputValue.eq(value)) {
-                            this.toInputValue = value;
-                            this.updateEstimatedPosition(true);
-                            valueChanged = true;
-                        }
-                        if (!isLastDot)
-                            toInput.value = value.toFixed();
-                    }
-                    if (valueChanged)
-                        await this.handleAddRoute();
-                }
-            }, 1000);
-        }
-        resetValuesByInput() {
-            this.initRoutes();
-            if (this.priceInfo)
-                this.priceInfo.setData(this.getPriceInfo());
-            this.fromInputValue = new eth_wallet_5.BigNumber(0);
-            this.toInputValue = new eth_wallet_5.BigNumber(0);
-        }
-        initRoutes() {
-            this.record = null;
-            this.isPriceToggled = false;
-            this.swapBtn.visible = false;
-        }
-        async handleAddRoute() {
-            if (!this.fromToken || !this.toToken || !(this.fromInputValue.gt(0) || this.toInputValue.gt(0)))
-                return;
-            this.initRoutes();
-            let listRouting = [];
-            const useAPI = this._data.category === 'aggregator' || this._data.category === 'cross-chain-swap';
-            this.updateContractAddress();
-            if (!this.isCrossChain) {
-                listRouting = await (0, index_8.getAllRoutesData)(this.state, this.fromToken, this.toToken, this.fromInputValue, this.toInputValue, this.isFrom, useAPI);
-                listRouting = listRouting.map((v) => {
-                    return {
-                        ...v,
-                        isHybrid: false // market == Market.HYBRID,
-                    };
-                });
-            }
-            else if (this.srcChain && this.desChain) {
-                const tokenIn = Object.assign({}, this.fromToken);
-                const tokenOut = Object.assign({}, this.toToken);
-                listRouting = await (0, index_8.getCrossChainRouteOptions)(this.state, {
-                    fromChainId: this.srcChain.chainId,
-                    toChainId: this.desChain.chainId,
-                    tokenIn: tokenIn,
-                    tokenOut: tokenOut,
-                    amountIn: this.fromInputValue
-                });
-                listRouting = listRouting.map((v) => {
-                    let route = {};
-                    if (v.sourceRouteObj) {
-                        const amountOut = v.targetRouteObj ? v.targetRouteObj.amountOut : v.sourceRouteObj.amountOut;
-                        route = {
-                            ...v,
-                            ...v.sourceRouteObj,
-                            tradeFee: v.tradeFee,
-                            price: v.price,
-                            amountOut: new eth_wallet_5.BigNumber(amountOut),
-                        };
-                        if (v.targetRouteObj) {
-                            const market = this.state.getProviderByKey(v.targetRouteObj.provider)?.key || '';
-                            if (market) {
-                                route.targetRouteObj = {
-                                    ...route.targetRouteObj,
-                                    route: v.targetRouteObj.bestRoute,
-                                    isHybrid: false //market == Market.HYBRID,
-                                };
-                            }
-                            else {
-                                route.targetRouteObj = undefined;
-                            }
-                        }
-                    }
-                    else {
-                        route = {
-                            ...v,
-                            ...v.targetRouteObj,
-                            tradeFee: v.tradeFee,
-                            price: v.price,
-                        };
-                    }
-                    return { ...route, fromAmount: new eth_wallet_5.BigNumber(route.fromAmount) };
-                });
-                if (this.minSwapHintLabel) {
-                    this.minSwapHintLabel.visible = !listRouting.length;
-                }
-            }
-            if (listRouting[0] && this.isCrossChain) {
-                const assetSymbol = listRouting[0].targetVaultToken.symbol;
-                const { vaultAddress, vaultRegistryAddress, tokenAddress: vaultTokenAddress, softCap } = index_7.bridgeVaultConstantMap[assetSymbol === 'USDT.e' ? 'USDT' : assetSymbol][this.desChain.chainId];
-                const [vault, vaultAssetBalance, bonds, oraclePriceMap] = await Promise.all([
-                    (0, index_9.getBridgeVault)(this.state, this.desChain.chainId, vaultAddress),
-                    (0, index_9.getVaultAssetBalance)(this.desChain.chainId, vaultAddress),
-                    (0, index_9.getBondsInBridgeVault)(this.state, this.desChain.chainId, vaultRegistryAddress),
-                    (0, index_9.getOraclePriceMap)(this.desChain.chainId)
-                ]);
-                const assetBalance = vaultAssetBalance ?? 0;
-                const assetDecimal = listRouting[0].targetVaultToken.decimals;
-                const targetVaultAssetBalance = (new eth_wallet_5.BigNumber(assetBalance)).shiftedBy(-assetDecimal);
-                const targetVaultBondBalance = bonds.reduce((acc, cur) => {
-                    if (cur.chainId !== this.desChain?.chainId)
-                        return acc;
-                    acc = acc.plus((new eth_wallet_5.BigNumber(cur.bond)).shiftedBy(-18));
-                    return acc;
-                }, new eth_wallet_5.BigNumber(0));
-                const vaultTokenToTargetChain = new eth_wallet_5.BigNumber(listRouting[0].vaultTokenToTargetChain);
-                const vaultToUsdPrice = oraclePriceMap[vaultTokenAddress.toLowerCase()]; // This will be the vaultToken -> USD Price
-                const oswapToken = Object.values(scom_token_list_7.tokenStore.getTokenMapByChainId(this.desChain.chainId)).find(v => v.symbol === 'OSWAP');
-                const oswapToUsdPrice = oraclePriceMap[oswapToken.address.toLowerCase()];
-                const vaultToOswapPrice = vaultToUsdPrice.div(oswapToUsdPrice); // This will vaultToken -> oswap price;
-                this.targetVaultAssetBalanceLabel1.caption = `Vault Asset Balance: ${(0, index_10.formatNumber)(targetVaultAssetBalance.toNumber(), 4)} ${assetSymbol}`;
-                this.targetVaultAssetBalanceLabel2.caption = `Vault Asset Balance: ${(0, index_10.formatNumber)(targetVaultAssetBalance.toNumber(), 4)} ${assetSymbol}`;
-                if (!vault.vaultGroup) {
-                    this.targetVaultBondBalanceLabel1.caption = `Vault Bond Balance: ${(0, index_10.formatNumber)(targetVaultBondBalance.toNumber(), 4)} ${assetSymbol}`;
-                    this.targetVaultBondBalanceLabel2.caption = `Vault Bond Balance: ${(0, index_10.formatNumber)(targetVaultBondBalance.toNumber(), 4)} ${assetSymbol}`;
-                }
-                else if (vault.vaultGroup === 'OSWAP') {
-                    this.targetVaultBondBalanceLabel1.caption = `Vault Bond Balance: ${(0, index_10.formatNumber)(targetVaultBondBalance.toNumber(), 4)} OSWAP`;
-                    this.targetVaultBondBalanceLabel2.caption = `Vault Bond Balance: ${(0, index_10.formatNumber)(targetVaultBondBalance.toNumber(), 4)} OSWAP`;
-                }
-                else {
-                    this.targetVaultBondBalanceLabel1.caption = `Vault Bond Balance: ${(0, index_10.formatNumber)(targetVaultBondBalance.toNumber(), 4)} OSWAP &#8776; ${(0, index_10.formatNumber)(targetVaultBondBalance.div(vaultToOswapPrice).toNumber(), 4)} ${assetSymbol}`;
-                    this.targetVaultBondBalanceLabel2.caption = `Vault Bond Balance: ${(0, index_10.formatNumber)(targetVaultBondBalance.toNumber(), 4)} OSWAP &#8776; ${(0, index_10.formatNumber)(targetVaultBondBalance.div(vaultToOswapPrice).toNumber(), 4)} ${assetSymbol}`;
-                }
-                this.crossChainSoftCapLabel1.caption = softCap ? `Cap: ${(0, index_10.formatNumber)(softCap)} ${assetSymbol}` : "-";
-                this.crossChainSoftCapLabel2.caption = softCap ? `Cap: ${(0, index_10.formatNumber)(softCap)} ${assetSymbol}` : "-";
-                const minValue = eth_wallet_5.BigNumber.min(targetVaultAssetBalance, targetVaultBondBalance, softCap);
-                if (minValue.eq(targetVaultAssetBalance)) {
-                    this.targetVaultAssetBalanceLabel1.classList.add('text--limit');
-                    this.targetVaultAssetBalanceLabel2.classList.add('text--limit');
-                    this.targetVaultBondBalanceLabel1.classList.remove('text--limit');
-                    this.targetVaultBondBalanceLabel2.classList.remove('text--limit');
-                    this.crossChainSoftCapLabel1.classList.remove('text--limit');
-                    this.crossChainSoftCapLabel2.classList.remove('text--limit');
-                }
-                else if (minValue.eq(targetVaultBondBalance)) {
-                    this.targetVaultAssetBalanceLabel1.classList.remove('text--limit');
-                    this.targetVaultAssetBalanceLabel2.classList.remove('text--limit');
-                    this.targetVaultBondBalanceLabel1.classList.add('text--limit');
-                    this.targetVaultBondBalanceLabel2.classList.add('text--limit');
-                    this.crossChainSoftCapLabel1.classList.remove('text--limit');
-                    this.crossChainSoftCapLabel2.classList.remove('text--limit');
-                }
-                else {
-                    this.targetVaultAssetBalanceLabel1.classList.remove('text--limit');
-                    this.targetVaultAssetBalanceLabel2.classList.remove('text--limit');
-                    this.targetVaultBondBalanceLabel1.classList.remove('text--limit');
-                    this.targetVaultBondBalanceLabel2.classList.remove('text--limit');
-                    this.crossChainSoftCapLabel1.classList.add('text--limit');
-                    this.crossChainSoftCapLabel2.classList.add('text--limit');
-                }
-                if (softCap && vaultTokenToTargetChain.toNumber() >= softCap) {
-                    this.swapModalConfirmBtn.caption = 'Cap Reached';
-                    this.swapModalConfirmBtn.enabled = false;
-                }
-                else if (vaultTokenToTargetChain.gt(targetVaultAssetBalance) || vaultTokenToTargetChain.multipliedBy(vaultToOswapPrice).gt(targetVaultBondBalance)) {
-                    this.swapModalConfirmBtn.caption = 'Exceed Vault Asset Balance or Bond Balance';
-                    this.swapModalConfirmBtn.enabled = false;
-                }
-                else {
-                    this.swapModalConfirmBtn.enabled = true;
-                }
-                this.crossChainApprovalStatus = listRouting[0].isApproveButtonShown ? index_10.ApprovalStatus.TO_BE_APPROVED : index_10.ApprovalStatus.NONE;
-            }
-            this.disableSelectChain(false);
-            this.disableSelectChain(false, true);
-            this.swapModalConfirmBtn.caption = 'Confirm Swap';
-            this.swapModalConfirmBtn.enabled = true;
-            this.record = listRouting[0] || null;
-            this.swapButtonStatusMap = {};
-            this.approveButtonStatusMap = {};
-            this.initRoutes();
-            if (listRouting.length) {
-                // this.receiveCol.classList.add('bg-box--active');
-                this.lbRouting.opacity = 0;
-                const option = listRouting[0];
-                await this.onSelectRouteItem(option);
-            }
-            else {
-                // this.receiveCol.classList.remove('bg-box--active');
-                this.lbRouting.opacity = 0.75;
-                if (this.priceInfo)
-                    this.priceInfo.setData(this.getPriceInfo());
-                if (this.isEstimated('to')) {
-                    this.toInputValue = new eth_wallet_5.BigNumber(0);
-                    this.secondTokenInput.value = '';
-                }
-                else {
-                    this.fromInputValue = new eth_wallet_5.BigNumber(0);
-                    this.firstTokenInput.value = '';
-                }
-            }
-            if (this.record) {
-                this.setApprovalSpenderAddress();
-                await this.approvalModelAction.checkAllowance(this.fromToken, this.fromInputValue.toFixed(), this.record);
-                this.swapBtn.visible = true;
-                const total = this.record?.fromAmount ? new eth_wallet_5.BigNumber(this.record.fromAmount) : new eth_wallet_5.BigNumber(0);
-                this.lbYouPayTitle.caption = `You Pay`;
-                this.lbYouPayValue.caption = `${(0, index_10.formatNumber)(total)} ${this.fromToken?.symbol}`;
-            }
-            else {
-                this.updateSwapButtonCaption();
-                this.swapBtn.visible = true;
-                this.swapBtn.enabled = !this.isSwapButtonDisabled();
+                const poolAmount = new eth_wallet_6.BigNumber(this.record?.amountOut);
+                if (poolAmount.isZero())
+                    return null;
+                const minReceivedMaxSold = poolAmount.times(1 - slippageTolerance / 100).toNumber();
+                return minReceivedMaxSold;
             }
         }
-        // Price Info
-        onTogglePrice(priceInfo) {
-            this.isPriceToggled = !this.isPriceToggled;
-            priceInfo.setData(this.getPriceInfo());
+        get isMaxDisabled() {
+            const address = this.fromToken?.address || this.fromToken?.symbol;
+            let balance = this.getBalance(this.fromToken);
+            return !address || new eth_wallet_6.BigNumber(balance).isLessThanOrEqualTo(0);
         }
-        getRate() {
-            const value = this.isPriceToggled ? this.record?.priceSwap : this.record?.price;
-            let fromSymbol = this.fromToken?.symbol;
-            let toSymbol = this.toToken?.symbol;
-            if (this.isCrossChain) {
-                const srcName = this.srcChain?.chainName;
-                const desName = this.desChain?.chainName;
-                if (srcName) {
-                    fromSymbol = `${fromSymbol} (${srcName})`;
-                }
-                if (desName) {
-                    toSymbol = `${toSymbol} (${desName})`;
-                }
-            }
-            if (value || value == 0) {
-                if (this.isPriceToggled) {
-                    return `1 ${fromSymbol} &#8776; ${(0, index_10.formatNumber)(value)} ${toSymbol}`;
-                }
-                return `1 ${toSymbol} &#8776; ${(0, index_10.formatNumber)(value)} ${fromSymbol}`;
-            }
-            return '-';
-        }
-        getPriceImpact() {
+        get priceImpact() {
             const value = this.record?.priceImpact;
             if (value || value == 0) {
                 return `${(0, index_10.formatNumber)(value)}%`;
             }
             return '-';
         }
-        getMinimumReceived() {
-            const value = this.getMinReceivedMaxSold();
+        get minimumReceived() {
+            const value = this.minReceivedMaxSold;
             if (value || value == 0) {
                 if (this.isFrom) {
                     return `${(0, index_10.formatNumber)(value)} ${this.fromToken?.symbol}`;
@@ -4674,14 +4086,14 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
             }
             return '-';
         }
-        getTradeFeeExactAmount() {
-            const tradeFee = this.isCrossChain ? new eth_wallet_5.BigNumber(this.record?.tradeFee) : this.record?.fromAmount.times(this.record?.tradeFee);
+        get tradeFeeExactAmount() {
+            const tradeFee = this.isCrossChain ? new eth_wallet_6.BigNumber(this.record?.tradeFee) : this.record?.fromAmount.times(this.record?.tradeFee);
             if (tradeFee && !tradeFee.isNaN()) {
                 return `${(0, index_10.formatNumber)(tradeFee)} ${this.fromToken?.symbol}`;
             }
             return '-';
         }
-        getFeeDetails() {
+        get feeDetails() {
             if (this.isCrossChain && this.record) {
                 let record = this.record;
                 let detail = [
@@ -4729,84 +4141,9 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
             }
             return [];
         }
-        getPriceInfo() {
-            const rate = this.getRate();
-            const priceImpact = this.getPriceImpact();
-            const minimumReceived = this.getMinimumReceived();
-            const tradeFeeExactAmount = this.getTradeFeeExactAmount();
-            const fees = this.getFeeDetails();
-            const countFees = fees.length;
-            let feeTooltip;
-            if (countFees === 1) {
-                const fee = fees[0];
-                feeTooltip = `${fee.description}`;
-            }
-            else if (countFees > 1) {
-                feeTooltip = fees;
-            }
-            let info = [
-                {
-                    title: "Rate",
-                    value: this.isValidToken ? rate : '-',
-                    isToggleShown: this.record && this.isValidToken,
-                },
-                {
-                    title: "Price Impact",
-                    value: this.isValidToken ? priceImpact : '-',
-                    isHidden: this.isCrossChain,
-                },
-                {
-                    title: this.isFrom ? "Maximum Sold" : "Minimum Received",
-                    value: this.isValidToken ? minimumReceived : '-',
-                },
-                {
-                    title: "Transaction Fee",
-                    value: this.isValidToken ? tradeFeeExactAmount : '-',
-                    tooltip: feeTooltip,
-                    onClick: countFees > 1 ? () => this.showModalFees() : null
-                },
-                {
-                    title: "Estimated Time",
-                    value: this.isValidToken && this.record ? '30 seconds' : '-',
-                    isHidden: !this.isCrossChain
-                }
-            ];
-            return info.filter((f) => !f.isHidden);
-        }
-        getBalance(token) {
-            if (!token)
-                return '0';
-            let tokenBalances = scom_token_list_7.tokenStore.getTokenBalancesByChainId(token.chainId);
-            if (!tokenBalances)
-                return '0';
-            const address = token.address || '';
-            let balance = address ? tokenBalances[address.toLowerCase()] ?? '0' : tokenBalances[token.symbol] || '0';
-            return balance;
-        }
-        async updateBalances() {
-            const chainIds = [...new Set([this.fromToken.chainId, this.toToken.chainId])];
-            for (let chainId of chainIds) {
-                await scom_token_list_7.tokenStore.updateTokenBalancesByChainId(chainId);
-            }
-            if (this.fromToken) {
-                const balance = this.getBalance(this.fromToken);
-                this.payBalance.caption = `Balance: ${(0, index_10.formatNumber)(balance, 4)} ${this.fromToken.symbol}`;
-            }
-            if (this.toToken) {
-                const balance = this.getBalance(this.toToken);
-                this.receiveBalance.caption = `Balance: ${(0, index_10.formatNumber)(balance, 4)} ${this.toToken.symbol}`;
-            }
-            const enabled = !this.isMaxDisabled();
-            this.maxButton.enabled = enabled;
-        }
-        updateSwapButtonCaption() {
-            if (this.swapBtn && this.swapBtn.hasChildNodes()) {
-                this.swapBtn.caption = this.determineSwapButtonCaption();
-            }
-        }
-        determineSwapButtonCaption() {
+        get determineSwapButtonCaption() {
             const isApproveButtonShown = this.isCrossChain ? this.crossChainApprovalStatus !== index_10.ApprovalStatus.NONE : this.isApproveButtonShown;
-            if (!(0, index_7.isClientWalletConnected)()) {
+            if (!(0, index_9.isClientWalletConnected)()) {
                 return "Connect Wallet";
             }
             if (!this.state.isRpcWalletConnected()) {
@@ -4838,59 +4175,1043 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                 return "Swap";
             }
         }
-        getWarningMessageText() {
-            const tokens = [this.fromToken?.symbol, this.toToken?.symbol];
-            if (tokens.every(v => v === 'ETH' || v === 'WETH')) {
-                return 'Invalid pair';
-            }
-            if (!this.record) {
-                return '';
-            }
-            if (this.record.key === 'Oracle' && (this.record.fromAmount.isZero() || this.record.toAmount.isZero())) {
-                return 'Circuit breaker triggered';
-            }
-            const balance = this.getBalance(this.fromToken);
-            if (this.maxSold.gt(balance)) {
-                return `Insufficient ${this.fromToken?.symbol} balance`;
-            }
-            if (this.record.priceImpact > 15 && !this.state.isExpertMode) {
-                return priceImpactTooHighMsg;
-            }
-            return '';
+    }
+    exports.SwapModel = SwapModel;
+});
+define("@scom/scom-swap/model/index.ts", ["require", "exports", "@scom/scom-swap/model/configModel.ts", "@scom/scom-swap/model/swapModel.ts"], function (require, exports, configModel_1, swapModel_1) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.SwapModel = exports.ConfigModel = void 0;
+    Object.defineProperty(exports, "ConfigModel", { enumerable: true, get: function () { return configModel_1.ConfigModel; } });
+    Object.defineProperty(exports, "SwapModel", { enumerable: true, get: function () { return swapModel_1.SwapModel; } });
+});
+define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstech/eth-wallet", "@scom/scom-swap/store/index.ts", "@scom/scom-token-list", "@scom/scom-swap/swap-utils/index.ts", "@scom/scom-swap/global/index.ts", "@scom/scom-swap/expert-mode-settings/index.tsx", "@scom/scom-swap/data.json.ts", "@scom/scom-dex-list", "@scom/scom-swap/index.css.ts", "@scom/scom-swap/model/index.ts"], function (require, exports, components_9, eth_wallet_7, index_13, scom_token_list_9, index_14, index_15, index_16, data_json_2, scom_dex_list_2, index_css_2, model_1) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    const Theme = components_9.Styles.Theme.ThemeVars;
+    const ROUNDING_NUMBER = eth_wallet_7.BigNumber.ROUND_DOWN;
+    let ScomSwap = class ScomSwap extends components_9.Module {
+        static async create(options, parent) {
+            let self = new this(parent, options);
+            await self.ready();
+            return self;
         }
-        setMapStatus(type, key, status) {
-            if (type === 'approve') {
-                let mapStatus = this.approveButtonStatusMap;
-                mapStatus[key] = status;
-                this.approveButtonStatusMap = {
-                    ...mapStatus
-                };
+        removeRpcWalletEvents() {
+            this.configModel.removeRpcWalletEvents();
+        }
+        onHide() {
+            this.dappContainer.onHide();
+            this.removeRpcWalletEvents();
+            for (let event of this.clientEvents) {
+                event.unregister();
+            }
+            this.clientEvents = [];
+        }
+        initModels() {
+            if (!this.state) {
+                this.state = new index_13.State(data_json_2.default);
+            }
+            if (!this.configModel) {
+                this.configModel = new model_1.ConfigModel(this.state, this, {
+                    updateContractAddress: () => this.updateContractAddress(),
+                    refreshWidget: () => this.refreshWidget(),
+                    refreshDappContainer: () => this.refreshDappContainer(),
+                    setContaiterTag: (value) => this.setContaiterTag(value),
+                    updateTheme: () => this.updateTheme(),
+                    onChainChanged: () => this.onChainChanged(),
+                    onWalletConnected: () => this.onWalletConnected()
+                });
+            }
+            if (!this.swapModel) {
+                this.swapModel = new model_1.SwapModel(this.state, this.configModel, {
+                    setHintLabel: (value) => {
+                        if (this.minSwapHintLabel)
+                            this.minSwapHintLabel.visible = value;
+                    },
+                    showModalFees: () => this.showModalFees()
+                });
+            }
+        }
+        get chainId() {
+            return this.configModel.chainId;
+        }
+        get rpcWallet() {
+            return this.configModel.rpcWallet;
+        }
+        get category() {
+            return this.configModel.category;
+        }
+        set category(value) {
+            this.configModel.category = value;
+        }
+        get providers() {
+            return this.configModel.providers;
+        }
+        set providers(value) {
+            this.configModel.providers = value;
+        }
+        get commissions() {
+            return this.configModel.commissions ?? [];
+        }
+        set commissions(value) {
+            this.configModel.commissions = value;
+        }
+        get defaultChainId() {
+            return this.configModel.defaultChainId;
+        }
+        set defaultChainId(value) {
+            this.configModel.defaultChainId = value;
+        }
+        get wallets() {
+            return this.configModel.wallets;
+        }
+        set wallets(value) {
+            this.configModel.wallets = value;
+        }
+        get networks() {
+            return this.configModel.networks ?? [];
+        }
+        set networks(value) {
+            this.configModel.networks = value;
+        }
+        get showHeader() {
+            return this.configModel.showHeader;
+        }
+        set showHeader(value) {
+            this.configModel.showHeader = value;
+        }
+        get title() {
+            return this.configModel.title;
+        }
+        set title(value) {
+            this.configModel.title = value ?? '';
+        }
+        get logo() {
+            return this.configModel.logo;
+        }
+        set logo(value) {
+            this.configModel.logo = value ?? '';
+        }
+        set width(value) {
+            this.resizeLayout();
+        }
+        getConfigurators() {
+            this.initModels();
+            return this.configModel.getConfigurators();
+        }
+        getData() {
+            return this.configModel.getData();
+        }
+        async setData(value) {
+            this.configModel.setData(value);
+        }
+        getTag() {
+            return this.tag;
+        }
+        async setTag(value) {
+            this.configModel.setTag(value);
+        }
+        setContaiterTag(value) {
+            if (this.dappContainer)
+                this.dappContainer.setTag(value);
+        }
+        updateStyle(name, value) {
+            if (value) {
+                this.style.setProperty(name, value);
             }
             else {
-                let mapStatus = this.swapButtonStatusMap;
-                mapStatus[key] = status;
-                this.swapButtonStatusMap = {
-                    ...mapStatus
+                this.style.removeProperty(name);
+            }
+        }
+        updateTheme() {
+            const themeVar = this.dappContainer?.theme || 'light';
+            this.updateStyle('--text-primary', this.tag[themeVar]?.fontColor);
+            this.updateStyle('--background-main', this.tag[themeVar]?.backgroundColor);
+            this.updateStyle('--input-font_color', this.tag[themeVar]?.inputFontColor);
+            this.updateStyle('--input-background', this.tag[themeVar]?.inputBackgroundColor);
+            //FIXME: temporary solution
+            this.updateStyle('--primary-button-background', this.tag[themeVar]?.primaryButtonBackground || 'transparent linear-gradient(90deg, #AC1D78 0%, #E04862 100%) 0% 0% no-repeat padding-box');
+            this.updateStyle('--primary-button-hover-background', this.tag[themeVar]?.primaryButtonHoverBackground || 'linear-gradient(255deg,#f15e61,#b52082)');
+            this.updateStyle('--primary-button-disabled-background', this.tag[themeVar]?.primaryButtonDisabledBackground || 'transparent linear-gradient(270deg,#351f52,#552a42) 0% 0% no-repeat padding-box');
+            this.updateStyle('--max-button-background', this.tag[themeVar]?.maxButtonBackground || 'transparent linear-gradient(255deg,#e75b66,#b52082) 0% 0% no-repeat padding-box');
+            this.updateStyle('--max-button-hover-background', this.tag[themeVar]?.maxButtonHoverBackground || 'linear-gradient(255deg,#f15e61,#b52082)');
+        }
+        updateContractAddress() {
+            if (this.approvalModelAction) {
+                if (this.configModel.campaignId !== undefined) {
+                    this.contractAddress = this.state.getProxyAddress();
+                }
+                else {
+                    this.contractAddress = '';
+                }
+                this.setApprovalSpenderAddress();
+            }
+        }
+        async refreshWidget() {
+            this.swapModel.setProviders();
+            await this.initData();
+            await this.initializeWidgetConfig();
+        }
+        constructor(parent, options) {
+            super(parent, options);
+            this.tag = {};
+            this.isInited = false;
+            this.clientEvents = [];
+            this.refreshDappContainer = () => {
+                const rpcWallet = this.rpcWallet;
+                const data = {
+                    defaultChainId: this.defaultChainId,
+                    wallets: this.wallets,
+                    networks: this.networks,
+                    showHeader: this.showHeader,
+                    rpcWalletId: rpcWallet.instanceId
                 };
+                if (this.dappContainer?.setData)
+                    this.dappContainer.setData(data);
+            };
+            this.onChainChanged = async () => {
+                const currentChainId = this.state.getChainId();
+                if (currentChainId != null && currentChainId != undefined)
+                    this.swapBtn.visible = true;
+                this.updateContractAddress();
+                await this.initializeWidgetConfig();
+            };
+            this.onWalletConnected = async () => {
+                if (this.swapBtn)
+                    this.swapBtn.visible = true;
+                this.updateContractAddress();
+                await this.initializeWidgetConfig();
+            };
+            this.initializeWidgetConfig = async () => {
+                setTimeout(async () => {
+                    await this.configModel.initWallet();
+                    this.initializeDefaultTokenPair();
+                    await this.renderChainList();
+                    await this.updateBalances();
+                    const { fromToken, toToken, record, isCrossChain, fromInputValue, toInputValue } = this.swapModel;
+                    const isFixedPair = this.configModel.isFixedPair;
+                    this.updateTokenValues(fromToken, true);
+                    this.updateTokenValues(toToken, false);
+                    this.hIcon.enabled = this.vIcon.enabled = !isFixedPair && !isCrossChain;
+                    this.firstTokenInput.tokenReadOnly = isFixedPair;
+                    this.firstTokenInput.inputReadOnly = false;
+                    this.secondTokenInput.tokenReadOnly = isFixedPair;
+                    this.secondTokenInput.inputReadOnly = false;
+                    const { logo, title, tokens } = this.configModel;
+                    this.pnlBranding.visible = !!logo || !!title;
+                    if (logo?.startsWith('ipfs://')) {
+                        this.imgLogo.url = logo.replace('ipfs://', '/ipfs/');
+                    }
+                    else {
+                        this.imgLogo.url = logo;
+                    }
+                    this.lbTitle.caption = title;
+                    this.updateSwapButtonCaption();
+                    this.toggleReverseImage.cursor = isFixedPair ? 'default' : 'pointer';
+                    if (isCrossChain) {
+                        this.initRoutes();
+                        this.swapModel.toInputValue = new eth_wallet_7.BigNumber(0);
+                        if (this.secondTokenInput) {
+                            this.secondTokenInput.value = '-';
+                            this.secondTokenInput.inputReadOnly = true;
+                        }
+                        this.toggleReverseImage.cursor = 'default';
+                        if (this.swapModel.isEstimated('from')) {
+                            this.swapModel.updateEstimatedPosition(false);
+                        }
+                    }
+                    else {
+                        if (this.secondTokenInput) {
+                            this.secondTokenInput.inputReadOnly = false;
+                        }
+                        this.toggleReverseImage.cursor = 'pointer';
+                    }
+                    if (fromInputValue.isGreaterThan(0)) {
+                        this.swapModel.updateEstimatedPosition(false);
+                        this.firstTokenInput.value = this.swapModel.fixedNumber(fromInputValue);
+                    }
+                    else if (toInputValue.isGreaterThan(0)) {
+                        this.swapModel.updateEstimatedPosition(true);
+                        this.secondTokenInput.value = this.swapModel.fixedNumber(toInputValue);
+                    }
+                    this.firstTokenInput.tokenDataListProp = (0, index_13.getSupportedTokens)(tokens, fromToken.chainId);
+                    this.secondTokenInput.tokenDataListProp = (0, index_13.getSupportedTokens)(tokens, toToken.chainId);
+                    if (!record)
+                        this.swapBtn.enabled = !this.swapModel.isSwapButtonDisabled;
+                    this.renderPriceInfo();
+                    await this.handleAddRoute();
+                });
+            };
+            this.onSwapConfirming = (key) => {
+                this.swapModel.setMapStatus('swap', key, index_15.ApprovalStatus.APPROVING);
+                this.updateSwapButtonCaption();
+                if (!this.swapBtn.rightIcon.visible)
+                    this.swapBtn.rightIcon.visible = true;
+            };
+            this.onSwapConfirmed = async (data) => {
+                const { key, isCrossChain } = data;
+                this.swapModel.setMapStatus('swap', key, index_15.ApprovalStatus.TO_BE_APPROVED);
+                this.updateSwapButtonCaption();
+                if (this.swapBtn.rightIcon.visible)
+                    this.swapBtn.rightIcon.visible = false;
+                await this.handleAddRoute();
+            };
+            this.onSubmit = async () => {
+                const { fromInputValue, fromToken, toInputValue, toToken } = this.swapModel;
+                this.swapModal.visible = false;
+                this.showResultMessage('warning', `Swapping ${(0, index_15.formatNumber)(fromInputValue, 4)} ${fromToken?.symbol} to ${(0, index_15.formatNumber)(toInputValue, 4)} ${toToken?.symbol}`);
+                const error = await this.swapModel.onSubmit();
+                if (error) {
+                    this.showResultMessage('error', error);
+                }
+            };
+            this.approveRouterMax = () => {
+                this.showResultMessage('warning', 'Approving');
+                this.setApprovalSpenderAddress();
+                const { fromToken, fromInputValue, record } = this.swapModel;
+                this.approvalModelAction.doApproveAction(fromToken, fromInputValue.toFixed(), record);
+            };
+            this.onSetMaxBalance = async () => {
+                const fromToken = this.swapModel.fromToken;
+                if (!fromToken?.symbol)
+                    return;
+                this.swapModel.isFrom = false;
+                const address = fromToken?.address || fromToken?.symbol;
+                let balance = this.swapModel.getBalance(fromToken);
+                let inputVal = new eth_wallet_7.BigNumber(balance);
+                if (!address) {
+                    inputVal = new eth_wallet_7.BigNumber(0);
+                }
+                if (inputVal.eq(this.swapModel.fromInputValue))
+                    return;
+                this.swapModel.fromInputValue = inputVal;
+                const decimals = fromToken?.decimals || 18;
+                this.firstTokenInput.value = this.swapModel.fromInputValue.dp(decimals, ROUNDING_NUMBER).toFixed();
+                await this.handleAddRoute();
+            };
+            this.disableSelectChain = (disabled, isDes) => {
+                const chains = isDes ? this.desChainList : this.srcChainList;
+                const imgs = chains.querySelectorAll('i-image');
+                imgs.forEach((elm) => {
+                    const img = elm;
+                    img.enabled = !disabled;
+                    if (disabled) {
+                        img.cursor = 'default';
+                    }
+                    else {
+                        img.cursor = 'pointer';
+                    }
+                });
+            };
+            this.selectSourceChain = async (obj, img) => {
+                const { isCrossChainEnabled, srcChain, bridgeSupportedChainList } = this.swapModel;
+                if (!isCrossChainEnabled)
+                    return;
+                this.disableSelectChain(true, false);
+                const selected = this.srcChainList.querySelector('.icon-selected');
+                selected && this.updateChainIcon(selected, false);
+                const oldSourceChain = srcChain;
+                try {
+                    this.swapModel.srcChain = obj;
+                    if (img) {
+                        this.updateChainIcon(img, true);
+                    }
+                    else {
+                        const currentNetwork = (0, index_13.getNetworkInfo)(bridgeSupportedChainList.find((f) => f.chainId == obj.chainId)?.chainId);
+                        const img = this.srcChainList.querySelector(`[data-tooltip="${currentNetwork?.chainName}"]`);
+                        if (img)
+                            this.updateChainIcon(img, true);
+                    }
+                }
+                catch (err) {
+                    console.log('err', err);
+                    if (oldSourceChain) {
+                        this.swapModel.srcChain = oldSourceChain;
+                        if (selected)
+                            this.updateChainIcon(selected, true);
+                    }
+                    else {
+                        this.swapModel.srcChain = (0, index_13.getNetworkInfo)(bridgeSupportedChainList[0]?.chainId);
+                        const elm = this.srcChainList?.firstElementChild;
+                        elm && this.updateChainIcon(elm, true);
+                    }
+                }
+                if (this.swapModel.srcChain) {
+                    this.srcChainLabel.caption = this.swapModel.srcChain.chainName;
+                }
+                this.firstTokenInput.tokenDataListProp = (0, index_13.getSupportedTokens)(this.configModel.tokens, this.swapModel.srcChain.chainId);
+                this.disableSelectChain(false, false);
+            };
+            this.selectDestinationChain = async (obj, img) => {
+                const { isCrossChainEnabled, desChain, bridgeSupportedChainList } = this.swapModel;
+                if (!isCrossChainEnabled)
+                    return;
+                this.disableSelectChain(true, true);
+                const selected = this.desChainList.querySelector('.icon-selected');
+                selected && this.updateChainIcon(selected, false);
+                const oldDestinationChain = desChain;
+                try {
+                    this.swapModel.desChain = obj;
+                    if (img) {
+                        this.updateChainIcon(img, true);
+                    }
+                    else {
+                        const currentNetwork = (0, index_13.getNetworkInfo)(bridgeSupportedChainList.find((f) => f.chainId == obj.chainId)?.chainId);
+                        const img = this.desChainList.querySelector(`[data-tooltip="${currentNetwork?.chainName}"]`);
+                        img && this.updateChainIcon(img, true);
+                    }
+                }
+                catch (err) {
+                    console.log('err', err);
+                    if (oldDestinationChain) {
+                        this.swapModel.desChain = oldDestinationChain;
+                        selected && this.updateChainIcon(selected, true);
+                    }
+                    else {
+                        this.swapModel.desChain = (0, index_13.getNetworkInfo)(bridgeSupportedChainList[0]?.chainId);
+                        const elm = this.desChainList?.firstElementChild;
+                        elm && this.updateChainIcon(elm, true);
+                    }
+                }
+                if (this.swapModel.desChain) {
+                    this.desChainLabel.caption = this.swapModel.desChain.chainName;
+                }
+                // this.setTargetTokenList();
+                this.secondTokenInput.tokenDataListProp = (0, index_13.getSupportedTokens)(this.configModel.tokens, this.swapModel.desChain.chainId);
+                this.disableSelectChain(false, true);
+            };
+            this.onSelectSourceChain = async (obj, img) => {
+                this.firstTokenInput.chainId = obj.chainId;
+                if (obj.chainId === this.swapModel.srcChain?.chainId)
+                    return;
+                const rpcWallet = this.state.getRpcWallet();
+                await rpcWallet.switchNetwork(obj.chainId);
+            };
+            this.onSelectDestinationChain = async (obj, img) => {
+                this.secondTokenInput.chainId = obj.chainId;
+                if (obj.chainId === this.swapModel.desChain?.chainId)
+                    return;
+                await this.selectDestinationChain(obj, img);
+                const tokenList = (0, index_13.getSupportedTokens)(this.configModel.tokens, obj.chainId);
+                this.swapModel.toToken = tokenList[0];
+                this.secondTokenInput.token = this.swapModel.toToken;
+                await scom_token_list_9.tokenStore.updateTokenBalancesByChainId(obj.chainId);
+                const balance = this.swapModel.getBalance(this.swapModel.toToken);
+                this.receiveBalance.caption = `Balance: ${(0, index_15.formatNumber)(balance, 4)} ${this.swapModel.toToken.symbol}`;
+                const enabled = !this.swapModel.isMaxDisabled;
+                this.maxButton.enabled = enabled;
+                await this.updateTokenValues(this.swapModel.toToken, false);
+                await this.handleAddRoute();
+            };
+            this.initChainIcon = (network, isDes) => {
+                const img = new components_9.Image(undefined, {
+                    width: 32,
+                    height: 32,
+                    margin: { top: '0.25rem', right: '0.5rem' },
+                    border: { radius: '50%', width: '2px', style: 'solid', color: 'transparent' },
+                    padding: { top: '0.25rem', right: '0.25rem', bottom: '0.25rem', left: '0.25rem' },
+                    url: network.image,
+                    tooltip: { content: network.chainName },
+                    cursor: 'pointer'
+                });
+                // img.url = network.image;
+                // img.tooltip.content = network.chainName;
+                img.classList.add('chain-icon');
+                img.setAttribute('data-tooltip', network.chainName); // for query
+                if (isDes) {
+                    img.onClick = () => this.onSelectDestinationChain(network, img);
+                    this.desChainList.appendChild(img);
+                }
+                else {
+                    if (!this.isMetaMask) {
+                        img.tooltip.content = `Swap supports this network ${network.chainName} (${network.chainId}), please switch network in the connected wallet.`;
+                        img.cursor = 'default';
+                    }
+                    img.setAttribute('network-name', network.chainName);
+                    img.setAttribute('chain-id', `${network.chainId}`);
+                    img.onClick = () => this.onSelectSourceChain(network, img);
+                    this.srcChainList.appendChild(img);
+                }
+            };
+            this.renderChainList = async () => {
+                if (!this.configModel.isCrossChainSwap)
+                    return;
+                this.swapModel.updateBridgeSupportChainList();
+                const { bridgeSupportedChainList, fromToken, toToken } = this.swapModel;
+                if (bridgeSupportedChainList.length < 2)
+                    return;
+                this.srcChainList.innerHTML = '';
+                this.desChainList.innerHTML = '';
+                this.swapModel.srcChain = undefined;
+                this.swapModel.desChain = undefined;
+                bridgeSupportedChainList.forEach((v) => {
+                    const network = (0, index_13.getNetworkInfo)(v.chainId);
+                    this.initChainIcon(network, false);
+                    this.initChainIcon(network, true);
+                });
+                const firstChainId = fromToken?.chainId;
+                const secondChainId = toToken?.chainId;
+                if (firstChainId && secondChainId) {
+                    const firstNetwork = (0, index_13.getNetworkInfo)(firstChainId);
+                    const secondNetwork = (0, index_13.getNetworkInfo)(secondChainId);
+                    await this.selectSourceChain(firstNetwork);
+                    await this.selectDestinationChain(secondNetwork);
+                }
+                this.srcChainBox.visible = true;
+                this.desChainBox.visible = true;
+            };
+            this.showModalFees = () => {
+                const { feeDetails, fromToken, tradeFeeExactAmount } = this.swapModel;
+                this.feesInfo.clearInnerHTML();
+                feeDetails.forEach((fee) => {
+                    const feeValue = components_9.FormatUtils.formatNumber(fee.value.toFixed(), { decimalFigures: 4 });
+                    this.feesInfo.appendChild(this.$render("i-hstack", { horizontalAlignment: "space-between", verticalAlignment: "center", margin: { top: 10 }, border: { bottom: { color: Theme.background.main, width: '2px', style: 'solid' } }, padding: { bottom: 16 } },
+                        this.$render("i-hstack", { verticalAlignment: "center" },
+                            this.$render("i-label", { caption: fee.title, margin: { right: 4 } }),
+                            this.$render("i-icon", { name: "question-circle", width: 15, height: 15, fill: Theme.text.primary, tooltip: { content: fee.description }, "data-placement": "right" })),
+                        this.$render("i-label", { margin: { left: 'auto' }, caption: `${feeValue} ${fromToken?.symbol}` })));
+                });
+                this.feesInfo.appendChild(this.$render("i-hstack", { horizontalAlignment: "space-between", verticalAlignment: "center", margin: { top: 16 } },
+                    this.$render("i-hstack", { verticalAlignment: "center" },
+                        this.$render("i-label", { caption: "Total Transaction Fee" })),
+                    this.$render("i-label", { margin: { left: 'auto' }, caption: tradeFeeExactAmount })));
+                this.modalFees.visible = true;
+            };
+            this.closeModalFees = () => {
+                this.modalFees.visible = false;
+            };
+            this.showResultMessage = (status, content) => {
+                if (!this.txStatusModal)
+                    return;
+                let params = { status };
+                if (status === 'success') {
+                    params.txtHash = content;
+                }
+                else {
+                    params.content = content;
+                }
+                this.txStatusModal.message = { ...params };
+                this.txStatusModal.showModal();
+            };
+            this.initModels();
+        }
+        registerEvent() {
+            this.clientEvents.push(this.$eventBus.register(this, "SlippageToleranceChanged" /* EventId.SlippageToleranceChanged */, () => { this.priceInfo.setData(this.swapModel.getPriceInfo(this.isPriceToggled)); }));
+            this.clientEvents.push(this.$eventBus.register(this, "ExpertModeChanged" /* EventId.ExpertModeChanged */, () => {
+                this.updateSwapButtonCaption();
+            }));
+        }
+        initializeDefaultTokenPair() {
+            if (this.swapModel.isCrossChain) {
+                let { firstDefaultToken, secondDefaultToken } = this.swapModel.calculateDefaultTokens();
+                this.firstTokenInput.chainId = firstDefaultToken.chainId;
+                this.secondTokenInput.chainId = secondDefaultToken.chainId;
+                this.swapModel.fromInputValue = new eth_wallet_7.BigNumber(this.configModel.defaultInputValue);
+                this.firstTokenInput.token = this.swapModel.fromToken;
+                this.secondTokenInput.token = this.swapModel.toToken;
+            }
+            else {
+                const providers = this.swapModel.originalData?.providers;
+                if (providers && providers.length) {
+                    let { firstDefaultToken, secondDefaultToken } = this.swapModel.calculateDefaultTokens();
+                    this.firstTokenInput.chainId = firstDefaultToken.chainId;
+                    this.secondTokenInput.chainId = secondDefaultToken.chainId;
+                    this.swapModel.fromInputValue = new eth_wallet_7.BigNumber(this.configModel.defaultInputValue);
+                    this.swapModel.toInputValue = new eth_wallet_7.BigNumber(this.configModel.defaultOutputValue);
+                    this.firstTokenInput.token = this.swapModel.fromToken;
+                    this.secondTokenInput.token = this.swapModel.toToken;
+                    this.toggleReverseImage.cursor = 'default';
+                }
             }
         }
-        isButtonLoading() {
-            if (this.isApproveButtonShown || (this.isCrossChain && this.crossChainApprovalStatus === index_10.ApprovalStatus.APPROVING)) {
-                return this.isApprovingRouter;
-            }
-            return this.isSwapping;
+        async initApprovalModelAction() {
+            this.approvalModelAction = await this.state.setApprovalModelAction({
+                sender: this,
+                payAction: this.onSubmit,
+                onToBeApproved: async (token, data) => {
+                    if (this.swapModel.isCrossChain) {
+                        this.swapModel.crossChainApprovalStatus = index_15.ApprovalStatus.TO_BE_APPROVED;
+                    }
+                    else {
+                        this.swapModel.setMapStatus('approve', data.key, index_15.ApprovalStatus.TO_BE_APPROVED);
+                        this.swapModel.setMapStatus('swap', data.key, index_15.ApprovalStatus.TO_BE_APPROVED);
+                    }
+                    this.updateSwapButtonCaption();
+                    const enabled = !this.swapModel.isSwapButtonDisabled;
+                    this.swapBtn.enabled = enabled;
+                },
+                onToBePaid: async (token, data) => {
+                    if (this.swapModel.isCrossChain) {
+                        this.swapModel.crossChainApprovalStatus = index_15.ApprovalStatus.NONE;
+                    }
+                    else {
+                        this.swapModel.setMapStatus('approve', data.key, index_15.ApprovalStatus.NONE);
+                        this.swapModel.setMapStatus('swap', data.key, index_15.ApprovalStatus.TO_BE_APPROVED);
+                    }
+                    this.updateSwapButtonCaption();
+                    const enabled = !this.swapModel.isSwapButtonDisabled;
+                    this.swapBtn.enabled = enabled;
+                },
+                onApproving: async (token, receipt, data) => {
+                    if (this.swapModel.isCrossChain) {
+                        this.swapModel.crossChainApprovalStatus = index_15.ApprovalStatus.APPROVING;
+                    }
+                    else {
+                        this.swapModel.setMapStatus('approve', data.key, index_15.ApprovalStatus.APPROVING);
+                    }
+                    this.updateSwapButtonCaption();
+                    this.showResultMessage('success', receipt);
+                    if ((this.swapModel.isApprovingRouter || this.swapModel.isCrossChain) && !this.swapBtn.rightIcon.visible)
+                        this.swapBtn.rightIcon.visible = true;
+                },
+                onApproved: async (token, data) => {
+                    if (this.swapModel.isCrossChain) {
+                        this.swapModel.crossChainApprovalStatus = index_15.ApprovalStatus.NONE;
+                    }
+                    else {
+                        this.swapModel.setMapStatus('approve', data.key, index_15.ApprovalStatus.NONE);
+                    }
+                    this.updateSwapButtonCaption();
+                    if (this.swapBtn.rightIcon.visible)
+                        this.swapBtn.rightIcon.visible = false;
+                    await this.handleAddRoute();
+                },
+                onApprovingError: async (token, err) => {
+                    this.showResultMessage('error', err);
+                    this.swapModel.crossChainApprovalStatus = index_15.ApprovalStatus.TO_BE_APPROVED;
+                    if (this.swapBtn.rightIcon.visible)
+                        this.swapBtn.rightIcon.visible = false;
+                },
+                onPaying: async (receipt, data) => {
+                    this.showResultMessage('success', receipt);
+                    this.onSwapConfirming(data.key);
+                },
+                onPaid: async (data, receipt) => {
+                    this.onSwapConfirmed({ key: data.key, isCrossChain: this.swapModel.isCrossChain });
+                    await this.updateBalances();
+                    components_9.application.EventBus.dispatch("Paid" /* EventId.Paid */, {
+                        isCrossChain: this.swapModel.isCrossChain,
+                        data: data ?? null,
+                        id: this.uuid,
+                        receipt: receipt
+                    });
+                },
+                onPayingError: async (err) => {
+                    this.showResultMessage('error', err);
+                }
+            });
         }
-        isSwapButtonDisabled() {
-            if ((0, index_7.isClientWalletConnected)() && this.state.isRpcWalletConnected() && !this.record) {
-                return true;
+        async onRevertSwap() {
+            if (this.swapModel.isCrossChain)
+                return;
+            this.swapModel.updateEstimatedPosition(!this.swapModel.isEstimated('from'));
+            [this.swapModel.fromToken, this.swapModel.toToken] = [this.swapModel.toToken, this.swapModel.fromToken];
+            const enabled = !this.swapModel.isMaxDisabled;
+            this.maxButton.enabled = enabled;
+            [this.swapModel.fromInputValue, this.swapModel.toInputValue] = [this.swapModel.toInputValue, this.swapModel.fromInputValue];
+            [this.payBalance.caption, this.receiveBalance.caption] = [this.receiveBalance.caption, this.payBalance.caption];
+            this.firstTokenInput.token = this.swapModel.fromToken;
+            this.secondTokenInput.token = this.swapModel.toToken;
+            this.firstTokenInput.value = this.swapModel.getInputValue(true);
+            this.secondTokenInput.value = this.swapModel.getInputValue(false);
+            await this.handleAddRoute();
+        }
+        setupCrossChainPopup() {
+            const { isCrossChain, srcChain, desChain, record, toToken } = this.swapModel;
+            const arrows = this.swapModal.querySelectorAll('i-icon.arrow-down');
+            if (!isCrossChain) {
+                arrows.forEach((arrow) => {
+                    arrow.margin = { top: '0.75rem', bottom: '0.75rem' };
+                });
             }
-            const warningMessageText = this.getWarningMessageText();
-            return (this.state.isRpcWalletConnected() && (warningMessageText != '' && !this.isPriceImpactTooHigh));
+            else {
+                arrows.forEach((arrow) => {
+                    arrow.margin = { top: '0.75rem', left: '6rem', bottom: '0.75rem', right: '6rem' };
+                });
+            }
+            if (this.lbReminderRejected)
+                this.lbReminderRejected.visible = false;
+            if (isCrossChain && srcChain && desChain) {
+                this.srcChainFirstPanel.visible = true;
+                this.targetChainFirstPanel.visible = true;
+                this.srcChainTokenImage.url = srcChain.image;
+                this.srcChainTokenLabel.caption = srcChain.chainName;
+                this.targetChainTokenImage.url = desChain.image;
+                this.targetChainTokenLabel.caption = desChain.chainName;
+                const { sourceVaultToken, targetVaultToken, sourceRouteObj, vaultTokenFromSourceChain, vaultTokenToTargetChain } = record;
+                if (sourceVaultToken && sourceRouteObj) {
+                    this.srcChainSecondPanel.visible = true;
+                    this.srcChainVaultImage.url = srcChain.image;
+                    this.srcChainVaultLabel.caption = srcChain.chainName;
+                    this.srcVaultTokenImage.url = scom_token_list_9.assets.getTokenIconPath(sourceVaultToken, srcChain.chainId);
+                    this.srcVaultTokenLabel.caption = sourceVaultToken.symbol;
+                    this.srcVaultTokenValue.caption = (0, index_15.formatNumber)(vaultTokenFromSourceChain);
+                    if (this.lbReminderRejected) {
+                        this.lbReminderRejected.visible = true;
+                        this.lbReminderRejected.caption = `If the order is not executed in the target chain, the estimated withdrawalble amount is <b class="text-pink">${(0, index_15.formatNumber)(vaultTokenFromSourceChain)} ${sourceVaultToken?.symbol}</b>`;
+                    }
+                }
+                else {
+                    this.srcChainSecondPanel.visible = false;
+                }
+                if (targetVaultToken && targetVaultToken.symbol !== toToken?.symbol) {
+                    this.targetChainSecondPanel.visible = true;
+                    this.targetChainVaultImage.url = desChain.image;
+                    this.targetChainVaultLabel.caption = desChain.chainName;
+                    this.targetVaultTokenImage.url = scom_token_list_9.assets.getTokenIconPath(targetVaultToken, desChain.chainId);
+                    this.targetVaultTokenLabel.caption = targetVaultToken.symbol;
+                    this.targetVaultTokenValue.caption = (0, index_15.formatNumber)(vaultTokenToTargetChain);
+                    // Hide vault info at toToken
+                    this.crossChainVaultInfoVstack.visible = false;
+                }
+                else {
+                    this.targetChainSecondPanel.visible = false;
+                    // Show vault info at the end if vaultTokenSymbol same as toToken
+                    this.crossChainVaultInfoVstack.visible = true;
+                }
+            }
+            else {
+                this.srcChainFirstPanel.visible = false;
+                this.targetChainFirstPanel.visible = false;
+                this.srcChainSecondPanel.visible = false;
+                this.targetChainSecondPanel.visible = false;
+                this.crossChainVaultInfoVstack.visible = false;
+            }
+        }
+        handleSwapPopup() {
+            const { isFrom, isCrossChain, desChain, record, fromToken, toToken, fromInputValue, toInputValue } = this.swapModel;
+            if (!record)
+                return;
+            this.setupCrossChainPopup();
+            const currentChainId = this.state.getChainId();
+            const slippageTolerance = this.state.slippageTolerance;
+            this.fromTokenImage.url = scom_token_list_9.assets.tokenPath(fromToken, currentChainId);
+            this.fromTokenLabel.caption = fromToken?.symbol ?? '';
+            this.fromTokenValue.caption = (0, index_15.formatNumber)(fromInputValue, 4);
+            this.toTokenImage.url = scom_token_list_9.assets.tokenPath(toToken, isCrossChain ? desChain?.chainId : currentChainId);
+            this.toTokenLabel.caption = toToken?.symbol ?? '';
+            this.toTokenValue.caption = (0, index_15.formatNumber)(toInputValue, 4);
+            const minimumReceived = this.swapModel.minReceivedMaxSold;
+            if (minimumReceived || minimumReceived == 0) {
+                this.payOrReceiveValue.caption = (0, index_15.formatNumber)(minimumReceived, 4);
+            }
+            else {
+                this.payOrReceiveValue.caption = ' - ';
+            }
+            this.payOrReceiveToken.caption = isFrom ? this.fromTokenLabel.caption : this.toTokenLabel.caption;
+            this.lbEstimate.caption = `${isFrom ? 'Input' : 'Output'} is estimated. If the price change by more than ${slippageTolerance}%, your transaction will revert`;
+            this.lbPayOrReceive.caption = isFrom ? 'You will pay at most' : 'You will receive at least';
+            this.priceInfo2.setData(this.swapModel.getPriceInfo(this.isPriceToggled));
+            this.swapModal.visible = true;
+        }
+        onCloseModal(name) {
+            this[name].visible = false;
+        }
+        doSwap() {
+            this.approvalModelAction.doPayAction(this.swapModel.record);
+        }
+        async updateTokenValues(token, isFrom) {
+            if (!token)
+                return;
+            const balance = this.swapModel.getBalance(token);
+            if (isFrom) {
+                const enabled = !this.swapModel.isMaxDisabled;
+                this.maxButton.enabled = enabled;
+                this.swapModel.updateTokenValues(token, true, this.firstTokenInput);
+                this.payBalance.caption = `Balance: ${(0, index_15.formatNumber)(balance, 4)} ${token.symbol}`;
+                await this.updateTokenInput(true);
+            }
+            else {
+                this.swapModel.updateTokenValues(token, false, this.secondTokenInput);
+                this.receiveBalance.caption = `Balance: ${(0, index_15.formatNumber)(balance, 4)} ${token.symbol}`;
+                await this.updateTokenInput(false);
+            }
+        }
+        async onSelectToken(token, isFrom) {
+            if (!token)
+                return;
+            this.firstTokenInput.enabled = false;
+            this.secondTokenInput.enabled = false;
+            // if (token.isNew && this.state.isRpcWalletConnected()) {
+            //   const rpcWallet = this.state.getRpcWallet();
+            //   await tokenStore.updateAllTokenBalances(rpcWallet);
+            // }
+            await this.updateTokenValues(token, isFrom);
+            await this.handleAddRoute();
+            this.firstTokenInput.enabled = true;
+            this.secondTokenInput.enabled = true;
+        }
+        setApprovalSpenderAddress() {
+            const item = this.swapModel.record;
+            if (!item)
+                return;
+            const market = this.state.getProviderByKey(item.provider)?.key || '';
+            if (this.approvalModelAction) {
+                if (this.swapModel.isCrossChain && item.contractAddress) {
+                    (0, index_14.setApprovalModalSpenderAddress)(this.state, market, item.contractAddress);
+                }
+                else if (this.configModel.campaignId !== undefined) {
+                    this.contractAddress = this.state.getProxyAddress();
+                    (0, index_14.setApprovalModalSpenderAddress)(this.state, market, this.contractAddress);
+                }
+                else {
+                    (0, index_14.setApprovalModalSpenderAddress)(this.state, market);
+                }
+            }
+        }
+        async updateTokenInput(isFrom, init) {
+            const inputEl = isFrom ? this.firstTokenInput : this.secondTokenInput;
+            if (inputEl)
+                inputEl.value = this.swapModel.getInputValue(isFrom);
+        }
+        async onSelectRouteItem(item) {
+            if (this.swapModel.isFrom) {
+                if (this.payCol.children) {
+                    let balanceValue = item.amountIn;
+                    this.firstTokenInput.value = this.swapModel.fixedNumber(balanceValue);
+                    this.swapModel.fromInputValue = typeof balanceValue !== 'object' ? new eth_wallet_7.BigNumber(balanceValue) : balanceValue;
+                }
+            }
+            else {
+                if (this.receiveCol.children) {
+                    let balanceValue = item.amountOut;
+                    this.secondTokenInput.value = this.swapModel.fixedNumber(balanceValue);
+                    this.swapModel.toInputValue = typeof balanceValue !== 'object' ? new eth_wallet_7.BigNumber(balanceValue) : balanceValue;
+                }
+            }
+            this.swapModel.record = item;
+            if (this.swapModel.isCrossChain && this.swapModel.fromToken && !this.swapModel.fromToken.isNative && this.state.isRpcWalletConnected()) {
+                try {
+                    this.setApprovalSpenderAddress();
+                    await this.approvalModelAction.checkAllowance(this.swapModel.fromToken, this.swapModel.fromInputValue.toFixed());
+                }
+                catch (e) {
+                    console.log('Cannot check the Approval status (Cross Chain)', e);
+                }
+            }
+            const isButtonLoading = this.swapModel.isButtonLoading;
+            if (this.swapBtn.rightIcon.visible != isButtonLoading) {
+                this.swapBtn.rightIcon.visible = isButtonLoading;
+            }
+            if (this.priceInfo)
+                await this.priceInfo.setData(this.swapModel.getPriceInfo(this.isPriceToggled));
+        }
+        onTokenInputChange(source) {
+            clearTimeout(this.timeout);
+            this.timeout = setTimeout(async () => {
+                const fromInput = this.payCol.getElementsByTagName('I-INPUT')?.[0];
+                const toInput = this.receiveCol.getElementsByTagName('I-INPUT')?.[0];
+                const isFrom = source.isSameNode(fromInput);
+                const amount = source.value;
+                if ((0, index_15.isInvalidInput)(amount)) {
+                    this.resetValuesByInput();
+                    if (fromInput)
+                        fromInput.value = '0';
+                    if (toInput)
+                        toInput.value = '0';
+                    return;
+                }
+                const limit = (isFrom ? this.swapModel.fromToken?.decimals : this.swapModel.toToken?.decimals) || 18;
+                const value = new eth_wallet_7.BigNumber(amount).dp(limit, ROUNDING_NUMBER);
+                if (!value.gt(0)) {
+                    this.resetValuesByInput();
+                    if (isFrom && toInput) {
+                        toInput.value = '0';
+                    }
+                    else if (!isFrom && fromInput) {
+                        fromInput.value = '0';
+                    }
+                }
+                else {
+                    let valueChanged = false;
+                    const isLastDot = amount.indexOf('.') === amount.length - 1;
+                    if (isFrom) {
+                        if (!this.swapModel.fromInputValue.eq(value)) {
+                            this.swapModel.fromInputValue = value;
+                            this.swapModel.updateEstimatedPosition(false);
+                            valueChanged = true;
+                        }
+                        if (!isLastDot)
+                            fromInput.value = value.toFixed();
+                    }
+                    else {
+                        if (!this.swapModel.toInputValue.eq(value)) {
+                            this.swapModel.toInputValue = value;
+                            this.swapModel.updateEstimatedPosition(true);
+                            valueChanged = true;
+                        }
+                        if (!isLastDot)
+                            toInput.value = value.toFixed();
+                    }
+                    if (valueChanged)
+                        await this.handleAddRoute();
+                }
+            }, 1000);
+        }
+        resetValuesByInput() {
+            this.initRoutes();
+            if (this.priceInfo)
+                this.priceInfo.setData(this.swapModel.getPriceInfo(this.isPriceToggled));
+            this.swapModel.fromInputValue = new eth_wallet_7.BigNumber(0);
+            this.swapModel.toInputValue = new eth_wallet_7.BigNumber(0);
+        }
+        initRoutes() {
+            this.swapModel.record = null;
+            this.isPriceToggled = false;
+            this.swapBtn.visible = false;
+        }
+        async handleAddRoute() {
+            const { isCrossChain, srcChain, desChain, fromToken, toToken, fromInputValue, toInputValue } = this.swapModel;
+            if (!fromToken || !toToken || !(fromInputValue.gt(0) || toInputValue.gt(0))) {
+                this.initRoutes();
+                this.showEmptyRoute();
+                this.lbYouPayValue.caption = '0';
+                this.minSwapHintLabel.visible = false;
+                return;
+            }
+            ;
+            this.initRoutes();
+            let listRouting = [];
+            this.updateContractAddress();
+            if (!isCrossChain) {
+                listRouting = await this.swapModel.getSwapRoutesData();
+            }
+            else if (srcChain && desChain) {
+                listRouting = await this.swapModel.getCrossChainRouteData();
+                if (this.minSwapHintLabel) {
+                    this.minSwapHintLabel.visible = !listRouting.length;
+                }
+            }
+            if (listRouting[0] && isCrossChain) {
+                const { assetSymbol, vault, targetVaultAssetBalance, targetVaultBondBalance, vaultTokenToTargetChain, vaultToOswapPrice, softCap, minValue } = await this.swapModel.getVaultData(listRouting[0]);
+                this.targetVaultAssetBalanceLabel1.caption = `Vault Asset Balance: ${(0, index_15.formatNumber)(targetVaultAssetBalance.toNumber(), 4)} ${assetSymbol}`;
+                this.targetVaultAssetBalanceLabel2.caption = `Vault Asset Balance: ${(0, index_15.formatNumber)(targetVaultAssetBalance.toNumber(), 4)} ${assetSymbol}`;
+                if (!vault.vaultGroup) {
+                    this.targetVaultBondBalanceLabel1.caption = `Vault Bond Balance: ${(0, index_15.formatNumber)(targetVaultBondBalance.toNumber(), 4)} ${assetSymbol}`;
+                    this.targetVaultBondBalanceLabel2.caption = `Vault Bond Balance: ${(0, index_15.formatNumber)(targetVaultBondBalance.toNumber(), 4)} ${assetSymbol}`;
+                }
+                else if (vault.vaultGroup === 'OSWAP') {
+                    this.targetVaultBondBalanceLabel1.caption = `Vault Bond Balance: ${(0, index_15.formatNumber)(targetVaultBondBalance.toNumber(), 4)} OSWAP`;
+                    this.targetVaultBondBalanceLabel2.caption = `Vault Bond Balance: ${(0, index_15.formatNumber)(targetVaultBondBalance.toNumber(), 4)} OSWAP`;
+                }
+                else {
+                    this.targetVaultBondBalanceLabel1.caption = `Vault Bond Balance: ${(0, index_15.formatNumber)(targetVaultBondBalance.toNumber(), 4)} OSWAP &#8776; ${(0, index_15.formatNumber)(targetVaultBondBalance.div(vaultToOswapPrice).toNumber(), 4)} ${assetSymbol}`;
+                    this.targetVaultBondBalanceLabel2.caption = `Vault Bond Balance: ${(0, index_15.formatNumber)(targetVaultBondBalance.toNumber(), 4)} OSWAP &#8776; ${(0, index_15.formatNumber)(targetVaultBondBalance.div(vaultToOswapPrice).toNumber(), 4)} ${assetSymbol}`;
+                }
+                this.crossChainSoftCapLabel1.caption = softCap ? `Cap: ${(0, index_15.formatNumber)(softCap)} ${assetSymbol}` : "-";
+                this.crossChainSoftCapLabel2.caption = softCap ? `Cap: ${(0, index_15.formatNumber)(softCap)} ${assetSymbol}` : "-";
+                if (minValue.eq(targetVaultAssetBalance)) {
+                    this.targetVaultAssetBalanceLabel1.classList.add('text--limit');
+                    this.targetVaultAssetBalanceLabel2.classList.add('text--limit');
+                    this.targetVaultBondBalanceLabel1.classList.remove('text--limit');
+                    this.targetVaultBondBalanceLabel2.classList.remove('text--limit');
+                    this.crossChainSoftCapLabel1.classList.remove('text--limit');
+                    this.crossChainSoftCapLabel2.classList.remove('text--limit');
+                }
+                else if (minValue.eq(targetVaultBondBalance)) {
+                    this.targetVaultAssetBalanceLabel1.classList.remove('text--limit');
+                    this.targetVaultAssetBalanceLabel2.classList.remove('text--limit');
+                    this.targetVaultBondBalanceLabel1.classList.add('text--limit');
+                    this.targetVaultBondBalanceLabel2.classList.add('text--limit');
+                    this.crossChainSoftCapLabel1.classList.remove('text--limit');
+                    this.crossChainSoftCapLabel2.classList.remove('text--limit');
+                }
+                else {
+                    this.targetVaultAssetBalanceLabel1.classList.remove('text--limit');
+                    this.targetVaultAssetBalanceLabel2.classList.remove('text--limit');
+                    this.targetVaultBondBalanceLabel1.classList.remove('text--limit');
+                    this.targetVaultBondBalanceLabel2.classList.remove('text--limit');
+                    this.crossChainSoftCapLabel1.classList.add('text--limit');
+                    this.crossChainSoftCapLabel2.classList.add('text--limit');
+                }
+                if (softCap && vaultTokenToTargetChain.toNumber() >= softCap) {
+                    this.swapModalConfirmBtn.caption = 'Cap Reached';
+                    this.swapModalConfirmBtn.enabled = false;
+                }
+                else if (vaultTokenToTargetChain.gt(targetVaultAssetBalance) || vaultTokenToTargetChain.multipliedBy(vaultToOswapPrice).gt(targetVaultBondBalance)) {
+                    this.swapModalConfirmBtn.caption = 'Exceed Vault Asset Balance or Bond Balance';
+                    this.swapModalConfirmBtn.enabled = false;
+                }
+                else {
+                    this.swapModalConfirmBtn.enabled = true;
+                }
+                this.swapModel.crossChainApprovalStatus = listRouting[0].isApproveButtonShown ? index_15.ApprovalStatus.TO_BE_APPROVED : index_15.ApprovalStatus.NONE;
+            }
+            this.disableSelectChain(false);
+            this.disableSelectChain(false, true);
+            this.swapModalConfirmBtn.caption = 'Confirm Swap';
+            this.swapModalConfirmBtn.enabled = true;
+            this.swapModel.record = listRouting[0] || null;
+            this.swapModel.swapButtonStatusMap = {};
+            this.swapModel.approveButtonStatusMap = {};
+            this.initRoutes();
+            if (listRouting.length) {
+                // this.receiveCol.classList.add('bg-box--active');
+                this.lbRouting.opacity = 0;
+                const option = listRouting[0];
+                await this.onSelectRouteItem(option);
+            }
+            else {
+                // this.receiveCol.classList.remove('bg-box--active');
+                this.showEmptyRoute();
+            }
+            if (this.swapModel.record) {
+                this.setApprovalSpenderAddress();
+                await this.approvalModelAction.checkAllowance(this.swapModel.fromToken, this.swapModel.fromInputValue.toFixed(), this.swapModel.record);
+                this.swapBtn.visible = true;
+                const total = this.swapModel.record?.fromAmount ? new eth_wallet_7.BigNumber(this.swapModel.record.fromAmount) : new eth_wallet_7.BigNumber(0);
+                this.lbYouPayValue.caption = `${(0, index_15.formatNumber)(total)} ${this.swapModel.fromToken?.symbol}`;
+            }
+            else {
+                this.updateSwapButtonCaption();
+                this.swapBtn.visible = true;
+                this.swapBtn.enabled = !this.swapModel.isSwapButtonDisabled;
+            }
+        }
+        showEmptyRoute() {
+            this.lbRouting.opacity = 0.75;
+            if (this.priceInfo)
+                this.priceInfo.setData(this.swapModel.getPriceInfo(this.isPriceToggled));
+            if (this.swapModel.isEstimated('to')) {
+                this.swapModel.toInputValue = new eth_wallet_7.BigNumber(0);
+                this.secondTokenInput.value = '';
+            }
+            else {
+                this.swapModel.fromInputValue = new eth_wallet_7.BigNumber(0);
+                this.firstTokenInput.value = '';
+            }
+        }
+        // Price Info
+        onTogglePrice(priceInfo) {
+            this.isPriceToggled = !this.isPriceToggled;
+            priceInfo.setData(this.swapModel.getPriceInfo(this.isPriceToggled));
+        }
+        async updateBalances() {
+            const { fromToken, toToken } = this.swapModel;
+            const chainIds = [...new Set([fromToken.chainId, toToken.chainId])];
+            for (let chainId of chainIds) {
+                await scom_token_list_9.tokenStore.updateTokenBalancesByChainId(chainId);
+            }
+            if (fromToken) {
+                const balance = this.swapModel.getBalance(fromToken);
+                this.payBalance.caption = `Balance: ${(0, index_15.formatNumber)(balance, 4)} ${fromToken.symbol}`;
+            }
+            if (toToken) {
+                const balance = this.swapModel.getBalance(toToken);
+                this.receiveBalance.caption = `Balance: ${(0, index_15.formatNumber)(balance, 4)} ${toToken.symbol}`;
+            }
+            const enabled = !this.swapModel.isMaxDisabled;
+            this.maxButton.enabled = enabled;
+        }
+        updateSwapButtonCaption() {
+            if (this.swapBtn && this.swapBtn.hasChildNodes()) {
+                this.swapBtn.caption = this.swapModel.determineSwapButtonCaption;
+            }
         }
         async onClickSwapButton() {
-            if (!(0, index_7.isClientWalletConnected)()) {
+            if (!(0, index_13.isClientWalletConnected)()) {
                 if (this.mdWallet) {
-                    await components_7.application.loadPackage('@scom/scom-wallet-modal', '*');
+                    await components_9.application.loadPackage('@scom/scom-wallet-modal', '*');
                     this.mdWallet.networks = this.networks;
                     this.mdWallet.wallets = this.wallets;
                     this.mdWallet.showModal();
@@ -4899,18 +5220,19 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
             }
             else if (!this.state.isRpcWalletConnected()) {
                 const chainId = this.state.getChainId();
-                const clientWallet = eth_wallet_5.Wallet.getClientInstance();
+                const clientWallet = eth_wallet_7.Wallet.getClientInstance();
                 await clientWallet.switchNetwork(chainId);
                 return;
             }
-            if (!this.record || this.isSwapButtonDisabled())
+            const { record, isSwapButtonDisabled, isCrossChain, isApproveButtonShown, crossChainApprovalStatus, isPriceImpactTooHigh } = this.swapModel;
+            if (!record || isSwapButtonDisabled)
                 return;
-            const isApproveButtonShown = this.isCrossChain ? this.crossChainApprovalStatus !== index_10.ApprovalStatus.NONE : this.isApproveButtonShown;
-            if (isApproveButtonShown) {
+            const isApproveShown = isCrossChain ? crossChainApprovalStatus !== index_15.ApprovalStatus.NONE : isApproveButtonShown;
+            if (isApproveShown) {
                 this.approveRouterMax();
                 return;
             }
-            if (this.isPriceImpactTooHigh) {
+            if (isPriceImpactTooHigh) {
                 this.$eventBus.dispatch("ShowExpertModal" /* EventId.ShowExpertModal */);
                 return;
             }
@@ -4923,41 +5245,15 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                 this.pnlPriceInfo.appendChild(this.priceInfo);
                 this.priceInfo.onTogglePrice = this.onTogglePrice.bind(this);
             }
-            this.priceInfo.setData(this.getPriceInfo());
+            this.priceInfo.setData(this.swapModel.getPriceInfo(this.isPriceToggled));
             if (!this.priceInfo2) {
                 this.priceInfo2 = this.$render("i-scom-swap-price-info", { padding: { ...padding }, display: "block", width: 'auto', height: 'auto' });
                 this.priceInfo2.onTogglePrice = this.onTogglePrice.bind(this);
             }
             this.priceInfoContainer.appendChild(this.priceInfo2);
         }
-        get chainId() {
-            return this.state.getChainId();
-        }
-        // Cross Chain
-        get isCrossChainSwap() {
-            return this._data.category === 'cross-chain-swap';
-        }
-        get isCrossChainEnabled() {
-            let chainId = this.state.getChainId();
-            if (!this.bridgeSupportedChainList.some((v) => v.chainId == chainId) || !this.isCrossChainSwap) {
-                return false;
-            }
-            return true;
-        }
-        ;
-        get isCrossChain() {
-            const srcChainId = this.srcChain?.chainId;
-            const desChainId = this.desChain?.chainId;
-            if (this.isCrossChainEnabled && index_7.crossChainSupportedChainIds.some(v => v.chainId === srcChainId) && srcChainId != desChainId) {
-                return true;
-            }
-            if (this.minSwapHintLabel)
-                this.minSwapHintLabel.visible = false;
-            return false;
-        }
-        ;
         get isMetaMask() {
-            return eth_wallet_5.Wallet.getClientInstance().clientSideProvider?.name === index_7.WalletPlugin.MetaMask;
+            return eth_wallet_7.Wallet.getClientInstance().clientSideProvider?.name === index_13.WalletPlugin.MetaMask;
         }
         updateChainIcon(el, selected) {
             if (selected) {
@@ -4972,7 +5268,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
             }
         }
         initExpertModal() {
-            this.expertModal = new index_11.ExpertModeSettings(this.state);
+            this.expertModal = new index_16.ExpertModeSettings(this.state);
             this.swapComponent.appendChild(this.expertModal);
             this.$eventBus.register(this, "ShowExpertModal" /* EventId.ShowExpertModal */, () => {
                 this.expertModal.showModal();
@@ -5003,17 +5299,9 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                 this.isInited = true;
             }
         }
-        isEmptyData(value) {
-            return !value || !value.networks || value.networks.length === 0;
-        }
         async init() {
             await super.init();
-            this.state = new index_7.State(data_json_1.default);
-            this.fromInputValue = new eth_wallet_5.BigNumber(0);
-            this.toInputValue = new eth_wallet_5.BigNumber(0);
-            this.swapButtonStatusMap = {};
-            this.approveButtonStatusMap = {};
-            this.$eventBus = components_7.application.EventBus;
+            this.$eventBus = components_9.application.EventBus;
             this.registerEvent();
             this.updateSwapButtonCaption();
             this.initExpertModal();
@@ -5053,7 +5341,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                     defaultOutputToken,
                     apiEndpoints
                 };
-                if (!this.isEmptyData(data)) {
+                if (!this.configModel.isEmptyData(data)) {
                     await this.setData(data);
                 }
             }
@@ -5186,7 +5474,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                                             this.$render("i-label", { id: "srcChainVaultLabel", font: { size: '1.1rem' }, caption: "" }),
                                             this.$render("i-icon", { name: "minus", fill: Theme.input.fontColor, width: 28, height: 10 })),
                                         this.$render("i-hstack", { verticalAlignment: "center", gap: '0.5rem' },
-                                            this.$render("i-image", { id: "srcVaultTokenImage", fallbackUrl: scom_token_list_7.assets.fallbackUrl, width: "30px", height: "30px", url: "#" }),
+                                            this.$render("i-image", { id: "srcVaultTokenImage", fallbackUrl: scom_token_list_9.assets.fallbackUrl, width: "30px", height: "30px", url: "#" }),
                                             this.$render("i-label", { id: "srcVaultTokenLabel", font: { size: '1.1rem' }, caption: "" })),
                                         this.$render("i-label", { id: "srcVaultTokenValue", margin: { left: 'auto' }, font: { size: '1.1rem' }, caption: "-" })),
                                     this.$render("i-icon", { width: 28, height: 28, name: "arrow-down", fill: Theme.input.fontColor, border: { width: '2px', style: 'solid', color: 'transparent', radius: '50%' }, padding: { left: '0.25rem', right: '0.25rem', top: '0.25rem', bottom: '0.25rem' }, background: { color: Theme.input.background }, margin: { top: '0.75rem', bottom: '0.75rem' }, class: "arrow-down" })),
@@ -5197,7 +5485,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                                             this.$render("i-label", { id: "targetChainVaultLabel", font: { size: '1.1rem' }, caption: "" }),
                                             this.$render("i-icon", { name: "minus", fill: Theme.input.fontColor, width: 28, height: 10 })),
                                         this.$render("i-hstack", { verticalAlignment: "center", gap: '0.5rem' },
-                                            this.$render("i-image", { id: "targetVaultTokenImage", fallbackUrl: scom_token_list_7.assets.fallbackUrl, width: "30px", height: "30px", url: "#" }),
+                                            this.$render("i-image", { id: "targetVaultTokenImage", fallbackUrl: scom_token_list_9.assets.fallbackUrl, width: "30px", height: "30px", url: "#" }),
                                             this.$render("i-label", { id: "targetVaultTokenLabel", font: { size: '1.1rem' }, caption: "" })),
                                         this.$render("i-label", { id: "targetVaultTokenValue", margin: { left: 'auto' }, font: { size: '1.1rem' }, caption: "-" })),
                                     this.$render("i-vstack", { justifyContent: 'end' },
@@ -5207,7 +5495,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                                     this.$render("i-icon", { width: 28, height: 28, name: "arrow-down", fill: Theme.input.fontColor, border: { width: '2px', style: 'solid', color: 'transparent', radius: '50%' }, padding: { left: '0.25rem', right: '0.25rem', top: '0.25rem', bottom: '0.25rem' }, margin: { top: '0.75rem', bottom: '0.75rem' }, background: { color: Theme.input.background }, class: "arrow-down" })),
                                 this.$render("i-hstack", { margin: { bottom: '1rem' }, verticalAlignment: 'center', horizontalAlignment: 'start' },
                                     this.$render("i-hstack", { id: "targetChainFirstPanel", verticalAlignment: "center", gap: '0.5rem' },
-                                        this.$render("i-image", { id: "targetChainTokenImage", fallbackUrl: scom_token_list_7.assets.fallbackUrl, width: "30px", height: "30px", url: "#" }),
+                                        this.$render("i-image", { id: "targetChainTokenImage", fallbackUrl: scom_token_list_9.assets.fallbackUrl, width: "30px", height: "30px", url: "#" }),
                                         this.$render("i-label", { id: "targetChainTokenLabel", font: { size: '1.1rem' }, caption: "" }),
                                         this.$render("i-icon", { name: "minus", fill: Theme.input.fontColor, width: 28, height: 10 })),
                                     this.$render("i-hstack", { verticalAlignment: "center", gap: '0.5rem' },
@@ -5239,8 +5527,8 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
         }
     };
     ScomSwap = __decorate([
-        components_7.customModule,
-        (0, components_7.customElements)('i-scom-swap')
+        components_9.customModule,
+        (0, components_9.customElements)('i-scom-swap')
     ], ScomSwap);
     exports.default = ScomSwap;
 });
