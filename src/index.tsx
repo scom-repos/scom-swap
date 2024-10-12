@@ -1,44 +1,19 @@
 import { Module, Panel, Button, Label, VStack, Image, Container, IEventBus, application, customModule, Modal, Input, Control, customElements, ControlElement, Styles, HStack, Icon, FormatUtils, GridLayout } from '@ijstech/components';
-import { BigNumber, Constants, INetwork, Wallet, IERC20ApprovalAction, TransactionReceipt, Utils } from '@ijstech/eth-wallet';
-import './index.css';
+import { BigNumber, INetwork, Wallet, IERC20ApprovalAction, TransactionReceipt } from '@ijstech/eth-wallet';
 import {
   isClientWalletConnected,
   getSupportedTokens,
   State,
-  crossChainSupportedChainIds,
-  BridgeVaultGroupList,
   WalletPlugin,
   getNetworkInfo,
-  bridgeVaultConstantMap,
-  getTokenObjArr,
-  getBridgeSupportedChainList,
 } from "./store/index";
-import { tokenStore, assets as tokenAssets } from '@scom/scom-token-list';
-
-import {
-  getAllRoutesData,
-  executeSwap,
-  setApprovalModalSpenderAddress,
-  getProviderProxySelectors,
-  getPair,
-  getCommissionRate,
-  getCrossChainRouteOptions,
-  createBridgeVaultOrder
-} from './swap-utils/index'
-import {
-  ICrossChainRouteResult,
-  getBridgeVault,
-  getBondsInBridgeVault,
-  getVaultAssetBalance,
-  getOraclePriceMap,
-} from './crosschain-utils/index';
-import { ITokenObject } from '@scom/scom-token-list';
+import { ITokenObject, tokenStore, assets as tokenAssets } from '@scom/scom-token-list';
+import { setApprovalModalSpenderAddress } from './swap-utils/index';
 import {
   ApprovalStatus,
   EventId,
   formatNumber,
   isInvalidInput,
-  IProvider,
   ISwapWidgetData,
   IProviderUI,
   Category,
@@ -46,24 +21,20 @@ import {
   INetworkConfig,
   ITokenConfig
 } from './global/index';
-
 import { PriceInfo } from './price-info/index';
-import { ExpertModeSettings } from './expert-mode-settings/index'
+import { ExpertModeSettings } from './expert-mode-settings/index';
 import configData from './data.json';
-import { getBuilderSchema, getProjectOwnerSchema } from './formSchema';
 import ScomWalletModal, { IWalletPlugin } from '@scom/scom-wallet-modal';
 import ScomDappContainer from '@scom/scom-dapp-container'
 import getDexList from '@scom/scom-dex-list';
-import ScomCommissionFeeSetup from '@scom/scom-commission-fee-setup';
 import ScomTokenInput from '@scom/scom-token-input';
 import ScomTxStatusModal from '@scom/scom-tx-status-modal';
 import { swapStyle } from './index.css';
+import { ConfigModel, SwapModel } from './model';
 
 export { ISwapWidgetData };
 
 const Theme = Styles.Theme.ThemeVars;
-const priceImpactTooHighMsg = 'Price Impact Too High. If you want to bypass this check, please turn on Expert Mode';
-type StatusMapType = 'approve' | 'swap';
 const ROUNDING_NUMBER = BigNumber.ROUND_DOWN;
 
 interface ScomSwapElement extends ControlElement {
@@ -99,16 +70,7 @@ declare const window: any;
 @customElements('i-scom-swap')
 export default class ScomSwap extends Module {
   private state: State;
-  private _data: ISwapWidgetData = {
-    category: 'fixed-pair',
-    providers: [],
-    tokens: [],
-    defaultChainId: 0,
-    wallets: [],
-    networks: []
-  };
   tag: any = {};
-  private _tokens: ITokenObject[] = [];
 
   private pnlBranding: VStack;
   private imgLogo: Image;
@@ -140,23 +102,14 @@ export default class ScomSwap extends Module {
   private txStatusModal: ScomTxStatusModal;
   private maxButton: Button;
   private swapBtn: Button;
-  private lbYouPayTitle: Label;
   private lbYouPayValue: Label;
   private mdWallet: ScomWalletModal;
   private dappContainer: ScomDappContainer;
+  private configModel: ConfigModel;
+  private swapModel: SwapModel;
 
-  private isFrom: boolean;
-  private fromToken?: ITokenObject;
-  private toToken?: ITokenObject;
-  private fromInputValue: BigNumber;
-  private toInputValue: BigNumber;
-  private timeout: any; // NodeJS.Timeout;
+  private timeout: any;
   private isPriceToggled: boolean;
-  private record: any;
-
-  private supportedChainIds: number[];
-  private swapButtonStatusMap: any;
-  private approveButtonStatusMap: any;
   private $eventBus: IEventBus;
   private lbEstimate: Label;
   private lbPayOrReceive: Label;
@@ -165,7 +118,6 @@ export default class ScomSwap extends Module {
   private toggleReverseImage: HStack;
   private hIcon: Icon;
   private vIcon: Icon;
-  private bridgeSupportedChainList: INetworkConfig[] = [];
   private swapModalConfirmBtn: Button;
   private modalFees: Modal;
   private feesInfo: VStack;
@@ -175,7 +127,6 @@ export default class ScomSwap extends Module {
   private clientEvents: any[] = [];
 
   // Cross Chain
-  private crossChainApprovalStatus: ApprovalStatus = ApprovalStatus.NONE;
   private minSwapHintLabel: Label;
   private srcChainBox: Panel;
   private desChainBox: Panel;
@@ -183,8 +134,6 @@ export default class ScomSwap extends Module {
   private srcChainList: HStack;
   private desChainLabel: Label;
   private desChainList: HStack;
-  private srcChain: INetwork | undefined;
-  private desChain: INetwork | undefined;
   private srcChainFirstPanel: Panel;
   private targetChainFirstPanel: Panel;
   private srcChainTokenImage: Image;
@@ -219,8 +168,7 @@ export default class ScomSwap extends Module {
   }
 
   removeRpcWalletEvents() {
-    const rpcWallet = this.state.getRpcWallet();
-    if (rpcWallet) rpcWallet.unregisterAllWalletEvents();
+    this.configModel.removeRpcWalletEvents();
   }
 
   onHide() {
@@ -232,390 +180,114 @@ export default class ScomSwap extends Module {
     this.clientEvents = [];
   }
 
+  initModels() {
+    if (!this.state) {
+      this.state = new State(configData);
+    }
+    if (!this.configModel) {
+      this.configModel = new ConfigModel(this.state, this, {
+        updateContractAddress: () => this.updateContractAddress(),
+        refreshWidget: () => this.refreshWidget(),
+        refreshDappContainer: () => this.refreshDappContainer(),
+        setContaiterTag: (value: any) => this.setContaiterTag(value),
+        updateTheme: () => this.updateTheme(),
+        onChainChanged: () => this.onChainChanged(),
+        onWalletConnected: () => this.onWalletConnected()
+      });
+    }
+    if (!this.swapModel) {
+      this.swapModel = new SwapModel(this.state, this.configModel, {
+        setHintLabel: (value: boolean) => {
+          if (this.minSwapHintLabel) this.minSwapHintLabel.visible = value;
+        },
+        showModalFees: () => this.showModalFees()
+      });
+    }
+  }
+
+  get chainId() {
+    return this.configModel.chainId;
+  }
+
+  private get rpcWallet() {
+    return this.configModel.rpcWallet;
+  }
+
   get category() {
-    return this._data.category;
+    return this.configModel.category;
   }
   set category(value: Category) {
-    this._data.category = value;
+    this.configModel.category = value;
   }
 
   get providers() {
-    return this._data.providers;
+    return this.configModel.providers;
   }
   set providers(value: IProviderUI[]) {
-    this._data.providers = value;
+    this.configModel.providers = value;
   }
 
   get commissions() {
-    return this._data.commissions ?? [];
+    return this.configModel.commissions ?? [];
   }
   set commissions(value: ICommissionInfo[]) {
-    this._data.commissions = value;
+    this.configModel.commissions = value;
   }
 
   get defaultChainId() {
-    if (this.networks.some(v => v.chainId === this._data.defaultChainId)) {
-      return this._data.defaultChainId;
-    }
-    return this.networks[0]?.chainId || this._data.defaultChainId;
+    return this.configModel.defaultChainId;
   }
-
   set defaultChainId(value: number) {
-    this._data.defaultChainId = value;
+    this.configModel.defaultChainId = value;
   }
 
   get wallets() {
-    return this._data.wallets ?? [];
+    return this.configModel.wallets;
   }
   set wallets(value: IWalletPlugin[]) {
-    this._data.wallets = value;
+    this.configModel.wallets = value;
   }
 
   get networks() {
-    return this._data.networks ?? [];
+    return this.configModel.networks ?? [];
   }
   set networks(value: INetworkConfig[]) {
-    this._data.networks = value;
+    this.configModel.networks = value;
   }
 
   get showHeader() {
-    return this._data.showHeader ?? true;
+    return this.configModel.showHeader;
   }
   set showHeader(value: boolean) {
-    this._data.showHeader = value;
+    this.configModel.showHeader = value;
   }
 
   get title() {
-    return this._data.title ?? '';
+    return this.configModel.title;
   }
   set title(value: string) {
-    this._data.title = value ?? '';
+    this.configModel.title = value ?? '';
   }
 
   get logo() {
-    return this._data.logo ?? '';
+    return this.configModel.logo;
   }
   set logo(value: string) {
-    this._data.logo = value ?? '';
+    this.configModel.logo = value ?? '';
   }
 
   set width(value: string | number) {
     this.resizeLayout();
   }
 
-  private get hasData() {
-    const { providers, defaultChainId, networks, wallets } = this._data;
-    return !!(providers?.length || networks?.length || wallets?.length || !isNaN(Number(defaultChainId)));
-  }
-
-  private determineActionsByTarget(target: 'builder' | 'projectOwner', category?: string) {
-    if (target === 'builder') {
-      return this.getBuilderActions(category);
-    }
-    else {
-      return this.getProjectOwnerActions();
-    }
-  }
-
-  private async loadCommissionFee() {
-    if (this._data.campaignId && this.state.embedderCommissionFee === undefined) {
-      const commissionRate = await getCommissionRate(this.state, this._data.campaignId);
-      this.state.embedderCommissionFee = commissionRate;
-    }
-  }
-
-  private getBuilderActions(category?: string) {
-    const formSchema: any = getBuilderSchema();
-    const dataSchema = formSchema.dataSchema;
-    const uiSchema = formSchema.uiSchema;
-    const customControls = formSchema.customControls();
-    let self = this;
-    const actions: any[] = [
-      {
-        name: 'Commissions',
-        icon: 'dollar-sign',
-        command: (builder: any, userInputData: any) => {
-          let _oldData: ISwapWidgetData = {
-            category: 'fixed-pair',
-            providers: [],
-            defaultChainId: 0,
-            wallets: [],
-            networks: []
-          }
-          return {
-            execute: async () => {
-              _oldData = { ...this._data };
-              if (userInputData.commissions) this._data.commissions = userInputData.commissions;
-              this.refreshUI();
-              if (builder?.setData) builder.setData(this._data);
-            },
-            undo: () => {
-              this._data = { ..._oldData };
-              this.refreshUI();
-              if (builder?.setData) builder.setData(this._data);
-            },
-            redo: () => { }
-          }
-        },
-        customUI: {
-          render: async (data?: any, onConfirm?: (result: boolean, data: any) => void) => {
-            const vstack = new VStack();
-            await self.loadCommissionFee();
-            const config = new ScomCommissionFeeSetup(null, {
-              commissions: self._data.commissions || [],
-              fee: self.state.embedderCommissionFee,
-              networks: self._data.networks
-            });
-            const hstack = new HStack(null, {
-              verticalAlignment: 'center',
-            });
-            const button = new Button(hstack, {
-              caption: 'Confirm',
-              width: '100%',
-              height: 40,
-              font: { color: Theme.colors.primary.contrastText }
-            });
-            vstack.append(config);
-            vstack.append(hstack);
-            button.onClick = async () => {
-              const commissions = config.commissions;
-              if (onConfirm) onConfirm(true, { commissions });
-            }
-            return vstack;
-          }
-        }
-      }
-    ]
-    if (category && category !== 'offers') {
-      actions.push({
-        name: 'Edit',
-        icon: 'edit',
-        command: (builder: any, userInputData: any) => {
-          let oldData: ISwapWidgetData = {
-            category: 'fixed-pair',
-            providers: [],
-            defaultChainId: 0,
-            wallets: [],
-            networks: []
-          };
-          let oldTag = {};
-          return {
-            execute: async () => {
-              oldData = JSON.parse(JSON.stringify(this._data));
-              const {
-                logo,
-                title,
-                networks,
-                category,
-                providers,
-                ...themeSettings
-              } = userInputData;
-
-              const generalSettings = {
-                logo,
-                title,
-                networks,
-                category,
-                providers,
-              };
-
-              this._data.logo = generalSettings.logo;
-              this._data.title = generalSettings.title;
-              this._data.networks = generalSettings.networks;
-              this._data.defaultChainId = this._data.networks[0].chainId;
-              this._data.category = generalSettings.category;
-              this._data.providers = generalSettings.providers;
-              this._tokens = [];
-              if (generalSettings.networks) {
-                let tokenList = [];
-                for (let network of generalSettings.networks) {
-                  const { chainId, tokens = [] } = network;
-                  const _tokens = tokens.map(v => {
-                    return {
-                      chainId,
-                      address: v.address
-                    }
-                  })
-                  tokenList.push(..._tokens);
-                }
-                this._tokens = getTokenObjArr(tokenList);
-              }
-              await this.resetRpcWallet();
-              this.updateContractAddress();
-              this.refreshUI();
-              if (builder?.setData) builder.setData(this._data);
-
-              oldTag = JSON.parse(JSON.stringify(this.tag));
-              if (builder?.setTag) builder.setTag(themeSettings);
-              else this.setTag(themeSettings);
-              if (this.dappContainer) this.dappContainer.setTag(themeSettings);
-            },
-            undo: () => {
-              this._data = JSON.parse(JSON.stringify(oldData));
-              this.refreshUI();
-              if (builder?.setData) builder.setData(this._data);
-
-              this.tag = JSON.parse(JSON.stringify(oldTag));
-              if (builder?.setTag) builder.setTag(this.tag);
-              else this.setTag(this.tag);
-              if (this.dappContainer) this.dappContainer.setTag(this.tag);
-            },
-            redo: () => { }
-          }
-        },
-        userInputDataSchema: dataSchema,
-        userInputUISchema: uiSchema,
-        customControls: customControls
-      });
-    }
-    return actions
-  }
-
-  private getProjectOwnerActions() {
-    const formSchema: any = getProjectOwnerSchema();
-    const propertiesDataSchema = formSchema.general.dataSchema;
-    const propertiesUISchema = formSchema.general.uiSchema;
-    const actions: any[] = [
-      {
-        name: 'Settings',
-        userInputDataSchema: propertiesDataSchema,
-        userInputUISchema: propertiesUISchema
-      }
-    ];
-    return actions
-  }
-
   getConfigurators() {
-    let self = this;
-    return [
-      {
-        name: 'Project Owner Configurator',
-        target: 'Project Owners',
-        getProxySelectors: async () => {
-          const selectors = await getProviderProxySelectors(this.state, this._data.providers);
-          return selectors;
-        },
-        getDexProviderOptions: (chainId: number) => {
-          const providers = this.state.getDexInfoList({ chainId });
-          return providers;
-        },
-        getPair: async (market: string, tokenA: ITokenObject, tokenB: ITokenObject) => {
-          const pair = await getPair(this.state, market, tokenA, tokenB);
-          return pair;
-        },
-        getActions: (category?: string) => {
-          return this.determineActionsByTarget('projectOwner', category);
-        },
-        getData: this.getData.bind(this),
-        setData: async (value: any) => {
-          this.setData(value);
-        },
-        getTag: this.getTag.bind(this),
-        setTag: this.setTag.bind(this)
-      },
-      {
-        name: 'Builder Configurator',
-        target: 'Builders',
-        getActions: (category?: string) => {
-          return this.determineActionsByTarget('builder', category);
-        },
-        getData: this.getData.bind(this),
-        setData: async (value: any) => {
-          const defaultData = configData.defaultBuilderData;
-          this.setData({ ...defaultData, ...value });
-        },
-        getTag: this.getTag.bind(this),
-        setTag: this.setTag.bind(this)
-      },
-      {
-        name: 'Embedder Configurator',
-        target: 'Embedders',
-        elementName: 'i-scom-commission-fee-setup',
-        getLinkParams: () => {
-          const commissions = this._data.commissions || [];
-          return {
-            data: window.btoa(JSON.stringify(commissions))
-          }
-        },
-        // setLinkParams: async (params: any) => {
-        //   if (params.data) {
-        //     const decodedString = window.atob(params.data);
-        //     const commissions = JSON.parse(decodedString);
-        //     let resultingData = {
-        //       ...self._data,
-        //       commissions
-        //     };
-        //     await this.setData(resultingData);
-        //   }
-        // },
-        bindOnChanged: (element: ScomCommissionFeeSetup, callback: (data: any) => Promise<void>) => {
-          element.onChanged = async (data: any) => {
-            const commissions: ICommissionInfo[] = data.commissions;
-            if (commissions) {
-              this.supportedChainIds = commissions.map(v => v.chainId).filter((v, i, a) => a.indexOf(v) === i);
-            }
-            let resultingData = {
-              ...self._data,
-              ...data
-            };
-
-            await this.setData(resultingData);
-            await callback(data);
-          }
-        },
-        getData: async () => {
-          await self.loadCommissionFee();
-          const fee = this.state.embedderCommissionFee;
-          return { ...this._data, fee }
-        },
-        setData: async (properties: ISwapWidgetData, linkParams?: Record<string, any>) => {
-          let resultingData = {
-            ...properties
-          }
-          if (linkParams?.data) {
-            const decodedString = window.atob(linkParams.data);
-            const commissions = JSON.parse(decodedString);
-            resultingData.commissions = commissions;
-
-          }
-          await this.setData(resultingData);
-        },
-        getTag: this.getTag.bind(this),
-        setTag: this.setTag.bind(this)
-      },
-      {
-        name: 'Editor',
-        target: 'Editor',
-        getActions: (category?: string) => {
-          const actions = this.determineActionsByTarget('builder', this.category);
-          const editAction = actions.find(action => action.name === 'Edit');
-          return editAction ? [editAction] : [];
-        },
-        getData: this.getData.bind(this),
-        setData: this.setData.bind(this),
-        getTag: this.getTag.bind(this),
-        setTag: this.setTag.bind(this)
-      }
-    ]
+    this.initModels();
+    return this.configModel.getConfigurators();
   }
 
-  private getData() {
-    return this._data;
-  }
-
-  private async resetRpcWallet() {
-    this.removeRpcWalletEvents();
-    const rpcWalletId = await this.state.initRpcWallet(this.defaultChainId);
-    const rpcWallet = this.state.getRpcWallet();
-    const chainChangedEvent = rpcWallet.registerWalletEvent(this, Constants.RpcWalletEvent.ChainChanged, async (chainId: number) => {
-      this.onChainChange();
-    });
-    const connectedEvent = rpcWallet.registerWalletEvent(this, Constants.RpcWalletEvent.Connected, async (connected: boolean) => {
-      if (this.swapBtn) this.swapBtn.visible = true;
-      this.updateContractAddress();
-      await this.initializeWidgetConfig();
-    });
-    const data: any = {
+  private refreshDappContainer = () => {
+    const rpcWallet = this.rpcWallet;
+    const data = {
       defaultChainId: this.defaultChainId,
       wallets: this.wallets,
       networks: this.networks,
@@ -625,61 +297,32 @@ export default class ScomSwap extends Module {
     if (this.dappContainer?.setData) this.dappContainer.setData(data);
   }
 
-  private async setData(value: ISwapWidgetData) {
-    this._data = value;
-    let tokenList = [];
-    for (let network of value.networks) {
-      const { chainId, tokens = [] } = network;
-      tokenStore.updateTokenMapData(chainId);
-      const _tokens = tokens.map(v => {
-        return {
-          chainId,
-          address: v.address
-        }
-      })
-      tokenList.push(..._tokens);
-    }
-    if (this._data.apiEndpoints) {
-      this.state.setAPIEnpoints(this._data.apiEndpoints);
-    }
-    this._tokens = getTokenObjArr(tokenList);
-    await this.resetRpcWallet();
-    this.updateContractAddress();
-    await this.refreshUI();
+  getData() {
+    return this.configModel.getData();
   }
 
-  private async getTag() {
+  async setData(value: ISwapWidgetData) {
+    this.configModel.setData(value);
+  }
+
+  getTag() {
     return this.tag;
   }
 
-  private updateTag(type: 'light' | 'dark', value: any) {
-    this.tag[type] = this.tag[type] ?? {};
-    for (let prop in value) {
-      if (value.hasOwnProperty(prop))
-        this.tag[type][prop] = value[prop];
-    }
+  async setTag(value: any) {
+    this.configModel.setTag(value);
   }
 
-  private async setTag(value: any) {
-    const newValue = value || {};
-    for (let prop in newValue) {
-      if (newValue.hasOwnProperty(prop)) {
-        if (prop === 'light' || prop === 'dark')
-          this.updateTag(prop, newValue[prop]);
-        else
-          this.tag[prop] = newValue[prop];
-      }
-    }
-    if (this.dappContainer)
-      this.dappContainer.setTag(this.tag);
-    this.updateTheme();
-    this.resizeLayout();
+  private setContaiterTag(value: any) {
+    if (this.dappContainer) this.dappContainer.setTag(value);
   }
 
   private updateStyle(name: string, value: any) {
-    value ?
-      this.style.setProperty(name, value) :
+    if (value) {
+      this.style.setProperty(name, value);
+    } else {
       this.style.removeProperty(name);
+    }
   }
 
   private updateTheme() {
@@ -696,18 +339,9 @@ export default class ScomSwap extends Module {
     this.updateStyle('--max-button-hover-background', this.tag[themeVar]?.maxButtonHoverBackground || 'linear-gradient(255deg,#f15e61,#b52082)');
   }
 
-  private setProviders() {
-    const providers = this.originalData?.providers || [];
-    if (this.isFixedPair) {
-      this.state.setProviderList([providers[0]]);
-    } else {
-      this.state.setProviderList(providers);
-    }
-  }
-
   private updateContractAddress() {
     if (this.approvalModelAction) {
-      if (this._data.campaignId !== undefined) {
+      if (this.configModel.campaignId !== undefined) {
         this.contractAddress = this.state.getProxyAddress();
       } else {
         this.contractAddress = '';
@@ -716,220 +350,100 @@ export default class ScomSwap extends Module {
     }
   }
 
-  private get isFixedPair() {
-    return this._data?.category === 'fixed-pair';
-  }
-
-  private get originalData() {
-    if (!this._data) return undefined;
-    const { category, providers } = this._data;
-    if (!providers.length) return undefined;
-    let _providers: IProvider[] = [];
-    if (this.isFixedPair) {
-      const { key } = providers[0];
-      let defaultProvider: IProvider = {
-        key
-      };
-      _providers.push(defaultProvider);
-    } else {
-      let providersByKeys: { [key: string]: IProviderUI[] } = {};
-      providers.forEach(v => {
-        if (!providersByKeys[v.key]) {
-          providersByKeys[v.key] = [];
-        }
-        providersByKeys[v.key].push(v);
-      });
-      Object.keys(providersByKeys).forEach(k => {
-        const arr = providersByKeys[k];
-        const { key } = arr[0];
-        let defaultProvider: IProvider = {
-          key
-        }
-        _providers.push(defaultProvider);
-      })
-    }
-    return { category, providers: _providers };
-  }
-
-  private async refreshUI() {
-    this.setProviders();
+  private async refreshWidget() {
+    this.swapModel.setProviders();
     await this.initData();
     await this.initializeWidgetConfig();
   }
 
   constructor(parent?: Container, options?: any) {
     super(parent, options);
-    this.deferReadyCallback = true;
+    this.initModels();
   }
 
   private registerEvent() {
-    this.clientEvents.push(this.$eventBus.register(this, EventId.SlippageToleranceChanged, () => { this.priceInfo.setData(this.getPriceInfo()) }));
+    this.clientEvents.push(this.$eventBus.register(this, EventId.SlippageToleranceChanged, () => { this.priceInfo.setData(this.swapModel.getPriceInfo(this.isPriceToggled)) }));
     this.clientEvents.push(this.$eventBus.register(this, EventId.ExpertModeChanged, () => {
       this.updateSwapButtonCaption();
     }));
   }
 
-  private onChainChange = async () => {
+  private onChainChanged = async () => {
     const currentChainId = this.state.getChainId();
     if (currentChainId != null && currentChainId != undefined)
       this.swapBtn.visible = true;
     this.updateContractAddress();
-    // if (this.originalData?.providers?.length) await this.initializeWidgetConfig();
     await this.initializeWidgetConfig();
   }
 
-  get isApproveButtonShown(): boolean {
-    const warningMessageText = this.getWarningMessageText();
-    return warningMessageText === '' && this.approveButtonStatus !== undefined && this.approveButtonStatus !== ApprovalStatus.NONE
-  }
-  get isPriceImpactTooHigh(): boolean {
-    if (this.isCrossChain) return false;
-    const warningMessageText = this.getWarningMessageText();
-    return this.record?.priceImpact > 15 && !this.state.isExpertMode && warningMessageText === priceImpactTooHighMsg
-  }
-  get isInsufficientBalance(): boolean {
-    if (!this.fromToken || !this.record) return false;
-    const balance = this.getBalance(this.fromToken);
-    return this.maxSold.gt(balance);
-  }
-  get maxSold() {
-    if (!this.fromToken || !this.record) return new BigNumber(0)
-    if (!this.isFrom) return new BigNumber(this.record.fromAmount);
-    return new BigNumber(this.getMinReceivedMaxSold() || this.record.fromAmount);
-  }
-  get isSwapping(): boolean {
-    const key = this.record?.key;
-    return key && this.swapButtonStatusMap[key] === ApprovalStatus.APPROVING;
-  }
-  get approveButtonStatus(): any {
-    const key = this.record?.key;
-    return this.approveButtonStatusMap[key];
-  }
-  get isApprovingRouter(): boolean {
-    return this.approveButtonStatus === ApprovalStatus.APPROVING;
-  }
-  get isValidToken(): boolean {
-    if (this.fromToken?.symbol && this.toToken?.symbol) {
-      return true;
-    }
-    return false;
+  private onWalletConnected = async () => {
+    if (this.swapBtn) this.swapBtn.visible = true;
+    this.updateContractAddress();
+    await this.initializeWidgetConfig();
   }
 
-  private fixedNumber = (value: BigNumber | string | number) => {
-    const val = typeof value === 'object' ? value : new BigNumber(value);
-    if (val.isNaN() || val.isZero()) return '';
-    return FormatUtils.formatNumber(val.toFixed(), { decimalFigures: 4, useSeparators: false });
-  }
-
-  private getTokenKey(token: ITokenObject) {
-    if (token.isNative) {
-      return token.symbol;
-    }
-    return token.address.toLowerCase();
-  }
-  private calculateDefaultTokens() {
-    let firstDefaultToken: ITokenObject;
-    let secondDefaultToken: ITokenObject;
-    const currentChainId = this.state.getChainId();
-    const currentChainTokens = getSupportedTokens(this._tokens, currentChainId);
-    if (!this._data.defaultInputToken && !this._data.defaultOutputToken) {
-      firstDefaultToken = currentChainTokens[0];
-      secondDefaultToken = currentChainTokens[1];
-    }
-    else {
-      if (this._data.defaultInputToken && currentChainId === this._data.defaultInputToken.chainId) {
-        let inputTokens = getSupportedTokens(this._tokens, this._data.defaultInputToken.chainId);
-        firstDefaultToken = inputTokens.find(v => v.chainId === this._data.defaultInputToken.chainId && v.address === this._data.defaultInputToken.address);
-      }
-      else {
-        firstDefaultToken = currentChainTokens[0];
-      }
-      if (this._data.defaultOutputToken) {
-        let outputTokens = getSupportedTokens(this._tokens, this._data.defaultOutputToken.chainId);
-        secondDefaultToken = outputTokens.find(v => v.chainId === this._data.defaultOutputToken.chainId && v.address === this._data.defaultOutputToken.address);
-      }
-      else {
-        secondDefaultToken = currentChainTokens[0];
-      }
-    }
-    return {
-      firstDefaultToken,
-      secondDefaultToken
-    }
-  }
   private initializeDefaultTokenPair() {
-    if (this.isCrossChain) {
-      let { firstDefaultToken, secondDefaultToken } = this.calculateDefaultTokens();
-      this.fromToken = firstDefaultToken;
-      this.toToken = secondDefaultToken;
+    if (this.swapModel.isCrossChain) {
+      let { firstDefaultToken, secondDefaultToken } = this.swapModel.calculateDefaultTokens();
       this.firstTokenInput.chainId = firstDefaultToken.chainId;
       this.secondTokenInput.chainId = secondDefaultToken.chainId;
-      this.fromInputValue = new BigNumber(this._data.defaultInputValue);
-      this.firstTokenInput.token = this.fromToken;
-      this.secondTokenInput.token = this.toToken;
+      this.swapModel.fromInputValue = new BigNumber(this.configModel.defaultInputValue);
+      this.firstTokenInput.token = this.swapModel.fromToken;
+      this.secondTokenInput.token = this.swapModel.toToken;
     }
     else {
-      const providers = this.originalData?.providers;
+      const providers = this.swapModel.originalData?.providers;
       if (providers && providers.length) {
-        let { firstDefaultToken, secondDefaultToken } = this.calculateDefaultTokens();
-        this.fromToken = firstDefaultToken;
-        this.toToken = secondDefaultToken;
+        let { firstDefaultToken, secondDefaultToken } = this.swapModel.calculateDefaultTokens();
         this.firstTokenInput.chainId = firstDefaultToken.chainId;
         this.secondTokenInput.chainId = secondDefaultToken.chainId;
-        this.fromInputValue = new BigNumber(this._data.defaultInputValue);
-        this.toInputValue = new BigNumber(this._data.defaultOutputValue);
-        this.firstTokenInput.token = this.fromToken;
-        this.secondTokenInput.token = this.toToken;
+        this.swapModel.fromInputValue = new BigNumber(this.configModel.defaultInputValue);
+        this.swapModel.toInputValue = new BigNumber(this.configModel.defaultOutputValue);
+        this.firstTokenInput.token = this.swapModel.fromToken;
+        this.secondTokenInput.token = this.swapModel.toToken;
         this.toggleReverseImage.cursor = 'default';
       }
-    }
-  }
-
-  private initWallet = async () => {
-    try {
-      await Wallet.getClientInstance().init();
-      const rpcWallet = this.state.getRpcWallet();
-      await rpcWallet.init();
-    } catch (err) {
-      console.log(err);
     }
   }
 
   private initializeWidgetConfig = async () => {
     setTimeout(async () => {
-      await this.initWallet();
+      await this.configModel.initWallet();
       this.initializeDefaultTokenPair();
       await this.renderChainList();
       await this.updateBalances();
-      this.updateTokenValues(this.fromToken, true);
-      this.updateTokenValues(this.toToken, false);
-      this.hIcon.enabled = this.vIcon.enabled = !this.isFixedPair && !this.isCrossChain;
-      this.firstTokenInput.tokenReadOnly = this.isFixedPair;
+      const { fromToken, toToken, record, isCrossChain, fromInputValue, toInputValue } = this.swapModel;
+      const isFixedPair = this.configModel.isFixedPair;
+      this.updateTokenValues(fromToken, true);
+      this.updateTokenValues(toToken, false);
+      this.hIcon.enabled = this.vIcon.enabled = !isFixedPair && !isCrossChain;
+      this.firstTokenInput.tokenReadOnly = isFixedPair;
       this.firstTokenInput.inputReadOnly = false;
-      this.secondTokenInput.tokenReadOnly = this.isFixedPair;
+      this.secondTokenInput.tokenReadOnly = isFixedPair;
       this.secondTokenInput.inputReadOnly = false;
-      this.pnlBranding.visible = !!this._data.logo || !!this._data.title;
-      if (this._data.logo?.startsWith('ipfs://')) {
-        this.imgLogo.url = this._data.logo.replace('ipfs://', '/ipfs/');
+      const { logo, title, tokens } = this.configModel;
+      this.pnlBranding.visible = !!logo || !!title;
+      if (logo?.startsWith('ipfs://')) {
+        this.imgLogo.url = logo.replace('ipfs://', '/ipfs/');
       }
       else {
-        this.imgLogo.url = this._data.logo;
+        this.imgLogo.url = logo;
       }
-      this.lbTitle.caption = this._data.title;
+      this.lbTitle.caption = title;
 
       this.updateSwapButtonCaption();
 
-      this.toggleReverseImage.cursor = this.isFixedPair ? 'default' : 'pointer';
-      if (this.isCrossChain) {
+      this.toggleReverseImage.cursor = isFixedPair ? 'default' : 'pointer';
+      if (isCrossChain) {
         this.initRoutes();
-        this.toInputValue = new BigNumber(0);
+        this.swapModel.toInputValue = new BigNumber(0);
         if (this.secondTokenInput) {
           this.secondTokenInput.value = '-';
           this.secondTokenInput.inputReadOnly = true;
         }
         this.toggleReverseImage.cursor = 'default';
-        if (this.isEstimated('from')) {
-          this.updateEstimatedPosition(false);
+        if (this.swapModel.isEstimated('from')) {
+          this.swapModel.updateEstimatedPosition(false);
         }
       } else {
         if (this.secondTokenInput) {
@@ -937,18 +451,18 @@ export default class ScomSwap extends Module {
         }
         this.toggleReverseImage.cursor = 'pointer';
       }
-      if (this.fromInputValue.isGreaterThan(0)) {
-        this.updateEstimatedPosition(false);
-        this.firstTokenInput.value = this.fixedNumber(this.fromInputValue);
+      if (fromInputValue.isGreaterThan(0)) {
+        this.swapModel.updateEstimatedPosition(false);
+        this.firstTokenInput.value = this.swapModel.fixedNumber(fromInputValue);
       }
-      else if (this.toInputValue.isGreaterThan(0)) {
-        this.updateEstimatedPosition(true);
-        this.secondTokenInput.value = this.fixedNumber(this.toInputValue);
+      else if (toInputValue.isGreaterThan(0)) {
+        this.swapModel.updateEstimatedPosition(true);
+        this.secondTokenInput.value = this.swapModel.fixedNumber(toInputValue);
       }
-      this.firstTokenInput.tokenDataListProp = getSupportedTokens(this._tokens, this.fromToken.chainId);
-      this.secondTokenInput.tokenDataListProp = getSupportedTokens(this._tokens, this.toToken.chainId);
-      if (!this.record)
-        this.swapBtn.enabled = !this.isSwapButtonDisabled();
+      this.firstTokenInput.tokenDataListProp = getSupportedTokens(tokens, fromToken.chainId);
+      this.secondTokenInput.tokenDataListProp = getSupportedTokens(tokens, toToken.chainId);
+      if (!record)
+        this.swapBtn.enabled = !this.swapModel.isSwapButtonDisabled;
       this.renderPriceInfo();
       await this.handleAddRoute();
     });
@@ -959,43 +473,43 @@ export default class ScomSwap extends Module {
       sender: this,
       payAction: this.onSubmit,
       onToBeApproved: async (token: ITokenObject, data?: any) => {
-        if (this.isCrossChain) {
-          this.crossChainApprovalStatus = ApprovalStatus.TO_BE_APPROVED;
+        if (this.swapModel.isCrossChain) {
+          this.swapModel.crossChainApprovalStatus = ApprovalStatus.TO_BE_APPROVED;
         } else {
-          this.setMapStatus('approve', data.key, ApprovalStatus.TO_BE_APPROVED);
-          this.setMapStatus('swap', data.key, ApprovalStatus.TO_BE_APPROVED);
+          this.swapModel.setMapStatus('approve', data.key, ApprovalStatus.TO_BE_APPROVED);
+          this.swapModel.setMapStatus('swap', data.key, ApprovalStatus.TO_BE_APPROVED);
         }
         this.updateSwapButtonCaption();
-        const enabled = !this.isSwapButtonDisabled();
+        const enabled = !this.swapModel.isSwapButtonDisabled;
         this.swapBtn.enabled = enabled;
       },
       onToBePaid: async (token: ITokenObject, data?: any) => {
-        if (this.isCrossChain) {
-          this.crossChainApprovalStatus = ApprovalStatus.NONE;
+        if (this.swapModel.isCrossChain) {
+          this.swapModel.crossChainApprovalStatus = ApprovalStatus.NONE;
         } else {
-          this.setMapStatus('approve', data.key, ApprovalStatus.NONE);
-          this.setMapStatus('swap', data.key, ApprovalStatus.TO_BE_APPROVED);
+          this.swapModel.setMapStatus('approve', data.key, ApprovalStatus.NONE);
+          this.swapModel.setMapStatus('swap', data.key, ApprovalStatus.TO_BE_APPROVED);
         }
         this.updateSwapButtonCaption();
-        const enabled = !this.isSwapButtonDisabled();
+        const enabled = !this.swapModel.isSwapButtonDisabled;
         this.swapBtn.enabled = enabled;
       },
       onApproving: async (token: ITokenObject, receipt?: string, data?: any) => {
-        if (this.isCrossChain) {
-          this.crossChainApprovalStatus = ApprovalStatus.APPROVING;
+        if (this.swapModel.isCrossChain) {
+          this.swapModel.crossChainApprovalStatus = ApprovalStatus.APPROVING;
         } else {
-          this.setMapStatus('approve', data.key, ApprovalStatus.APPROVING);
+          this.swapModel.setMapStatus('approve', data.key, ApprovalStatus.APPROVING);
         }
         this.updateSwapButtonCaption();
         this.showResultMessage('success', receipt);
-        if ((this.isApprovingRouter || this.isCrossChain) && !this.swapBtn.rightIcon.visible)
+        if ((this.swapModel.isApprovingRouter || this.swapModel.isCrossChain) && !this.swapBtn.rightIcon.visible)
           this.swapBtn.rightIcon.visible = true;
       },
       onApproved: async (token: ITokenObject, data?: any) => {
-        if (this.isCrossChain) {
-          this.crossChainApprovalStatus = ApprovalStatus.NONE;
+        if (this.swapModel.isCrossChain) {
+          this.swapModel.crossChainApprovalStatus = ApprovalStatus.NONE;
         } else {
-          this.setMapStatus('approve', data.key, ApprovalStatus.NONE);
+          this.swapModel.setMapStatus('approve', data.key, ApprovalStatus.NONE);
         }
         this.updateSwapButtonCaption();
         if (this.swapBtn.rightIcon.visible)
@@ -1004,7 +518,7 @@ export default class ScomSwap extends Module {
       },
       onApprovingError: async (token: ITokenObject, err: Error) => {
         this.showResultMessage('error', err);
-        this.crossChainApprovalStatus = ApprovalStatus.TO_BE_APPROVED;
+        this.swapModel.crossChainApprovalStatus = ApprovalStatus.TO_BE_APPROVED;
         if (this.swapBtn.rightIcon.visible)
           this.swapBtn.rightIcon.visible = false;
       },
@@ -1013,10 +527,10 @@ export default class ScomSwap extends Module {
         this.onSwapConfirming(data.key);
       },
       onPaid: async (data?: any, receipt?: TransactionReceipt) => {
-        this.onSwapConfirmed({ key: data.key, isCrossChain: this.isCrossChain });
+        this.onSwapConfirmed({ key: data.key, isCrossChain: this.swapModel.isCrossChain });
         await this.updateBalances();
         application.EventBus.dispatch(EventId.Paid, {
-          isCrossChain: this.isCrossChain,
+          isCrossChain: this.swapModel.isCrossChain,
           data: data ?? null,
           id: this.uuid,
           receipt: receipt
@@ -1029,24 +543,25 @@ export default class ScomSwap extends Module {
   }
 
   private async onRevertSwap() {
-    if (this.isCrossChain) return;
-    this.updateEstimatedPosition(!this.isEstimated('from'));
-    [this.fromToken, this.toToken] = [this.toToken, this.fromToken];
-    const enabled = !this.isMaxDisabled();
+    if (this.swapModel.isCrossChain) return;
+    this.swapModel.updateEstimatedPosition(!this.swapModel.isEstimated('from'));
+    [this.swapModel.fromToken, this.swapModel.toToken] = [this.swapModel.toToken, this.swapModel.fromToken];
+    const enabled = !this.swapModel.isMaxDisabled;
     this.maxButton.enabled = enabled;
-    [this.fromInputValue, this.toInputValue] = [this.toInputValue, this.fromInputValue];
+    [this.swapModel.fromInputValue, this.swapModel.toInputValue] = [this.swapModel.toInputValue, this.swapModel.fromInputValue];
     [this.payBalance.caption, this.receiveBalance.caption] = [this.receiveBalance.caption, this.payBalance.caption];
-    this.firstTokenInput.token = this.fromToken;
-    this.secondTokenInput.token = this.toToken;
-    this.firstTokenInput.value = this.getInputValue(true);
-    this.secondTokenInput.value = this.getInputValue(false);
+    this.firstTokenInput.token = this.swapModel.fromToken;
+    this.secondTokenInput.token = this.swapModel.toToken;
+    this.firstTokenInput.value = this.swapModel.getInputValue(true);
+    this.secondTokenInput.value = this.swapModel.getInputValue(false);
 
     await this.handleAddRoute();
   }
 
   private setupCrossChainPopup() {
+    const { isCrossChain, srcChain, desChain, record, toToken } = this.swapModel;
     const arrows = this.swapModal.querySelectorAll('i-icon.arrow-down');
-    if (!this.isCrossChain) {
+    if (!isCrossChain) {
       arrows.forEach((arrow: Icon) => {
         arrow.margin = { top: '0.75rem', bottom: '0.75rem' };
       });
@@ -1056,19 +571,19 @@ export default class ScomSwap extends Module {
       });
     }
     if (this.lbReminderRejected) this.lbReminderRejected.visible = false;
-    if (this.isCrossChain && this.srcChain && this.desChain) {
+    if (isCrossChain && srcChain && desChain) {
       this.srcChainFirstPanel.visible = true;
       this.targetChainFirstPanel.visible = true;
-      this.srcChainTokenImage.url = this.srcChain.image;
-      this.srcChainTokenLabel.caption = this.srcChain.chainName;
-      this.targetChainTokenImage.url = this.desChain.image;
-      this.targetChainTokenLabel.caption = this.desChain.chainName;
-      const { sourceVaultToken, targetVaultToken, sourceRouteObj, vaultTokenFromSourceChain, vaultTokenToTargetChain } = this.record;
+      this.srcChainTokenImage.url = srcChain.image;
+      this.srcChainTokenLabel.caption = srcChain.chainName;
+      this.targetChainTokenImage.url = desChain.image;
+      this.targetChainTokenLabel.caption = desChain.chainName;
+      const { sourceVaultToken, targetVaultToken, sourceRouteObj, vaultTokenFromSourceChain, vaultTokenToTargetChain } = record;
       if (sourceVaultToken && sourceRouteObj) {
         this.srcChainSecondPanel.visible = true;
-        this.srcChainVaultImage.url = this.srcChain.image;
-        this.srcChainVaultLabel.caption = this.srcChain.chainName;
-        this.srcVaultTokenImage.url = tokenAssets.getTokenIconPath(sourceVaultToken, this.srcChain.chainId);
+        this.srcChainVaultImage.url = srcChain.image;
+        this.srcChainVaultLabel.caption = srcChain.chainName;
+        this.srcVaultTokenImage.url = tokenAssets.getTokenIconPath(sourceVaultToken, srcChain.chainId);
         this.srcVaultTokenLabel.caption = sourceVaultToken.symbol;
         this.srcVaultTokenValue.caption = formatNumber(vaultTokenFromSourceChain);
         if (this.lbReminderRejected) {
@@ -1078,11 +593,11 @@ export default class ScomSwap extends Module {
       } else {
         this.srcChainSecondPanel.visible = false;
       }
-      if (targetVaultToken && targetVaultToken.symbol !== this.toToken?.symbol) {
+      if (targetVaultToken && targetVaultToken.symbol !== toToken?.symbol) {
         this.targetChainSecondPanel.visible = true;
-        this.targetChainVaultImage.url = this.desChain.image;
-        this.targetChainVaultLabel.caption = this.desChain.chainName;
-        this.targetVaultTokenImage.url = tokenAssets.getTokenIconPath(targetVaultToken, this.desChain.chainId);
+        this.targetChainVaultImage.url = desChain.image;
+        this.targetChainVaultLabel.caption = desChain.chainName;
+        this.targetVaultTokenImage.url = tokenAssets.getTokenIconPath(targetVaultToken, desChain.chainId);
         this.targetVaultTokenLabel.caption = targetVaultToken.symbol;
         this.targetVaultTokenValue.caption = formatNumber(vaultTokenToTargetChain);
         // Hide vault info at toToken
@@ -1102,88 +617,55 @@ export default class ScomSwap extends Module {
   }
 
   private handleSwapPopup() {
-    if (!this.record) return;
+    const { isFrom, isCrossChain, desChain, record, fromToken, toToken, fromInputValue, toInputValue } = this.swapModel;
+    if (!record) return;
     this.setupCrossChainPopup();
     const currentChainId = this.state.getChainId();
     const slippageTolerance = this.state.slippageTolerance;
-    this.fromTokenImage.url = tokenAssets.tokenPath(this.fromToken, currentChainId);
-    this.fromTokenLabel.caption = this.fromToken?.symbol ?? '';
-    this.fromTokenValue.caption = formatNumber(this.fromInputValue, 4);
-    this.toTokenImage.url = tokenAssets.tokenPath(this.toToken, this.isCrossChain ? this.desChain?.chainId : currentChainId);
-    this.toTokenLabel.caption = this.toToken?.symbol ?? '';
-    this.toTokenValue.caption = formatNumber(this.toInputValue, 4);
-    const minimumReceived = this.getMinReceivedMaxSold();
+    this.fromTokenImage.url = tokenAssets.tokenPath(fromToken, currentChainId);
+    this.fromTokenLabel.caption = fromToken?.symbol ?? '';
+    this.fromTokenValue.caption = formatNumber(fromInputValue, 4);
+    this.toTokenImage.url = tokenAssets.tokenPath(toToken, isCrossChain ? desChain?.chainId : currentChainId);
+    this.toTokenLabel.caption = toToken?.symbol ?? '';
+    this.toTokenValue.caption = formatNumber(toInputValue, 4);
+    const minimumReceived = this.swapModel.minReceivedMaxSold;
     if (minimumReceived || minimumReceived == 0) {
       this.payOrReceiveValue.caption = formatNumber(minimumReceived, 4);
     } else {
       this.payOrReceiveValue.caption = ' - ';
     }
-    this.payOrReceiveToken.caption = this.isFrom ? this.fromTokenLabel.caption : this.toTokenLabel.caption;
-    this.lbEstimate.caption = `${this.isFrom ? 'Input' : 'Output'} is estimated. If the price change by more than ${slippageTolerance}%, your transaction will revert`;
-    this.lbPayOrReceive.caption = this.isFrom ? 'You will pay at most' : 'You will receive at least';
-    this.priceInfo2.setData(this.getPriceInfo());
+    this.payOrReceiveToken.caption = isFrom ? this.fromTokenLabel.caption : this.toTokenLabel.caption;
+    this.lbEstimate.caption = `${isFrom ? 'Input' : 'Output'} is estimated. If the price change by more than ${slippageTolerance}%, your transaction will revert`;
+    this.lbPayOrReceive.caption = isFrom ? 'You will pay at most' : 'You will receive at least';
+    this.priceInfo2.setData(this.swapModel.getPriceInfo(this.isPriceToggled));
 
     this.swapModal.visible = true;
   }
+
   private onCloseModal(name: string) {
     this[name].visible = false;
   }
+
   private doSwap() {
-    this.approvalModelAction.doPayAction(this.record);
-  }
-  private getMinReceivedMaxSold = (): number | null => {
-    const slippageTolerance = this.state.slippageTolerance;
-    if (!slippageTolerance) return null;
-    if (this.isFrom) {
-      const poolAmount = new BigNumber(this.record?.amountIn);
-      if (poolAmount.isZero()) return null;
-      const minReceivedMaxSold = poolAmount.times(1 + slippageTolerance / 100).toNumber();
-      return minReceivedMaxSold;
-    } else {
-      const poolAmount = new BigNumber(this.record?.amountOut);
-      if (poolAmount.isZero()) return null;
-      const minReceivedMaxSold = poolAmount.times(1 - slippageTolerance / 100).toNumber();
-      return minReceivedMaxSold;
-    }
+    this.approvalModelAction.doPayAction(this.swapModel.record);
   }
 
   private async updateTokenValues(token: ITokenObject, isFrom: boolean) {
     if (!token) return;
-    const balance = this.getBalance(token);
+    const balance = this.swapModel.getBalance(token);
     if (isFrom) {
-      this.fromToken = token;
-      const enabled = !this.isMaxDisabled();
+      const enabled = !this.swapModel.isMaxDisabled;
       this.maxButton.enabled = enabled;
-      if (this.fromInputValue.gt(0)) {
-        const formattedValue = new BigNumber(this.fromInputValue).dp(token.decimals || 18, ROUNDING_NUMBER).toFixed();
-        if (!this.fromInputValue.eq(formattedValue)) {
-          if (this.firstTokenInput) {
-            this.firstTokenInput.value = formattedValue === '0' ? '' : formattedValue;
-          }
-          this.fromInputValue = new BigNumber(formattedValue);
-        }
-      } else if (this.fromInputValue.isZero()) {
-        this.updateEstimatedPosition(true);
-      }
+      this.swapModel.updateTokenValues(token, true, this.firstTokenInput);
       this.payBalance.caption = `Balance: ${formatNumber(balance, 4)} ${token.symbol}`;
-      this.updateTokenInput(true);
+      await this.updateTokenInput(true);
     } else {
-      this.toToken = token;
-      if (this.toInputValue.gt(0)) {
-        const formattedValue = new BigNumber(this.toInputValue).dp(token.decimals || 18, ROUNDING_NUMBER).toFixed();
-        if (!this.toInputValue.eq(formattedValue)) {
-          if (this.secondTokenInput) {
-            this.secondTokenInput.value = formattedValue === '0' ? '' : formattedValue;
-          }
-          this.toInputValue = new BigNumber(formattedValue);
-        }
-      } else if (this.toInputValue.isZero()) {
-        this.updateEstimatedPosition(false);
-      }
+      this.swapModel.updateTokenValues(token, false, this.secondTokenInput);
       this.receiveBalance.caption = `Balance: ${formatNumber(balance, 4)} ${token.symbol}`;
       await this.updateTokenInput(false);
     }
   }
+
   private async onSelectToken(token: ITokenObject, isFrom: boolean) {
     if (!token) return
     this.firstTokenInput.enabled = false;
@@ -1199,13 +681,13 @@ export default class ScomSwap extends Module {
   }
 
   private setApprovalSpenderAddress() {
-    const item = this.record;
+    const item = this.swapModel.record;
     if (!item) return;
     const market = this.state.getProviderByKey(item.provider)?.key || '';
     if (this.approvalModelAction) {
-      if (this.isCrossChain && item.contractAddress) {
+      if (this.swapModel.isCrossChain && item.contractAddress) {
         setApprovalModalSpenderAddress(this.state, market, item.contractAddress);
-      } else if (this._data.campaignId !== undefined) {
+      } else if (this.configModel.campaignId !== undefined) {
         this.contractAddress = this.state.getProxyAddress();
         setApprovalModalSpenderAddress(this.state, market, this.contractAddress);
       } else {
@@ -1214,49 +696,41 @@ export default class ScomSwap extends Module {
     }
   }
 
-  private getInputValue(isFrom: boolean) {
-    const token = isFrom ? this.fromToken : this.toToken;
-    const value = isFrom ? this.fromInputValue : this.toInputValue;
-    if (!value || value.isNaN()) return '';
-    const newValue = value.dp(token?.decimals || 18, ROUNDING_NUMBER).toFixed()
-    return newValue;
-  }
-
   private async updateTokenInput(isFrom: boolean, init?: boolean) {
     const inputEl = isFrom ? this.firstTokenInput : this.secondTokenInput;
-    if (inputEl) inputEl.value = this.getInputValue(isFrom);
+    if (inputEl) inputEl.value = this.swapModel.getInputValue(isFrom);
   }
 
   private async onSelectRouteItem(item: any) {
-    if (this.isFrom) {
+    if (this.swapModel.isFrom) {
       if (this.payCol.children) {
         let balanceValue = item.amountIn;
-        this.firstTokenInput.value = this.fixedNumber(balanceValue);
-        this.fromInputValue = typeof balanceValue !== 'object' ? new BigNumber(balanceValue) : balanceValue;
+        this.firstTokenInput.value = this.swapModel.fixedNumber(balanceValue);
+        this.swapModel.fromInputValue = typeof balanceValue !== 'object' ? new BigNumber(balanceValue) : balanceValue;
       }
     } else {
       if (this.receiveCol.children) {
         let balanceValue = item.amountOut;
-        this.secondTokenInput.value = this.fixedNumber(balanceValue);
-        this.toInputValue = typeof balanceValue !== 'object' ? new BigNumber(balanceValue) : balanceValue;
+        this.secondTokenInput.value = this.swapModel.fixedNumber(balanceValue);
+        this.swapModel.toInputValue = typeof balanceValue !== 'object' ? new BigNumber(balanceValue) : balanceValue;
       }
     }
 
-    this.record = item;
-    if (this.isCrossChain && this.fromToken && !this.fromToken.isNative && this.state.isRpcWalletConnected()) {
+    this.swapModel.record = item;
+    if (this.swapModel.isCrossChain && this.swapModel.fromToken && !this.swapModel.fromToken.isNative && this.state.isRpcWalletConnected()) {
       try {
         this.setApprovalSpenderAddress();
-        await this.approvalModelAction.checkAllowance(this.fromToken, this.fromInputValue.toFixed());
+        await this.approvalModelAction.checkAllowance(this.swapModel.fromToken, this.swapModel.fromInputValue.toFixed());
       } catch (e) {
         console.log('Cannot check the Approval status (Cross Chain)', e);
       }
     }
-    const isButtonLoading = this.isButtonLoading();
+    const isButtonLoading = this.swapModel.isButtonLoading;
     if (this.swapBtn.rightIcon.visible != isButtonLoading) {
       this.swapBtn.rightIcon.visible = isButtonLoading;
     }
     if (this.priceInfo)
-      await this.priceInfo.setData(this.getPriceInfo());
+      await this.priceInfo.setData(this.swapModel.getPriceInfo(this.isPriceToggled));
   }
 
   private onTokenInputChange(source: Control) {
@@ -1274,7 +748,7 @@ export default class ScomSwap extends Module {
           toInput.value = '0';
         return;
       }
-      const limit = (isFrom ? this.fromToken?.decimals : this.toToken?.decimals) || 18;
+      const limit = (isFrom ? this.swapModel.fromToken?.decimals : this.swapModel.toToken?.decimals) || 18;
       const value = new BigNumber(amount).dp(limit, ROUNDING_NUMBER);
       if (!value.gt(0)) {
         this.resetValuesByInput();
@@ -1287,17 +761,17 @@ export default class ScomSwap extends Module {
         let valueChanged = false;
         const isLastDot = amount.indexOf('.') === amount.length - 1;
         if (isFrom) {
-          if (!this.fromInputValue.eq(value)) {
-            this.fromInputValue = value;
-            this.updateEstimatedPosition(false);
+          if (!this.swapModel.fromInputValue.eq(value)) {
+            this.swapModel.fromInputValue = value;
+            this.swapModel.updateEstimatedPosition(false);
             valueChanged = true;
           }
           if (!isLastDot)
             fromInput.value = value.toFixed();
         } else {
-          if (!this.toInputValue.eq(value)) {
-            this.toInputValue = value;
-            this.updateEstimatedPosition(true);
+          if (!this.swapModel.toInputValue.eq(value)) {
+            this.swapModel.toInputValue = value;
+            this.swapModel.updateEstimatedPosition(true);
             valueChanged = true;
           }
           if (!isLastDot)
@@ -1308,100 +782,42 @@ export default class ScomSwap extends Module {
 
     }, 1000);
   }
+
   private resetValuesByInput() {
     this.initRoutes();
-    if (this.priceInfo) this.priceInfo.setData(this.getPriceInfo());
-    this.fromInputValue = new BigNumber(0);
-    this.toInputValue = new BigNumber(0);
+    if (this.priceInfo) this.priceInfo.setData(this.swapModel.getPriceInfo(this.isPriceToggled));
+    this.swapModel.fromInputValue = new BigNumber(0);
+    this.swapModel.toInputValue = new BigNumber(0);
   }
+
   private initRoutes() {
-    this.record = null;
+    this.swapModel.record = null;
     this.isPriceToggled = false;
     this.swapBtn.visible = false;
   }
+
   private async handleAddRoute() {
-    if (!this.fromToken || !this.toToken || !(this.fromInputValue.gt(0) || this.toInputValue.gt(0))) return;
+    const { isCrossChain, srcChain, desChain, fromToken, toToken, fromInputValue, toInputValue } = this.swapModel;
+    if (!fromToken || !toToken || !(fromInputValue.gt(0) || toInputValue.gt(0))) {
+      this.initRoutes();
+      this.showEmptyRoute();
+      this.lbYouPayValue.caption = '0';
+      this.minSwapHintLabel.visible = false;
+      return;
+    };
     this.initRoutes();
     let listRouting: any[] = [];
-    const useAPI = this._data.category === 'aggregator' || this._data.category === 'cross-chain-swap';
     this.updateContractAddress();
-    if (!this.isCrossChain) {
-      listRouting = await getAllRoutesData(this.state, this.fromToken, this.toToken, this.fromInputValue, this.toInputValue, this.isFrom, useAPI);
-      listRouting = listRouting.map((v: any) => {
-        return {
-          ...v,
-          isHybrid: false // market == Market.HYBRID,
-        }
-      });
-    } else if (this.srcChain && this.desChain) {
-      const tokenIn = Object.assign({}, this.fromToken);
-      const tokenOut = Object.assign({}, this.toToken);
-      listRouting = await getCrossChainRouteOptions(this.state, {
-        fromChainId: this.srcChain.chainId,
-        toChainId: this.desChain.chainId,
-        tokenIn: tokenIn,
-        tokenOut: tokenOut,
-        amountIn: this.fromInputValue
-      })
-      listRouting = listRouting.map((v: any) => {
-        let route: any = {};
-        if (v.sourceRouteObj) {
-          const amountOut = v.targetRouteObj ? v.targetRouteObj.amountOut : v.sourceRouteObj.amountOut;
-          route = {
-            ...v,
-            ...v.sourceRouteObj,
-            tradeFee: v.tradeFee,
-            price: v.price,
-            amountOut: new BigNumber(amountOut),
-          };
-          if (v.targetRouteObj) {
-            const market = this.state.getProviderByKey(v.targetRouteObj.provider)?.key || '';
-            if (market) {
-              route.targetRouteObj = {
-                ...route.targetRouteObj,
-                route: v.targetRouteObj.bestRoute,
-                isHybrid: false //market == Market.HYBRID,
-              }
-            } else {
-              route.targetRouteObj = undefined;
-            }
-          }
-        } else {
-          route = {
-            ...v,
-            ...v.targetRouteObj,
-            tradeFee: v.tradeFee,
-            price: v.price,
-          };
-        }
-        return { ...route, fromAmount: new BigNumber(route.fromAmount) };
-      });
+    if (!isCrossChain) {
+      listRouting = await this.swapModel.getSwapRoutesData();
+    } else if (srcChain && desChain) {
+      listRouting = await this.swapModel.getCrossChainRouteData();
       if (this.minSwapHintLabel) {
         this.minSwapHintLabel.visible = !listRouting.length;
       }
     }
-    if (listRouting[0] && this.isCrossChain) {
-      const assetSymbol = listRouting[0].targetVaultToken.symbol;
-      const { vaultAddress, vaultRegistryAddress, tokenAddress: vaultTokenAddress, softCap } = bridgeVaultConstantMap[assetSymbol === 'USDT.e' ? 'USDT' : assetSymbol][this.desChain!.chainId];
-      const [vault, vaultAssetBalance, bonds, oraclePriceMap] = await Promise.all([
-        getBridgeVault(this.state, this.desChain!.chainId, vaultAddress),
-        getVaultAssetBalance(this.desChain!.chainId, vaultAddress),
-        getBondsInBridgeVault(this.state, this.desChain!.chainId, vaultRegistryAddress),
-        getOraclePriceMap(this.desChain!.chainId)
-      ]);
-      const assetBalance = vaultAssetBalance ?? 0;
-      const assetDecimal = listRouting[0].targetVaultToken.decimals;
-      const targetVaultAssetBalance = (new BigNumber(assetBalance)).shiftedBy(-assetDecimal);
-      const targetVaultBondBalance = bonds.reduce((acc, cur) => {
-        if (cur.chainId !== this.desChain?.chainId) return acc;
-        acc = acc.plus((new BigNumber(cur.bond)).shiftedBy(-18));
-        return acc;
-      }, new BigNumber(0));
-      const vaultTokenToTargetChain: BigNumber = new BigNumber(listRouting[0].vaultTokenToTargetChain);
-      const vaultToUsdPrice = oraclePriceMap[vaultTokenAddress.toLowerCase()]; // This will be the vaultToken -> USD Price
-      const oswapToken = Object.values(tokenStore.getTokenMapByChainId(this.desChain!.chainId)).find(v => v.symbol === 'OSWAP')
-      const oswapToUsdPrice = oraclePriceMap[oswapToken.address.toLowerCase()];
-      const vaultToOswapPrice = vaultToUsdPrice.div(oswapToUsdPrice); // This will vaultToken -> oswap price;
+    if (listRouting[0] && isCrossChain) {
+      const { assetSymbol, vault, targetVaultAssetBalance, targetVaultBondBalance, vaultTokenToTargetChain, vaultToOswapPrice, softCap, minValue } = await this.swapModel.getVaultData(listRouting[0]);
       this.targetVaultAssetBalanceLabel1.caption = `Vault Asset Balance: ${formatNumber(targetVaultAssetBalance.toNumber(), 4)} ${assetSymbol}`;
       this.targetVaultAssetBalanceLabel2.caption = `Vault Asset Balance: ${formatNumber(targetVaultAssetBalance.toNumber(), 4)} ${assetSymbol}`;
       if (!vault.vaultGroup) {
@@ -1416,7 +832,6 @@ export default class ScomSwap extends Module {
       }
       this.crossChainSoftCapLabel1.caption = softCap ? `Cap: ${formatNumber(softCap)} ${assetSymbol}` : "-";
       this.crossChainSoftCapLabel2.caption = softCap ? `Cap: ${formatNumber(softCap)} ${assetSymbol}` : "-";
-      const minValue = BigNumber.min(targetVaultAssetBalance, targetVaultBondBalance, softCap);
       if (minValue.eq(targetVaultAssetBalance)) {
         this.targetVaultAssetBalanceLabel1.classList.add('text--limit');
         this.targetVaultAssetBalanceLabel2.classList.add('text--limit');
@@ -1448,16 +863,16 @@ export default class ScomSwap extends Module {
       } else {
         this.swapModalConfirmBtn.enabled = true;
       }
-      this.crossChainApprovalStatus = listRouting[0].isApproveButtonShown ? ApprovalStatus.TO_BE_APPROVED : ApprovalStatus.NONE;
+      this.swapModel.crossChainApprovalStatus = listRouting[0].isApproveButtonShown ? ApprovalStatus.TO_BE_APPROVED : ApprovalStatus.NONE;
     }
     this.disableSelectChain(false);
     this.disableSelectChain(false, true);
 
     this.swapModalConfirmBtn.caption = 'Confirm Swap';
     this.swapModalConfirmBtn.enabled = true;
-    this.record = listRouting[0] || null;
-    this.swapButtonStatusMap = {};
-    this.approveButtonStatusMap = {};
+    this.swapModel.record = listRouting[0] || null;
+    this.swapModel.swapButtonStatusMap = {};
+    this.swapModel.approveButtonStatusMap = {};
     this.initRoutes();
     if (listRouting.length) {
       // this.receiveCol.classList.add('bg-box--active');
@@ -1466,314 +881,78 @@ export default class ScomSwap extends Module {
       await this.onSelectRouteItem(option);
     } else {
       // this.receiveCol.classList.remove('bg-box--active');
-      this.lbRouting.opacity = 0.75;
-      if (this.priceInfo)
-        this.priceInfo.setData(this.getPriceInfo());
-      if (this.isEstimated('to')) {
-        this.toInputValue = new BigNumber(0);
-        this.secondTokenInput.value = '';
-      } else {
-        this.fromInputValue = new BigNumber(0);
-        this.firstTokenInput.value = '';
-      }
+      this.showEmptyRoute();
     }
-    if (this.record) {
+    if (this.swapModel.record) {
       this.setApprovalSpenderAddress();
-      await this.approvalModelAction.checkAllowance(this.fromToken as ITokenObject, this.fromInputValue.toFixed(), this.record);
+      await this.approvalModelAction.checkAllowance(this.swapModel.fromToken as ITokenObject, this.swapModel.fromInputValue.toFixed(), this.swapModel.record);
       this.swapBtn.visible = true;
-      const total = this.record?.fromAmount ? new BigNumber(this.record.fromAmount) : new BigNumber(0);
-      this.lbYouPayTitle.caption = `You Pay`;
-      this.lbYouPayValue.caption = `${formatNumber(total)} ${this.fromToken?.symbol}`;
+      const total = this.swapModel.record?.fromAmount ? new BigNumber(this.swapModel.record.fromAmount) : new BigNumber(0);
+      this.lbYouPayValue.caption = `${formatNumber(total)} ${this.swapModel.fromToken?.symbol}`;
     }
     else {
       this.updateSwapButtonCaption();
       this.swapBtn.visible = true;
-      this.swapBtn.enabled = !this.isSwapButtonDisabled();
+      this.swapBtn.enabled = !this.swapModel.isSwapButtonDisabled;
+    }
+  }
+
+  private showEmptyRoute() {
+    this.lbRouting.opacity = 0.75;
+    if (this.priceInfo)
+      this.priceInfo.setData(this.swapModel.getPriceInfo(this.isPriceToggled));
+    if (this.swapModel.isEstimated('to')) {
+      this.swapModel.toInputValue = new BigNumber(0);
+      this.secondTokenInput.value = '';
+    } else {
+      this.swapModel.fromInputValue = new BigNumber(0);
+      this.firstTokenInput.value = '';
     }
   }
 
   // Price Info
   private onTogglePrice(priceInfo: PriceInfo) {
     this.isPriceToggled = !this.isPriceToggled;
-    priceInfo.setData(this.getPriceInfo());
+    priceInfo.setData(this.swapModel.getPriceInfo(this.isPriceToggled));
   }
-  private getRate() {
-    const value = this.isPriceToggled ? this.record?.priceSwap : this.record?.price;
-    let fromSymbol = this.fromToken?.symbol;
-    let toSymbol = this.toToken?.symbol;
-    if (this.isCrossChain) {
-      const srcName = this.srcChain?.chainName;
-      const desName = this.desChain?.chainName;
-      if (srcName) {
-        fromSymbol = `${fromSymbol} (${srcName})`;
-      }
-      if (desName) {
-        toSymbol = `${toSymbol} (${desName})`;
-      }
-    }
-    if (value || value == 0) {
-      if (this.isPriceToggled) {
-        return `1 ${fromSymbol} &#8776; ${formatNumber(value)} ${toSymbol}`;
-      }
-      return `1 ${toSymbol} &#8776; ${formatNumber(value)} ${fromSymbol}`;
-    }
-    return '-';
-  }
-  private getPriceImpact() {
-    const value = this.record?.priceImpact;
-    if (value || value == 0) {
-      return `${formatNumber(value)}%`;
-    }
-    return '-';
-  }
-  private getMinimumReceived() {
-    const value = this.getMinReceivedMaxSold();
-    if (value || value == 0) {
-      if (this.isFrom) {
-        return `${formatNumber(value)} ${this.fromToken?.symbol}`;
-      }
-      return `${formatNumber(value)} ${this.toToken?.symbol}`;
-    }
-    return '-';
-  }
-  private getTradeFeeExactAmount() {
-    const tradeFee = this.isCrossChain ? new BigNumber(this.record?.tradeFee) : this.record?.fromAmount.times(this.record?.tradeFee);
-    if (tradeFee && !tradeFee.isNaN()) {
-      return `${formatNumber(tradeFee)} ${this.fromToken?.symbol}`;
-    }
-    return '-';
-  }
-  private getFeeDetails() {
-    if (this.isCrossChain && this.record) {
-      let record: ICrossChainRouteResult = this.record
-      let detail = [
-        {
-          title: "Source Chain Liquidity Fee",
-          description: "This fee is paid to the AMM Liquidity Providers on the Source Chain.",
-          value: record.fees.sourceRouteLiquidityFee,
-          isHidden: record.fees.sourceRouteLiquidityFee?.isZero()
-        },
-        {
-          title: "Target Chain Liquidity Fee",
-          description: "This fee is paid to the AMM Liquidity Providers on the Target Chain.",
-          value: record.fees.targetRouteLiquidityFee,
-          isHidden: record.targetRouteObj.pairs.length == 0
-        },
-        {
-          title: "Base Fee",
-          description: "This fee is paid to the trolls to cover gas fee on the Target Chain",
-          value: record.fees.baseFee,
-        },
-        {
-          title: "Bridge Vault Liquidity Fee",
-          description: "This fee is paid to the Bridge Vault Liquidity Provider on Target Chain",
-          value: record.fees.transactionFee,
-        },
-        {
-          title: "Protocol Fee",
-          description: "This fee is paid to the troll owners on the Cross Chain Network",
-          value: record.fees.protocolFee,
-        },
-        {
-          title: "Imbalance Fee",
-          description: "This fee is acted as an incentive to balance the vault.",
-          value: record.fees.imbalanceFee,
-        }
-      ]
-      return detail.filter(v => !v.isHidden)
-    }
-    if (!this.isCrossChain && this.record) {
-      return [{
-        title: "Liquidity Provider Fee",
-        description: "This fee is paid to the AMM Liquidity Provider.",
-        value: this.record.tradeFee
-      }]
-    }
-    return []
-  }
-  private getPriceInfo() {
-    const rate = this.getRate();
-    const priceImpact = this.getPriceImpact();
-    const minimumReceived = this.getMinimumReceived();
-    const tradeFeeExactAmount = this.getTradeFeeExactAmount();
-    const fees = this.getFeeDetails();
-    const countFees = fees.length;
-    let feeTooltip: any;
-    if (countFees === 1) {
-      const fee = fees[0];
-      feeTooltip = `${fee.description}`;
-    } else if (countFees > 1) {
-      feeTooltip = fees;
-    }
 
-    let info = [
-      {
-        title: "Rate",
-        value: this.isValidToken ? rate : '-',
-        isToggleShown: this.record && this.isValidToken,
-      },
-      {
-        title: "Price Impact",
-        value: this.isValidToken ? priceImpact : '-',
-        isHidden: this.isCrossChain,
-      },
-      {
-        title: this.isFrom ? "Maximum Sold" : "Minimum Received",
-        value: this.isValidToken ? minimumReceived : '-',
-      },
-      {
-        title: "Transaction Fee",
-        value: this.isValidToken ? tradeFeeExactAmount : '-',
-        tooltip: feeTooltip,
-        onClick: countFees > 1 ? () => this.showModalFees() : null
-      },
-      {
-        title: "Estimated Time",
-        value: this.isValidToken && this.record ? '30 seconds' : '-',
-        isHidden: !this.isCrossChain
-      }
-    ];
-    return info.filter((f: any) => !f.isHidden);
-  }
-  private updateEstimatedPosition = (isFrom: boolean) => {
-    if (this.isFrom != isFrom) {
-      this.isFrom = isFrom;
-    }
-  }
-  private isEstimated = (tokenPosition: string, strict = false) => {
-    if (tokenPosition === 'from') {
-      return strict ? this.isFrom && !this.fromInputValue.isZero() : this.isFrom;
-    } else if (tokenPosition === 'to') {
-      return strict ? !this.isFrom && !this.toInputValue.isZero() : !this.isFrom;
-    } else {
-      return false;
-    }
-  };
-  private getBalance(token?: ITokenObject) {
-    if (!token) return '0';
-    let tokenBalances = tokenStore.getTokenBalancesByChainId(token.chainId);
-    if (!tokenBalances) return '0';
-    const address = token.address || '';
-    let balance = address ? tokenBalances[address.toLowerCase()] ?? '0' : tokenBalances[token.symbol] || '0';
-    return balance
-  }
   private async updateBalances() {
-    const chainIds = [...new Set([this.fromToken.chainId, this.toToken.chainId])];
+    const { fromToken, toToken } = this.swapModel;
+    const chainIds = [...new Set([fromToken.chainId, toToken.chainId])];
     for (let chainId of chainIds) {
       await tokenStore.updateTokenBalancesByChainId(chainId);
     }
-    if (this.fromToken) {
-      const balance = this.getBalance(this.fromToken);
-      this.payBalance.caption = `Balance: ${formatNumber(balance, 4)} ${this.fromToken.symbol}`;
+    if (fromToken) {
+      const balance = this.swapModel.getBalance(fromToken);
+      this.payBalance.caption = `Balance: ${formatNumber(balance, 4)} ${fromToken.symbol}`;
     }
-    if (this.toToken) {
-      const balance = this.getBalance(this.toToken);
-      this.receiveBalance.caption = `Balance: ${formatNumber(balance, 4)} ${this.toToken.symbol}`;
+    if (toToken) {
+      const balance = this.swapModel.getBalance(toToken);
+      this.receiveBalance.caption = `Balance: ${formatNumber(balance, 4)} ${toToken.symbol}`;
     }
-    const enabled = !this.isMaxDisabled();
+    const enabled = !this.swapModel.isMaxDisabled;
     this.maxButton.enabled = enabled;
   }
+
   private updateSwapButtonCaption() {
     if (this.swapBtn && this.swapBtn.hasChildNodes()) {
-      this.swapBtn.caption = this.determineSwapButtonCaption();
+      this.swapBtn.caption = this.swapModel.determineSwapButtonCaption;
     }
   }
 
-  private determineSwapButtonCaption() {
-    const isApproveButtonShown = this.isCrossChain ? this.crossChainApprovalStatus !== ApprovalStatus.NONE : this.isApproveButtonShown;
-    if (!isClientWalletConnected()) {
-      return "Connect Wallet";
-    }
-    if (!this.state.isRpcWalletConnected()) {
-      return "Switch Network";
-    }
-    if (isApproveButtonShown) {
-      const status = this.isCrossChain ? this.crossChainApprovalStatus : this.approveButtonStatus;
-      switch (status) {
-        case ApprovalStatus.APPROVING:
-          return "Approving";
-        case ApprovalStatus.TO_BE_APPROVED:
-          return "Approve";
-      }
-      return '';
-    } else {
-      if (this.isSwapping) {
-        return this.isCrossChain ? "Creating Order" : "Swapping";
-      }
-      if (this.isInsufficientBalance) {
-        return `Insufficient ${this.fromToken?.symbol} balance`;
-      }
-      if (this.isCrossChain) {
-        return "Create Order";
-      }
-      if (this.isPriceImpactTooHigh) {
-        return "Turn on Expert Mode"
-      }
-      return "Swap";
-    }
-  }
-  private getWarningMessageText() {
-    const tokens = [this.fromToken?.symbol, this.toToken?.symbol];
-    if (tokens.every(v => v === 'ETH' || v === 'WETH')) {
-      return 'Invalid pair';
-    }
-    if (!this.record) {
-      return '';
-    }
-    if (this.record.key === 'Oracle' && (this.record.fromAmount.isZero() || this.record.toAmount.isZero())) {
-      return 'Circuit breaker triggered';
-    }
-    const balance = this.getBalance(this.fromToken);
-    if (this.maxSold.gt(balance)) {
-      return `Insufficient ${this.fromToken?.symbol} balance`;
-    }
-    if (this.record.priceImpact > 15 && !this.state.isExpertMode) {
-      return priceImpactTooHighMsg;
-    }
-    return '';
-  }
-  private setMapStatus(type: StatusMapType, key: string, status: ApprovalStatus) {
-    if (type === 'approve') {
-      let mapStatus = this.approveButtonStatusMap;
-      mapStatus[key] = status;
-      this.approveButtonStatusMap = {
-        ...mapStatus
-      };
-    }
-    else {
-      let mapStatus = this.swapButtonStatusMap;
-      mapStatus[key] = status;
-      this.swapButtonStatusMap = {
-        ...mapStatus
-      };
-    }
-  }
   private onSwapConfirming = (key: any) => {
-    this.setMapStatus('swap', key, ApprovalStatus.APPROVING);
+    this.swapModel.setMapStatus('swap', key, ApprovalStatus.APPROVING);
     this.updateSwapButtonCaption();
     if (!this.swapBtn.rightIcon.visible)
       this.swapBtn.rightIcon.visible = true;
   }
   private onSwapConfirmed = async (data: any) => {
     const { key, isCrossChain } = data;
-    this.setMapStatus('swap', key, ApprovalStatus.TO_BE_APPROVED);
+    this.swapModel.setMapStatus('swap', key, ApprovalStatus.TO_BE_APPROVED);
     this.updateSwapButtonCaption();
     if (this.swapBtn.rightIcon.visible)
       this.swapBtn.rightIcon.visible = false;
     await this.handleAddRoute();
-  }
-  private isButtonLoading() {
-    if (this.isApproveButtonShown || (this.isCrossChain && this.crossChainApprovalStatus === ApprovalStatus.APPROVING)) {
-      return this.isApprovingRouter;
-    }
-    return this.isSwapping;
-  }
-  private isSwapButtonDisabled() {
-    if (isClientWalletConnected() && this.state.isRpcWalletConnected() && !this.record) {
-      return true;
-    }
-    const warningMessageText = this.getWarningMessageText();
-    return (this.state.isRpcWalletConnected() && (warningMessageText != '' && !this.isPriceImpactTooHigh));
   }
 
   private async onClickSwapButton() {
@@ -1792,88 +971,53 @@ export default class ScomSwap extends Module {
       await clientWallet.switchNetwork(chainId);
       return;
     }
-    if (!this.record || this.isSwapButtonDisabled()) return;
+    const { record, isSwapButtonDisabled, isCrossChain, isApproveButtonShown, crossChainApprovalStatus, isPriceImpactTooHigh } = this.swapModel;
+    if (!record || isSwapButtonDisabled) return;
 
-    const isApproveButtonShown = this.isCrossChain ? this.crossChainApprovalStatus !== ApprovalStatus.NONE : this.isApproveButtonShown;
-    if (isApproveButtonShown) {
+    const isApproveShown = isCrossChain ? crossChainApprovalStatus !== ApprovalStatus.NONE : isApproveButtonShown;
+    if (isApproveShown) {
       this.approveRouterMax();
       return;
     }
-    if (this.isPriceImpactTooHigh) {
+    if (isPriceImpactTooHigh) {
       this.$eventBus.dispatch(EventId.ShowExpertModal);
       return;
     }
     this.handleSwapPopup();
   }
-  private onSubmit = async () => {
-    try {
-      this.swapModal.visible = false;
-      this.showResultMessage('warning', `Swapping ${formatNumber(this.fromInputValue, 4)} ${this.fromToken?.symbol} to ${formatNumber(this.toInputValue, 4)} ${this.toToken?.symbol}`);
-      if (this.isCrossChain) {
-        if (this.toToken && this.fromToken && this.desChain) {
-          this.record.minReceivedMaxSold = this.getMinReceivedMaxSold()
-          const { error } = await createBridgeVaultOrder(this.state, {
-            vaultAddress: this.record.vaultAddress,
-            targetChainId: this.desChain.chainId,
-            tokenIn: this.fromToken,
-            tokenOut: this.toToken,
-            amountIn: this.record.fromAmount,
-            minAmountOut: this.record.minReceivedMaxSold,
-            sourceRouteInfo: this.record.sourceRouteObj ? { amountOut: this.record.sourceRouteObj.amountOut, pairs: this.record.sourceRouteObj.pairs } : undefined
-          })
-          if (error) {
-            this.showResultMessage('error', error as any);
-          }
-        }
-        return;
-      }
-      const route = this.record.bestRoute ? this.record.bestRoute : [this.fromToken, this.toToken];
-      const swapData = {
-        provider: this.record.provider,
-        queueType: this.record.queueType,
-        routeTokens: this.record.bestRoute,
-        bestSmartRoute: route,
-        pairs: this.record.pairs,
-        fromAmount: this.record.fromAmount,
-        toAmount: this.record.toAmount,
-        isFromEstimated: this.isFrom,
-        providerList: this.originalData?.providers || [],
-        campaignId: this._data.campaignId,
-        referrer: this.commissions.find(v => v.chainId === this.state.getChainId())?.walletAddress,
-      }
 
-      const { error } = await executeSwap(this.state, swapData);
-      if (error) {
-        this.showResultMessage('error', error as any);
-      }
-    } catch (error) {
-      console.error(error);
+  private onSubmit = async () => {
+    const { fromInputValue, fromToken, toInputValue, toToken } = this.swapModel;
+    this.swapModal.visible = false;
+    this.showResultMessage('warning', `Swapping ${formatNumber(fromInputValue, 4)} ${fromToken?.symbol} to ${formatNumber(toInputValue, 4)} ${toToken?.symbol}`);
+    const error = await this.swapModel.onSubmit();
+    if (error) {
+      this.showResultMessage('error', error as any);
     }
   }
+
   private approveRouterMax = () => {
     this.showResultMessage('warning', 'Approving');
     this.setApprovalSpenderAddress();
-    this.approvalModelAction.doApproveAction(this.fromToken as ITokenObject, this.fromInputValue.toFixed(), this.record);
+    const { fromToken, fromInputValue, record } = this.swapModel;
+    this.approvalModelAction.doApproveAction(fromToken as ITokenObject, fromInputValue.toFixed(), record);
   }
+
   private onSetMaxBalance = async () => {
-    if (!this.fromToken?.symbol) return;
-    this.isFrom = false;
-    const address = this.fromToken?.address || this.fromToken?.symbol;
-    let balance = this.getBalance(this.fromToken);
+    const fromToken = this.swapModel.fromToken;
+    if (!fromToken?.symbol) return;
+    this.swapModel.isFrom = false;
+    const address = fromToken?.address || fromToken?.symbol;
+    let balance = this.swapModel.getBalance(fromToken);
     let inputVal = new BigNumber(balance);
     if (!address) {
       inputVal = new BigNumber(0);
     }
-    if (inputVal.eq(this.fromInputValue)) return;
-    this.fromInputValue = inputVal;
-    const decimals = this.fromToken?.decimals || 18;
-    this.firstTokenInput.value = this.fromInputValue.dp(decimals, ROUNDING_NUMBER).toFixed();
+    if (inputVal.eq(this.swapModel.fromInputValue)) return;
+    this.swapModel.fromInputValue = inputVal;
+    const decimals = fromToken?.decimals || 18;
+    this.firstTokenInput.value = this.swapModel.fromInputValue.dp(decimals, ROUNDING_NUMBER).toFixed();
     await this.handleAddRoute();
-  }
-  private isMaxDisabled = (): boolean => {
-    const address = this.fromToken?.address || this.fromToken?.symbol;
-    let balance = this.getBalance(this.fromToken);
-    return !address || new BigNumber(balance).isLessThanOrEqualTo(0)
   }
 
   private renderPriceInfo() {
@@ -1883,7 +1027,7 @@ export default class ScomSwap extends Module {
       this.pnlPriceInfo.appendChild(this.priceInfo);
       this.priceInfo.onTogglePrice = this.onTogglePrice.bind(this);
     }
-    this.priceInfo.setData(this.getPriceInfo());
+    this.priceInfo.setData(this.swapModel.getPriceInfo(this.isPriceToggled));
 
     if (!this.priceInfo2) {
       this.priceInfo2 = <i-scom-swap-price-info padding={{ ...padding }} display="block" width={'auto'} height={'auto'}></i-scom-swap-price-info>
@@ -1891,33 +1035,6 @@ export default class ScomSwap extends Module {
     }
     this.priceInfoContainer.appendChild(this.priceInfo2);
   }
-
-  get chainId() {
-    return this.state.getChainId();
-  }
-
-  // Cross Chain
-  private get isCrossChainSwap() {
-    return this._data.category === 'cross-chain-swap';
-  }
-
-  private get isCrossChainEnabled() {
-    let chainId = this.state.getChainId();
-    if (!this.bridgeSupportedChainList.some((v: INetworkConfig) => v.chainId == chainId) || !this.isCrossChainSwap) {
-      return false;
-    }
-    return true;
-  };
-
-  get isCrossChain() {
-    const srcChainId = this.srcChain?.chainId;
-    const desChainId = this.desChain?.chainId;
-    if (this.isCrossChainEnabled && crossChainSupportedChainIds.some(v => v.chainId === srcChainId) && srcChainId != desChainId) {
-      return true;
-    }
-    if (this.minSwapHintLabel) this.minSwapHintLabel.visible = false;
-    return false;
-  };
 
   get isMetaMask() {
     return Wallet.getClientInstance().clientSideProvider?.name === WalletPlugin.MetaMask;
@@ -1936,71 +1053,75 @@ export default class ScomSwap extends Module {
       }
     });
   }
+
   private selectSourceChain = async (obj: INetwork, img?: Image) => {
-    if (!this.isCrossChainEnabled) return;
+    const { isCrossChainEnabled, srcChain, bridgeSupportedChainList } = this.swapModel;
+    if (!isCrossChainEnabled) return;
     this.disableSelectChain(true, false);
     const selected = this.srcChainList.querySelector('.icon-selected') as Control;
     selected && this.updateChainIcon(selected, false);
-    const oldDestination = this.srcChain;
+    const oldSourceChain = srcChain;
     try {
-      this.srcChain = obj;
+      this.swapModel.srcChain = obj;
       if (img) {
         this.updateChainIcon(img, true);
       } else {
-        const currentNetwork = getNetworkInfo(this.bridgeSupportedChainList.find((f: INetwork) => f.chainId == obj.chainId)?.chainId);
+        const currentNetwork = getNetworkInfo(bridgeSupportedChainList.find((f: INetwork) => f.chainId == obj.chainId)?.chainId);
         const img = this.srcChainList.querySelector(`[data-tooltip="${currentNetwork?.chainName}"]`) as Control;
         if (img) this.updateChainIcon(img, true);
       }
     } catch (err) {
       console.log('err', err)
-      if (oldDestination) {
-        this.srcChain = oldDestination;
+      if (oldSourceChain) {
+        this.swapModel.srcChain = oldSourceChain;
         if (selected) this.updateChainIcon(selected, true);
       } else {
-        this.srcChain = getNetworkInfo(this.bridgeSupportedChainList[0]?.chainId);
+        this.swapModel.srcChain = getNetworkInfo(bridgeSupportedChainList[0]?.chainId);
         const elm = this.srcChainList?.firstElementChild as Control;
         elm && this.updateChainIcon(elm, true);
       }
     }
-    if (this.srcChain) {
-      this.srcChainLabel.caption = this.srcChain.chainName;
+    if (this.swapModel.srcChain) {
+      this.srcChainLabel.caption = this.swapModel.srcChain.chainName;
     }
-    this.firstTokenInput.tokenDataListProp = getSupportedTokens(this._tokens, this.srcChain.chainId);
+    this.firstTokenInput.tokenDataListProp = getSupportedTokens(this.configModel.tokens, this.swapModel.srcChain.chainId);
     this.disableSelectChain(false, false);
-  };
+  }
+
   private selectDestinationChain = async (obj: INetwork, img?: Image) => {
-    if (!this.isCrossChainEnabled) return;
+    const { isCrossChainEnabled, desChain, bridgeSupportedChainList } = this.swapModel;
+    if (!isCrossChainEnabled) return;
     this.disableSelectChain(true, true);
     const selected = this.desChainList.querySelector('.icon-selected') as Control;
     selected && this.updateChainIcon(selected, false);
-    const oldDestination = this.desChain;
+    const oldDestinationChain = desChain;
     try {
-      this.desChain = obj;
+      this.swapModel.desChain = obj;
       if (img) {
         this.updateChainIcon(img, true);
       } else {
-        const currentNetwork = getNetworkInfo(this.bridgeSupportedChainList.find((f: INetwork) => f.chainId == obj.chainId)?.chainId);
+        const currentNetwork = getNetworkInfo(bridgeSupportedChainList.find((f: INetwork) => f.chainId == obj.chainId)?.chainId);
         const img = this.desChainList.querySelector(`[data-tooltip="${currentNetwork?.chainName}"]`) as Control;
         img && this.updateChainIcon(img, true);
       }
     } catch (err) {
       console.log('err', err)
-      if (oldDestination) {
-        this.desChain = oldDestination;
+      if (oldDestinationChain) {
+        this.swapModel.desChain = oldDestinationChain;
         selected && this.updateChainIcon(selected, true);
       } else {
-        this.desChain = getNetworkInfo(this.bridgeSupportedChainList[0]?.chainId);
+        this.swapModel.desChain = getNetworkInfo(bridgeSupportedChainList[0]?.chainId);
         const elm = this.desChainList?.firstElementChild as Control;
         elm && this.updateChainIcon(elm, true);
       }
     }
-    if (this.desChain) {
-      this.desChainLabel.caption = this.desChain.chainName;
+    if (this.swapModel.desChain) {
+      this.desChainLabel.caption = this.swapModel.desChain.chainName;
     }
     // this.setTargetTokenList();
-    this.secondTokenInput.tokenDataListProp = getSupportedTokens(this._tokens, this.desChain.chainId);
+    this.secondTokenInput.tokenDataListProp = getSupportedTokens(this.configModel.tokens, this.swapModel.desChain.chainId);
     this.disableSelectChain(false, true);
-  };
+  }
 
   private updateChainIcon(el: Control, selected: boolean) {
     if (selected) {
@@ -2016,24 +1137,24 @@ export default class ScomSwap extends Module {
 
   private onSelectSourceChain = async (obj: INetwork, img?: Image) => {
     this.firstTokenInput.chainId = obj.chainId;
-    if (obj.chainId === this.srcChain?.chainId) return;
+    if (obj.chainId === this.swapModel.srcChain?.chainId) return;
     const rpcWallet = this.state.getRpcWallet();
     await rpcWallet.switchNetwork(obj.chainId);
   }
 
   private onSelectDestinationChain = async (obj: INetwork, img?: Image) => {
     this.secondTokenInput.chainId = obj.chainId;
-    if (obj.chainId === this.desChain?.chainId) return;
+    if (obj.chainId === this.swapModel.desChain?.chainId) return;
     await this.selectDestinationChain(obj, img);
-    const tokenList = getSupportedTokens(this._tokens, obj.chainId);
-    this.toToken = tokenList[0];
-    this.secondTokenInput.token = this.toToken;
+    const tokenList = getSupportedTokens(this.configModel.tokens, obj.chainId);
+    this.swapModel.toToken = tokenList[0];
+    this.secondTokenInput.token = this.swapModel.toToken;
     await tokenStore.updateTokenBalancesByChainId(obj.chainId);
-    const balance = this.getBalance(this.toToken);
-    this.receiveBalance.caption = `Balance: ${formatNumber(balance, 4)} ${this.toToken.symbol}`;
-    const enabled = !this.isMaxDisabled();
+    const balance = this.swapModel.getBalance(this.swapModel.toToken);
+    this.receiveBalance.caption = `Balance: ${formatNumber(balance, 4)} ${this.swapModel.toToken.symbol}`;
+    const enabled = !this.swapModel.isMaxDisabled;
     this.maxButton.enabled = enabled;
-    await this.updateTokenValues(this.toToken, false);
+    await this.updateTokenValues(this.swapModel.toToken, false);
     await this.handleAddRoute();
   }
 
@@ -2068,23 +1189,22 @@ export default class ScomSwap extends Module {
   };
 
   private renderChainList = async () => {
-    if (!this.isCrossChainSwap) return;
-    this.bridgeSupportedChainList = getBridgeSupportedChainList(this.chainId, this.networks);
-    if (this.bridgeSupportedChainList.length < 2) return;
+    if (!this.configModel.isCrossChainSwap) return;
+    this.swapModel.updateBridgeSupportChainList();
+    const { bridgeSupportedChainList, fromToken, toToken } = this.swapModel;
+    if (bridgeSupportedChainList.length < 2) return;
     this.srcChainList.innerHTML = '';
     this.desChainList.innerHTML = '';
-    this.srcChain = undefined;
-    this.desChain = undefined;
-    this.bridgeSupportedChainList.forEach((v: INetworkConfig) => {
+    this.swapModel.srcChain = undefined;
+    this.swapModel.desChain = undefined;
+    bridgeSupportedChainList.forEach((v: INetworkConfig) => {
       const network = getNetworkInfo(v.chainId);
       this.initChainIcon(network, false);
       this.initChainIcon(network, true);
     });
 
-    const firstChainId = this.fromToken?.chainId;
-    const secondChainId = this.toToken?.chainId;
-    console.log('firstChainId', firstChainId)
-    console.log('secondChainId', secondChainId)
+    const firstChainId = fromToken?.chainId;
+    const secondChainId = toToken?.chainId;
     if (firstChainId && secondChainId) {
       const firstNetwork = getNetworkInfo(firstChainId);
       const secondNetwork = getNetworkInfo(secondChainId);
@@ -2096,9 +1216,9 @@ export default class ScomSwap extends Module {
   };
 
   showModalFees = () => {
-    const fees = this.getFeeDetails();
+    const { feeDetails, fromToken, tradeFeeExactAmount } = this.swapModel;
     this.feesInfo.clearInnerHTML();
-    fees.forEach((fee) => {
+    feeDetails.forEach((fee) => {
       const feeValue = FormatUtils.formatNumber(fee.value.toFixed(), { decimalFigures: 4 });
       this.feesInfo.appendChild(
         <i-hstack
@@ -2117,7 +1237,7 @@ export default class ScomSwap extends Module {
               data-placement="right"
             />
           </i-hstack>
-          <i-label margin={{ left: 'auto' }} caption={`${feeValue} ${this.fromToken?.symbol}`} />
+          <i-label margin={{ left: 'auto' }} caption={`${feeValue} ${fromToken?.symbol}`} />
         </i-hstack>
       )
     })
@@ -2126,7 +1246,7 @@ export default class ScomSwap extends Module {
         <i-hstack verticalAlignment="center">
           <i-label caption="Total Transaction Fee" />
         </i-hstack>
-        <i-label margin={{ left: 'auto' }} caption={this.getTradeFeeExactAmount()} />
+        <i-label margin={{ left: 'auto' }} caption={tradeFeeExactAmount} />
       </i-hstack>
     )
     this.modalFees.visible = true;
@@ -2181,17 +1301,8 @@ export default class ScomSwap extends Module {
     }
   }
 
-  isEmptyData(value: ISwapWidgetData) {
-    return !value || !value.networks || value.networks.length === 0;
-  }
-
   async init() {
     await super.init();
-    this.state = new State(configData);
-    this.fromInputValue = new BigNumber(0);
-    this.toInputValue = new BigNumber(0);
-    this.swapButtonStatusMap = {};
-    this.approveButtonStatusMap = {};
     this.$eventBus = application.EventBus;
     this.registerEvent();
     this.updateSwapButtonCaption();
@@ -2232,7 +1343,7 @@ export default class ScomSwap extends Module {
         defaultOutputToken,
         apiEndpoints
       };
-      if (!this.isEmptyData(data)) {
+      if (!this.configModel.isEmptyData(data)) {
         await this.setData(data);
       }
     };

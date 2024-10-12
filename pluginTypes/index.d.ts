@@ -2,11 +2,7 @@
 /// <reference path="@scom/scom-commission-proxy-contract/@ijstech/eth-wallet/index.d.ts" />
 /// <reference path="@scom/scom-dapp-container/@ijstech/eth-wallet/index.d.ts" />
 /// <reference path="@scom/scom-dex-list/index.d.ts" />
-/// <amd-module name="@scom/scom-swap/index.css.ts" />
-declare module "@scom/scom-swap/index.css.ts" {
-    export const swapStyle: string;
-    export const storageModalStyle: string;
-}
+/// <reference path="@scom/scom-commission-fee-setup/index.d.ts" />
 /// <amd-module name="@scom/scom-swap/global/utils/helper.ts" />
 declare module "@scom/scom-swap/global/utils/helper.ts" {
     import { BigNumber } from "@ijstech/eth-wallet";
@@ -550,6 +546,11 @@ declare module "@scom/scom-swap/data.json.ts" {
     };
     export default _default;
 }
+/// <amd-module name="@scom/scom-swap/index.css.ts" />
+declare module "@scom/scom-swap/index.css.ts" {
+    export const swapStyle: string;
+    export const storageModalStyle: string;
+}
 /// <amd-module name="@scom/scom-swap/formSchema.ts" />
 declare module "@scom/scom-swap/formSchema.ts" {
     import { Control, StackLayout } from '@ijstech/components';
@@ -822,15 +823,308 @@ declare module "@scom/scom-swap/formSchema.ts" {
         };
     };
 }
+/// <amd-module name="@scom/scom-swap/model/configModel.ts" />
+declare module "@scom/scom-swap/model/configModel.ts" {
+    import { Module } from "@ijstech/components";
+    import { State } from "@scom/scom-swap/store/index.ts";
+    import ScomCommissionFeeSetup from "@scom/scom-commission-fee-setup";
+    import { ITokenObject } from "@scom/scom-token-list";
+    import { Category, ICommissionInfo, INetworkConfig, IProviderUI, ISwapWidgetData } from "@scom/scom-swap/global/index.ts";
+    import { IWalletPlugin } from "@scom/scom-wallet-modal";
+    interface IConfigOptions {
+        refreshWidget: () => Promise<void>;
+        refreshDappContainer: () => void;
+        setContaiterTag: (value: any) => void;
+        updateTheme: () => void;
+        onChainChanged: () => Promise<void>;
+        onWalletConnected: () => Promise<void>;
+        updateContractAddress: () => void;
+    }
+    export class ConfigModel {
+        private state;
+        private module;
+        private options;
+        private _data;
+        private _tokens;
+        private supportedChainIds;
+        private rpcWalletEvents;
+        constructor(state: State, module: Module, options: IConfigOptions);
+        get chainId(): number;
+        get campaignId(): number;
+        get defaultInputValue(): string;
+        get defaultOutputValue(): string;
+        get defaultOutputToken(): import("@scom/scom-swap/global/index.ts").ITokenConfig;
+        get defaultInputToken(): import("@scom/scom-swap/global/index.ts").ITokenConfig;
+        get isFixedPair(): boolean;
+        get isCrossChainSwap(): boolean;
+        get defaultChainId(): number;
+        set defaultChainId(value: number);
+        get wallets(): IWalletPlugin[];
+        set wallets(value: IWalletPlugin[]);
+        get networks(): INetworkConfig[];
+        set networks(value: INetworkConfig[]);
+        get showHeader(): boolean;
+        set showHeader(value: boolean);
+        get category(): Category;
+        set category(value: Category);
+        get providers(): IProviderUI[];
+        set providers(value: IProviderUI[]);
+        get commissions(): ICommissionInfo[];
+        set commissions(value: ICommissionInfo[]);
+        get tokens(): ITokenObject[];
+        get rpcWallet(): import("@ijstech/eth-wallet").IRpcWallet;
+        get title(): string;
+        set title(value: string);
+        get logo(): string;
+        set logo(value: string);
+        private determineActionsByTarget;
+        private loadCommissionFee;
+        private getBuilderActions;
+        private getProjectOwnerActions;
+        getConfigurators(): ({
+            name: string;
+            target: string;
+            getProxySelectors: () => Promise<string[]>;
+            getDexProviderOptions: (chainId: number) => import("@scom/scom-dex-list/interfaces.ts").IDexInfo[];
+            getPair: (market: string, tokenA: ITokenObject, tokenB: ITokenObject) => Promise<string>;
+            getActions: (category?: string) => any[];
+            getData: any;
+            setData: (value: any) => Promise<void>;
+            getTag: any;
+            setTag: any;
+            elementName?: undefined;
+            getLinkParams?: undefined;
+            bindOnChanged?: undefined;
+        } | {
+            name: string;
+            target: string;
+            elementName: string;
+            getLinkParams: () => {
+                data: string;
+            };
+            bindOnChanged: (element: ScomCommissionFeeSetup, callback: (data: any) => Promise<void>) => void;
+            getData: () => Promise<{
+                fee: string;
+                campaignId?: number;
+                category: Category;
+                providers: IProviderUI[];
+                commissions?: ICommissionInfo[];
+                tokens?: import("@scom/scom-swap/global/index.ts").ITokenConfig[];
+                defaultChainId: number;
+                wallets: IWalletPlugin[];
+                networks: INetworkConfig[];
+                showHeader?: boolean;
+                logo?: string;
+                title?: string;
+                defaultInputToken?: import("@scom/scom-swap/global/index.ts").ITokenConfig;
+                defaultOutputToken?: import("@scom/scom-swap/global/index.ts").ITokenConfig;
+                defaultInputValue?: string;
+                defaultOutputValue?: string;
+                apiEndpoints?: Record<string, string>;
+            }>;
+            setData: (properties: ISwapWidgetData, linkParams?: Record<string, any>) => Promise<void>;
+            getTag: any;
+            setTag: any;
+            getProxySelectors?: undefined;
+            getDexProviderOptions?: undefined;
+            getPair?: undefined;
+            getActions?: undefined;
+        } | {
+            name: string;
+            target: string;
+            getActions: (category?: string) => any[];
+            getData: any;
+            setData: any;
+            getTag: any;
+            setTag: any;
+            getProxySelectors?: undefined;
+            getDexProviderOptions?: undefined;
+            getPair?: undefined;
+            elementName?: undefined;
+            getLinkParams?: undefined;
+            bindOnChanged?: undefined;
+        })[];
+        getData(): ISwapWidgetData;
+        setData(value: ISwapWidgetData): Promise<void>;
+        getTag(): any;
+        setTag(value: any): void;
+        private updateTag;
+        removeRpcWalletEvents: () => void;
+        resetRpcWallet: () => Promise<void>;
+        initWallet: () => Promise<void>;
+        isEmptyData: (value: ISwapWidgetData) => boolean;
+    }
+}
+/// <amd-module name="@scom/scom-swap/model/swapModel.ts" />
+declare module "@scom/scom-swap/model/swapModel.ts" {
+    import { State } from "@scom/scom-swap/store/index.ts";
+    import { BigNumber, INetwork } from "@ijstech/eth-wallet";
+    import { ITokenObject } from "@scom/scom-token-list";
+    import { ApprovalStatus, INetworkConfig, IProvider } from "@scom/scom-swap/global/index.ts";
+    import { ConfigModel } from "@scom/scom-swap/model/configModel.ts";
+    import ScomTokenInput from "@scom/scom-token-input";
+    import { ICrossChainRouteResult } from "@scom/scom-swap/crosschain-utils/index.ts";
+    type StatusMapType = 'approve' | 'swap';
+    interface ISwapOptions {
+        setHintLabel: (visible?: boolean) => void;
+        showModalFees: () => void;
+    }
+    export class SwapModel {
+        private state;
+        private configModel;
+        private options;
+        private _fromInputValue;
+        private _toInputValue;
+        private _isFrom;
+        private _fromToken;
+        private _toToken;
+        private _record;
+        private _srcChain;
+        private _desChain;
+        private _bridgeSupportedChainList;
+        private _swapButtonStatusMap;
+        private _approveButtonStatusMap;
+        private _crossChainApprovalStatus;
+        constructor(state: State, configModel: ConfigModel, options: ISwapOptions);
+        get crossChainApprovalStatus(): ApprovalStatus;
+        set crossChainApprovalStatus(value: ApprovalStatus);
+        get swapButtonStatusMap(): {
+            [key: string]: ApprovalStatus;
+        };
+        set swapButtonStatusMap(value: {
+            [key: string]: ApprovalStatus;
+        });
+        get approveButtonStatusMap(): {
+            [key: string]: ApprovalStatus;
+        };
+        set approveButtonStatusMap(value: {
+            [key: string]: ApprovalStatus;
+        });
+        get isFrom(): boolean;
+        set isFrom(value: boolean);
+        get fromInputValue(): BigNumber;
+        set fromInputValue(value: BigNumber);
+        get toInputValue(): BigNumber;
+        set toInputValue(value: BigNumber);
+        get record(): any;
+        set record(value: any);
+        get fromToken(): ITokenObject;
+        set fromToken(token: ITokenObject);
+        get toToken(): ITokenObject;
+        set toToken(token: ITokenObject);
+        get srcChain(): INetwork;
+        set srcChain(value: INetwork);
+        get desChain(): INetwork;
+        set desChain(value: INetwork);
+        get bridgeSupportedChainList(): INetworkConfig[];
+        set bridgeSupportedChainList(value: INetworkConfig[]);
+        get originalData(): {
+            category: import("@scom/scom-swap/global/index.ts").Category;
+            providers: IProvider[];
+        };
+        get isCrossChainEnabled(): boolean;
+        get isCrossChain(): boolean;
+        get isApproveButtonShown(): boolean;
+        get isPriceImpactTooHigh(): boolean;
+        get isInsufficientBalance(): boolean;
+        get maxSold(): BigNumber;
+        get isSwapping(): boolean;
+        get approveButtonStatus(): any;
+        get isApprovingRouter(): boolean;
+        get isValidToken(): boolean;
+        get isButtonLoading(): boolean;
+        get isSwapButtonDisabled(): boolean;
+        private get warningMessageText();
+        get minReceivedMaxSold(): number;
+        get isMaxDisabled(): boolean;
+        get priceImpact(): string;
+        get minimumReceived(): string;
+        get tradeFeeExactAmount(): string;
+        get feeDetails(): ({
+            title: string;
+            description: string;
+            value: BigNumber;
+            isHidden: boolean;
+        } | {
+            title: string;
+            description: string;
+            value: BigNumber;
+            isHidden?: undefined;
+        })[] | {
+            title: string;
+            description: string;
+            value: any;
+        }[];
+        get determineSwapButtonCaption(): string;
+        isEstimated: (tokenPosition: string, strict?: boolean) => boolean;
+        updateEstimatedPosition: (isFrom: boolean) => void;
+        setProviders: () => void;
+        setMapStatus: (type: StatusMapType, key: string, status: ApprovalStatus) => void;
+        updateTokenValues: (token: ITokenObject, isFrom: boolean, tokenInput: ScomTokenInput) => void;
+        getBalance: (token?: ITokenObject) => string;
+        fixedNumber: (value: BigNumber | string | number) => string;
+        getInputValue: (isFrom: boolean) => string;
+        calculateDefaultTokens: () => {
+            firstDefaultToken: ITokenObject;
+            secondDefaultToken: ITokenObject;
+        };
+        getSwapRoutesData: () => Promise<any[]>;
+        getCrossChainRouteData: () => Promise<ICrossChainRouteResult[]>;
+        getVaultData: (record: any) => Promise<{
+            assetSymbol: any;
+            softCap: number;
+            vault: import("@scom/scom-swap/crosschain-utils/crosschain-utils.types.ts").IBridgeVault;
+            targetVaultAssetBalance: BigNumber;
+            targetVaultBondBalance: BigNumber;
+            vaultTokenToTargetChain: BigNumber;
+            vaultToOswapPrice: BigNumber;
+            minValue: BigNumber;
+        }>;
+        getRate: (isPriceToggled: boolean) => string;
+        getPriceInfo: (isPriceToggled: boolean) => ({
+            title: string;
+            value: string;
+            isToggleShown: boolean;
+            isHidden?: undefined;
+            tooltip?: undefined;
+            onClick?: undefined;
+        } | {
+            title: string;
+            value: string;
+            isHidden: boolean;
+            isToggleShown?: undefined;
+            tooltip?: undefined;
+            onClick?: undefined;
+        } | {
+            title: string;
+            value: string;
+            isToggleShown?: undefined;
+            isHidden?: undefined;
+            tooltip?: undefined;
+            onClick?: undefined;
+        } | {
+            title: string;
+            value: string;
+            tooltip: any;
+            onClick: () => void;
+            isToggleShown?: undefined;
+            isHidden?: undefined;
+        })[];
+        updateBridgeSupportChainList: () => void;
+        onSubmit: () => Promise<Record<string, string>>;
+    }
+}
+/// <amd-module name="@scom/scom-swap/model/index.ts" />
+declare module "@scom/scom-swap/model/index.ts" {
+    export { ConfigModel } from "@scom/scom-swap/model/configModel.ts";
+    export { SwapModel } from "@scom/scom-swap/model/swapModel.ts";
+}
 /// <amd-module name="@scom/scom-swap" />
 declare module "@scom/scom-swap" {
     import { Module, Container, ControlElement } from '@ijstech/components';
-    import { BigNumber } from '@ijstech/eth-wallet';
-    import "@scom/scom-swap/index.css.ts";
     import { ITokenObject } from '@scom/scom-token-list';
     import { ISwapWidgetData, IProviderUI, Category, ICommissionInfo, INetworkConfig, ITokenConfig } from "@scom/scom-swap/global/index.ts";
     import { IWalletPlugin } from '@scom/scom-wallet-modal';
-    import ScomCommissionFeeSetup from '@scom/scom-commission-fee-setup';
     export { ISwapWidgetData };
     interface ScomSwapElement extends ControlElement {
         campaignId?: number;
@@ -860,9 +1154,7 @@ declare module "@scom/scom-swap" {
     }
     export default class ScomSwap extends Module {
         private state;
-        private _data;
         tag: any;
-        private _tokens;
         private pnlBranding;
         private imgLogo;
         private lbTitle;
@@ -892,21 +1184,13 @@ declare module "@scom/scom-swap" {
         private txStatusModal;
         private maxButton;
         private swapBtn;
-        private lbYouPayTitle;
         private lbYouPayValue;
         private mdWallet;
         private dappContainer;
-        private isFrom;
-        private fromToken?;
-        private toToken?;
-        private fromInputValue;
-        private toInputValue;
+        private configModel;
+        private swapModel;
         private timeout;
         private isPriceToggled;
-        private record;
-        private supportedChainIds;
-        private swapButtonStatusMap;
-        private approveButtonStatusMap;
         private $eventBus;
         private lbEstimate;
         private lbPayOrReceive;
@@ -914,14 +1198,12 @@ declare module "@scom/scom-swap" {
         private toggleReverseImage;
         private hIcon;
         private vIcon;
-        private bridgeSupportedChainList;
         private swapModalConfirmBtn;
         private modalFees;
         private feesInfo;
         private expertModal;
         private contractAddress;
         private clientEvents;
-        private crossChainApprovalStatus;
         private minSwapHintLabel;
         private srcChainBox;
         private desChainBox;
@@ -929,8 +1211,6 @@ declare module "@scom/scom-swap" {
         private srcChainList;
         private desChainLabel;
         private desChainList;
-        private srcChain;
-        private desChain;
         private srcChainFirstPanel;
         private targetChainFirstPanel;
         private srcChainTokenImage;
@@ -960,6 +1240,9 @@ declare module "@scom/scom-swap" {
         static create(options?: ScomSwapElement, parent?: Container): Promise<ScomSwap>;
         removeRpcWalletEvents(): void;
         onHide(): void;
+        initModels(): void;
+        get chainId(): number;
+        private get rpcWallet();
         get category(): Category;
         set category(value: Category);
         get providers(): IProviderUI[];
@@ -979,11 +1262,6 @@ declare module "@scom/scom-swap" {
         get logo(): string;
         set logo(value: string);
         set width(value: string | number);
-        private get hasData();
-        private determineActionsByTarget;
-        private loadCommissionFee;
-        private getBuilderActions;
-        private getProjectOwnerActions;
         getConfigurators(): ({
             name: string;
             target: string;
@@ -1003,9 +1281,9 @@ declare module "@scom/scom-swap" {
             target: string;
             elementName: string;
             getLinkParams: () => {
-                data: any;
+                data: string;
             };
-            bindOnChanged: (element: ScomCommissionFeeSetup, callback: (data: any) => Promise<void>) => void;
+            bindOnChanged: (element: import("@scom/scom-commission-fee-setup").default, callback: (data: any) => Promise<void>) => void;
             getData: () => Promise<{
                 fee: string;
                 campaignId?: number;
@@ -1047,35 +1325,21 @@ declare module "@scom/scom-swap" {
             getLinkParams?: undefined;
             bindOnChanged?: undefined;
         })[];
-        private getData;
-        private resetRpcWallet;
-        private setData;
-        private getTag;
-        private updateTag;
-        private setTag;
+        private refreshDappContainer;
+        getData(): ISwapWidgetData;
+        setData(value: ISwapWidgetData): Promise<void>;
+        getTag(): any;
+        setTag(value: any): Promise<void>;
+        private setContaiterTag;
         private updateStyle;
         private updateTheme;
-        private setProviders;
         private updateContractAddress;
-        private get isFixedPair();
-        private get originalData();
-        private refreshUI;
+        private refreshWidget;
         constructor(parent?: Container, options?: any);
         private registerEvent;
-        private onChainChange;
-        get isApproveButtonShown(): boolean;
-        get isPriceImpactTooHigh(): boolean;
-        get isInsufficientBalance(): boolean;
-        get maxSold(): BigNumber;
-        get isSwapping(): boolean;
-        get approveButtonStatus(): any;
-        get isApprovingRouter(): boolean;
-        get isValidToken(): boolean;
-        private fixedNumber;
-        private getTokenKey;
-        private calculateDefaultTokens;
+        private onChainChanged;
+        private onWalletConnected;
         private initializeDefaultTokenPair;
-        private initWallet;
         private initializeWidgetConfig;
         private initApprovalModelAction;
         private onRevertSwap;
@@ -1083,46 +1347,26 @@ declare module "@scom/scom-swap" {
         private handleSwapPopup;
         private onCloseModal;
         private doSwap;
-        private getMinReceivedMaxSold;
         private updateTokenValues;
         private onSelectToken;
         private setApprovalSpenderAddress;
-        private getInputValue;
         private updateTokenInput;
         private onSelectRouteItem;
         private onTokenInputChange;
         private resetValuesByInput;
         private initRoutes;
         private handleAddRoute;
+        private showEmptyRoute;
         private onTogglePrice;
-        private getRate;
-        private getPriceImpact;
-        private getMinimumReceived;
-        private getTradeFeeExactAmount;
-        private getFeeDetails;
-        private getPriceInfo;
-        private updateEstimatedPosition;
-        private isEstimated;
-        private getBalance;
         private updateBalances;
         private updateSwapButtonCaption;
-        private determineSwapButtonCaption;
-        private getWarningMessageText;
-        private setMapStatus;
         private onSwapConfirming;
         private onSwapConfirmed;
-        private isButtonLoading;
-        private isSwapButtonDisabled;
         private onClickSwapButton;
         private onSubmit;
         private approveRouterMax;
         private onSetMaxBalance;
-        private isMaxDisabled;
         private renderPriceInfo;
-        get chainId(): number;
-        private get isCrossChainSwap();
-        private get isCrossChainEnabled();
-        get isCrossChain(): boolean;
         get isMetaMask(): boolean;
         private disableSelectChain;
         private selectSourceChain;
@@ -1138,7 +1382,6 @@ declare module "@scom/scom-swap" {
         private initExpertModal;
         private resizeLayout;
         private initData;
-        isEmptyData(value: ISwapWidgetData): boolean;
         init(): Promise<void>;
         render(): any;
     }
