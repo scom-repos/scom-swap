@@ -55,7 +55,10 @@ export default {
     "wallets": [
       {
         "name": "metamask"
-      }
+      },
+      {
+        "name": "walletconnect"
+      },
     ],
     "showHeader": true,
     "showFooter": true

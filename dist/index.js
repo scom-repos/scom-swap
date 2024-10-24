@@ -2010,7 +2010,10 @@ define("@scom/scom-swap/data.json.ts", ["require", "exports"], function (require
             "wallets": [
                 {
                     "name": "metamask"
-                }
+                },
+                {
+                    "name": "walletconnect"
+                },
             ],
             "showHeader": true,
             "showFooter": true
