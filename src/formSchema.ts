@@ -4,6 +4,7 @@ import ScomTokenInput from '@scom/scom-token-input';
 import { ScomStorage } from "@scom/scom-storage";
 import { storageModalStyle } from './index.css';
 import { ChainNativeTokenByChainId, DefaultERC20Tokens } from '@scom/scom-token-list';
+import { SwapTypes } from './global/index';
 
 const Theme = Styles.Theme.ThemeVars;
 const chainIds = [1, 56, 137, 250, 97, 80001, 43113, 43114];
@@ -212,12 +213,7 @@ export function getBuilderSchema() {
                 category: {
                     type: 'string',
                     required: true,
-                    enum: [
-                        'fixed-pair',
-                        'fixed-protocal',
-                        'aggregator',
-                        'cross-chain-swap'
-                    ]
+                    enum: SwapTypes
                 },
                 networks: {
                     type: 'array',

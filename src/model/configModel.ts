@@ -6,7 +6,7 @@ import { getBuilderSchema, getProjectOwnerSchema } from "../formSchema";
 import ScomCommissionFeeSetup from "@scom/scom-commission-fee-setup";
 import configData from "../data.json";
 import { ITokenObject, tokenStore } from "@scom/scom-token-list";
-import { Category, ICommissionInfo, INetworkConfig, IProviderUI, ISwapWidgetData } from "../global/index";
+import { Category, DEAULT_SWAP_TYPE, ICommissionInfo, INetworkConfig, IProviderUI, ISwapWidgetData } from "../global/index";
 import { IWalletPlugin } from "@scom/scom-wallet-modal";
 import { getCommissionRate, getPair, getProviderProxySelectors } from "../swap-utils/index";
 const Theme = Styles.Theme.ThemeVars;
@@ -34,7 +34,7 @@ export class ConfigModel {
     updateContractAddress: () => { }
   };
   private _data: ISwapWidgetData = {
-    category: 'fixed-pair',
+    category: DEAULT_SWAP_TYPE,
     providers: [],
     tokens: [],
     defaultChainId: 0,
@@ -194,7 +194,7 @@ export class ConfigModel {
         icon: 'dollar-sign',
         command: (builder: any, userInputData: any) => {
           let _oldData: ISwapWidgetData = {
-            category: 'fixed-pair',
+            category: DEAULT_SWAP_TYPE,
             providers: [],
             defaultChainId: 0,
             wallets: [],
@@ -250,7 +250,7 @@ export class ConfigModel {
         icon: 'edit',
         command: (builder: any, userInputData: any) => {
           let oldData: ISwapWidgetData = {
-            category: 'fixed-pair',
+            category: DEAULT_SWAP_TYPE,
             providers: [],
             defaultChainId: 0,
             wallets: [],

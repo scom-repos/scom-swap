@@ -91,6 +91,8 @@ declare module "@scom/scom-swap/global/index.ts" {
         APPROVING = 1,
         NONE = 2
     }
+    export const SwapTypes: string[];
+    export const DEAULT_SWAP_TYPE = "fixed-pair";
     export * from "@scom/scom-swap/global/utils/index.ts";
 }
 /// <amd-module name="@scom/scom-swap/store/utils.ts" />
@@ -1125,6 +1127,7 @@ declare module "@scom/scom-swap" {
     import { ITokenObject } from '@scom/scom-token-list';
     import { ISwapWidgetData, IProviderUI, Category, ICommissionInfo, INetworkConfig, ITokenConfig } from "@scom/scom-swap/global/index.ts";
     import { IWalletPlugin } from '@scom/scom-wallet-modal';
+    import { BlockNoteEditor, BlockNoteSpecs, callbackFnType, executeFnType } from '@scom/scom-blocknote-sdk';
     export { ISwapWidgetData };
     interface ScomSwapElement extends ControlElement {
         campaignId?: number;
@@ -1152,7 +1155,7 @@ declare module "@scom/scom-swap" {
             }
         }
     }
-    export default class ScomSwap extends Module {
+    export default class ScomSwap extends Module implements BlockNoteSpecs {
         private state;
         tag: any;
         private pnlBranding;
@@ -1238,6 +1241,23 @@ declare module "@scom/scom-swap" {
         private crossChainVaultInfoVstack;
         private lbReminderRejected;
         static create(options?: ScomSwapElement, parent?: Container): Promise<ScomSwap>;
+        addBlock(blocknote: any, executeFn: executeFnType, callbackFn?: callbackFnType): {
+            block: any;
+            slashItem: {
+                name: string;
+                execute: (editor: BlockNoteEditor) => void;
+                aliases: string[];
+                group: string;
+                icon: {
+                    name: string;
+                };
+                hint: string;
+            };
+            moduleData: {
+                name: string;
+                localPath: string;
+            };
+        };
         removeRpcWalletEvents(): void;
         onHide(): void;
         initModels(): void;

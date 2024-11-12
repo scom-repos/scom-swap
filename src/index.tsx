@@ -19,7 +19,9 @@ import {
   Category,
   ICommissionInfo,
   INetworkConfig,
-  ITokenConfig
+  ITokenConfig,
+  SwapTypes,
+  DEAULT_SWAP_TYPE
 } from './global/index';
 import { PriceInfo } from './price-info/index';
 import { ExpertModeSettings } from './expert-mode-settings/index';
@@ -31,6 +33,7 @@ import ScomTokenInput from '@scom/scom-token-input';
 import ScomTxStatusModal from '@scom/scom-tx-status-modal';
 import { swapStyle } from './index.css';
 import { ConfigModel, SwapModel } from './model';
+import { Block, BlockNoteEditor, BlockNoteSpecs, callbackFnType, executeFnType, getWidgetEmbedUrl, parseUrl } from '@scom/scom-blocknote-sdk';
 
 export { ISwapWidgetData };
 
@@ -68,7 +71,7 @@ declare const window: any;
 
 @customModule
 @customElements('i-scom-swap')
-export default class ScomSwap extends Module {
+export default class ScomSwap extends Module implements BlockNoteSpecs {
   private state: State;
   tag: any = {};
 
@@ -166,6 +169,155 @@ export default class ScomSwap extends Module {
     await self.ready();
     return self;
   }
+
+  addBlock(blocknote: any, executeFn: executeFnType, callbackFn?: callbackFnType) {
+    const blockType = 'swap';
+    const moduleData = {
+      name: '@scom/scom-swap',
+      localPath: 'scom-swap',
+    }
+
+    const swapRegex = /https:\/\/widget.noto.fan\/(#!\/)?scom\/scom-swap\/\S+/g;
+    function getData(href: string) {
+      const widgetData = parseUrl(href);
+      if (widgetData) {
+        const { module, properties } = widgetData;
+        if (module.localPath === moduleData.localPath) return {...properties};
+      }
+      return false;
+    }
+
+    const SwapBlock = blocknote.createBlockSpec({
+      type: blockType,
+      propSchema: {
+        ...blocknote.defaultProps,
+        category: { default: DEAULT_SWAP_TYPE, values: SwapTypes },
+        providers: { default: [] },
+        tokens: { default: [] },
+        defaultChainId: { default: 0 },
+        networks: { default: [] },
+        logo: { default: '' },
+        title: { default: '' },
+        campaignId: { default: null},
+        wallets: { default: [] },
+        commissions: { default: [] },
+        defaultInputValue: { default: '' },
+        defaultOutputValue: { default: '' },
+        defaultInputToken: { default: null },
+        defaultOutputToken: { default: null },
+        apiEndpoints: { default: null }
+      },
+      content: "none"
+    },
+    {
+      render: (block: Block) => {
+        const wrapper = new Panel();
+        const props = JSON.parse(JSON.stringify(block.props));
+        const customElm = new ScomSwap(wrapper, {...props});
+        if (typeof callbackFn === 'function') {
+          callbackFn(customElm, block);
+        }
+        wrapper.appendChild(customElm);
+        return {
+          dom: wrapper
+        };
+      },
+      parseFn: () => {
+        return [
+          {
+            tag: `div[data-content-type=${blockType}]`,
+            node: blockType
+          },
+          {
+            tag: "a",
+            getAttrs: (element: string|HTMLElement) => {
+              if (typeof element === "string") {
+                return false;
+              }
+              const href = element.getAttribute('href');
+              if (href) return getData(href);
+              return false;
+            },
+            priority: 402,
+            node: blockType
+          },
+          {
+            tag: "p",
+            getAttrs: (element: string|HTMLElement) => {
+              if (typeof element === "string") {
+                return false;
+              }
+              const child = element.firstChild as HTMLElement;
+              if (child?.nodeName === 'A' && child.getAttribute('href')) {
+                const href = child.getAttribute('href');
+                return getData(href);
+              }
+              return false;
+            },
+            priority: 403,
+            node: blockType
+          },
+        ]
+      },
+      toExternalHTML: (block: any, editor: any) => {
+        const link = document.createElement("a");
+        const url = getWidgetEmbedUrl(
+          {
+            type: blockType,
+            props: {...(block.props || {})}
+          },
+          moduleData
+        );
+        link.setAttribute("href", url);
+        link.textContent = blockType;
+        const wrapper = document.createElement("p");
+        wrapper.appendChild(link);
+        return { dom: wrapper };
+      },
+      pasteRules: [
+        {
+          find: swapRegex,
+          handler(props: any) {
+            const { state, chain, range } = props;
+            const textContent = state.doc.resolve(range.from).nodeAfter?.textContent;
+            const widgetData = parseUrl(textContent);
+            const { module, properties } = widgetData;
+            if (!widgetData && module.localPath !== moduleData.localPath) return null;
+            chain().BNUpdateBlock(state.selection.from, {
+              type: blockType,
+              props: {
+                ...properties
+              },
+            }).setTextSelection(range.from + 1);
+          }
+        }
+      ]
+    });
+
+    const SwapSlashItem = {
+      name: "Swap",
+      execute: (editor: BlockNoteEditor) => {
+        const block: any = {
+          type: blockType,
+          props: configData.defaultBuilderData
+        };
+        if (typeof executeFn === 'function') {
+          executeFn(editor, block);
+        }
+      },
+      aliases: [blockType, "widget"],
+      group: "Widget",
+      icon: {name: 'exchange-alt'},
+      hint: "Insert a swap widget",
+    }
+
+    return {
+      block: SwapBlock,
+      slashItem: SwapSlashItem,
+      moduleData
+    };
+  }
+
 
   removeRpcWalletEvents() {
     this.configModel.removeRpcWalletEvents();
@@ -1312,7 +1464,7 @@ export default class ScomSwap extends Module {
     const lazyLoad = this.getAttribute('lazyLoad', true, false);
     if (!lazyLoad) {
       const campaignId = this.getAttribute('campaignId', true);
-      const category = this.getAttribute('category', true, "fixed-pair");
+      const category = this.getAttribute('category', true, DEAULT_SWAP_TYPE);
       const providers = this.getAttribute('providers', true, []);
       const commissions = this.getAttribute('commissions', true, []);
       const defaultChainId = this.getAttribute('defaultChainId', true);
