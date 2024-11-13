@@ -24,6 +24,7 @@
         "@scom/scom-tx-status-modal",
         "@scom/scom-network-picker",
         "@scom/scom-storage",
-        "@scom/scom-commission-fee-setup"
+        "@scom/scom-commission-fee-setup",
+        "@scom/scom-blocknote-sdk"
     ]
 }

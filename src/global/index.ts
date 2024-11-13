@@ -15,4 +15,13 @@ export enum ApprovalStatus {
   NONE,
 }
 
+export const SwapTypes = [
+  'fixed-pair',
+  'fixed-protocal',
+  'aggregator',
+  'cross-chain-swap'
+];
+
+export const DEAULT_SWAP_TYPE = 'fixed-pair';
+
 export * from './utils/index';
