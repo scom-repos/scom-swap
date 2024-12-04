@@ -376,7 +376,7 @@ export function getBuilderSchema() {
                         const button = new Button(hstack, {
                             height: 42,
                             padding: { left: '0.5rem', right: '0.5rem' },
-                            caption: 'Browse',
+                            caption: '$browse',
                             icon: { width: '0.875rem', height: '0.875rem', name: 'image' },
                             font: { size: '0.875rem', color: Theme.colors.secondary.contrastText },
                             background: { color: Theme.colors.secondary.main }
