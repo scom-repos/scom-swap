@@ -1,5 +1,5 @@
 
-import { FormatUtils } from "@ijstech/components";
+import { FormatUtils, Module } from "@ijstech/components";
 import { bridgeVaultConstantMap, crossChainSupportedChainIds, getBridgeSupportedChainList, getSupportedTokens, isClientWalletConnected, State } from "../store/index";
 import { BigNumber, INetwork } from "@ijstech/eth-wallet";
 import { ITokenObject, tokenStore } from "@scom/scom-token-list";
@@ -9,7 +9,7 @@ import { ConfigModel } from "./configModel";
 import ScomTokenInput from "@scom/scom-token-input";
 import { getBondsInBridgeVault, getBridgeVault, getOraclePriceMap, getVaultAssetBalance, ICrossChainRouteResult } from "../crosschain-utils/index";
 
-const priceImpactTooHighMsg = 'Price Impact Too High. If you want to bypass this check, please turn on Expert Mode';
+const priceImpactTooHighMsg = '$price_impact_too_high_if_you_want_to_bypass_this_check_please_turn_on_expert_mode';
 type StatusMapType = 'approve' | 'swap';
 const ROUNDING_NUMBER = BigNumber.ROUND_DOWN;
 
@@ -38,7 +38,10 @@ export class SwapModel {
   private _approveButtonStatusMap: { [key: string]: ApprovalStatus } = {};
   private _crossChainApprovalStatus: ApprovalStatus = ApprovalStatus.NONE;
 
-  constructor(state: State, configModel: ConfigModel, options: ISwapOptions) {
+  private module: Module;
+
+  constructor(module: Module, state: State, configModel: ConfigModel, options: ISwapOptions) {
+    this.module = module;
     this.state = state;
     this.configModel = configModel;
     this.options = options;
@@ -241,17 +244,17 @@ export class SwapModel {
   private get warningMessageText() {
     const tokens = [this.fromToken?.symbol, this.toToken?.symbol];
     if (tokens.every(v => v === 'ETH' || v === 'WETH')) {
-      return 'Invalid pair';
+      return '$invalid_pair';
     }
     if (!this.record) {
       return '';
     }
     if (this.record.key === 'Oracle' && (this.record.fromAmount.isZero() || this.record.toAmount.isZero())) {
-      return 'Circuit breaker triggered';
+      return '$circuit_breaker_triggered';
     }
     const balance = this.getBalance(this.fromToken);
     if (this.maxSold.gt(balance)) {
-      return `Insufficient ${this.fromToken?.symbol} balance`;
+      return this.module.i18n.get('$insufficient_balance', {symbol: this.fromToken?.symbol});
     }
     if (this.record.priceImpact > 15 && !this.state.isExpertMode) {
       return priceImpactTooHighMsg;
@@ -313,35 +316,35 @@ export class SwapModel {
       let record: ICrossChainRouteResult = this.record;
       let detail = [
         {
-          title: "Source Chain Liquidity Fee",
-          description: "This fee is paid to the AMM Liquidity Providers on the Source Chain.",
+          title: "$source_chain_liquidity_fee",
+          description: "$this_fee_is_paid_to_the_amm_liquidity_providers_on_the_source_chain",
           value: record.fees.sourceRouteLiquidityFee,
           isHidden: record.fees.sourceRouteLiquidityFee?.isZero()
         },
         {
-          title: "Target Chain Liquidity Fee",
-          description: "This fee is paid to the AMM Liquidity Providers on the Target Chain.",
+          title: "$target_chain_liquidity_fee",
+          description: "$this_fee_is_paid_to_the_amm_liquidity_providers_on_the_target_chain",
           value: record.fees.targetRouteLiquidityFee,
           isHidden: record.targetRouteObj.pairs.length == 0
         },
         {
-          title: "Base Fee",
-          description: "This fee is paid to the trolls to cover gas fee on the Target Chain",
+          title: "$base_fee",
+          description: "$this_fee_is_paid_to_the_trolls_to_cover_gas_fee_on_the_target_chain",
           value: record.fees.baseFee,
         },
         {
-          title: "Bridge Vault Liquidity Fee",
-          description: "This fee is paid to the Bridge Vault Liquidity Provider on Target Chain",
+          title: "$bridge_vault_liquidity_fee",
+          description: "$this_fee_is_paid_to_the_bridge_vault_liquidity_provider_on_target_chain",
           value: record.fees.transactionFee,
         },
         {
-          title: "Protocol Fee",
-          description: "This fee is paid to the troll owners on the Cross Chain Network",
+          title: "$protocol_fee",
+          description: "$this_fee_is_paid_to_the_troll_owners_on_the_cross_chain_network",
           value: record.fees.protocolFee,
         },
         {
-          title: "Imbalance Fee",
-          description: "This fee is acted as an incentive to balance the vault.",
+          title: "$imbalance_fee",
+          description: "$this_fee_is_acted_as_an_incentive_to_balance_the_vault",
           value: record.fees.imbalanceFee,
         }
       ]
@@ -349,8 +352,8 @@ export class SwapModel {
     }
     if (!this.isCrossChain && this.record) {
       return [{
-        title: "Liquidity Provider Fee",
-        description: "This fee is paid to the AMM Liquidity Provider.",
+        title: "$liquidity_provider_fee",
+        description: "$this_fee_is_paid_to_the_amm_liquidity_provider",
         value: this.record.tradeFee
       }];
     }
@@ -360,34 +363,34 @@ export class SwapModel {
   get determineSwapButtonCaption() {
     const isApproveButtonShown = this.isCrossChain ? this.crossChainApprovalStatus !== ApprovalStatus.NONE : this.isApproveButtonShown;
     if (!isClientWalletConnected()) {
-      return "Connect Wallet";
+      return this.module.i18n.get("$connect_wallet");
     }
     if (!this.state.isRpcWalletConnected()) {
-      return "Switch Network";
+      return this.module.i18n.get("$switch_network");
     }
     if (isApproveButtonShown) {
       const status = this.isCrossChain ? this.crossChainApprovalStatus : this.approveButtonStatus;
       switch (status) {
         case ApprovalStatus.APPROVING:
-          return "Approving";
+          return this.module.i18n.get("$approving");
         case ApprovalStatus.TO_BE_APPROVED:
-          return "Approve";
+          return this.module.i18n.get("$approve");
       }
       return '';
     } else {
       if (this.isSwapping) {
-        return this.isCrossChain ? "Creating Order" : "Swapping";
+        return this.module.i18n.get(this.isCrossChain ? "$creating_order" : "$swapping");
       }
       if (this.isInsufficientBalance) {
-        return `Insufficient ${this.fromToken?.symbol} balance`;
+        return this.module.i18n.get('$insufficient_balance', { symbol: this.fromToken?.symbol });
       }
       if (this.isCrossChain) {
-        return "Create Order";
+        return this.module.i18n.get("$create_order");
       }
       if (this.isPriceImpactTooHigh) {
-        return "Turn on Expert Mode"
+        return this.module.i18n.get("$turn_on_expert_mode")
       }
-      return "Swap";
+      return this.module.i18n.get("$swap");
     }
   }
 
@@ -651,28 +654,28 @@ export class SwapModel {
 
     let info = [
       {
-        title: "Rate",
+        title: "$rate",
         value: this.isValidToken ? rate : '-',
         isToggleShown: this.record && this.isValidToken,
       },
       {
-        title: "Price Impact",
+        title: "$price_impact",
         value: this.isValidToken ? this.priceImpact : '-',
         isHidden: this.isCrossChain,
       },
       {
-        title: this.isFrom ? "Maximum Sold" : "Minimum Received",
+        title: this.isFrom ? "$maximum_sold" : "$minimum_received",
         value: this.isValidToken ? this.minimumReceived : '-',
       },
       {
-        title: "Transaction Fee",
+        title: "$transaction_fee",
         value: this.isValidToken ? this.tradeFeeExactAmount : '-',
         tooltip: feeTooltip,
         onClick: countFees > 1 ? () => this.options.showModalFees() : null
       },
       {
-        title: "Estimated Time",
-        value: this.isValidToken && this.record ? '30 seconds' : '-',
+        title: "$estimated_time",
+        value: this.isValidToken && this.record ? '$30_seconds' : '-',
         isHidden: !this.isCrossChain
       }
     ];

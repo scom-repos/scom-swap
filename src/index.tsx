@@ -34,6 +34,7 @@ import ScomTxStatusModal from '@scom/scom-tx-status-modal';
 import { swapStyle } from './index.css';
 import { ConfigModel, SwapModel } from './model';
 import { Block, BlockNoteEditor, BlockNoteSpecs, callbackFnType, executeFnType, getWidgetEmbedUrl, parseUrl } from '@scom/scom-blocknote-sdk';
+import { mainJson } from './languages/index';
 
 export { ISwapWidgetData };
 
@@ -348,7 +349,7 @@ export default class ScomSwap extends Module implements BlockNoteSpecs {
       });
     }
     if (!this.swapModel) {
-      this.swapModel = new SwapModel(this.state, this.configModel, {
+      this.swapModel = new SwapModel(this, this.state, this.configModel, {
         setHintLabel: (value: boolean) => {
           if (this.minSwapHintLabel) this.minSwapHintLabel.visible = value;
         },
@@ -740,7 +741,7 @@ export default class ScomSwap extends Module implements BlockNoteSpecs {
         this.srcVaultTokenValue.caption = formatNumber(vaultTokenFromSourceChain);
         if (this.lbReminderRejected) {
           this.lbReminderRejected.visible = true;
-          this.lbReminderRejected.caption = `If the order is not executed in the target chain, the estimated withdrawalble amount is <b class="text-pink">${formatNumber(vaultTokenFromSourceChain)} ${sourceVaultToken?.symbol}</b>`;
+          this.lbReminderRejected.caption = `${this.i18n.get('$if_the_order_is_not_executed_in_the_target_chain_the_estimated_withdrawalble_amount_is')} <b class="text-pink">${formatNumber(vaultTokenFromSourceChain)} ${sourceVaultToken?.symbol}</b>`;
         }
       } else {
         this.srcChainSecondPanel.visible = false;
@@ -787,8 +788,12 @@ export default class ScomSwap extends Module implements BlockNoteSpecs {
       this.payOrReceiveValue.caption = ' - ';
     }
     this.payOrReceiveToken.caption = isFrom ? this.fromTokenLabel.caption : this.toTokenLabel.caption;
-    this.lbEstimate.caption = `${isFrom ? 'Input' : 'Output'} is estimated. If the price change by more than ${slippageTolerance}%, your transaction will revert`;
-    this.lbPayOrReceive.caption = isFrom ? 'You will pay at most' : 'You will receive at least';
+    const caption = this.i18n.get(
+        isFrom ? 'input_is_estimated_if_the_price_change_by_more_than_your_transaction_will_revert' : 'output_is_estimated_if_the_price_change_by_more_than_your_transaction_will_revert',
+        {value: `${slippageTolerance}`}
+      )
+    this.lbEstimate.caption = caption;
+    this.lbPayOrReceive.caption = isFrom ? '$you_will_pay_at_most' : '$you_will_receive_at_least';
     this.priceInfo2.setData(this.swapModel.getPriceInfo(this.isPriceToggled));
 
     this.swapModal.visible = true;
@@ -809,11 +814,11 @@ export default class ScomSwap extends Module implements BlockNoteSpecs {
       const enabled = !this.swapModel.isMaxDisabled;
       this.maxButton.enabled = enabled;
       this.swapModel.updateTokenValues(token, true, this.firstTokenInput);
-      this.payBalance.caption = `Balance: ${formatNumber(balance, 4)} ${token.symbol}`;
+      this.payBalance.caption = `${this.i18n.get('$balance')}: ${formatNumber(balance, 4)} ${token.symbol}`;
       await this.updateTokenInput(true);
     } else {
       this.swapModel.updateTokenValues(token, false, this.secondTokenInput);
-      this.receiveBalance.caption = `Balance: ${formatNumber(balance, 4)} ${token.symbol}`;
+      this.receiveBalance.caption = `${this.i18n.get('$balance')}: ${formatNumber(balance, 4)} ${token.symbol}`;
       await this.updateTokenInput(false);
     }
   }
@@ -970,20 +975,20 @@ export default class ScomSwap extends Module implements BlockNoteSpecs {
     }
     if (listRouting[0] && isCrossChain) {
       const { assetSymbol, vault, targetVaultAssetBalance, targetVaultBondBalance, vaultTokenToTargetChain, vaultToOswapPrice, softCap, minValue } = await this.swapModel.getVaultData(listRouting[0]);
-      this.targetVaultAssetBalanceLabel1.caption = `Vault Asset Balance: ${formatNumber(targetVaultAssetBalance.toNumber(), 4)} ${assetSymbol}`;
-      this.targetVaultAssetBalanceLabel2.caption = `Vault Asset Balance: ${formatNumber(targetVaultAssetBalance.toNumber(), 4)} ${assetSymbol}`;
+      this.targetVaultAssetBalanceLabel1.caption = `${this.i18n.get('$vault_asset_balance')}: ${formatNumber(targetVaultAssetBalance.toNumber(), 4)} ${assetSymbol}`;
+      this.targetVaultAssetBalanceLabel2.caption = `${this.i18n.get('$vault_asset_balance')}: ${formatNumber(targetVaultAssetBalance.toNumber(), 4)} ${assetSymbol}`;
       if (!vault.vaultGroup) {
-        this.targetVaultBondBalanceLabel1.caption = `Vault Bond Balance: ${formatNumber(targetVaultBondBalance.toNumber(), 4)} ${assetSymbol}`;
-        this.targetVaultBondBalanceLabel2.caption = `Vault Bond Balance: ${formatNumber(targetVaultBondBalance.toNumber(), 4)} ${assetSymbol}`;
+        this.targetVaultBondBalanceLabel1.caption = `${this.i18n.get('$vault_bond_balance')}: ${formatNumber(targetVaultBondBalance.toNumber(), 4)} ${assetSymbol}`;
+        this.targetVaultBondBalanceLabel2.caption = `${this.i18n.get('$vault_bond_balance')}: ${formatNumber(targetVaultBondBalance.toNumber(), 4)} ${assetSymbol}`;
       } else if (vault.vaultGroup === 'OSWAP') {
-        this.targetVaultBondBalanceLabel1.caption = `Vault Bond Balance: ${formatNumber(targetVaultBondBalance.toNumber(), 4)} OSWAP`;
-        this.targetVaultBondBalanceLabel2.caption = `Vault Bond Balance: ${formatNumber(targetVaultBondBalance.toNumber(), 4)} OSWAP`;
+        this.targetVaultBondBalanceLabel1.caption = `${this.i18n.get('$vault_bond_balance')}: ${formatNumber(targetVaultBondBalance.toNumber(), 4)} OSWAP`;
+        this.targetVaultBondBalanceLabel2.caption = `${this.i18n.get('$vault_bond_balance')}: ${formatNumber(targetVaultBondBalance.toNumber(), 4)} OSWAP`;
       } else {
-        this.targetVaultBondBalanceLabel1.caption = `Vault Bond Balance: ${formatNumber(targetVaultBondBalance.toNumber(), 4)} OSWAP &#8776; ${formatNumber(targetVaultBondBalance.div(vaultToOswapPrice).toNumber(), 4)} ${assetSymbol}`;
-        this.targetVaultBondBalanceLabel2.caption = `Vault Bond Balance: ${formatNumber(targetVaultBondBalance.toNumber(), 4)} OSWAP &#8776; ${formatNumber(targetVaultBondBalance.div(vaultToOswapPrice).toNumber(), 4)} ${assetSymbol}`;
+        this.targetVaultBondBalanceLabel1.caption = `${this.i18n.get('$vault_bond_balance')}: ${formatNumber(targetVaultBondBalance.toNumber(), 4)} OSWAP &#8776; ${formatNumber(targetVaultBondBalance.div(vaultToOswapPrice).toNumber(), 4)} ${assetSymbol}`;
+        this.targetVaultBondBalanceLabel2.caption = `${this.i18n.get('$vault_bond_balance')}: ${formatNumber(targetVaultBondBalance.toNumber(), 4)} OSWAP &#8776; ${formatNumber(targetVaultBondBalance.div(vaultToOswapPrice).toNumber(), 4)} ${assetSymbol}`;
       }
-      this.crossChainSoftCapLabel1.caption = softCap ? `Cap: ${formatNumber(softCap)} ${assetSymbol}` : "-";
-      this.crossChainSoftCapLabel2.caption = softCap ? `Cap: ${formatNumber(softCap)} ${assetSymbol}` : "-";
+      this.crossChainSoftCapLabel1.caption = softCap ? `${this.i18n.get('$cap')}: ${formatNumber(softCap)} ${assetSymbol}` : "-";
+      this.crossChainSoftCapLabel2.caption = softCap ? `${this.i18n.get('$cap')}: ${formatNumber(softCap)} ${assetSymbol}` : "-";
       if (minValue.eq(targetVaultAssetBalance)) {
         this.targetVaultAssetBalanceLabel1.classList.add('text--limit');
         this.targetVaultAssetBalanceLabel2.classList.add('text--limit');
@@ -1007,10 +1012,10 @@ export default class ScomSwap extends Module implements BlockNoteSpecs {
         this.crossChainSoftCapLabel2.classList.add('text--limit');
       }
       if (softCap && vaultTokenToTargetChain.toNumber() >= softCap) {
-        this.swapModalConfirmBtn.caption = 'Cap Reached';
+        this.swapModalConfirmBtn.caption = '$cap_reached';
         this.swapModalConfirmBtn.enabled = false;
       } else if (vaultTokenToTargetChain.gt(targetVaultAssetBalance) || vaultTokenToTargetChain.multipliedBy(vaultToOswapPrice).gt(targetVaultBondBalance)) {
-        this.swapModalConfirmBtn.caption = 'Exceed Vault Asset Balance or Bond Balance';
+        this.swapModalConfirmBtn.caption = '$exceed_vault_asset_balance_or_bond_balance';
         this.swapModalConfirmBtn.enabled = false;
       } else {
         this.swapModalConfirmBtn.enabled = true;
@@ -1020,7 +1025,7 @@ export default class ScomSwap extends Module implements BlockNoteSpecs {
     this.disableSelectChain(false);
     this.disableSelectChain(false, true);
 
-    this.swapModalConfirmBtn.caption = 'Confirm Swap';
+    this.swapModalConfirmBtn.caption = '$confirm_swap';
     this.swapModalConfirmBtn.enabled = true;
     this.swapModel.record = listRouting[0] || null;
     this.swapModel.swapButtonStatusMap = {};
@@ -1076,11 +1081,11 @@ export default class ScomSwap extends Module implements BlockNoteSpecs {
     }
     if (fromToken) {
       const balance = this.swapModel.getBalance(fromToken);
-      this.payBalance.caption = `Balance: ${formatNumber(balance, 4)} ${fromToken.symbol}`;
+      this.payBalance.caption = `${this.i18n.get('$balance')}: ${formatNumber(balance, 4)} ${fromToken.symbol}`;
     }
     if (toToken) {
       const balance = this.swapModel.getBalance(toToken);
-      this.receiveBalance.caption = `Balance: ${formatNumber(balance, 4)} ${toToken.symbol}`;
+      this.receiveBalance.caption = `${this.i18n.get('$balance')}: ${formatNumber(balance, 4)} ${toToken.symbol}`;
     }
     const enabled = !this.swapModel.isMaxDisabled;
     this.maxButton.enabled = enabled;
@@ -1141,7 +1146,7 @@ export default class ScomSwap extends Module implements BlockNoteSpecs {
   private onSubmit = async () => {
     const { fromInputValue, fromToken, toInputValue, toToken } = this.swapModel;
     this.swapModal.visible = false;
-    this.showResultMessage('warning', `Swapping ${formatNumber(fromInputValue, 4)} ${fromToken?.symbol} to ${formatNumber(toInputValue, 4)} ${toToken?.symbol}`);
+    this.showResultMessage('warning', `${this.i18n.get('$swapping')} ${formatNumber(fromInputValue, 4)} ${fromToken?.symbol} ${this.i18n.get('$to')} ${formatNumber(toInputValue, 4)} ${toToken?.symbol}`);
     const error = await this.swapModel.onSubmit();
     if (error) {
       this.showResultMessage('error', error as any);
@@ -1149,7 +1154,7 @@ export default class ScomSwap extends Module implements BlockNoteSpecs {
   }
 
   private approveRouterMax = () => {
-    this.showResultMessage('warning', 'Approving');
+    this.showResultMessage('warning', '$approving');
     this.setApprovalSpenderAddress();
     const { fromToken, fromInputValue, record } = this.swapModel;
     this.approvalModelAction.doApproveAction(fromToken as ITokenObject, fromInputValue.toFixed(), record);
@@ -1303,7 +1308,7 @@ export default class ScomSwap extends Module implements BlockNoteSpecs {
     this.secondTokenInput.token = this.swapModel.toToken;
     await tokenStore.updateTokenBalancesByChainId(obj.chainId);
     const balance = this.swapModel.getBalance(this.swapModel.toToken);
-    this.receiveBalance.caption = `Balance: ${formatNumber(balance, 4)} ${this.swapModel.toToken.symbol}`;
+    this.receiveBalance.caption = `${this.i18n.get('$balance')}: ${formatNumber(balance, 4)} ${this.swapModel.toToken.symbol}`;
     const enabled = !this.swapModel.isMaxDisabled;
     this.maxButton.enabled = enabled;
     await this.updateTokenValues(this.swapModel.toToken, false);
@@ -1330,7 +1335,7 @@ export default class ScomSwap extends Module implements BlockNoteSpecs {
       this.desChainList.appendChild(img);
     } else {
       if (!this.isMetaMask) {
-        img.tooltip.content = `Swap supports this network ${network.chainName} (${network.chainId}), please switch network in the connected wallet.`;
+        img.tooltip.content = this.i18n.get('swap_supports_this_network_please_switch_network_in_the_connected_wallet', {chainId: `${network.chainId}`, chainName: network.chainName});
         img.cursor = 'default';
       }
       img.setAttribute('network-name', network.chainName);
@@ -1396,7 +1401,7 @@ export default class ScomSwap extends Module implements BlockNoteSpecs {
     this.feesInfo.appendChild(
       <i-hstack horizontalAlignment="space-between" verticalAlignment="center" margin={{ top: 16 }}>
         <i-hstack verticalAlignment="center">
-          <i-label caption="Total Transaction Fee" />
+          <i-label caption="$total_transaction_fee" />
         </i-hstack>
         <i-label margin={{ left: 'auto' }} caption={tradeFeeExactAmount} />
       </i-hstack>
@@ -1454,6 +1459,7 @@ export default class ScomSwap extends Module implements BlockNoteSpecs {
   }
 
   async init() {
+    this.i18n.init({...mainJson});
     await super.init();
     this.$eventBus = application.EventBus;
     this.registerEvent();
@@ -1544,7 +1550,7 @@ export default class ScomSwap extends Module implements BlockNoteSpecs {
                   <i-vstack gap={5} minWidth={230} width="100%">
                     <i-vstack id="srcChainBox" width="100%" margin={{ top: 8, bottom: 8 }} visible={false}>
                       <i-hstack gap={8} horizontalAlignment="space-between">
-                        <i-label opacity={0.8} caption="Source Chain" minWidth="7rem" />
+                        <i-label opacity={0.8} caption="$source_chain" minWidth="7rem" />
                         <i-label id="srcChainLabel" textOverflow="ellipsis" margin={{ left: 'auto' }} caption="-" />
                       </i-hstack>
                       <i-hstack id="srcChainList" wrap="wrap" verticalAlignment="center" maxWidth="100%" />
@@ -1553,13 +1559,13 @@ export default class ScomSwap extends Module implements BlockNoteSpecs {
                       <i-vstack gap={8}>
                         <i-vstack width="100%" gap={8}>
                           <i-vstack width="100%">
-                            <i-label caption="You Swap" font={{ size: '1.125rem' }}></i-label>
+                            <i-label caption="$you_swap" font={{ size: '1.125rem' }}></i-label>
                           </i-vstack>
                           <i-hstack gap={'0.5rem'} horizontalAlignment="end" verticalAlignment="center" width="100%">
-                            <i-label id="payBalance" opacity={0.55} caption="Balance: 0"></i-label>
+                            <i-label id="payBalance" opacity={0.55} caption="$balance"></i-label>
                             <i-button
                               id="maxButton" class="btn-max"
-                              caption="Max" enabled={false}
+                              caption="$max" enabled={false}
                               font={{ weight: 600, size: '1rem', color: Theme.colors.primary.contrastText }}
                               lineHeight={1.5}
                               border={{ radius: '0.5rem' }}
@@ -1606,7 +1612,7 @@ export default class ScomSwap extends Module implements BlockNoteSpecs {
                       </i-vstack>
                     </i-panel>
                     <i-hstack horizontalAlignment="space-between">
-                      <i-label id="lbYouPayTitle" caption="You Pay" font={{ size: '1rem' }}></i-label>
+                      <i-label id="lbYouPayTitle" caption="$you_pay" font={{ size: '1rem' }}></i-label>
                       <i-label id="lbYouPayValue" caption="0" font={{ size: '1rem' }}></i-label>
                     </i-hstack>
                   </i-vstack>
@@ -1662,7 +1668,7 @@ export default class ScomSwap extends Module implements BlockNoteSpecs {
                   <i-vstack gap={5} minWidth={230} width="100%">
                     <i-vstack id="desChainBox" width="100%" margin={{ top: 8, bottom: 8 }} visible={false}>
                       <i-hstack gap={8} horizontalAlignment="space-between">
-                        <i-label opacity={0.8} caption="Destination Chain" minWidth="7rem" />
+                        <i-label opacity={0.8} caption="$destination_chain" minWidth="7rem" />
                         <i-label id="desChainLabel" textOverflow="ellipsis" margin={{ left: 'auto' }} caption="-" />
                       </i-hstack>
                       <i-hstack id="desChainList" wrap="wrap" verticalAlignment="center" maxWidth="100%" />
@@ -1671,10 +1677,10 @@ export default class ScomSwap extends Module implements BlockNoteSpecs {
                       <i-vstack height="100%" gap={8}>
                         <i-vstack width="100%" gap={8}>
                           <i-vstack width="100%">
-                            <i-label caption="You Receive" font={{ size: '1.125rem' }}></i-label>
+                            <i-label caption="$you_receive" font={{ size: '1.125rem' }}></i-label>
                           </i-vstack>
                           <i-hstack horizontalAlignment="end" width="100%">
-                            <i-label id="receiveBalance" opacity={0.55} margin={{ left: 'auto' }} caption="Balance: 0"></i-label>
+                            <i-label id="receiveBalance" opacity={0.55} margin={{ left: 'auto' }} caption="$balance"></i-label>
                           </i-hstack>
                         </i-vstack>
                         <i-panel
@@ -1714,7 +1720,7 @@ export default class ScomSwap extends Module implements BlockNoteSpecs {
                       </i-vstack>
                     </i-panel>
                     <i-hstack horizontalAlignment="end">
-                      <i-label id="lbRouting" caption="No routing" opacity={0} font={{ size: '1rem' }} />
+                      <i-label id="lbRouting" caption="$no_routing" opacity={0} font={{ size: '1rem' }} />
                     </i-hstack>
                   </i-vstack>
                 </i-grid-layout>
@@ -1726,7 +1732,7 @@ export default class ScomSwap extends Module implements BlockNoteSpecs {
                 gap={'0.25rem'}
               >
                 <i-icon name="star" fill={Theme.colors.primary.main} width={13} height={13} />
-                <i-label caption="No crosschain routes are found. You may try updating the input amount or selecting another token." opacity={0.9} font={{ color: Theme.colors.primary.main, size: '0.8rem' }} />
+                <i-label caption="$no_crosschain_routes_are_found_you_may_try_updating_the_input_amount_or_selecting_another_token" opacity={0.9} font={{ color: Theme.colors.primary.main, size: '0.8rem' }} />
               </i-hstack>
               <i-panel id="pnlPriceInfo" />
               <i-vstack
@@ -1763,7 +1769,7 @@ export default class ScomSwap extends Module implements BlockNoteSpecs {
               >
                 <i-label
                   font={{ color: Theme.colors.primary.main, size: '1.25rem', weight: 700 }}
-                  caption="Confirm Swap"
+                  caption="$confirm_swap"
                 ></i-label>
                 <i-icon
                   fill={Theme.colors.primary.main}
@@ -1831,8 +1837,8 @@ export default class ScomSwap extends Module implements BlockNoteSpecs {
                   </i-hstack>
                   <i-vstack justifyContent='end'>
                     <i-label id="crossChainSoftCapLabel1" opacity={0.55} margin={{ left: 'auto' }}></i-label>
-                    <i-label id="targetVaultAssetBalanceLabel1" opacity={0.55} margin={{ left: 'auto' }} caption="Vault Asset Balance: 0"></i-label>
-                    <i-label id="targetVaultBondBalanceLabel1" opacity={0.55} margin={{ left: 'auto' }} caption="Vault Bond Balance: 0"></i-label>
+                    <i-label id="targetVaultAssetBalanceLabel1" opacity={0.55} margin={{ left: 'auto' }} caption="$vault_asset_balance"></i-label>
+                    <i-label id="targetVaultBondBalanceLabel1" opacity={0.55} margin={{ left: 'auto' }} caption="$vault_bond_balance"></i-label>
                   </i-vstack>
                   <i-icon
                     width={28} height={28} name="arrow-down" fill={Theme.input.fontColor}
@@ -1857,8 +1863,8 @@ export default class ScomSwap extends Module implements BlockNoteSpecs {
                 </i-hstack>
                 <i-vstack id="crossChainVaultInfoVstack" justifyContent='end'>
                   <i-label id="crossChainSoftCapLabel2" opacity={0.55} margin={{ left: 'auto' }}></i-label>
-                  <i-label id="targetVaultAssetBalanceLabel2" opacity={0.55} margin={{ left: 'auto' }} caption="Vault Asset Balance: 0"></i-label>
-                  <i-label id="targetVaultBondBalanceLabel2" opacity={0.55} margin={{ left: 'auto' }} caption="Vault Bond Balance: 0"></i-label>
+                  <i-label id="targetVaultAssetBalanceLabel2" opacity={0.55} margin={{ left: 'auto' }} caption="$vault_asset_balance"></i-label>
+                  <i-label id="targetVaultBondBalanceLabel2" opacity={0.55} margin={{ left: 'auto' }} caption="$vault_bond_balance"></i-label>
                 </i-vstack>
                 <i-label id="lbEstimate" display="block" margin={{ bottom: '1rem' }}></i-label>
                 <i-hstack margin={{ bottom: '1rem' }} gap={'0.25rem'}>
@@ -1882,7 +1888,7 @@ export default class ScomSwap extends Module implements BlockNoteSpecs {
                   id="swapModalConfirmBtn"
                   class="btn-os"
                   height="auto" width={'100%'}
-                  caption="Confirm Swap"
+                  caption="$confirm_swap"
                   border={{ radius: '0.65rem' }}
                   font={{ size: '1.125rem', color: Theme.colors.primary.contrastText, bold: true }}
                   opacity={1}
@@ -1906,7 +1912,7 @@ export default class ScomSwap extends Module implements BlockNoteSpecs {
               >
                 <i-label
                   font={{ color: Theme.colors.primary.main, size: '0.875rem', weight: 700 }}
-                  caption="Transaction Fee Details"
+                  caption="$transaction_fee_details"
                 ></i-label>
                 <i-icon
                   fill={Theme.colors.primary.main}
@@ -1924,7 +1930,7 @@ export default class ScomSwap extends Module implements BlockNoteSpecs {
                   margin={{ bottom: '0.5rem' }}
                 >
                   <i-button
-                    caption="Close"
+                    caption="$close"
                     class="btn-os"
                     lineHeight={1.5}
                     width='150px' height="auto"

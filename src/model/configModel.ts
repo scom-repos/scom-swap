@@ -228,7 +228,7 @@ export class ConfigModel {
               verticalAlignment: 'center',
             });
             const button = new Button(hstack, {
-              caption: 'Confirm',
+              caption: '$Confirm',
               width: '100%',
               height: 40,
               font: { color: Theme.colors.primary.contrastText }

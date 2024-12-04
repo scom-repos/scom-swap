@@ -1,6 +1,7 @@
 import { customElements, customModule, Module, Container, ControlElement, Modal, application, IEventBus, Styles } from '@ijstech/components';
 import { State } from '../store/index';
 import { EventId } from '../global/index';
+import { settingsJson } from '../languages/index';
 const Theme = Styles.Theme.ThemeVars;
 
 declare global {
@@ -38,6 +39,11 @@ export class ExpertModeSettings extends Module {
     this.$eventBus.dispatch(EventId.ExpertModeChanged)
   }
 
+  init() {
+    this.i18n.init({...settingsJson});
+    super.init();
+  }
+
 	render() {
 		return (
       <i-modal
@@ -53,7 +59,7 @@ export class ExpertModeSettings extends Module {
         >
           <i-label
             font={{color: Theme.colors.primary.main, weight: 700, size: '1.125rem'}}
-            caption="Expert Mode"
+            caption="$expert_mode"
             margin={{left: 'auto', right: 'auto'}}
             padding={{left: '2rem', right: '2rem'}}
           ></i-label>
@@ -73,18 +79,18 @@ export class ExpertModeSettings extends Module {
             border={{width: '1px', style: 'solid', color: '#f15e61', radius: '0.5rem'}}
           >
             <i-label
-              caption="Expert mode allows high slippage trades that often result in bad rates and lost funds."
+              caption="$expert_mode_allows_high_slippage_trades_that_often_result_in_bad_rates_and_lost_funds"
               font={{weight: 'bold', color: Theme.colors.primary.contrastText, size: '1rem'}}
             ></i-label>
           </i-panel>
           <i-label
             class="warning-text"
-            caption="Only use this mode if you know what you are doing."
+            caption="$only_use_this_mode_if_you_know_what_you_are_doing"
             font={{weight: 'bold', color: Theme.colors.warning.light, size: '1.05rem'}}
           ></i-label>
           <i-button
             width="100%" height="auto"
-            caption="Turn On Expert Mode"
+            caption="$turn_on_expert_mode"
             padding={{top: '0.75rem', bottom: '0.75rem', left: '0.75rem', right: '0.75rem'}}
             margin={{top: '1.25rem', bottom: '0.5rem'}}
             font={{color: Theme.colors.primary.contrastText, weight: 700}}

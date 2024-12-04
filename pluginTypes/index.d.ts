@@ -464,6 +464,158 @@ declare module "@scom/scom-swap/swap-utils/index.ts" {
     }>;
     export { getExtendedRouteObjData, getTradeFeeMap, getAllRoutesData, getPair, SwapData, executeSwap, getChainNativeToken, getRouterAddress, setApprovalModalSpenderAddress, getProviderProxySelectors, getCommissionRate, getCrossChainRouteOptions, createBridgeVaultOrder };
 }
+/// <amd-module name="@scom/scom-swap/languages/main.json.ts" />
+declare module "@scom/scom-swap/languages/main.json.ts" {
+    const _default: {
+        en: {
+            confirm_swap: string;
+            transaction_fee_details: string;
+            close: string;
+            vault_bond_balance: string;
+            vault_asset_balance: string;
+            no_crosschain_routes_are_found_you_may_try_updating_the_input_amount_or_selecting_another_token: string;
+            no_routing: string;
+            balance: string;
+            you_receive: string;
+            you_pay: string;
+            destination_chain: string;
+            source_chain: string;
+            you_swap: string;
+            total_transaction_fee: string;
+            exceed_vault_asset_balance_or_bond_balance: string;
+            cap_reached: string;
+            cap: string;
+            you_will_pay_at_most: string;
+            you_will_receive_at_least: string;
+            input_is_estimated_if_the_price_change_by_more_than_your_transaction_will_revert: string;
+            output_is_estimated_if_the_price_change_by_more_than_your_transaction_will_revert: string;
+            if_the_order_is_not_executed_in_the_target_chain_the_estimated_withdrawalble_amount_is: string;
+            swapping: string;
+            approving: string;
+            max: string;
+            swap_supports_this_network_please_switch_network_in_the_connected_wallet: string;
+            connect_wallet: string;
+            switch_network: string;
+            approve: string;
+            swap: string;
+            create_order: string;
+            turn_on_expert_mode: string;
+            insufficient_balance: string;
+            invalid_pair: string;
+            circuit_breaker_triggered: string;
+        };
+        "zh-hant": {};
+        vi: {
+            confirm_swap: string;
+            transaction_fee_details: string;
+            close: string;
+            vault_bond_balance: string;
+            vault_asset_balance: string;
+            no_crosschain_routes_are_found_you_may_try_updating_the_input_amount_or_selecting_another_token: string;
+            no_routing: string;
+            balance: string;
+            you_receive: string;
+            you_pay: string;
+            destination_chain: string;
+            source_chain: string;
+            you_swap: string;
+            total_transaction_fee: string;
+            exceed_vault_asset_balance_or_bond_balance: string;
+            cap_reached: string;
+            cap: string;
+            you_will_pay_at_most: string;
+            you_will_receive_at_least: string;
+            input_is_estimated_if_the_price_change_by_more_than_your_transaction_will_revert: string;
+            output_is_estimated_if_the_price_change_by_more_than_your_transaction_will_revert: string;
+            if_the_order_is_not_executed_in_the_target_chain_the_estimated_withdrawalble_amount_is: string;
+            swapping: string;
+            approving: string;
+            max: string;
+            swap_supports_this_network_please_switch_network_in_the_connected_wallet: string;
+            price_impact_too_high_if_you_want_to_bypass_this_check_please_turn_on_expert_mode: string;
+            connect_wallet: string;
+            switch_network: string;
+            approve: string;
+            swap: string;
+            create_order: string;
+            turn_on_expert_mode: string;
+            insufficient_balance: string;
+            invalid_pair: string;
+            circuit_breaker_triggered: string;
+        };
+    };
+    export default _default;
+}
+/// <amd-module name="@scom/scom-swap/languages/settings.json.ts" />
+declare module "@scom/scom-swap/languages/settings.json.ts" {
+    const _default_1: {
+        en: {
+            expert_mode: string;
+            expert_mode_allows_high_slippage_trades_that_often_result_in_bad_rates_and_lost_funds: string;
+            only_use_this_mode_if_you_know_what_you_are_doing: string;
+            turn_on_expert_mode: string;
+            click_to_view_details: string;
+            rate: string;
+            price_impact: string;
+            maximum_sold: string;
+            transaction_fee: string;
+            estimated_time: string;
+            minimum_received: string;
+            "30_seconds": string;
+            price_impact_too_high_if_you_want_to_bypass_this_check_please_turn_on_expert_mode: string;
+            source_chain_liquidity_fee: string;
+            target_chain_liquidity_fee: string;
+            this_fee_is_paid_to_the_amm_liquidity_providers_on_the_source_chain: string;
+            this_fee_is_paid_to_the_amm_liquidity_providers_on_the_target_chain: string;
+            base_fee: string;
+            this_fee_is_paid_to_the_trolls_to_cover_gas_fee_on_the_target_chain: string;
+            protocol_fee: string;
+            this_fee_is_paid_to_the_troll_owners_on_the_cross_chain_network: string;
+            imbalance_fee: string;
+            this_fee_is_acted_as_an_incentive_to_balance_the_vault: string;
+            bridge_vault_liquidity_fee: string;
+            this_fee_is_paid_to_the_bridge_vault_liquidity_provider_on_target_chain: string;
+            liquidity_provider_fee: string;
+            this_fee_is_paid_to_the_amm_liquidity_provider: string;
+        };
+        "zh-hant": {};
+        vi: {
+            expert_mode: string;
+            expert_mode_allows_high_slippage_trades_that_often_result_in_bad_rates_and_lost_funds: string;
+            only_use_this_mode_if_you_know_what_you_are_doing: string;
+            turn_on_expert_mode: string;
+            click_to_view_details: string;
+            rate: string;
+            price_impact: string;
+            maximum_sold: string;
+            transaction_fee: string;
+            estimated_time: string;
+            minimum_received: string;
+            "30_seconds": string;
+            source_chain_liquidity_fee: string;
+            target_chain_liquidity_fee: string;
+            this_fee_is_paid_to_the_amm_liquidity_providers_on_the_source_chain: string;
+            this_fee_is_paid_to_the_amm_liquidity_providers_on_the_target_chain: string;
+            base_fee: string;
+            this_fee_is_paid_to_the_trolls_to_cover_gas_fee_on_the_target_chain: string;
+            protocol_fee: string;
+            this_fee_is_paid_to_the_troll_owners_on_the_cross_chain_network: string;
+            imbalance_fee: string;
+            this_fee_is_acted_as_an_incentive_to_balance_the_vault: string;
+            bridge_vault_liquidity_fee: string;
+            this_fee_is_paid_to_the_bridge_vault_liquidity_provider_on_target_chain: string;
+            liquidity_provider_fee: string;
+            this_fee_is_paid_to_the_amm_liquidity_provider: string;
+        };
+    };
+    export default _default_1;
+}
+/// <amd-module name="@scom/scom-swap/languages/index.ts" />
+declare module "@scom/scom-swap/languages/index.ts" {
+    import mainJson from "@scom/scom-swap/languages/main.json.ts";
+    import settingsJson from "@scom/scom-swap/languages/settings.json.ts";
+    export { mainJson, settingsJson };
+}
 /// <amd-module name="@scom/scom-swap/price-info/index.tsx" />
 declare module "@scom/scom-swap/price-info/index.tsx" {
     import { Module, Control, ControlElement, Icon, Container } from '@ijstech/components';
@@ -509,12 +661,13 @@ declare module "@scom/scom-swap/expert-mode-settings/index.tsx" {
         closeModal(): void;
         showModal(): void;
         onToggle(): void;
+        init(): void;
         render(): any;
     }
 }
 /// <amd-module name="@scom/scom-swap/data.json.ts" />
 declare module "@scom/scom-swap/data.json.ts" {
-    const _default: {
+    const _default_2: {
         infuraId: string;
         apiEndpoints: {
             tradingRouting: string;
@@ -546,7 +699,7 @@ declare module "@scom/scom-swap/data.json.ts" {
             showFooter: boolean;
         };
     };
-    export default _default;
+    export default _default_2;
 }
 /// <amd-module name="@scom/scom-swap/index.css.ts" />
 declare module "@scom/scom-swap/index.css.ts" {
@@ -959,6 +1112,7 @@ declare module "@scom/scom-swap/model/configModel.ts" {
 }
 /// <amd-module name="@scom/scom-swap/model/swapModel.ts" />
 declare module "@scom/scom-swap/model/swapModel.ts" {
+    import { Module } from "@ijstech/components";
     import { State } from "@scom/scom-swap/store/index.ts";
     import { BigNumber, INetwork } from "@ijstech/eth-wallet";
     import { ITokenObject } from "@scom/scom-token-list";
@@ -987,7 +1141,8 @@ declare module "@scom/scom-swap/model/swapModel.ts" {
         private _swapButtonStatusMap;
         private _approveButtonStatusMap;
         private _crossChainApprovalStatus;
-        constructor(state: State, configModel: ConfigModel, options: ISwapOptions);
+        private module;
+        constructor(module: Module, state: State, configModel: ConfigModel, options: ISwapOptions);
         get crossChainApprovalStatus(): ApprovalStatus;
         set crossChainApprovalStatus(value: ApprovalStatus);
         get swapButtonStatusMap(): {

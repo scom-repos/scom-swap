@@ -1,0 +1,87 @@
+export default {
+  "en": {
+    "confirm_swap": "Confirm Swap",
+    "transaction_fee_details": "Transaction Fee Details",
+    "close": "Close",
+    "vault_bond_balance": "Vault Bond Balance",
+    "vault_asset_balance": "Vault Asset Balance",
+    "no_crosschain_routes_are_found_you_may_try_updating_the_input_amount_or_selecting_another_token": "No crosschain routes are found. You may try updating the input amount or selecting another token.",
+    "no_routing": "No routing",
+    "balance": "Balance",
+    "you_receive": "You Receive",
+    "you_pay": "You Pay",
+    "destination_chain": "Destination Chain",
+    "source_chain": "Source Chain",
+    "you_swap": "You Swap",
+    "total_transaction_fee": "Total Transaction Fee",
+    "exceed_vault_asset_balance_or_bond_balance": "Exceed Vault Asset Balance or Bond Balance",
+    "cap_reached": "Cap Reached",
+    "cap": "Cap",
+    "you_will_pay_at_most": "You will pay at most",
+    "you_will_receive_at_least": "You will receive at least",
+    "input_is_estimated_if_the_price_change_by_more_than_your_transaction_will_revert": "Input is estimated. If the price changes unfavorably by more than {{value}}% your transaction will revert.",
+    "output_is_estimated_if_the_price_change_by_more_than_your_transaction_will_revert": "Output is estimated. If the price changes unfavorably by more than {{value}}% your transaction will revert.",
+    "if_the_order_is_not_executed_in_the_target_chain_the_estimated_withdrawalble_amount_is": "If the order is not executed in the target chain, the estimated withdrawalble amount is",
+    "swapping": "Swapping",
+    "approving": "Approving",
+    "max" : "Max",
+    "swap_supports_this_network_please_switch_network_in_the_connected_wallet":
+    "Swap supports this network {{chainName}} ({{chainId}}), please switch network in the connected wallet.",
+    "connect_wallet": "Connect Wallet",
+    "switch_network": "Switch Network",
+    "approve": "Approve",
+    "swap": "Swap",
+    "create_order": "Create Order",
+    "turn_on_expert_mode": "Turn On Expert Mode",
+    "insufficient_balance": "Insufficient {{symbol}} balance",
+    "invalid_pair": "Invalid pair",
+    "circuit_breaker_triggered": "Circuit breaker triggered"
+  },
+  "zh-hant": {
+
+  },
+  "vi": {
+    "confirm_swap": "Xác nhận Hoán đổi",
+    "transaction_fee_details": "Chi tiết Phí Giao dịch",
+    "close": "Đóng",
+    "vault_bond_balance": "Dư nợ trái phiếu",
+    "vault_asset_balance": "Tổng tài sản",
+    "no_crosschain_routes_are_found_you_may_try_updating_the_input_amount_or_selecting_another_token": 
+      "Không tìm thấy tuyến đường crosschain. Bạn có thể thử cập nhật số tiền đã nhập hoặc chọn token khác.",
+    "no_routing": "Không có định tuyến",
+    "balance": "Số dư",
+    "you_receive": "Bạn Nhận",
+    "you_pay": "Bạn Trả",
+    "destination_chain": "Chuỗi Đích",
+    "source_chain": "Chuỗi Nguồn",
+    "you_swap": "Bạn Hoán đổi",
+    "total_transaction_fee": "Tổng Phí Giao dịch",
+    "exceed_vault_asset_balance_or_bond_balance": "Vượt quá Tổng tài sản hoặc Dư nợ trái phiếu",
+    "cap_reached": "Đã đạt Giới hạn",
+    "cap": "Giới hạn",
+    "you_will_pay_at_most": "Bạn sẽ trả tối đa",
+    "you_will_receive_at_least": "Bạn sẽ nhận ít nhất",
+    "input_is_estimated_if_the_price_change_by_more_than_your_transaction_will_revert": 
+      "Số tiền nhập là ước tính. Nếu giá thay đổi không thuận lợi nhiều hơn {{value}}%, giao dịch của bạn sẽ bị hoàn tác.",
+    "output_is_estimated_if_the_price_change_by_more_than_your_transaction_will_revert": 
+      "Số tiền đầu ra là ước tính. Nếu giá thay đổi không thuận lợi nhiều hơn {{value}}%, giao dịch của bạn sẽ bị hoàn tác.",
+    "if_the_order_is_not_executed_in_the_target_chain_the_estimated_withdrawalble_amount_is": 
+      "Nếu đơn hàng không được thực hiện trong chuỗi đích, số tiền có thể rút ước tính là",
+    "swapping": "Đang Hoán đổi",
+    "approving": "Đang Chấp thuận",
+    "max": "Tối đa",
+    "swap_supports_this_network_please_switch_network_in_the_connected_wallet": 
+      "Hoán đổi hỗ trợ mạng lưới {{chainName}} ({{chainId}}), vui lòng chuyển mạng trong ví đã kết nối.",
+      "price_impact_too_high_if_you_want_to_bypass_this_check_please_turn_on_expert_mode": 
+      "Tác động giá quá cao. Nếu bạn muốn bỏ qua kiểm tra này, hãy bật chế độ Chuyên gia.",
+    "connect_wallet": "Kết nối Ví",
+    "switch_network": "Chuyển Mạng",
+    "approve": "Phê duyệt",
+    "swap": "Hoán đổi",
+    "create_order": "Tạo Đơn hàng",
+    "turn_on_expert_mode": "Bật Chế độ Chuyên gia",
+    "insufficient_balance": "Số dư {{symbol}} không đủ",
+    "invalid_pair": "Cặp này không hợp lệ",
+    "circuit_breaker_triggered": "Cầu dao đã kích hoạt"
+  }
+}

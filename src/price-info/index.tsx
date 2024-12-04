@@ -1,5 +1,5 @@
-import { customElements, Module, Control, ControlElement, VStack, Label, Icon, HStack, Container, Styles } from '@ijstech/components';
-
+import { customElements, Module, Control, ControlElement, VStack, Icon, Container, Styles } from '@ijstech/components';
+import { settingsJson } from '../languages/index';
 const Theme = Styles.Theme.ThemeVars;
 
 declare global {
@@ -109,7 +109,7 @@ export class PriceInfo extends Module {
     iconTooltip.classList.add('icon-tooltip');
     if (item.onClick) {
       iconTooltip.cursor = 'pointer';
-      iconTooltip.tooltip.content = 'Click to view details';
+      iconTooltip.tooltip.content = '$click_to_view_details';
       iconTooltip.tooltip.placement = 'right';
       iconTooltip.tooltip.maxWidth = '270px';
       iconTooltip.onClick = item.onClick;
@@ -158,6 +158,7 @@ export class PriceInfo extends Module {
   // }
 
   init() {
+    this.i18n.init({...settingsJson});
     super.init();
   }
 
