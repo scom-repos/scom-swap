@@ -163,7 +163,8 @@ export default class ScomSwap extends Module implements BlockNoteSpecs {
   private targetVaultBondBalanceLabel2: Label;
   private crossChainSoftCapLabel2: Label;
   private crossChainVaultInfoVstack: VStack;
-  private lbReminderRejected: Label;
+  private lbReminderRejectedValue: Label;
+  private pnlReminderRejected: Panel;
 
   static async create(options?: ScomSwapElement, parent?: Container) {
     let self = new this(parent, options);
@@ -723,7 +724,7 @@ export default class ScomSwap extends Module implements BlockNoteSpecs {
         arrow.margin = { top: '0.75rem', left: '6rem', bottom: '0.75rem', right: '6rem' };
       });
     }
-    if (this.lbReminderRejected) this.lbReminderRejected.visible = false;
+    if (this.pnlReminderRejected) this.pnlReminderRejected.visible = false;
     if (isCrossChain && srcChain && desChain) {
       this.srcChainFirstPanel.visible = true;
       this.targetChainFirstPanel.visible = true;
@@ -739,9 +740,9 @@ export default class ScomSwap extends Module implements BlockNoteSpecs {
         this.srcVaultTokenImage.url = tokenAssets.getTokenIconPath(sourceVaultToken, srcChain.chainId);
         this.srcVaultTokenLabel.caption = sourceVaultToken.symbol;
         this.srcVaultTokenValue.caption = formatNumber(vaultTokenFromSourceChain);
-        if (this.lbReminderRejected) {
-          this.lbReminderRejected.visible = true;
-          this.lbReminderRejected.caption = `${this.i18n.get('$if_the_order_is_not_executed_in_the_target_chain_the_estimated_withdrawalble_amount_is')} <b class="text-pink">${formatNumber(vaultTokenFromSourceChain)} ${sourceVaultToken?.symbol}</b>`;
+        if (this.pnlReminderRejected) {
+          this.pnlReminderRejected.visible = true;
+          this.lbReminderRejectedValue.caption = `${formatNumber(vaultTokenFromSourceChain)} ${sourceVaultToken?.symbol}`;
         }
       } else {
         this.srcChainSecondPanel.visible = false;
@@ -984,8 +985,8 @@ export default class ScomSwap extends Module implements BlockNoteSpecs {
         this.targetVaultBondBalanceLabel1.caption = `${this.i18n.get('$vault_bond_balance')}: ${formatNumber(targetVaultBondBalance.toNumber(), 4)} OSWAP`;
         this.targetVaultBondBalanceLabel2.caption = `${this.i18n.get('$vault_bond_balance')}: ${formatNumber(targetVaultBondBalance.toNumber(), 4)} OSWAP`;
       } else {
-        this.targetVaultBondBalanceLabel1.caption = `${this.i18n.get('$vault_bond_balance')}: ${formatNumber(targetVaultBondBalance.toNumber(), 4)} OSWAP &#8776; ${formatNumber(targetVaultBondBalance.div(vaultToOswapPrice).toNumber(), 4)} ${assetSymbol}`;
-        this.targetVaultBondBalanceLabel2.caption = `${this.i18n.get('$vault_bond_balance')}: ${formatNumber(targetVaultBondBalance.toNumber(), 4)} OSWAP &#8776; ${formatNumber(targetVaultBondBalance.div(vaultToOswapPrice).toNumber(), 4)} ${assetSymbol}`;
+        this.targetVaultBondBalanceLabel1.caption = `${this.i18n.get('$vault_bond_balance')}: ${formatNumber(targetVaultBondBalance.toNumber(), 4)} OSWAP ≈ ${formatNumber(targetVaultBondBalance.div(vaultToOswapPrice).toNumber(), 4)} ${assetSymbol}`;
+        this.targetVaultBondBalanceLabel2.caption = `${this.i18n.get('$vault_bond_balance')}: ${formatNumber(targetVaultBondBalance.toNumber(), 4)} OSWAP ≈ ${formatNumber(targetVaultBondBalance.div(vaultToOswapPrice).toNumber(), 4)} ${assetSymbol}`;
       }
       this.crossChainSoftCapLabel1.caption = softCap ? `${this.i18n.get('$cap')}: ${formatNumber(softCap)} ${assetSymbol}` : "-";
       this.crossChainSoftCapLabel2.caption = softCap ? `${this.i18n.get('$cap')}: ${formatNumber(softCap)} ${assetSymbol}` : "-";
@@ -1597,6 +1598,7 @@ export default class ScomSwap extends Module implements BlockNoteSpecs {
                             display='flex'
                             font={{ size: '1.25rem' }}
                             padding={{ left: '0.75rem', right: '0.75rem' }}
+                            overflow={'hidden'}
                             tokenButtonStyles={{
                               background: { color: Theme.background.main },
                               padding: { top: '0.5rem', bottom: '0.5rem', left: '0.5rem', right: '0.5rem' },
@@ -1703,6 +1705,7 @@ export default class ScomSwap extends Module implements BlockNoteSpecs {
                             border={{ radius: '1rem' }}
                             height={'auto'} width={'100%'}
                             display='flex'
+                            overflow={'hidden'}
                             font={{ size: '1.25rem' }}
                             padding={{ left: '0.75rem', right: '0.75rem' }}
                             tokenButtonStyles={{
@@ -1880,6 +1883,12 @@ export default class ScomSwap extends Module implements BlockNoteSpecs {
                 margin={{ top: '1rem', bottom: '1rem' }}
                 width="100%"
               />
+              <i-panel>
+                <i-hstack id="pnlReminderRejected" margin={{ top: 8, bottom: 16 }} display='inline'>
+                  <i-label caption="$if_the_order_is_not_executed_in_the_target_chain_the_estimated_withdrawalble_amount_is" display='inline' />
+                  <i-label id="lbReminderRejectedValue" font={{ color: Theme.colors.primary.main, bold: true }} display='inline' padding={{ left: '0.25rem' }} />
+                </i-hstack>
+              </i-panel>
               <i-panel
                 width="100%"
                 margin={{ top: 10 }}
