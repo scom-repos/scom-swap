@@ -1394,7 +1394,8 @@ declare module "@scom/scom-swap" {
         private targetVaultBondBalanceLabel2;
         private crossChainSoftCapLabel2;
         private crossChainVaultInfoVstack;
-        private lbReminderRejected;
+        private lbReminderRejectedValue;
+        private pnlReminderRejected;
         static create(options?: ScomSwapElement, parent?: Container): Promise<ScomSwap>;
         addBlock(blocknote: any, executeFn: executeFnType, callbackFn?: callbackFnType): {
             block: any;

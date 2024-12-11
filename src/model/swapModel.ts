@@ -633,9 +633,9 @@ export class SwapModel {
     }
     if (value || value == 0) {
       if (isPriceToggled) {
-        return `1 ${fromSymbol} &#8776; ${formatNumber(value)} ${toSymbol}`;
+        return `1 ${fromSymbol} ≈ ${formatNumber(value)} ${toSymbol}`;
       }
-      return `1 ${toSymbol} &#8776; ${formatNumber(value)} ${fromSymbol}`;
+      return `1 ${toSymbol} ≈ ${formatNumber(value)} ${fromSymbol}`;
     }
     return '-';
   }

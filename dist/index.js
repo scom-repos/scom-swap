@@ -1900,11 +1900,11 @@ define("@scom/scom-swap/languages/settings.json.ts", ["require", "exports"], fun
             "turn_on_expert_mode": "Bật chế độ chuyên gia",
             "click_to_view_details": "Nhấp vào để xem chi tiết",
             "rate": "Tỷ giá",
-            "price_impact": "Tác động Giá",
-            "maximum_sold": "Bán Tối đa",
-            "transaction_fee": "Phí Giao dịch",
-            "estimated_time": "Thời gian Ước tính",
-            "minimum_received": "Nhận Tối thiểu",
+            "price_impact": "Tác động giá",
+            "maximum_sold": "Bán tối đa",
+            "transaction_fee": "Phí giao dịch",
+            "estimated_time": "Thời gian ước tính",
+            "minimum_received": "Nhận tối thiểu",
             "30_seconds": "30 giây",
             "source_chain_liquidity_fee": "Phí Thanh khoản Chuỗi Nguồn",
             "target_chain_liquidity_fee": "Phí Thanh khoản Chuỗi Đích",
@@ -3918,9 +3918,9 @@ define("@scom/scom-swap/model/swapModel.ts", ["require", "exports", "@ijstech/co
                 }
                 if (value || value == 0) {
                     if (isPriceToggled) {
-                        return `1 ${fromSymbol} &#8776; ${(0, index_14.formatNumber)(value)} ${toSymbol}`;
+                        return `1 ${fromSymbol} ≈ ${(0, index_14.formatNumber)(value)} ${toSymbol}`;
                     }
-                    return `1 ${toSymbol} &#8776; ${(0, index_14.formatNumber)(value)} ${fromSymbol}`;
+                    return `1 ${toSymbol} ≈ ${(0, index_14.formatNumber)(value)} ${fromSymbol}`;
                 }
                 return '-';
             };
@@ -5138,8 +5138,8 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                     arrow.margin = { top: '0.75rem', left: '6rem', bottom: '0.75rem', right: '6rem' };
                 });
             }
-            if (this.lbReminderRejected)
-                this.lbReminderRejected.visible = false;
+            if (this.pnlReminderRejected)
+                this.pnlReminderRejected.visible = false;
             if (isCrossChain && srcChain && desChain) {
                 this.srcChainFirstPanel.visible = true;
                 this.targetChainFirstPanel.visible = true;
@@ -5155,9 +5155,9 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                     this.srcVaultTokenImage.url = scom_token_list_9.assets.getTokenIconPath(sourceVaultToken, srcChain.chainId);
                     this.srcVaultTokenLabel.caption = sourceVaultToken.symbol;
                     this.srcVaultTokenValue.caption = (0, index_19.formatNumber)(vaultTokenFromSourceChain);
-                    if (this.lbReminderRejected) {
-                        this.lbReminderRejected.visible = true;
-                        this.lbReminderRejected.caption = `${this.i18n.get('$if_the_order_is_not_executed_in_the_target_chain_the_estimated_withdrawalble_amount_is')} <b class="text-pink">${(0, index_19.formatNumber)(vaultTokenFromSourceChain)} ${sourceVaultToken?.symbol}</b>`;
+                    if (this.pnlReminderRejected) {
+                        this.pnlReminderRejected.visible = true;
+                        this.lbReminderRejectedValue.caption = `${(0, index_19.formatNumber)(vaultTokenFromSourceChain)} ${sourceVaultToken?.symbol}`;
                     }
                 }
                 else {
@@ -5405,8 +5405,8 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                     this.targetVaultBondBalanceLabel2.caption = `${this.i18n.get('$vault_bond_balance')}: ${(0, index_19.formatNumber)(targetVaultBondBalance.toNumber(), 4)} OSWAP`;
                 }
                 else {
-                    this.targetVaultBondBalanceLabel1.caption = `${this.i18n.get('$vault_bond_balance')}: ${(0, index_19.formatNumber)(targetVaultBondBalance.toNumber(), 4)} OSWAP &#8776; ${(0, index_19.formatNumber)(targetVaultBondBalance.div(vaultToOswapPrice).toNumber(), 4)} ${assetSymbol}`;
-                    this.targetVaultBondBalanceLabel2.caption = `${this.i18n.get('$vault_bond_balance')}: ${(0, index_19.formatNumber)(targetVaultBondBalance.toNumber(), 4)} OSWAP &#8776; ${(0, index_19.formatNumber)(targetVaultBondBalance.div(vaultToOswapPrice).toNumber(), 4)} ${assetSymbol}`;
+                    this.targetVaultBondBalanceLabel1.caption = `${this.i18n.get('$vault_bond_balance')}: ${(0, index_19.formatNumber)(targetVaultBondBalance.toNumber(), 4)} OSWAP ≈ ${(0, index_19.formatNumber)(targetVaultBondBalance.div(vaultToOswapPrice).toNumber(), 4)} ${assetSymbol}`;
+                    this.targetVaultBondBalanceLabel2.caption = `${this.i18n.get('$vault_bond_balance')}: ${(0, index_19.formatNumber)(targetVaultBondBalance.toNumber(), 4)} OSWAP ≈ ${(0, index_19.formatNumber)(targetVaultBondBalance.div(vaultToOswapPrice).toNumber(), 4)} ${assetSymbol}`;
                 }
                 this.crossChainSoftCapLabel1.caption = softCap ? `${this.i18n.get('$cap')}: ${(0, index_19.formatNumber)(softCap)} ${assetSymbol}` : "-";
                 this.crossChainSoftCapLabel2.caption = softCap ? `${this.i18n.get('$cap')}: ${(0, index_19.formatNumber)(softCap)} ${assetSymbol}` : "-";
@@ -5696,7 +5696,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                                                         this.$render("i-label", { id: "payBalance", opacity: 0.55, caption: "$balance" }),
                                                         this.$render("i-button", { id: "maxButton", class: "btn-max", caption: "$max", enabled: false, font: { weight: 600, size: '1rem', color: Theme.colors.primary.contrastText }, lineHeight: 1.5, border: { radius: '0.5rem' }, padding: { left: '0.5rem', right: '0.5rem' }, onClick: this.onSetMaxBalance }))),
                                                 this.$render("i-panel", { id: "payCol", class: "bg-box", background: { color: Theme.input.background }, width: "100%", margin: { top: 'auto' }, border: { radius: '1rem', width: '2px', style: 'solid', color: 'transparent' } },
-                                                    this.$render("i-scom-token-input", { id: "firstTokenInput", placeholder: '0.0', value: '-', tokenReadOnly: false, isBalanceShown: false, isBtnMaxShown: false, isCommonShown: true, inputReadOnly: true, background: { color: Theme.input.background }, border: { radius: '1rem' }, height: 'auto', width: '100%', display: 'flex', font: { size: '1.25rem' }, padding: { left: '0.75rem', right: '0.75rem' }, tokenButtonStyles: {
+                                                    this.$render("i-scom-token-input", { id: "firstTokenInput", placeholder: '0.0', value: '-', tokenReadOnly: false, isBalanceShown: false, isBtnMaxShown: false, isCommonShown: true, inputReadOnly: true, background: { color: Theme.input.background }, border: { radius: '1rem' }, height: 'auto', width: '100%', display: 'flex', font: { size: '1.25rem' }, padding: { left: '0.75rem', right: '0.75rem' }, overflow: 'hidden', tokenButtonStyles: {
                                                             background: { color: Theme.background.main },
                                                             padding: { top: '0.5rem', bottom: '0.5rem', left: '0.5rem', right: '0.5rem' },
                                                             border: { radius: 8 },
@@ -5747,7 +5747,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                                                     this.$render("i-hstack", { horizontalAlignment: "end", width: "100%" },
                                                         this.$render("i-label", { id: "receiveBalance", opacity: 0.55, margin: { left: 'auto' }, caption: "$balance" }))),
                                                 this.$render("i-panel", { id: "receiveCol", background: { color: Theme.input.background }, width: "100%", margin: { top: 'auto' }, border: { radius: '1rem', width: '2px', style: 'solid', color: 'transparent' } },
-                                                    this.$render("i-scom-token-input", { id: "secondTokenInput", value: '-', placeholder: '0.0', inputReadOnly: true, tokenReadOnly: false, isBalanceShown: false, isBtnMaxShown: false, isCommonShown: true, background: { color: Theme.input.background }, border: { radius: '1rem' }, height: 'auto', width: '100%', display: 'flex', font: { size: '1.25rem' }, padding: { left: '0.75rem', right: '0.75rem' }, tokenButtonStyles: {
+                                                    this.$render("i-scom-token-input", { id: "secondTokenInput", value: '-', placeholder: '0.0', inputReadOnly: true, tokenReadOnly: false, isBalanceShown: false, isBtnMaxShown: false, isCommonShown: true, background: { color: Theme.input.background }, border: { radius: '1rem' }, height: 'auto', width: '100%', display: 'flex', overflow: 'hidden', font: { size: '1.25rem' }, padding: { left: '0.75rem', right: '0.75rem' }, tokenButtonStyles: {
                                                             background: { color: Theme.background.main },
                                                             padding: { top: '0.5rem', bottom: '0.5rem', left: '0.5rem', right: '0.5rem' },
                                                             border: { radius: 8 },
@@ -5823,6 +5823,10 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                                     this.$render("i-label", { id: "payOrReceiveValue", font: { weight: 700, color: Theme.colors.primary.main }, caption: "" }),
                                     this.$render("i-label", { id: "payOrReceiveToken", caption: "" }))),
                             this.$render("i-panel", { id: "priceInfoContainer", background: { color: Theme.background.main }, border: { radius: '1rem', width: '2px', style: 'solid', color: 'transparent' }, margin: { top: '1rem', bottom: '1rem' }, width: "100%" }),
+                            this.$render("i-panel", null,
+                                this.$render("i-hstack", { id: "pnlReminderRejected", margin: { top: 8, bottom: 16 }, display: 'inline' },
+                                    this.$render("i-label", { caption: "$if_the_order_is_not_executed_in_the_target_chain_the_estimated_withdrawalble_amount_is", display: 'inline' }),
+                                    this.$render("i-label", { id: "lbReminderRejectedValue", font: { color: Theme.colors.primary.main, bold: true }, display: 'inline', padding: { left: '0.25rem' } }))),
                             this.$render("i-panel", { width: "100%", margin: { top: 10 } },
                                 this.$render("i-button", { id: "swapModalConfirmBtn", class: "btn-os", height: "auto", width: '100%', caption: "$confirm_swap", border: { radius: '0.65rem' }, font: { size: '1.125rem', color: Theme.colors.primary.contrastText, bold: true }, opacity: 1, lineHeight: 1.5, padding: { left: '0.75rem', right: '0.75rem', top: '0.5rem', bottom: '0.5rem' }, onClick: this.doSwap }))),
                         this.$render("i-modal", { id: "modalFees", width: 490, maxWidth: '100%', padding: { left: '1rem', right: '1rem', top: '0.75rem', bottom: '0.75rem' }, border: { radius: '1rem' } },
