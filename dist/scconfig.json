@@ -23,6 +23,7 @@
         "@scom/scom-token-input",
         "@scom/scom-tx-status-modal",
         "@scom/scom-network-picker",
+        "@scom/scom-upload-modal",
         "@scom/scom-storage",
         "@scom/scom-commission-fee-setup",
         "@scom/scom-blocknote-sdk"

@@ -4415,7 +4415,7 @@ define("@scom/scom-swap/model/index.ts", ["require", "exports", "@scom/scom-swap
     Object.defineProperty(exports, "ConfigModel", { enumerable: true, get: function () { return configModel_1.ConfigModel; } });
     Object.defineProperty(exports, "SwapModel", { enumerable: true, get: function () { return swapModel_1.SwapModel; } });
 });
-define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstech/eth-wallet", "@scom/scom-swap/store/index.ts", "@scom/scom-token-list", "@scom/scom-swap/swap-utils/index.ts", "@scom/scom-swap/global/index.ts", "@scom/scom-swap/expert-mode-settings/index.tsx", "@scom/scom-swap/data.json.ts", "@scom/scom-dex-list", "@scom/scom-swap/index.css.ts", "@scom/scom-swap/model/index.ts", "@scom/scom-blocknote-sdk", "@scom/scom-swap/languages/index.ts"], function (require, exports, components_9, eth_wallet_7, index_17, scom_token_list_9, index_18, index_19, index_20, data_json_2, scom_dex_list_2, index_css_2, model_1, scom_blocknote_sdk_1, index_21) {
+define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstech/eth-wallet", "@scom/scom-swap/store/index.ts", "@scom/scom-token-list", "@scom/scom-swap/swap-utils/index.ts", "@scom/scom-swap/global/index.ts", "@scom/scom-swap/expert-mode-settings/index.tsx", "@scom/scom-swap/data.json.ts", "@scom/scom-dapp-container", "@scom/scom-dex-list", "@scom/scom-swap/index.css.ts", "@scom/scom-swap/model/index.ts", "@scom/scom-blocknote-sdk", "@scom/scom-swap/languages/index.ts"], function (require, exports, components_9, eth_wallet_7, index_17, scom_token_list_9, index_18, index_19, index_20, data_json_2, scom_dapp_container_1, scom_dex_list_2, index_css_2, model_1, scom_blocknote_sdk_1, index_21) {
     "use strict";
     var ScomSwap_1;
     Object.defineProperty(exports, "__esModule", { value: true });
@@ -4665,6 +4665,12 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
         set logo(value) {
             this.configModel.logo = value ?? '';
         }
+        get widgetType() {
+            return this._widgetType;
+        }
+        set widgetType(value) {
+            this._widgetType = value;
+        }
         set width(value) {
             this.resizeLayout();
         }
@@ -4730,6 +4736,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
             this.tag = {};
             this.isInited = false;
             this.clientEvents = [];
+            this._widgetType = scom_dapp_container_1.WidgetType.Standalone;
             this.refreshDappContainer = () => {
                 const rpcWallet = this.rpcWallet;
                 const data = {
@@ -4737,7 +4744,8 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                     wallets: this.wallets,
                     networks: this.networks,
                     showHeader: this.showHeader,
-                    rpcWalletId: rpcWallet.instanceId
+                    rpcWalletId: rpcWallet.instanceId,
+                    widgetType: this.widgetType
                 };
                 if (this.dappContainer?.setData)
                     this.dappContainer.setData(data);
@@ -5682,6 +5690,9 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
             this.initExpertModal();
             const dexList = (0, scom_dex_list_2.default)();
             this.state.setDexInfoList(dexList);
+            const widgetType = this.getAttribute('widgetType', true);
+            if (widgetType)
+                this.widgetType = widgetType;
             const lazyLoad = this.getAttribute('lazyLoad', true, false);
             if (!lazyLoad) {
                 const campaignId = this.getAttribute('campaignId', true);

@@ -1346,6 +1346,7 @@ declare module "@scom/scom-swap" {
     import { ITokenObject } from '@scom/scom-token-list';
     import { ISwapWidgetData, IProviderUI, Category, ICommissionInfo, INetworkConfig, ITokenConfig } from "@scom/scom-swap/global/index.ts";
     import { IWalletPlugin } from '@scom/scom-wallet-modal';
+    import { WidgetType } from '@scom/scom-dapp-container';
     import { BlockNoteEditor, BlockNoteSpecs, callbackFnType, executeFnType } from '@scom/scom-blocknote-sdk';
     export { ISwapWidgetData };
     interface ScomSwapElement extends ControlElement {
@@ -1366,6 +1367,7 @@ declare module "@scom/scom-swap" {
         defaultInputValue?: string;
         defaultOutputValue?: string;
         apiEndpoints?: Record<string, string>;
+        widgetType?: WidgetType;
     }
     global {
         namespace JSX {
@@ -1426,6 +1428,7 @@ declare module "@scom/scom-swap" {
         private expertModal;
         private contractAddress;
         private clientEvents;
+        private _widgetType;
         private minSwapHintLabel;
         private srcChainBox;
         private desChainBox;
@@ -1501,6 +1504,8 @@ declare module "@scom/scom-swap" {
         set title(value: string);
         get logo(): string;
         set logo(value: string);
+        get widgetType(): WidgetType;
+        set widgetType(value: WidgetType);
         set width(value: string | number);
         getConfigurators(): ({
             name: string;

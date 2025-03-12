@@ -27,7 +27,7 @@ import { PriceInfo } from './price-info/index';
 import { ExpertModeSettings } from './expert-mode-settings/index';
 import configData from './data.json';
 import ScomWalletModal, { IWalletPlugin } from '@scom/scom-wallet-modal';
-import ScomDappContainer from '@scom/scom-dapp-container'
+import ScomDappContainer, { WidgetType } from '@scom/scom-dapp-container'
 import getDexList from '@scom/scom-dex-list';
 import ScomTokenInput from '@scom/scom-token-input';
 import ScomTxStatusModal from '@scom/scom-tx-status-modal';
@@ -59,6 +59,7 @@ interface ScomSwapElement extends ControlElement {
   defaultInputValue?: string;
   defaultOutputValue?: string;
   apiEndpoints?: Record<string, string>;
+	widgetType?: WidgetType;
 }
 
 declare global {
@@ -129,6 +130,7 @@ export default class ScomSwap extends Module implements BlockNoteSpecs {
   private expertModal: ExpertModeSettings;
   private contractAddress: string;
   private clientEvents: any[] = [];
+	private _widgetType: WidgetType = WidgetType.Standalone;
 
   // Cross Chain
   private minSwapHintLabel: Label;
@@ -428,7 +430,15 @@ export default class ScomSwap extends Module implements BlockNoteSpecs {
   }
   set logo(value: string) {
     this.configModel.logo = value ?? '';
-  }
+  }	
+
+	get widgetType() {
+		return this._widgetType;
+	}
+
+	set widgetType(value: WidgetType) {
+		this._widgetType = value;
+	}
 
   set width(value: string | number) {
     this.resizeLayout();
@@ -446,7 +456,8 @@ export default class ScomSwap extends Module implements BlockNoteSpecs {
       wallets: this.wallets,
       networks: this.networks,
       showHeader: this.showHeader,
-      rpcWalletId: rpcWallet.instanceId
+      rpcWalletId: rpcWallet.instanceId,
+			widgetType: this.widgetType
     }
     if (this.dappContainer?.setData) this.dappContainer.setData(data);
   }
@@ -1468,6 +1479,8 @@ export default class ScomSwap extends Module implements BlockNoteSpecs {
     this.initExpertModal();
     const dexList = getDexList();
     this.state.setDexInfoList(dexList);
+		const widgetType = this.getAttribute('widgetType', true);
+		if (widgetType) this.widgetType = widgetType;
     const lazyLoad = this.getAttribute('lazyLoad', true, false);
     if (!lazyLoad) {
       const campaignId = this.getAttribute('campaignId', true);
