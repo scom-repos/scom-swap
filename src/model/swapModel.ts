@@ -717,6 +717,7 @@ export class SwapModel {
           providerList: this.originalData?.providers || [],
           campaignId: this.configModel.campaignId,
           referrer: this.configModel.commissions.find(v => v.chainId === this.state.getChainId())?.walletAddress,
+          toAddress: this.configModel.toAddress
         }
 
         const { error } = await executeSwap(this.state, swapData);

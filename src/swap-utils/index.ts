@@ -891,6 +891,7 @@ interface SwapData {
   groupQueueOfferIndex?: number;
   campaignId?: number;
   referrer?: string;
+  toAddress?: string;
 }
 
 
@@ -901,7 +902,7 @@ const executeSwap: (state: State, swapData: SwapData) => Promise<{
   let receipt: TransactionReceipt | null = null;
   const wallet: any = Wallet.getClientInstance();
   try {
-    const toAddress = wallet.account.address;
+    const toAddress = swapData.toAddress || wallet.account.address;
     const slippageTolerance = state.slippageTolerance;
     const transactionDeadlineInMinutes = state.swapTransactionDeadline;
     const transactionDeadline = Math.floor(

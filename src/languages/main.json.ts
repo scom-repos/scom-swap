@@ -35,6 +35,7 @@ export default {
     "you_swap": "You Swap",
     "you_will_pay_at_most": "You will pay at most",
     "you_will_receive_at_least": "You will receive at least",
+    "recipient_address": "Recipient Address",
   },
   "zh-hant": {
     "approve": "批准",
@@ -71,7 +72,8 @@ export default {
     "you_receive": "您收到",
     "you_swap": "您交換",
     "you_will_pay_at_most": "您最多將支付",
-    "you_will_receive_at_least": "您至少將收到"
+    "you_will_receive_at_least": "您至少將收到",
+    "recipient_address": "收款錢包地址",
   },
   "vi": {
     "approve": "Phê duyệt",
@@ -109,5 +111,6 @@ export default {
     "you_swap": "Bạn Hoán đổi",
     "you_will_pay_at_most": "Bạn sẽ trả tối đa",
     "you_will_receive_at_least": "Bạn sẽ nhận ít nhất",
+    "recipient_address": "Địa chỉ ví nhận",
   }
 }

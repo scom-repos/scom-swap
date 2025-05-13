@@ -1735,7 +1735,7 @@ define("@scom/scom-swap/swap-utils/index.ts", ["require", "exports", "@ijstech/e
         let receipt = null;
         const wallet = eth_wallet_4.Wallet.getClientInstance();
         try {
-            const toAddress = wallet.account.address;
+            const toAddress = swapData.toAddress || wallet.account.address;
             const slippageTolerance = state.slippageTolerance;
             const transactionDeadlineInMinutes = state.swapTransactionDeadline;
             const transactionDeadline = Math.floor(Date.now() / 1000 + transactionDeadlineInMinutes * 60);
@@ -1816,6 +1816,7 @@ define("@scom/scom-swap/languages/main.json.ts", ["require", "exports"], functio
             "you_swap": "You Swap",
             "you_will_pay_at_most": "You will pay at most",
             "you_will_receive_at_least": "You will receive at least",
+            "recipient_address": "Recipient Address",
         },
         "zh-hant": {
             "approve": "批准",
@@ -1852,7 +1853,8 @@ define("@scom/scom-swap/languages/main.json.ts", ["require", "exports"], functio
             "you_receive": "您收到",
             "you_swap": "您交換",
             "you_will_pay_at_most": "您最多將支付",
-            "you_will_receive_at_least": "您至少將收到"
+            "you_will_receive_at_least": "您至少將收到",
+            "recipient_address": "收款錢包地址",
         },
         "vi": {
             "approve": "Phê duyệt",
@@ -1890,6 +1892,7 @@ define("@scom/scom-swap/languages/main.json.ts", ["require", "exports"], functio
             "you_swap": "Bạn Hoán đổi",
             "you_will_pay_at_most": "Bạn sẽ trả tối đa",
             "you_will_receive_at_least": "Bạn sẽ nhận ít nhất",
+            "recipient_address": "Địa chỉ ví nhận",
         }
     };
 });
@@ -3400,6 +3403,12 @@ define("@scom/scom-swap/model/configModel.ts", ["require", "exports", "@ijstech/
         set logo(value) {
             this._data.logo = value ?? '';
         }
+        get toAddress() {
+            return this._data.toAddress;
+        }
+        set toAddress(value) {
+            this._data.toAddress = value;
+        }
         determineActionsByTarget(target, category) {
             if (target === 'builder') {
                 return this.getBuilderActions(category);
@@ -4064,6 +4073,7 @@ define("@scom/scom-swap/model/swapModel.ts", ["require", "exports", "@ijstech/co
                             providerList: this.originalData?.providers || [],
                             campaignId: this.configModel.campaignId,
                             referrer: this.configModel.commissions.find(v => v.chainId === this.state.getChainId())?.walletAddress,
+                            toAddress: this.configModel.toAddress
                         };
                         const { error } = await (0, index_15.executeSwap)(this.state, swapData);
                         _error = error;
@@ -4778,7 +4788,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                     this.firstTokenInput.inputReadOnly = false;
                     this.secondTokenInput.tokenReadOnly = isFixedPair;
                     this.secondTokenInput.inputReadOnly = false;
-                    const { logo, title, tokens } = this.configModel;
+                    const { logo, title, tokens, toAddress } = this.configModel;
                     this.pnlBranding.visible = !!logo || !!title;
                     if (logo?.startsWith('ipfs://')) {
                         this.imgLogo.url = logo.replace('ipfs://', '/ipfs/');
@@ -4787,6 +4797,8 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                         this.imgLogo.url = logo;
                     }
                     this.lbTitle.caption = title;
+                    this.pnlToAddress.visible = !!toAddress;
+                    this.lblToAddress.caption = toAddress || "";
                     this.updateSwapButtonCaption();
                     this.toggleReverseImage.cursor = isFixedPair ? 'default' : 'pointer';
                     if (isCrossChain) {
@@ -5710,6 +5722,7 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                 const defaultInputToken = this.getAttribute('defaultInputToken', true);
                 const defaultOutputToken = this.getAttribute('defaultOutputToken', true);
                 const apiEndpoints = this.getAttribute('apiEndpoints', true);
+                const toAddress = this.getAttribute('toAddress', true);
                 let data = {
                     campaignId,
                     category,
@@ -5725,7 +5738,8 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                     defaultOutputValue,
                     defaultInputToken,
                     defaultOutputToken,
-                    apiEndpoints
+                    apiEndpoints,
+                    toAddress
                 };
                 if (!this.configModel.isEmptyData(data)) {
                     await this.setData(data);
@@ -5835,6 +5849,9 @@ define("@scom/scom-swap", ["require", "exports", "@ijstech/components", "@ijstec
                             this.$render("i-hstack", { id: "minSwapHintLabel", verticalAlignment: "center", margin: { top: '-0.5rem' }, gap: '0.25rem' },
                                 this.$render("i-icon", { name: "star", fill: Theme.colors.primary.main, width: 13, height: 13 }),
                                 this.$render("i-label", { caption: "$no_crosschain_routes_are_found_you_may_try_updating_the_input_amount_or_selecting_another_token", opacity: 0.9, font: { color: Theme.colors.primary.main, size: '0.8rem' } })),
+                            this.$render("i-hstack", { id: "pnlToAddress", verticalAlignment: "center", horizontalAlignment: "space-between", padding: { top: '0.25rem', bottom: '0.25rem', left: 0, right: 0 }, gap: "0.5rem", visible: false },
+                                this.$render("i-label", { caption: "$recipient_address", opacity: 0.75 }),
+                                this.$render("i-label", { id: "lblToAddress", overflowWrap: "anywhere" })),
                             this.$render("i-panel", { id: "pnlPriceInfo" }),
                             this.$render("i-vstack", { horizontalAlignment: "center", width: "100%", margin: { top: 10 } },
                                 this.$render("i-button", { id: "swapBtn", class: "btn-os", maxWidth: 360, height: 60, width: '100%', visible: false, rightIcon: { spin: true, visible: false, fill: Theme.colors.primary.contrastText, width: 16, height: 16 }, border: { radius: '0.65rem' }, font: { size: '1.125rem', color: Theme.colors.primary.contrastText, bold: true }, opacity: 1, lineHeight: 1.5, padding: { left: '0.75rem', right: '0.75rem', top: '0.5rem', bottom: '0.5rem' }, onClick: this.onClickSwapButton.bind(this) }))),

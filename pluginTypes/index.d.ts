@@ -67,6 +67,7 @@ declare module "@scom/scom-swap/global/utils/swapInterface.ts" {
         defaultInputValue?: string;
         defaultOutputValue?: string;
         apiEndpoints?: Record<string, string>;
+        toAddress?: string;
     }
 }
 /// <amd-module name="@scom/scom-swap/global/utils/index.ts" />
@@ -450,6 +451,7 @@ declare module "@scom/scom-swap/swap-utils/index.ts" {
         groupQueueOfferIndex?: number;
         campaignId?: number;
         referrer?: string;
+        toAddress?: string;
     }
     const executeSwap: (state: State, swapData: SwapData) => Promise<{
         receipt: TransactionReceipt | null;
@@ -503,6 +505,7 @@ declare module "@scom/scom-swap/languages/main.json.ts" {
             you_swap: string;
             you_will_pay_at_most: string;
             you_will_receive_at_least: string;
+            recipient_address: string;
         };
         "zh-hant": {
             approve: string;
@@ -540,6 +543,7 @@ declare module "@scom/scom-swap/languages/main.json.ts" {
             you_swap: string;
             you_will_pay_at_most: string;
             you_will_receive_at_least: string;
+            recipient_address: string;
         };
         vi: {
             approve: string;
@@ -577,6 +581,7 @@ declare module "@scom/scom-swap/languages/main.json.ts" {
             you_swap: string;
             you_will_pay_at_most: string;
             you_will_receive_at_least: string;
+            recipient_address: string;
         };
     };
     export default _default;
@@ -1096,6 +1101,8 @@ declare module "@scom/scom-swap/model/configModel.ts" {
         set title(value: string);
         get logo(): string;
         set logo(value: string);
+        get toAddress(): string;
+        set toAddress(value: string);
         private determineActionsByTarget;
         private loadCommissionFee;
         private getBuilderActions;
@@ -1140,6 +1147,7 @@ declare module "@scom/scom-swap/model/configModel.ts" {
                 defaultInputValue?: string;
                 defaultOutputValue?: string;
                 apiEndpoints?: Record<string, string>;
+                toAddress?: string;
             }>;
             setData: (properties: ISwapWidgetData, linkParams?: Record<string, any>) => Promise<void>;
             getTag: any;
@@ -1413,6 +1421,8 @@ declare module "@scom/scom-swap" {
         private dappContainer;
         private configModel;
         private swapModel;
+        private pnlToAddress;
+        private lblToAddress;
         private timeout;
         private isPriceToggled;
         private $eventBus;
@@ -1547,6 +1557,7 @@ declare module "@scom/scom-swap" {
                 defaultInputValue?: string;
                 defaultOutputValue?: string;
                 apiEndpoints?: Record<string, string>;
+                toAddress?: string;
             }>;
             setData: (properties: ISwapWidgetData, linkParams?: Record<string, any>) => Promise<void>;
             getTag: any;

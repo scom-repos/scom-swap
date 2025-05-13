@@ -112,6 +112,8 @@ export default class ScomSwap extends Module implements BlockNoteSpecs {
   private dappContainer: ScomDappContainer;
   private configModel: ConfigModel;
   private swapModel: SwapModel;
+  private pnlToAddress: HStack;
+  private lblToAddress: Label;
 
   private timeout: any;
   private isPriceToggled: boolean;
@@ -586,7 +588,7 @@ export default class ScomSwap extends Module implements BlockNoteSpecs {
       this.firstTokenInput.inputReadOnly = false;
       this.secondTokenInput.tokenReadOnly = isFixedPair;
       this.secondTokenInput.inputReadOnly = false;
-      const { logo, title, tokens } = this.configModel;
+      const { logo, title, tokens, toAddress } = this.configModel;
       this.pnlBranding.visible = !!logo || !!title;
       if (logo?.startsWith('ipfs://')) {
         this.imgLogo.url = logo.replace('ipfs://', '/ipfs/');
@@ -595,6 +597,8 @@ export default class ScomSwap extends Module implements BlockNoteSpecs {
         this.imgLogo.url = logo;
       }
       this.lbTitle.caption = title;
+      this.pnlToAddress.visible = !!toAddress;
+      this.lblToAddress.caption = toAddress || "";
 
       this.updateSwapButtonCaption();
 
@@ -1498,6 +1502,7 @@ export default class ScomSwap extends Module implements BlockNoteSpecs {
       const defaultInputToken = this.getAttribute('defaultInputToken', true);
       const defaultOutputToken = this.getAttribute('defaultOutputToken', true);
       const apiEndpoints = this.getAttribute('apiEndpoints', true);
+      const toAddress = this.getAttribute('toAddress', true);
       let data = {
         campaignId,
         category,
@@ -1513,7 +1518,8 @@ export default class ScomSwap extends Module implements BlockNoteSpecs {
         defaultOutputValue,
         defaultInputToken,
         defaultOutputToken,
-        apiEndpoints
+        apiEndpoints,
+        toAddress
       };
       if (!this.configModel.isEmptyData(data)) {
         await this.setData(data);
@@ -1749,6 +1755,17 @@ export default class ScomSwap extends Module implements BlockNoteSpecs {
               >
                 <i-icon name="star" fill={Theme.colors.primary.main} width={13} height={13} />
                 <i-label caption="$no_crosschain_routes_are_found_you_may_try_updating_the_input_amount_or_selecting_another_token" opacity={0.9} font={{ color: Theme.colors.primary.main, size: '0.8rem' }} />
+              </i-hstack>
+              <i-hstack
+                id="pnlToAddress"
+                verticalAlignment="center"
+                horizontalAlignment="space-between"
+                padding={{ top: '0.25rem', bottom: '0.25rem', left: 0, right: 0 }}
+                gap="0.5rem"
+                visible={false}
+              >
+                <i-label caption="$recipient_address" opacity={0.75}></i-label>
+                <i-label id="lblToAddress" overflowWrap="anywhere"></i-label>
               </i-hstack>
               <i-panel id="pnlPriceInfo" />
               <i-vstack

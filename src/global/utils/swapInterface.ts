@@ -63,4 +63,5 @@ export interface ISwapWidgetData {
   defaultInputValue?: string;
   defaultOutputValue?: string;
   apiEndpoints?: Record<string, string>;
+  toAddress?: string;
 }

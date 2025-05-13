@@ -166,6 +166,14 @@ export class ConfigModel {
     this._data.logo = value ?? '';
   }
 
+  get toAddress() {
+    return this._data.toAddress;
+  }
+
+  set toAddress(value: string) {
+    this._data.toAddress = value;
+  }
+
   private determineActionsByTarget(target: 'builder' | 'projectOwner', category?: string) {
     if (target === 'builder') {
       return this.getBuilderActions(category);
