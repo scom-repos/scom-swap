@@ -1239,7 +1239,7 @@ export default class ScomSwap extends Module implements BlockNoteSpecs {
       if (img) {
         this.updateChainIcon(img, true);
       } else {
-        const currentNetwork = getNetworkInfo(bridgeSupportedChainList.find((f: INetwork) => f.chainId == obj.chainId)?.chainId);
+        const currentNetwork = getNetworkInfo(bridgeSupportedChainList.find((f: INetworkConfig) => f.chainId == obj.chainId)?.chainId);
         const img = this.srcChainList.querySelector(`[data-tooltip="${currentNetwork?.chainName}"]`) as Control;
         if (img) this.updateChainIcon(img, true);
       }
@@ -1273,7 +1273,7 @@ export default class ScomSwap extends Module implements BlockNoteSpecs {
       if (img) {
         this.updateChainIcon(img, true);
       } else {
-        const currentNetwork = getNetworkInfo(bridgeSupportedChainList.find((f: INetwork) => f.chainId == obj.chainId)?.chainId);
+        const currentNetwork = getNetworkInfo(bridgeSupportedChainList.find((f: INetworkConfig) => f.chainId == obj.chainId)?.chainId);
         const img = this.desChainList.querySelector(`[data-tooltip="${currentNetwork?.chainName}"]`) as Control;
         img && this.updateChainIcon(img, true);
       }
